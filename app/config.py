@@ -11,6 +11,8 @@ SERVICE_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = SERVICE_ROOT.parent
 DEFAULT_DATA_PATH = (SERVICE_ROOT / "data" / "problems.json").resolve()
 DEFAULT_DB_PATH = (SERVICE_ROOT / "data" / "attempts.db").resolve()
+DEFAULT_CONCEPT_PATH = (SERVICE_ROOT / "data" / "concepts.json").resolve()
+DEFAULT_TEMPLATE_PATH = (SERVICE_ROOT / "data" / "templates.json").resolve()
 
 
 def _load_env_file() -> None:
@@ -80,6 +82,8 @@ class Settings:
     invite_token_bytes: int
     problem_data_path: Path
     attempts_database_path: Path
+    concept_data_path: Path
+    template_data_path: Path
 
 
 def _build_settings() -> Settings:
@@ -105,6 +109,12 @@ def _build_settings() -> Settings:
         ),
         attempts_database_path=_resolve_path(
             os.getenv("ATTEMPTS_DATABASE_PATH"), default=DEFAULT_DB_PATH
+        ),
+        concept_data_path=_resolve_path(
+            os.getenv("CONCEPT_DATA_PATH"), default=DEFAULT_CONCEPT_PATH
+        ),
+        template_data_path=_resolve_path(
+            os.getenv("TEMPLATE_DATA_PATH"), default=DEFAULT_TEMPLATE_PATH
         ),
     )
 

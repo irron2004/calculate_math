@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ALG-AP",
+    "name": "등차 수열 기초",
+    "lens": ["difference"],
+    "prerequisites": [],
+    "transfers": ["ALG-LIN"],
+    "summary": "같은 차이를 반복해 수를 늘리는 구조를 이해합니다.",
+    "stage_span": ["S1", "S2", "S3"],
+    "focus_keywords": ["시작값", "차이", "기울기"]
+  },
+  {
+    "id": "RAT-PRO",
+    "name": "비율과 비례 관계",
+    "lens": ["ratio"],
+    "prerequisites": ["ALG-AP"],
+    "transfers": ["RAT-INV"],
+    "summary": "단위율과 비례식을 다양한 맥락에 연결합니다.",
+    "stage_span": ["S1", "S2", "S3"],
+    "focus_keywords": ["단위율", "기울기", "곱은 일정"]
+  },
+  {
+    "id": "GEO-LIN",
+    "name": "좌표와 직선",
+    "lens": ["scale", "difference"],
+    "prerequisites": ["ALG-AP", "RAT-PRO"],
+    "transfers": ["CAL-CHANGE"],
+    "summary": "좌표평면에서 기울기와 절편을 통해 직선을 해석합니다.",
+    "stage_span": ["S1", "S2", "S3"],
+    "focus_keywords": ["좌표", "기울기", "절편"]
+  }
+]

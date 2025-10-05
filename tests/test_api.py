@@ -32,6 +32,8 @@ list_categories = problem_bank_module.list_categories
 reset_problem_cache = problem_bank_module.reset_cache
 get_settings = config_module.get_settings
 AttemptRepository = repositories_module.AttemptRepository
+template_engine_module = _load_module("app.template_engine")
+reset_template_engine = template_engine_module.reset_engine
 
 
 @pytest.fixture
@@ -70,6 +72,7 @@ def dataset(tmp_path, monkeypatch):
 
     get_settings.cache_clear()  # type: ignore[attr-defined]
     reset_problem_cache()
+    reset_template_engine()
 
     try:
         yield {
@@ -79,6 +82,7 @@ def dataset(tmp_path, monkeypatch):
         }
     finally:
         reset_problem_cache()
+        reset_template_engine()
         get_settings.cache_clear()  # type: ignore[attr-defined]
 
 

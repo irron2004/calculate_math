@@ -284,22 +284,42 @@ async function handleCheck(card) {
     }
 }
 
-function bindCard(card) {
-    const button = card.querySelector('[data-check]');
-    const input = card.querySelector('[data-input]');
-    const correctAnswer = problemData[index]?.answer;
-    if (!button || typeof correctAnswer === 'undefined') {
+function focusNextProblem(currentCard) {
+    const currentIndex = problemCards.indexOf(currentCard);
+    if (currentIndex === -1) {
         return;
     }
-    button.addEventListener('click', () => {
-        void handleCheck(card);
-    });
-    if (input) {
-        input.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                void handleCheck(card);
-            }
+    const nextCard = problemCards[currentIndex + 1];
+    if (!nextCard) {
+        return;
+    }
+    const nextInput = nextCard.querySelector('[data-input]');
+    if (nextInput instanceof HTMLElement) {
+        nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        nextInput.focus();
+        if (typeof nextInput.select === 'function') {
+            nextInput.select();
+        }
+    }
+}
+
+async function checkAndAdvance(card) {
+    await handleCheck(card);
+    focusNextProblem(card);
+}
+
+function bindCard(card) {
+    const button = card.querySelector('[data-check]');
+    const form = card.querySelector('[data-problem-form]');
+    if (button) {
+        button.addEventListener('click', () => {
+            void handleCheck(card);
+        });
+    }
+    if (form) {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            void checkAndAdvance(card);
         });
     }
 }

@@ -8,6 +8,8 @@
 - `/api/v1/login`: 닉네임 기반 학생/부모용 계정 생성 + 로그인
 - `/api/v1/sessions`: React 학습 게임이 사용하는 20문제 세트 생성
 - `/api/categories`: 사용 가능한 문제 카테고리 나열
+- `/api/v1/concepts` · `/api/v1/templates`: 렌즈/템플릿 메타데이터와 문제 인스턴스 생성 API
+- `/api/v1/lrc/evaluate`: Leap Ready Criteria(LRC) 게이트 평가 결과 계산
 - 모든 응답은 `X-Request-ID` 헤더를 보존하며, `X-Robots-Tag: noindex`로 검색 노출을 차단
 - OpenTelemetry 트레이싱/메트릭 설정을 통해 요청별 스팬과 기본 메트릭을 OTLP 수집기로 전송
 

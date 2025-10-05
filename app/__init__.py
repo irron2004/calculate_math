@@ -8,8 +8,9 @@ from fastapi.templating import Jinja2Templates
 from .config import get_settings
 from .instrumentation import RequestContextMiddleware, configure_telemetry
 from .problem_bank import refresh_cache, reset_cache
+from .template_engine import refresh_engine, reset_engine
 from .repositories import AttemptRepository, UserRepository
-from .routers import health, invites, pages, practice, problems
+from .routers import curriculum, health, invites, pages, practice, problems
 
 
 def create_app() -> FastAPI:
@@ -23,6 +24,13 @@ def create_app() -> FastAPI:
         app.state.problem_cache_strategy = {
             "strategy": "file-mtime",
             "source": str(problem_repository.source_path),
+        }
+
+        template_engine = refresh_engine(force=True)
+        app.state.template_engine = template_engine
+        app.state.template_cache_strategy = {
+            "concept_source": str(template_engine.concept_path),
+            "template_source": str(template_engine.template_path),
         }
 
         attempt_repository = AttemptRepository(settings.attempts_database_path)
@@ -42,7 +50,12 @@ def create_app() -> FastAPI:
                 delattr(app.state, "problem_cache_strategy")
             if hasattr(app.state, "problem_repository"):
                 delattr(app.state, "problem_repository")
+            if hasattr(app.state, "template_cache_strategy"):
+                delattr(app.state, "template_cache_strategy")
+            if hasattr(app.state, "template_engine"):
+                delattr(app.state, "template_engine")
             reset_cache()
+            reset_engine()
 
     app = FastAPI(
         title=settings.app_name,
@@ -87,6 +100,7 @@ def create_app() -> FastAPI:
     app.include_router(invite_router)
     app.include_router(problems.router)
     app.include_router(practice.router)
+    app.include_router(curriculum.router)
 
     return app
 
