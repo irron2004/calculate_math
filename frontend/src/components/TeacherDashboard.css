@@ -1,0 +1,313 @@
+.teacher-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.dashboard-header {
+  background: white;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content h1 {
+  font-size: 1.8rem;
+  color: #333;
+  margin: 0 0 5px 0;
+  font-weight: bold;
+}
+
+.header-content p {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.logout-button {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+}
+
+.dashboard-content {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 전체 통계 */
+.overall-stats {
+  margin-bottom: 40px;
+}
+
+.overall-stats h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-icon {
+  margin-right: 15px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #f8f9fa;
+}
+
+.stat-info h3 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 5px 0;
+}
+
+.stat-info p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+/* 학생 섹션 */
+.students-section {
+  margin-bottom: 40px;
+}
+
+.students-section h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.students-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.student-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.student-card:hover {
+  transform: translateY(-5px);
+}
+
+.student-info h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin: 0 0 5px 0;
+  font-weight: bold;
+}
+
+.student-info p {
+  font-size: 1rem;
+  color: #666;
+  margin: 0 0 20px 0;
+}
+
+.student-stats {
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.student-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.view-details-button, .send-message-button {
+  flex: 1;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-details-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.view-details-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.send-message-button {
+  background: #f8f9fa;
+  color: #333;
+  border: 2px solid #e1e5e9;
+}
+
+.send-message-button:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+/* 학년별 통계 */
+.grade-stats {
+  margin-bottom: 40px;
+}
+
+.grade-stats h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.grade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.grade-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.grade-card:hover {
+  transform: translateY(-5px);
+}
+
+.grade-card h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin: 0 0 20px 0;
+  font-weight: bold;
+  text-align: center;
+}
+
+.grade-info p {
+  font-size: 1rem;
+  color: #666;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+.grade-info p:last-child {
+  margin-bottom: 0;
+}
+
+/* 태블릿 반응형 */
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 15px;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-content {
+    padding: 15px;
+  }
+
+  .students-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .student-card {
+    padding: 20px;
+  }
+
+  .student-actions {
+    flex-direction: column;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-info h3 {
+    font-size: 1.5rem;
+  }
+
+  .grade-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .grade-card {
+    padding: 20px;
+  }
+}
+
+/* 모바일 반응형 */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-content h1 {
+    font-size: 1.3rem;
+  }
+
+  .student-stats {
+    margin-bottom: 15px;
+  }
+
+  .stat-item {
+    font-size: 0.8rem;
+  }
+} 

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Invite 초대장 — 360Me Math Lab{% endblock %}
+
+{% block content %}
+<div class="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+    {% if expired %}
+    <section class="space-y-6 rounded-3xl border border-white/10 bg-slate-900/80 p-10 text-center shadow-2xl shadow-sky-900/20">
+        <div class="inline-flex items-center justify-center rounded-full bg-rose-500/20 px-4 py-2 text-sm font-semibold text-rose-200">
+            <span aria-hidden="true">⏱️</span>
+            <span class="ml-2">초대가 만료되었습니다</span>
+        </div>
+        <h1 class="text-3xl font-bold text-white">유효 시간이 지난 초대 링크입니다.</h1>
+        <p class="text-sm text-slate-300">
+            보안을 위해 초대 링크는 일정 시간이 지나면 만료됩니다. 새로운 초대를 생성하려면 연습 문제 페이지에서 다시 Invite 버튼을 눌러주세요.
+        </p>
+        <div class="flex flex-wrap justify-center gap-3">
+            <a href="/problems" class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-sky-300">
+                <span aria-hidden="true">🧮</span> 문제 선택으로 이동
+            </a>
+            <a href="/" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
+                <span aria-hidden="true">🏠</span> Math Lab 홈
+            </a>
+        </div>
+    </section>
+    {% else %}
+    <section class="space-y-8 rounded-3xl border border-white/10 bg-slate-900/80 p-10 shadow-2xl shadow-sky-900/20">
+        <div class="flex flex-col gap-3 text-center">
+            <div class="mx-auto inline-flex items-center gap-2 rounded-full bg-primary/20 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                <span aria-hidden="true">🤝</span> Invite Session
+            </div>
+            <h1 class="text-4xl font-bold text-white">{{ invite.category }} 초대장</h1>
+            <p class="text-sm text-slate-300">
+                360Me Math Lab의 {{ invite.category }} 문제 세트를 함께 풀어보세요. 아래 링크는 초대자가 공유한 학습 현황을 포함하며, 일정 시간이 지나면 자동으로 만료됩니다.
+            </p>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-6">
+            <h2 class="text-lg font-semibold text-white">초대 링크</h2>
+            <p class="mt-2 break-all text-sm text-sky-300">{{ request.url }}</p>
+            <dl class="mt-4 grid gap-4 sm:grid-cols-2 text-sm text-slate-300">
+                <div class="space-y-1">
+                    <dt class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">초대 생성</dt>
+                    <dd>{{ invite.created_at }}</dd>
+                </div>
+                <div class="space-y-1">
+                    <dt class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">만료 예정</dt>
+                    <dd>{{ invite.expires_at }}</dd>
+                </div>
+            </dl>
+            {% if invite.summary %}
+            <dl class="mt-6 grid grid-cols-3 gap-4 text-center">
+                <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-5">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">총 문제</dt>
+                    <dd class="mt-2 text-2xl font-semibold text-white">{{ invite.summary.total }}</dd>
+                </div>
+                <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-5">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">정답</dt>
+                    <dd class="mt-2 text-2xl font-semibold text-white">{{ invite.summary.correct }}</dd>
+                </div>
+                <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-5">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">정답률</dt>
+                    <dd class="mt-2 text-2xl font-semibold text-white">{{ invite.summary.accuracy }}%</dd>
+                </div>
+            </dl>
+            {% endif %}
+        </div>
+        <div class="flex flex-wrap justify-center gap-3">
+            <a href="/problems?category={{ invite.category }}" class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-sky-300">
+                <span aria-hidden="true">🚀</span> 문제 풀기 시작
+            </a>
+            <a href="/" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
+                <span aria-hidden="true">🏠</span> Math Lab 홈
+            </a>
+        </div>
+        <p class="text-center text-xs text-slate-400">
+            본 페이지는 검색 엔진에 노출되지 않으며, 초대 토큰이 만료되면 접근이 자동으로 차단됩니다.
+        </p>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

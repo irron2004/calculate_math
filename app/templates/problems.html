@@ -1,0 +1,579 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category_display }} 문제 — 360Me Math Lab{% endblock %}
+
+{% block content %}
+<div class="mx-auto w-full max-w-5xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
+    <section class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-sky-500 via-primary to-purple-500 px-6 py-14 text-white shadow-2xl sm:px-10">
+        <div class="absolute inset-0 opacity-15" aria-hidden="true"
+             style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.28) 0, transparent 55%),
+                    radial-gradient(circle at 80% 10%, rgba(255,255,255,0.2) 0, transparent 45%);"></div>
+        <div class="relative z-10 space-y-5 text-center">
+            <span class="inline-flex items-center justify-center rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
+                Practice Stage · {{ category_display }} · WCAG 2.2 AA
+            </span>
+            <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">{{ category_display }} 문제 연습</h1>
+            <p class="text-base text-white/85 sm:text-lg">
+                문제를 읽고 답을 입력하면 즉시 피드백이 제공됩니다. Self → Invite → Aggregate 여정의 Practice 단계에 해당합니다.
+                정답률 요약과 학습 노트 링크로 다음 단계에 대비하세요.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a href="/" class="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-white">
+                    <span aria-hidden="true">🏠</span> 허브 홈
+                </a>
+                <a href="http://localhost:8080" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
+                    <span aria-hidden="true">🌐</span> 360Me Hub로 이동
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {% set icon_map = {
+        "덧셈": "➕",
+        "뺄셈": "➖",
+        "곱셈": "✖️",
+        "나눗셈": "➗"
+    } %}
+    <nav aria-label="연산 유형" class="flex flex-wrap items-center justify-center gap-3">
+        {% if categories %}
+        {% for label in categories %}
+        {% set icon = icon_map.get(label, "📘") %}
+        <a href="/problems?category={{ label }}" class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition {% if label == category %}bg-primary text-slate-900 shadow-lg shadow-sky-900/30{% else %}border border-white/20 text-slate-200 hover:bg-white/10{% endif %}">
+            <span aria-hidden="true">{{ icon }}</span> {{ label }}
+        </a>
+        {% endfor %}
+        {% else %}
+        <span class="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-slate-300">활성화된 문제 유형이 없습니다</span>
+        {% endif %}
+    </nav>
+
+    <section aria-labelledby="section-problems" class="space-y-6">
+        <header>
+            <h2 id="section-problems" class="text-2xl font-semibold text-white sm:text-3xl">총 {{ problems|length }}개의 {{ category_display }} 문제</h2>
+            <p class="mt-2 text-sm text-slate-300">포커스 이동과 키보드 입력을 지원하며, 즉시 피드백이 제공됩니다.</p>
+        </header>
+        <div class="space-y-5" data-problem-list>
+            {% for problem in problems %}
+            <article class="rounded-2xl border border-white/10 bg-slate-900/70 p-6 shadow-lg shadow-sky-900/5" data-problem-card data-problem-index="{{ loop.index0 }}" data-problem-id="{{ problem.id }}">
+                <header class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="text-xl font-semibold text-white">
+                        <span class="mr-2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-base font-semibold text-primary">{{ loop.index }}</span>
+                        문제 {{ loop.index }}: {{ problem.question }}
+                    </h3>
+                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70">즉시 채점</span>
+                </header>
+                <form class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center" data-problem-form>
+                    <label for="answer-{{ loop.index }}" class="flex-1">
+                        <span class="sr-only">{{ problem.question }} 정답 입력</span>
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="answer-{{ loop.index }}" class="w-full rounded-xl border border-white/15 bg-slate-950/60 px-4 py-3 text-lg text-white placeholder:text-slate-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="정답을 입력하세요" data-input>
+                    </label>
+                    <button type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-sky-300" data-check>
+                        <span aria-hidden="true">✅</span> 답 확인
+                    </button>
+                </form>
+                <p class="mt-3 text-sm text-slate-300" data-feedback role="status"></p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section aria-labelledby="section-summary" class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-sky-900/10">
+        <header class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 id="section-summary" class="text-2xl font-semibold text-white">학습 결과 요약</h2>
+                <p class="mt-1 text-sm text-slate-300">정답 수와 정확도를 확인하고, Invite 단계로 넘어갈 준비를 마칩니다.</p>
+            </div>
+            <button type="button" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10" data-reset>
+                <span aria-hidden="true">🔄</span> 결과 초기화
+            </button>
+        </header>
+        <dl class="mt-6 grid gap-4 sm:grid-cols-3 text-center">
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
+                <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">총 문제</dt>
+                <dd class="mt-3 text-3xl font-semibold text-white" id="summary-total">{{ problems|length }}</dd>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
+                <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">정답 수</dt>
+                <dd class="mt-3 text-3xl font-semibold text-white" id="summary-correct">0</dd>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
+                <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">정답률</dt>
+                <dd class="mt-3 text-3xl font-semibold text-white" id="summary-accuracy">0%</dd>
+            </div>
+        </dl>
+        <p class="mt-4 text-xs text-slate-400">Tip: 정답률 80% 이상이면 Invite 링크를 생성해 친구나 가족과 함께 풀어보세요.</p>
+    </section>
+
+    <section id="invite" data-invite-section data-category="{{ category or '' }}" data-category-available="{{ 'true' if category_available else 'false' }}" tabindex="-1" class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-sky-900/10 focus:outline-none">
+        <header class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 class="text-2xl font-semibold text-white">Invite 링크 공유</h2>
+                <p class="mt-1 text-sm text-slate-300">현재 스테이지 진행 상황을 공유하고, 가족이나 친구에게 {{ category_display }} 문제를 초대하세요.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <button type="button" class="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60" data-invite-generate data-label-default="초대 링크 생성" data-label-refresh="초대 링크 다시 생성">
+                    <span aria-hidden="true">🤝</span>
+                    <span data-label>초대 링크 생성</span>
+                </button>
+                <button type="button" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60" data-invite-copy disabled>
+                    <span aria-hidden="true">📋</span> 링크 복사
+                </button>
+                <button type="button" class="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white/70 transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60" data-invite-expire disabled>
+                    <span aria-hidden="true">🗑️</span> 초대 만료
+                </button>
+            </div>
+        </header>
+        <p class="mt-4 text-sm text-slate-300" data-invite-status role="status">
+            {% if category_available %}
+            정답률을 확인한 뒤 초대 링크를 생성해보세요.
+            {% else %}
+            문제 유형을 선택해야 초대 링크를 생성할 수 있습니다. 상단에서 카테고리를 먼저 선택해주세요.
+            {% endif %}
+        </p>
+        <div class="mt-6 hidden gap-6 lg:grid lg:grid-cols-[1.3fr_1fr]" data-invite-result>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+                <h3 class="text-lg font-semibold text-white">공유 링크</h3>
+                <a data-invite-url href="#" target="_blank" rel="noopener" class="mt-3 inline-block break-all text-sm text-sky-300 underline underline-offset-4">초대 링크가 아직 생성되지 않았습니다.</a>
+                <p class="mt-3 text-xs text-slate-300">만료 예정: <span data-invite-expiry>—</span></p>
+                <dl class="mt-6 grid grid-cols-3 gap-3 text-center">
+                    <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-4">
+                        <dt class="text-[0.7rem] font-medium uppercase tracking-[0.2em] text-slate-400">총 문제</dt>
+                        <dd class="mt-2 text-xl font-semibold text-white" data-invite-summary-total>0</dd>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-4">
+                        <dt class="text-[0.7rem] font-medium uppercase tracking-[0.2em] text-slate-400">정답</dt>
+                        <dd class="mt-2 text-xl font-semibold text-white" data-invite-summary-correct>0</dd>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-4">
+                        <dt class="text-[0.7rem] font-medium uppercase tracking-[0.2em] text-slate-400">정답률</dt>
+                        <dd class="mt-2 text-xl font-semibold text-white" data-invite-summary-accuracy>0%</dd>
+                    </div>
+                </dl>
+            </div>
+            <div class="flex flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                <p class="text-sm text-slate-300">QR 코드를 스캔하면 초대 링크로 바로 이동할 수 있습니다.</p>
+                <img data-invite-qr src="" alt="초대 링크 QR 코드" class="hidden h-44 w-44 rounded-xl border border-white/20 bg-white/80 p-3 shadow-lg shadow-sky-900/20" loading="lazy" />
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+const problemCards = Array.from(document.querySelectorAll('[data-problem-card]'));
+const problemData = {{ problems|tojson }};
+const summaryCorrect = document.getElementById('summary-correct');
+const summaryAccuracy = document.getElementById('summary-accuracy');
+const summaryTotal = document.getElementById('summary-total');
+const answered = new Map();
+
+function renderSummary() {
+    const correctCount = Array.from(answered.values()).reduce((acc, value) => acc + (value ? 1 : 0), 0);
+    const total = problemData.length || problemCards.length;
+    const accuracy = total === 0 ? 0 : Math.round((correctCount / total) * 100);
+    if (summaryCorrect) {
+        summaryCorrect.textContent = String(correctCount);
+    }
+    if (summaryAccuracy) {
+        summaryAccuracy.textContent = `${accuracy}%`;
+    }
+    if (summaryTotal) {
+        summaryTotal.textContent = String(total);
+    }
+}
+
+function setFeedback(feedbackEl, message, toneClass) {
+    if (!feedbackEl) {
+        return;
+    }
+    feedbackEl.textContent = message;
+    feedbackEl.className = `mt-3 text-sm font-semibold ${toneClass}`;
+}
+
+function extractErrorMessage(payload) {
+    if (!payload) {
+        return '답안을 채점하는 중 오류가 발생했습니다. 다시 시도해주세요.';
+    }
+    if (typeof payload.detail === 'string') {
+        return payload.detail;
+    }
+    if (Array.isArray(payload.detail) && payload.detail[0]?.msg) {
+        return payload.detail[0].msg;
+    }
+    if (payload.detail && typeof payload.detail.detail === 'string') {
+        return payload.detail.detail;
+    }
+    if (typeof payload.message === 'string') {
+        return payload.message;
+    }
+    return '답안을 채점하는 중 오류가 발생했습니다. 다시 시도해주세요.';
+}
+
+async function submitAttempt(problemId, answer) {
+    const response = await fetch(`/api/problems/${encodeURIComponent(problemId)}/attempts`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ answer }),
+    });
+
+    let payload = null;
+    const contentType = response.headers.get('content-type') ?? '';
+    if (contentType.includes('application/json')) {
+        payload = await response.json();
+    }
+
+    if (!response.ok) {
+        const error = new Error(extractErrorMessage(payload));
+        error.payload = payload;
+        error.status = response.status;
+        throw error;
+    }
+
+    return payload;
+}
+
+async function handleCheck(card) {
+    const button = card.querySelector('[data-check]');
+    const input = card.querySelector('[data-input]');
+    const feedback = card.querySelector('[data-feedback]');
+    const problemId = card.dataset.problemId ?? '';
+    const rawValue = input?.value ?? '';
+    const trimmed = rawValue.trim();
+    const userAnswer = Number(trimmed);
+
+    if (!problemId) {
+        setFeedback(feedback, '문제 정보를 찾을 수 없습니다.', 'text-amber-300');
+        return;
+    }
+
+    if (trimmed === '' || !Number.isFinite(userAnswer)) {
+        setFeedback(feedback, '답을 숫자로 입력해주세요.', 'text-amber-300');
+        answered.delete(problemId);
+        renderSummary();
+        return;
+    }
+
+    if (button) {
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+    }
+
+    try {
+        const payload = await submitAttempt(problemId, userAnswer);
+        const isCorrect = Boolean(payload?.is_correct);
+        if (isCorrect) {
+            setFeedback(feedback, '정답입니다! 잘했어요 🎉', 'text-emerald-300');
+        } else {
+            const correctAnswer = payload?.correct_answer;
+            const hint = correctAnswer !== undefined ? `정답은 ${correctAnswer} 입니다.` : '다시 한번 도전해보세요!';
+            setFeedback(feedback, `오답입니다. ${hint}`, 'text-rose-300');
+        }
+        answered.set(problemId, isCorrect);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : '답안을 채점할 수 없습니다.';
+        setFeedback(feedback, message, 'text-amber-300');
+        answered.delete(problemId);
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.removeAttribute('aria-busy');
+        }
+        renderSummary();
+    }
+}
+
+function bindCard(card) {
+    const button = card.querySelector('[data-check]');
+    const input = card.querySelector('[data-input]');
+    const correctAnswer = problemData[index]?.answer;
+    if (!button || typeof correctAnswer === 'undefined') {
+        return;
+    }
+    button.addEventListener('click', () => {
+        void handleCheck(card);
+    });
+    if (input) {
+        input.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                void handleCheck(card);
+            }
+        });
+    }
+}
+
+problemCards.forEach(bindCard);
+renderSummary();
+
+const resetButton = document.querySelector('[data-reset]');
+if (resetButton) {
+    resetButton.addEventListener('click', () => {
+        answered.clear();
+        problemCards.forEach((card) => {
+            const input = card.querySelector('[data-input]');
+            const feedback = card.querySelector('[data-feedback]');
+            if (input) {
+                input.value = '';
+            }
+            if (feedback) {
+                feedback.textContent = '';
+                feedback.className = 'mt-3 text-sm text-slate-300';
+            }
+        });
+        renderSummary();
+    });
+}
+
+const inviteSection = document.querySelector('[data-invite-section]');
+if (inviteSection) {
+    const rawCategoryName = (inviteSection.dataset.category ?? '').trim();
+    const hasValidCategory = (inviteSection.dataset.categoryAvailable ?? 'false') === 'true' && rawCategoryName !== '';
+    const categoryName = hasValidCategory ? rawCategoryName : null;
+    const inviteGenerateButton = inviteSection.querySelector('[data-invite-generate]');
+    const inviteCopyButton = inviteSection.querySelector('[data-invite-copy]');
+    const inviteExpireButton = inviteSection.querySelector('[data-invite-expire]');
+    const inviteResult = inviteSection.querySelector('[data-invite-result]');
+    const inviteStatus = inviteSection.querySelector('[data-invite-status]');
+    const inviteUrlElement = inviteSection.querySelector('[data-invite-url]');
+    const inviteExpiryElement = inviteSection.querySelector('[data-invite-expiry]');
+    const inviteQrImage = inviteSection.querySelector('[data-invite-qr]');
+    const inviteSummaryTotal = inviteSection.querySelector('[data-invite-summary-total]');
+    const inviteSummaryCorrect = inviteSection.querySelector('[data-invite-summary-correct]');
+    const inviteSummaryAccuracy = inviteSection.querySelector('[data-invite-summary-accuracy]');
+    const inviteGenerateLabel = inviteGenerateButton?.querySelector('[data-label]');
+    let inviteState = null;
+
+    const defaultLabel = inviteGenerateButton?.dataset.labelDefault ?? '초대 링크 생성';
+    const refreshLabel = inviteGenerateButton?.dataset.labelRefresh ?? '초대 링크 다시 생성';
+
+    function setInviteStatus(message, tone = 'info') {
+        if (!inviteStatus) {
+            return;
+        }
+        const baseClass = 'mt-4 text-sm font-medium';
+        const toneClass = {
+            success: 'text-emerald-300',
+            error: 'text-rose-300',
+            warning: 'text-amber-300',
+            info: 'text-slate-300',
+            neutral: 'text-slate-400',
+        }[tone] ?? 'text-slate-300';
+        inviteStatus.className = `${baseClass} ${toneClass}`;
+        inviteStatus.textContent = message;
+    }
+
+    function resetInviteState() {
+        inviteState = null;
+        if (inviteCopyButton) {
+            inviteCopyButton.disabled = true;
+        }
+        if (inviteExpireButton) {
+            inviteExpireButton.disabled = true;
+        }
+        if (inviteResult) {
+            inviteResult.classList.add('hidden');
+        }
+        if (inviteGenerateButton && inviteGenerateLabel) {
+            inviteGenerateButton.disabled = !hasValidCategory;
+            if (inviteGenerateButton.disabled) {
+                inviteGenerateButton.setAttribute('aria-disabled', 'true');
+            } else {
+                inviteGenerateButton.removeAttribute('aria-disabled');
+            }
+            inviteGenerateLabel.textContent = defaultLabel;
+        }
+        if (inviteUrlElement) {
+            inviteUrlElement.textContent = '초대 링크가 아직 생성되지 않았습니다.';
+            inviteUrlElement.setAttribute('href', '#');
+        }
+        if (inviteExpiryElement) {
+            inviteExpiryElement.textContent = '—';
+        }
+        if (inviteQrImage) {
+            inviteQrImage.classList.add('hidden');
+            inviteQrImage.removeAttribute('src');
+        }
+        if (inviteSummaryTotal) {
+            inviteSummaryTotal.textContent = '0';
+        }
+        if (inviteSummaryCorrect) {
+            inviteSummaryCorrect.textContent = '0';
+        }
+        if (inviteSummaryAccuracy) {
+            inviteSummaryAccuracy.textContent = '0%';
+        }
+    }
+
+    function toggleGenerateLoading(isLoading) {
+        if (!inviteGenerateButton || !inviteGenerateLabel) {
+            return;
+        }
+        const shouldDisable = isLoading || !hasValidCategory;
+        inviteGenerateButton.disabled = shouldDisable;
+        if (shouldDisable) {
+            inviteGenerateButton.setAttribute('aria-disabled', 'true');
+        } else {
+            inviteGenerateButton.removeAttribute('aria-disabled');
+        }
+        if (isLoading) {
+            inviteGenerateLabel.textContent = '생성 중…';
+        } else if (inviteState) {
+            inviteGenerateLabel.textContent = refreshLabel;
+        } else {
+            inviteGenerateLabel.textContent = defaultLabel;
+        }
+    }
+
+    function computeInviteSummary() {
+        const total = problemData.length || problemCards.length;
+        const correct = Array.from(answered.values()).reduce((acc, value) => acc + (value ? 1 : 0), 0);
+        return { total, correct };
+    }
+
+    function formatDateTime(isoString) {
+        try {
+            const locale = navigator.language || 'ko-KR';
+            const formatter = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' });
+            return formatter.format(new Date(isoString));
+        } catch (error) {
+            return isoString;
+        }
+    }
+
+    function updateInviteState(data) {
+        inviteState = data;
+        if (inviteResult) {
+            inviteResult.classList.remove('hidden');
+        }
+        if (inviteCopyButton) {
+            inviteCopyButton.disabled = false;
+        }
+        if (inviteExpireButton) {
+            inviteExpireButton.disabled = false;
+        }
+        if (inviteUrlElement && data.share_url) {
+            inviteUrlElement.textContent = data.share_url;
+            inviteUrlElement.setAttribute('href', data.share_url);
+        }
+        if (inviteExpiryElement && data.expires_at) {
+            inviteExpiryElement.textContent = formatDateTime(data.expires_at);
+        }
+        if (inviteQrImage && data.share_url) {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.share_url)}`;
+            inviteQrImage.setAttribute('src', qrUrl);
+            inviteQrImage.classList.remove('hidden');
+        }
+        if (inviteSummaryTotal && data.summary?.total != null) {
+            inviteSummaryTotal.textContent = String(data.summary.total);
+        }
+        if (inviteSummaryCorrect && data.summary?.correct != null) {
+            inviteSummaryCorrect.textContent = String(data.summary.correct);
+        }
+        if (inviteSummaryAccuracy && data.summary?.accuracy != null) {
+            inviteSummaryAccuracy.textContent = `${data.summary.accuracy}%`;
+        }
+    }
+
+    async function handleInviteGenerate() {
+        if (!inviteGenerateButton) {
+            return;
+        }
+        if (!hasValidCategory || !categoryName) {
+            setInviteStatus('현재 활성화된 문제 유형이 없어 초대 링크를 생성할 수 없습니다.', 'warning');
+            toggleGenerateLoading(false);
+            return;
+        }
+        toggleGenerateLoading(true);
+        setInviteStatus('초대 링크를 생성 중입니다...', 'info');
+        try {
+            const payload = {
+                category: categoryName,
+                summary: computeInviteSummary(),
+            };
+            const response = await fetch('/api/invites', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({}));
+                const errorMessage = errorBody.detail ?? '초대 링크 생성에 실패했습니다.';
+                throw new Error(errorMessage);
+            }
+            const data = await response.json();
+            updateInviteState(data);
+            setInviteStatus('초대 링크가 생성되었습니다. 링크를 복사하거나 QR 코드를 공유하세요!', 'success');
+            toggleGenerateLoading(false);
+        } catch (error) {
+            console.error(error);
+            setInviteStatus(error.message ?? '초대 링크 생성 중 오류가 발생했습니다.', 'error');
+            toggleGenerateLoading(false);
+        }
+    }
+
+    async function handleInviteCopy() {
+        if (!inviteState?.share_url) {
+            return;
+        }
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(inviteState.share_url);
+                setInviteStatus('링크를 클립보드에 복사했습니다.', 'success');
+            } else {
+                const tempInput = document.createElement('input');
+                tempInput.value = inviteState.share_url;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                setInviteStatus('링크를 복사했습니다.', 'success');
+            }
+        } catch (error) {
+            console.error(error);
+            setInviteStatus('링크 복사에 실패했습니다. 직접 선택해 복사해주세요.', 'warning');
+        }
+    }
+
+    async function handleInviteExpire() {
+        if (!inviteState?.token) {
+            return;
+        }
+        setInviteStatus('초대 링크를 만료 처리 중입니다...', 'info');
+        try {
+            const response = await fetch(`/api/invites/${inviteState.token}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error('초대 만료에 실패했습니다.');
+            }
+            resetInviteState();
+            setInviteStatus('초대 링크가 만료되었습니다. 필요하면 새로 생성하세요.', 'neutral');
+        } catch (error) {
+            console.error(error);
+            setInviteStatus(error.message ?? '초대 링크 만료 처리 중 오류가 발생했습니다.', 'error');
+        }
+    }
+
+    if (inviteGenerateButton) {
+        inviteGenerateButton.addEventListener('click', handleInviteGenerate);
+    }
+    if (inviteCopyButton) {
+        inviteCopyButton.addEventListener('click', handleInviteCopy);
+    }
+    if (inviteExpireButton) {
+        inviteExpireButton.addEventListener('click', handleInviteExpire);
+    }
+
+    resetInviteState();
+    if (!hasValidCategory) {
+        setInviteStatus('현재 선택된 문제 유형이 없어 초대 링크를 생성할 수 없습니다. 카테고리를 선택한 뒤 다시 시도해주세요.', 'warning');
+        return;
+    }
+    setInviteStatus('정답률을 확인한 뒤 초대 링크를 생성해보세요.', 'info');
+}
+</script>
+{% endblock %}

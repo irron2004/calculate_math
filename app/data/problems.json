@@ -1,0 +1,124 @@
+[
+  {
+    "id": "add-1",
+    "category": "덧셈",
+    "question": "15 + 23 = ?",
+    "answer": 38,
+    "hint": "같은 자리끼리 더한 뒤 받아올림을 확인하세요."
+  },
+  {
+    "id": "add-2",
+    "category": "덧셈",
+    "question": "47 + 18 = ?",
+    "answer": 65,
+    "hint": "일의 자리부터 차근차근 더해보세요."
+  },
+  {
+    "id": "add-3",
+    "category": "덧셈",
+    "question": "32 + 45 = ?",
+    "answer": 77
+  },
+  {
+    "id": "add-4",
+    "category": "덧셈",
+    "question": "56 + 29 = ?",
+    "answer": 85
+  },
+  {
+    "id": "add-5",
+    "category": "덧셈",
+    "question": "78 + 34 = ?",
+    "answer": 112
+  },
+  {
+    "id": "sub-1",
+    "category": "뺄셈",
+    "question": "45 - 12 = ?",
+    "answer": 33
+  },
+  {
+    "id": "sub-2",
+    "category": "뺄셈",
+    "question": "67 - 23 = ?",
+    "answer": 44
+  },
+  {
+    "id": "sub-3",
+    "category": "뺄셈",
+    "question": "89 - 34 = ?",
+    "answer": 55
+  },
+  {
+    "id": "sub-4",
+    "category": "뺄셈",
+    "question": "123 - 45 = ?",
+    "answer": 78
+  },
+  {
+    "id": "sub-5",
+    "category": "뺄셈",
+    "question": "156 - 67 = ?",
+    "answer": 89
+  },
+  {
+    "id": "mul-1",
+    "category": "곱셈",
+    "question": "7 × 8 = ?",
+    "answer": 56
+  },
+  {
+    "id": "mul-2",
+    "category": "곱셈",
+    "question": "6 × 9 = ?",
+    "answer": 54
+  },
+  {
+    "id": "mul-3",
+    "category": "곱셈",
+    "question": "4 × 12 = ?",
+    "answer": 48
+  },
+  {
+    "id": "mul-4",
+    "category": "곱셈",
+    "question": "9 × 7 = ?",
+    "answer": 63
+  },
+  {
+    "id": "mul-5",
+    "category": "곱셈",
+    "question": "8 × 6 = ?",
+    "answer": 48
+  },
+  {
+    "id": "div-1",
+    "category": "나눗셈",
+    "question": "56 ÷ 7 = ?",
+    "answer": 8
+  },
+  {
+    "id": "div-2",
+    "category": "나눗셈",
+    "question": "72 ÷ 8 = ?",
+    "answer": 9
+  },
+  {
+    "id": "div-3",
+    "category": "나눗셈",
+    "question": "45 ÷ 5 = ?",
+    "answer": 9
+  },
+  {
+    "id": "div-4",
+    "category": "나눗셈",
+    "question": "63 ÷ 9 = ?",
+    "answer": 7
+  },
+  {
+    "id": "div-5",
+    "category": "나눗셈",
+    "question": "48 ÷ 6 = ?",
+    "answer": 8
+  }
+]
