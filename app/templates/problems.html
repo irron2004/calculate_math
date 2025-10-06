@@ -206,7 +206,9 @@ const answered = new Map();
 const explanations = new Map();
 const attemptTimings = new Map();
 const pageContainer = document.querySelector('[data-problem-container]');
-const currentCategory = pageContainer?.dataset?.category ?? null;
+const currentCategory = pageContainer && pageContainer.dataset && pageContainer.dataset.category
+    ? pageContainer.dataset.category
+    : null;
 
 function trackProblemRTEvent(payload) {
     if (window.analytics && typeof window.analytics.trackProblemRT === 'function') {
@@ -261,7 +263,7 @@ function extractErrorMessage(payload) {
     if (typeof payload.detail === 'string') {
         return payload.detail;
     }
-    if (Array.isArray(payload.detail) && payload.detail[0]?.msg) {
+    if (Array.isArray(payload.detail) && payload.detail[0] && payload.detail[0].msg) {
         return payload.detail[0].msg;
     }
     if (payload.detail && typeof payload.detail.detail === 'string') {
@@ -284,7 +286,7 @@ async function submitAttempt(problemId, answer) {
     });
 
     let payload = null;
-    const contentType = response.headers.get('content-type') ?? '';
+    const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
         payload = await response.json();
     }
@@ -303,12 +305,12 @@ async function handleCheck(card) {
     const button = card.querySelector('[data-check]');
     const input = card.querySelector('[data-input]');
     const feedback = card.querySelector('[data-feedback]');
-    const problemId = card.dataset.problemId ?? '';
-    const rawValue = input?.value ?? '';
+    const problemId = card.dataset.problemId || '';
+    const rawValue = input ? input.value : '';
     const trimmed = rawValue.trim();
     const userAnswer = Number(trimmed);
     const explanationInput = card.querySelector('[data-explanation]');
-    const explanationValue = explanationInput?.value?.trim() ?? '';
+    const explanationValue = explanationInput ? (explanationInput.value || '').trim() : '';
 
     if (!problemId) {
         setFeedback(feedback, '문제 정보를 찾을 수 없습니다.', 'text-amber-300');
@@ -339,11 +341,11 @@ async function handleCheck(card) {
             explanations.delete(problemId);
         }
         const payload = await submitAttempt(problemId, userAnswer);
-        const isCorrect = Boolean(payload?.is_correct);
+        const isCorrect = Boolean(payload && payload.is_correct);
         if (isCorrect) {
             setFeedback(feedback, '정답입니다! 잘했어요 🎉', 'text-emerald-300');
         } else {
-            const correctAnswer = payload?.correct_answer;
+            const correctAnswer = payload ? payload.correct_answer : undefined;
             const hint = correctAnswer !== undefined ? `정답은 ${correctAnswer} 입니다.` : '다시 한번 도전해보세요!';
             setFeedback(feedback, `오답입니다. ${hint}`, 'text-rose-300');
         }
@@ -407,7 +409,7 @@ function bindCard(card) {
     const form = card.querySelector('[data-problem-form]');
     const input = card.querySelector('[data-input]');
     const explanationField = card.querySelector('[data-explanation]');
-    const problemId = card.dataset.problemId ?? '';
+    const problemId = card.dataset.problemId || '';
     if (button) {
         button.addEventListener('click', () => {
             void handleCheck(card);
@@ -467,8 +469,8 @@ if (resetButton) {
 
 const inviteSection = document.querySelector('[data-invite-section]');
 if (inviteSection) {
-    const rawCategoryName = (inviteSection.dataset.category ?? '').trim();
-    const hasValidCategory = (inviteSection.dataset.categoryAvailable ?? 'false') === 'true' && rawCategoryName !== '';
+    const rawCategoryName = (inviteSection.dataset.category || '').trim();
+    const hasValidCategory = (inviteSection.dataset.categoryAvailable || 'false') === 'true' && rawCategoryName !== '';
     const categoryName = hasValidCategory ? rawCategoryName : null;
     const inviteGenerateButton = inviteSection.querySelector('[data-invite-generate]');
     const inviteCopyButton = inviteSection.querySelector('[data-invite-copy]');
@@ -481,11 +483,15 @@ if (inviteSection) {
     const inviteSummaryTotal = inviteSection.querySelector('[data-invite-summary-total]');
     const inviteSummaryCorrect = inviteSection.querySelector('[data-invite-summary-correct]');
     const inviteSummaryAccuracy = inviteSection.querySelector('[data-invite-summary-accuracy]');
-    const inviteGenerateLabel = inviteGenerateButton?.querySelector('[data-label]');
+    const inviteGenerateLabel = inviteGenerateButton ? inviteGenerateButton.querySelector('[data-label]') : null;
     let inviteState = null;
 
-    const defaultLabel = inviteGenerateButton?.dataset.labelDefault ?? '초대 링크 생성';
-    const refreshLabel = inviteGenerateButton?.dataset.labelRefresh ?? '초대 링크 다시 생성';
+    const defaultLabel = inviteGenerateButton && inviteGenerateButton.dataset && inviteGenerateButton.dataset.labelDefault
+        ? inviteGenerateButton.dataset.labelDefault
+        : '초대 링크 생성';
+    const refreshLabel = inviteGenerateButton && inviteGenerateButton.dataset && inviteGenerateButton.dataset.labelRefresh
+        ? inviteGenerateButton.dataset.labelRefresh
+        : '초대 링크 다시 생성';
 
     function setInviteStatus(message, tone = 'info') {
         if (!inviteStatus) {
@@ -498,7 +504,7 @@ if (inviteSection) {
             warning: 'text-amber-300',
             info: 'text-slate-300',
             neutral: 'text-slate-400',
-        }[tone] ?? 'text-slate-300';
+        }[tone] || 'text-slate-300';
         inviteStatus.className = `${baseClass} ${toneClass}`;
         inviteStatus.textContent = message;
     }
@@ -604,13 +610,13 @@ if (inviteSection) {
             inviteQrImage.setAttribute('src', qrUrl);
             inviteQrImage.classList.remove('hidden');
         }
-        if (inviteSummaryTotal && data.summary?.total != null) {
+        if (inviteSummaryTotal && data.summary && data.summary.total != null) {
             inviteSummaryTotal.textContent = String(data.summary.total);
         }
-        if (inviteSummaryCorrect && data.summary?.correct != null) {
+        if (inviteSummaryCorrect && data.summary && data.summary.correct != null) {
             inviteSummaryCorrect.textContent = String(data.summary.correct);
         }
-        if (inviteSummaryAccuracy && data.summary?.accuracy != null) {
+        if (inviteSummaryAccuracy && data.summary && data.summary.accuracy != null) {
             inviteSummaryAccuracy.textContent = `${data.summary.accuracy}%`;
         }
     }
@@ -640,7 +646,7 @@ if (inviteSection) {
             });
             if (!response.ok) {
                 const errorBody = await response.json().catch(() => ({}));
-                const errorMessage = errorBody.detail ?? '초대 링크 생성에 실패했습니다.';
+                const errorMessage = errorBody.detail || '초대 링크 생성에 실패했습니다.';
                 throw new Error(errorMessage);
             }
             const data = await response.json();
@@ -649,13 +655,13 @@ if (inviteSection) {
             toggleGenerateLoading(false);
         } catch (error) {
             console.error(error);
-            setInviteStatus(error.message ?? '초대 링크 생성 중 오류가 발생했습니다.', 'error');
+            setInviteStatus(error && error.message ? error.message : '초대 링크 생성 중 오류가 발생했습니다.', 'error');
             toggleGenerateLoading(false);
         }
     }
 
     async function handleInviteCopy() {
-        if (!inviteState?.share_url) {
+        if (!inviteState || !inviteState.share_url) {
             return;
         }
         try {
@@ -678,7 +684,7 @@ if (inviteSection) {
     }
 
     async function handleInviteExpire() {
-        if (!inviteState?.token) {
+        if (!inviteState || !inviteState.token) {
             return;
         }
         setInviteStatus('초대 링크를 만료 처리 중입니다...', 'info');
@@ -693,7 +699,7 @@ if (inviteSection) {
             setInviteStatus('초대 링크가 만료되었습니다. 필요하면 새로 생성하세요.', 'neutral');
         } catch (error) {
             console.error(error);
-            setInviteStatus(error.message ?? '초대 링크 만료 처리 중 오류가 발생했습니다.', 'error');
+            setInviteStatus(error && error.message ? error.message : '초대 링크 만료 처리 중 오류가 발생했습니다.', 'error');
         }
     }
 

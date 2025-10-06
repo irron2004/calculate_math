@@ -3,11 +3,23 @@
     if (!payload || typeof payload !== 'object') {
       return {};
     }
-    return Object.fromEntries(
-      Object.entries(payload).filter(function ([, value]) {
-        return value !== undefined && value !== null;
-      })
-    );
+    var entries = Object.entries
+      ? Object.entries(payload)
+      : Object.keys(payload).map(function (key) {
+          return [key, payload[key]];
+        });
+    var filtered = entries.filter(function (pair) {
+      var value = pair[1];
+      return value !== undefined && value !== null;
+    });
+    if (Object.fromEntries) {
+      return Object.fromEntries(filtered);
+    }
+    var result = {};
+    filtered.forEach(function (pair) {
+      result[pair[0]] = pair[1];
+    });
+    return result;
   }
 
   function pushMatomo(eventName, payload) {
