@@ -223,7 +223,7 @@ async def api_evaluate_lrc(payload: LRCEvaluateRequest, request: Request) -> LRC
 
 
 @router.get("/lrc/last", response_model=LRCEvaluateResponse)
-async def api_get_last_lrc(user_id: str = Query(...), request: Request) -> LRCEvaluateResponse:
+async def api_get_last_lrc(request: Request, user_id: str = Query(...)) -> LRCEvaluateResponse:
     repository = _resolve_lrc_repository(request)
     if repository is None:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="lrc repository not available")
