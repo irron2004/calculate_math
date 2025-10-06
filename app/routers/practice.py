@@ -90,12 +90,19 @@ def _generate_problem(problem_id: int) -> GeneratedProblem:
 
 @router.post("/v1/login", response_model=LoginResponse)
 async def login(payload: LoginRequest, repository: UserRepository = Depends(_get_user_repository)) -> LoginResponse:
-    existing = repository.get_by_nickname(payload.nickname)
+    normalized_nickname = payload.nickname.strip()
+    if not normalized_nickname:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={"message": "닉네임을 입력해주세요."},
+        )
+
+    existing = repository.get_by_nickname(normalized_nickname)
     password_hash = _hash_password(payload.password)
 
     if existing is None:
         created = repository.create_user(
-            nickname=payload.nickname.strip(),
+            nickname=normalized_nickname,
             password_hash=password_hash,
             role="student",
         )

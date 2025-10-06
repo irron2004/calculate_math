@@ -232,6 +232,27 @@ def test_login_creates_and_returns_user(client) -> None:
     assert payload["message"].startswith("새 계정")
 
 
+def test_login_trims_whitespace_and_reuses_account(client) -> None:
+    first = client.post(
+        "/api/v1/login",
+        json={"nickname": "  spaced-user  ", "password": "secret"},
+    )
+    assert first.status_code == 200
+    created = first.json()
+    assert created["nickname"] == "spaced-user"
+
+    second = client.post(
+        "/api/v1/login",
+        json={"nickname": "\t spaced-user\n", "password": "secret"},
+    )
+    assert second.status_code == 200
+    payload = second.json()
+
+    assert payload["user_id"] == created["user_id"]
+    assert payload["nickname"] == "spaced-user"
+    assert payload["message"] == "로그인 성공"
+
+
 def test_login_with_wrong_password_returns_error(client) -> None:
     success = client.post(
         "/api/v1/login",
