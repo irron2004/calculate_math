@@ -196,10 +196,159 @@ class UserRepository:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class LRCRecord:
+    id: int
+    user_id: str
+    accuracy: float
+    rt_percentile: float
+    rubric: float
+    passed: bool
+    status: str
+    recommendation: str
+    focus_concept: str | None
+    evaluated_at: datetime
+
+
+class LRCRepository:
+    """SQLite-backed store for per-user LRC evaluations."""
+
+    def __init__(self, database_path: Path):
+        self.database_path = Path(database_path)
+        self.database_path.parent.mkdir(parents=True, exist_ok=True)
+        self._lock = RLock()
+        self._initialize()
+
+    def _initialize(self) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS lrc_results (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id TEXT NOT NULL,
+                    accuracy REAL NOT NULL,
+                    rt_percentile REAL NOT NULL,
+                    rubric REAL NOT NULL,
+                    passed INTEGER NOT NULL,
+                    status TEXT NOT NULL,
+                    recommendation TEXT NOT NULL,
+                    focus_concept TEXT,
+                    evaluated_at TEXT NOT NULL
+                )
+                """
+            )
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS idx_lrc_results_user ON lrc_results(user_id, evaluated_at DESC)"
+            )
+            connection.commit()
+
+    def _connect(self) -> sqlite3.Connection:
+        return sqlite3.connect(
+            self.database_path,
+            detect_types=sqlite3.PARSE_DECLTYPES,
+            check_same_thread=False,
+        )
+
+    def record_result(
+        self,
+        *,
+        user_id: str,
+        accuracy: float,
+        rt_percentile: float,
+        rubric: float,
+        passed: bool,
+        status: str,
+        recommendation: str,
+        focus_concept: str | None,
+    ) -> LRCRecord:
+        evaluated_at = datetime.now(timezone.utc)
+        with self._lock, self._connect() as connection:
+            cursor = connection.execute(
+                """
+                INSERT INTO lrc_results (
+                    user_id, accuracy, rt_percentile, rubric, passed, status, recommendation, focus_concept, evaluated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    user_id,
+                    float(accuracy),
+                    float(rt_percentile),
+                    float(rubric),
+                    1 if passed else 0,
+                    status,
+                    recommendation,
+                    focus_concept,
+                    evaluated_at.isoformat(),
+                ),
+            )
+            connection.commit()
+            record_id = int(cursor.lastrowid)
+        return LRCRecord(
+            id=record_id,
+            user_id=user_id,
+            accuracy=float(accuracy),
+            rt_percentile=float(rt_percentile),
+            rubric=float(rubric),
+            passed=passed,
+            status=status,
+            recommendation=recommendation,
+            focus_concept=focus_concept,
+            evaluated_at=evaluated_at,
+        )
+
+    def get_latest(self, user_id: str) -> LRCRecord | None:
+        with self._lock, self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT id, user_id, accuracy, rt_percentile, rubric, passed, status, recommendation, focus_concept, evaluated_at
+                FROM lrc_results
+                WHERE user_id = ?
+                ORDER BY evaluated_at DESC, id DESC
+                LIMIT 1
+                """,
+                (user_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return self._row_to_record(row)
+
+    def _row_to_record(self, row: Iterable[object]) -> LRCRecord:
+        (
+            record_id,
+            user_id,
+            accuracy,
+            rt_percentile,
+            rubric,
+            passed,
+            status,
+            recommendation,
+            focus_concept,
+            evaluated_at,
+        ) = row
+        evaluated_at_dt = datetime.fromisoformat(str(evaluated_at))
+        if evaluated_at_dt.tzinfo is None:
+            evaluated_at_dt = evaluated_at_dt.replace(tzinfo=timezone.utc)
+        return LRCRecord(
+            id=int(record_id),
+            user_id=str(user_id),
+            accuracy=float(accuracy),
+            rt_percentile=float(rt_percentile),
+            rubric=float(rubric),
+            passed=bool(passed),
+            status=str(status),
+            recommendation=str(recommendation),
+            focus_concept=str(focus_concept) if focus_concept is not None else None,
+            evaluated_at=evaluated_at_dt,
+        )
+
+
+
 __all__ = [
     "AttemptRecord",
     "AttemptRepository",
     "UserRecord",
     "UserRepository",
+    "LRCRecord",
+    "LRCRepository",
 ]
 

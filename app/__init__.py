@@ -9,7 +9,7 @@ from .config import get_settings
 from .instrumentation import RequestContextMiddleware, configure_telemetry
 from .problem_bank import refresh_cache, reset_cache
 from .template_engine import refresh_engine, reset_engine
-from .repositories import AttemptRepository, UserRepository
+from .repositories import AttemptRepository, LRCRepository, UserRepository
 from .routers import curriculum, health, invites, pages, practice, problems
 
 
@@ -39,6 +39,9 @@ def create_app() -> FastAPI:
         user_repository = UserRepository(settings.attempts_database_path)
         app.state.user_repository = user_repository
 
+        lrc_repository = LRCRepository(settings.attempts_database_path)
+        app.state.lrc_repository = lrc_repository
+
         try:
             yield
         finally:
@@ -46,6 +49,8 @@ def create_app() -> FastAPI:
                 delattr(app.state, "attempt_repository")
             if hasattr(app.state, "user_repository"):
                 delattr(app.state, "user_repository")
+            if hasattr(app.state, "lrc_repository"):
+                delattr(app.state, "lrc_repository")
             if hasattr(app.state, "problem_cache_strategy"):
                 delattr(app.state, "problem_cache_strategy")
             if hasattr(app.state, "problem_repository"):

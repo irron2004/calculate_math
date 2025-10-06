@@ -124,6 +124,126 @@
     "rubric_keywords": ["곱", "반비례", "나눈다"]
   },
   {
+    "id": "RAT-PRO-S1-002",
+    "concept": "RAT-PRO",
+    "step": "S1",
+    "lens": ["ratio"],
+    "representation": "P",
+    "context_pack": ["data"],
+    "parameters": {
+      "rate": {"type": "int", "min": 2, "max": 6},
+      "hours": {"type": "int", "min": 2, "max": 4}
+    },
+    "computed_values": {
+      "distance": "rate * hours"
+    },
+    "prompt": "거리-시간 표에서 {hours}시간 동안 {distance}km를 이동했습니다. 1시간당 이동 거리는 얼마인가요?",
+    "explanation": "총 거리를 시간으로 나눠 단위율을 구합니다.",
+    "answer_expression": "rate",
+    "option_offsets": [-1, 1, 2],
+    "rubric_keywords": ["단위율", "시간", "나눈다"]
+  },
+  {
+    "id": "RAT-PRO-S1-003",
+    "concept": "RAT-PRO",
+    "step": "S1",
+    "lens": ["ratio"],
+    "representation": "C",
+    "context_pack": ["geometry"],
+    "parameters": {
+      "short_side": {"type": "int", "min": 4, "max": 8, "step": 2},
+      "scale_factor": {"type": "int", "min": 2, "max": 3}
+    },
+    "computed_values": {
+      "long_side": "short_side * scale_factor"
+    },
+    "prompt": "작은 삼각형의 밑변이 {short_side}cm이고 닮음비가 {scale_factor}:1 입니다. 큰 삼각형의 밑변 길이는 몇 cm인가요?",
+    "explanation": "닮음비만큼 길이를 곱해 구합니다.",
+    "answer_expression": "long_side",
+    "option_offsets": ["-short_side", "short_side", "2 * short_side"],
+    "rubric_keywords": ["닮음", "배", "길이"]
+  },
+  {
+    "id": "RAT-PRO-S2-002",
+    "concept": "RAT-PRO",
+    "step": "S2",
+    "lens": ["ratio"],
+    "representation": "C",
+    "context_pack": ["life"],
+    "parameters": {
+      "price_per": {"type": "int", "min": 2000, "max": 5000, "step": 500},
+      "count": {"type": "int", "min": 2, "max": 5}
+    },
+    "computed_values": {
+      "total_price": "price_per * count"
+    },
+    "prompt": "머핀 {count}개가 총 {total_price}원일 때 머핀 1개의 가격은 얼마인가요?",
+    "explanation": "전체 가격을 개수로 나눠 단위 가격을 구합니다.",
+    "answer_expression": "price_per",
+    "option_offsets": [-500, 500, 1000],
+    "rubric_keywords": ["단위율", "가격", "나눈다"]
+  },
+  {
+    "id": "RAT-PRO-S2-003",
+    "concept": "RAT-PRO",
+    "step": "S2",
+    "lens": ["ratio"],
+    "representation": "P",
+    "context_pack": ["geometry"],
+    "parameters": {
+      "scale": {"type": "int", "min": 200, "max": 500, "step": 100},
+      "map_length": {"type": "int", "min": 2, "max": 6}
+    },
+    "computed_values": {
+      "real_length": "scale * map_length"
+    },
+    "prompt": "축척 1:{scale} 지도에서 두 지점 사이 거리가 {map_length}cm입니다. 실제 거리는 몇 cm인가요?",
+    "explanation": "지도 길이에 축척 비율을 곱합니다.",
+    "answer_expression": "real_length",
+    "option_offsets": ["-scale * 1", "scale * 1", "2 * scale * 1"],
+    "rubric_keywords": ["축척", "비례", "곱"]
+  },
+  {
+    "id": "RAT-PRO-S3-002",
+    "concept": "RAT-PRO",
+    "step": "S3",
+    "lens": ["ratio"],
+    "representation": "C",
+    "context_pack": ["life"],
+    "parameters": {
+      "distance": {"type": "int", "min": 24, "max": 48, "step": 6},
+      "speed": {"type": "int", "min": 3, "max": 6}
+    },
+    "computed_values": {
+      "time": "distance // speed"
+    },
+    "prompt": "거리 {distance}km를 이동해야 합니다. 속력이 {speed}km/h라면 이동 시간은 몇 시간인가요?",
+    "explanation": "거리와 속력의 곱이 일정하므로 거리를 속력으로 나눕니다.",
+    "answer_expression": "time",
+    "option_offsets": [-1, 1, 2],
+    "rubric_keywords": ["반비례", "거리", "나눈다"]
+  },
+  {
+    "id": "RAT-PRO-S3-003",
+    "concept": "RAT-PRO",
+    "step": "S3",
+    "lens": ["ratio"],
+    "representation": "A",
+    "context_pack": ["geometry"],
+    "parameters": {
+      "width": {"type": "int", "min": 3, "max": 6},
+      "height": {"type": "int", "min": 4, "max": 8}
+    },
+    "computed_values": {
+      "area": "width * height"
+    },
+    "prompt": "넓이가 {area}㎠인 직사각형에서 가로 길이가 {width}cm라면 세로 길이는 몇 cm인가요?",
+    "explanation": "가로와 세로의 곱이 일정하므로 넓이를 가로 길이로 나눕니다.",
+    "answer_expression": "height",
+    "option_offsets": [-1, 1, 2],
+    "rubric_keywords": ["넓이", "반비례", "나눈다"]
+  },
+  {
     "id": "GEO-LIN-S1-001",
     "concept": "GEO-LIN",
     "step": "S1",
@@ -187,5 +307,133 @@
     "answer_expression": "(y_intercept + slope * x + y_intercept) * x // 2",
     "option_offsets": ["-slope * x", "slope * x", "2 * slope * x"],
     "rubric_keywords": ["면적", "삼각형", "(윗변+아랫변)/2"]
+  },
+  {
+    "id": "GEO-LIN-S1-002",
+    "concept": "GEO-LIN",
+    "step": "S1",
+    "lens": ["difference", "scale"],
+    "representation": "C",
+    "context_pack": ["life"],
+    "parameters": {
+      "start_height": {"type": "int", "min": 1, "max": 4},
+      "step_height": {"type": "int", "min": 2, "max": 4},
+      "steps": {"type": "int", "min": 2, "max": 4}
+    },
+    "computed_values": {
+      "final_height": "start_height + step_height * steps"
+    },
+    "prompt": "계단의 첫 단이 {start_height}m이고 한 단 오를 때마다 {step_height}m씩 높아집니다. {steps}단을 오르면 높이는 얼마가 되나요?",
+    "explanation": "출발 높이에 변화량을 반복해서 더합니다.",
+    "answer_expression": "final_height",
+    "option_offsets": ["-step_height", "step_height", "2 * step_height"],
+    "rubric_keywords": ["기울기", "증가", "높이"]
+  },
+  {
+    "id": "GEO-LIN-S1-003",
+    "concept": "GEO-LIN",
+    "step": "S1",
+    "lens": ["difference", "scale"],
+    "representation": "P",
+    "context_pack": ["data"],
+    "parameters": {
+      "x": {"type": "int", "min": 1, "max": 4},
+      "slope": {"type": "int", "min": 1, "max": 3},
+      "y_intercept": {"type": "int", "min": 0, "max": 3}
+    },
+    "computed_values": {
+      "y": "slope * x + y_intercept"
+    },
+    "prompt": "표에 주어진 (x, y) 데이터에서 x={x}일 때 y의 값을 구하세요 (기울기 {slope}, 절편 {y_intercept}).",
+    "explanation": "y = 기울기 × x + 절편 공식을 사용합니다.",
+    "answer_expression": "y",
+    "option_offsets": ["-slope", "slope", "2 * slope"],
+    "rubric_keywords": ["표", "기울기", "절편"]
+  },
+  {
+    "id": "GEO-LIN-S2-002",
+    "concept": "GEO-LIN",
+    "step": "S2",
+    "lens": ["scale", "difference"],
+    "representation": "C",
+    "context_pack": ["life"],
+    "parameters": {
+      "start_value": {"type": "int", "min": 5, "max": 20, "step": 5},
+      "increase": {"type": "int", "min": 2, "max": 5},
+      "weeks": {"type": "int", "min": 3, "max": 6}
+    },
+    "computed_values": {
+      "future_value": "start_value + increase * weeks"
+    },
+    "prompt": "저금통에 처음 {start_value}천원이 들어 있고 매주 {increase}천원씩 저축합니다. {weeks}주 후 금액은 얼마인가요?",
+    "explanation": "기울기(증가량)와 주 수를 곱해 출발값에 더합니다.",
+    "answer_expression": "future_value",
+    "option_offsets": ["-increase * weeks", "increase * weeks", "2 * increase * weeks"],
+    "rubric_keywords": ["기울기", "시작값", "더한다"]
+  },
+  {
+    "id": "GEO-LIN-S2-003",
+    "concept": "GEO-LIN",
+    "step": "S2",
+    "lens": ["scale", "difference"],
+    "representation": "P",
+    "context_pack": ["geometry"],
+    "parameters": {
+      "x1": {"type": "int", "min": 1, "max": 4},
+      "y1": {"type": "int", "min": 2, "max": 6},
+      "x2": {"type": "int", "min": 5, "max": 8}
+    },
+    "computed_values": {
+      "y2": "y1 + 2 * (x2 - x1)"
+    },
+    "prompt": "두 점 ({x1}, {y1})과 ({x2}, {y2})를 지나는 직선의 기울기를 구하세요.",
+    "explanation": "y 변화량을 x 변화량으로 나눠 기울기를 계산합니다.",
+    "answer_expression": "(y2 - y1) // (x2 - x1)",
+    "option_offsets": [-1, 1, 2],
+    "rubric_keywords": ["기울기", "변화율", "나눈다"]
+  },
+  {
+    "id": "GEO-LIN-S3-002",
+    "concept": "GEO-LIN",
+    "step": "S3",
+    "lens": ["scale", "difference"],
+    "representation": "C",
+    "context_pack": ["life"],
+    "parameters": {
+      "slope": {"type": "int", "min": 2, "max": 5},
+      "y_intercept": {"type": "int", "min": 0, "max": 3},
+      "time": {"type": "int", "min": 4, "max": 6}
+    },
+    "computed_values": {
+      "y": "slope * time + y_intercept",
+      "area": "(y_intercept + y) * time // 2"
+    },
+    "prompt": "속력 그래프가 기울기 {slope}, 시작 속도 {y_intercept}km/h인 직선입니다. {time}시간 동안 이동한 거리를 구하세요.",
+    "explanation": "삼각형 넓이로 거리(누적 값)를 계산합니다.",
+    "answer_expression": "area",
+    "option_offsets": ["-slope * time", "slope * time", "2 * slope * time"],
+    "rubric_keywords": ["면적", "속력", "누적"]
+  },
+  {
+    "id": "GEO-LIN-S3-003",
+    "concept": "GEO-LIN",
+    "step": "S3",
+    "lens": ["scale", "difference"],
+    "representation": "P",
+    "context_pack": ["data"],
+    "parameters": {
+      "x": {"type": "int", "min": 5, "max": 8},
+      "slope": {"type": "int", "min": 1, "max": 4},
+      "y_intercept": {"type": "int", "min": 1, "max": 3}
+    },
+    "computed_values": {
+      "y": "slope * x + y_intercept",
+      "total": "y_intercept + y"
+    },
+    "prompt": "선형 데이터에서 x={x}일 때 y={y}입니다. 시작 값과 현재 값을 더한 합은 얼마인가요?",
+    "explanation": "초기 값과 현재 값을 더합니다.",
+    "answer_expression": "total",
+    "option_offsets": [-2, 2, 4],
+    "rubric_keywords": ["합", "선형", "시작값"]
   }
 ]

@@ -16,6 +16,59 @@ export type APIProblem = {
   options: number[];
 };
 
+export type CurriculumConcept = {
+  id: string;
+  name: string;
+  lens: string[];
+  prerequisites: string[];
+  transfers: string[];
+  summary: string;
+  stage_span: string[];
+  focus_keywords: string[];
+};
+
+export type TemplateSummary = {
+  id: string;
+  concept: string;
+  step: string;
+  lens: string[];
+  representation: string;
+  context_pack: string[];
+  rubric_keywords: string[];
+  parameter_names: string[];
+};
+
+export type GeneratedItem = {
+  id: string;
+  template_id: string;
+  concept: string;
+  step: string;
+  prompt: string;
+  explanation: string;
+  answer: number;
+  options: number[];
+  context: string;
+  lens: string[];
+  representation: string;
+  rubric_keywords: string[];
+  variables: Record<string, unknown>;
+};
+
+export type LRCMetric = {
+  value: number;
+  threshold: number;
+  met: boolean;
+};
+
+export type LRCEvaluation = {
+  passed: boolean;
+  status: string;
+  recommendation: string;
+  metrics: Record<string, LRCMetric>;
+  focus_concept?: string | null;
+  evaluated_at?: string | null;
+};
+
 export type APISession = {
   session_id: number;
   problems: APIProblem[];

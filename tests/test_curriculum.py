@@ -149,18 +149,32 @@ def test_generate_template_returns_options(client) -> None:
 def test_lrc_evaluate_promote(client) -> None:
     response = client.post(
         "/api/v1/lrc/evaluate",
-        json={"accuracy": 0.95, "rt_percentile": 0.75, "rubric": 0.9},
+        json={
+            "accuracy": 0.95,
+            "rt_percentile": 0.75,
+            "rubric": 0.9,
+            "user_id": "student-1",
+            "focus_concept": "TEST-CON",
+        },
     )
     assert response.status_code == 200
     payload = response.json()
     assert payload["passed"] is True
     assert payload["recommendation"] == "promote"
+    assert payload["focus_concept"] == "TEST-CON"
+    assert "evaluated_at" in payload
 
 
 def test_lrc_evaluate_near_miss(client) -> None:
     response = client.post(
         "/api/v1/lrc/evaluate",
-        json={"accuracy": 0.88, "rt_percentile": 0.62, "rubric": 0.8},
+        json={
+            "accuracy": 0.88,
+            "rt_percentile": 0.62,
+            "rubric": 0.8,
+            "user_id": "student-2",
+            "focus_concept": "TEST-CON",
+        },
     )
     assert response.status_code == 200
     payload = response.json()
@@ -172,9 +186,42 @@ def test_lrc_evaluate_near_miss(client) -> None:
 def test_lrc_evaluate_fail(client) -> None:
     response = client.post(
         "/api/v1/lrc/evaluate",
-        json={"accuracy": 0.7, "rt_percentile": 0.4, "rubric": 0.5},
+        json={
+            "accuracy": 0.7,
+            "rt_percentile": 0.4,
+            "rubric": 0.5,
+            "user_id": "student-3",
+            "focus_concept": "TEST-CON",
+        },
     )
     assert response.status_code == 200
     payload = response.json()
     assert payload["passed"] is False
     assert payload["recommendation"] == "remediate"
+
+
+def test_lrc_last_endpoint_returns_latest(client) -> None:
+    # Ensure evaluating with user id stores the record
+    response = client.post(
+        "/api/v1/lrc/evaluate",
+        json={
+            "accuracy": 0.88,
+            "rt_percentile": 0.72,
+            "rubric": 0.81,
+            "user_id": "student-latest",
+            "focus_concept": "TEST-CON",
+        },
+    )
+    assert response.status_code == 200
+
+    response = client.get("/api/v1/lrc/last", params={"user_id": "student-latest"})
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["recommendation"] == "reinforce"
+    assert payload["focus_concept"] == "TEST-CON"
+    assert "metrics" in payload
+
+
+def test_lrc_last_endpoint_handles_missing(client) -> None:
+    response = client.get("/api/v1/lrc/last", params={"user_id": "missing-user"})
+    assert response.status_code == 404

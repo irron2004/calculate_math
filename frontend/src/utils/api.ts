@@ -1,4 +1,11 @@
-import type { APIProblemResponse, APISession } from '../types';
+import type {
+  APIProblemResponse,
+  APISession,
+  CurriculumConcept,
+  GeneratedItem,
+  LRCEvaluation,
+  TemplateSummary
+} from '../types';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/math-api/api';
 
@@ -46,4 +53,70 @@ export async function getDailyStats(days: number = 30) {
   return apiCall(`/v1/stats/daily?days=${days}`, {
     method: 'GET',
   });
-} 
+}
+
+export async function fetchConcepts(step?: string): Promise<CurriculumConcept[]> {
+  const query = step ? `?step=${encodeURIComponent(step)}` : '';
+  return apiCall<CurriculumConcept[]>(`/v1/concepts${query}`);
+}
+
+export async function fetchTemplates(
+  concept?: string,
+  step?: string
+): Promise<TemplateSummary[]> {
+  const params = new URLSearchParams();
+  if (concept) {
+    params.append('concept', concept);
+  }
+  if (step) {
+    params.append('step', step);
+  }
+  const query = params.toString();
+  return apiCall<TemplateSummary[]>(`/v1/templates${query ? `?${query}` : ''}`);
+}
+
+export async function generateTemplateInstance(
+  templateId: string,
+  payload?: { seed?: number; context?: string }
+): Promise<GeneratedItem> {
+  return apiCall<GeneratedItem>(`/v1/templates/${templateId}/generate`, {
+    method: 'POST',
+    body: JSON.stringify(payload ?? {}),
+  });
+}
+
+export async function evaluateLRC(payload: {
+  accuracy: number;
+  rt_percentile: number;
+  rubric: number;
+  user_id?: string;
+  focus_concept?: string;
+}): Promise<LRCEvaluation> {
+  const body: Record<string, unknown> = {
+    accuracy: payload.accuracy,
+    rt_percentile: payload.rt_percentile,
+    rubric: payload.rubric,
+  };
+  if (payload.user_id) {
+    body.user_id = payload.user_id;
+  }
+  if (payload.focus_concept) {
+    body.focus_concept = payload.focus_concept;
+  }
+
+  return apiCall<LRCEvaluation>('/v1/lrc/evaluate', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+
+export async function fetchLatestLRC(userId: string): Promise<LRCEvaluation | null> {
+  const response = await fetch(`${API_BASE_URL}/v1/lrc/last?user_id=${encodeURIComponent(userId)}`);
+  if (response.status === 404) {
+    return null;
+  }
+  if (!response.ok) {
+    throw new Error(`LRC 조회 실패: ${response.status}`);
+  }
+  return response.json();
+}
