@@ -38,7 +38,7 @@ const Login: React.FC = () => {
       } else {
         setError('로그인에 실패했습니다. 닉네임과 비밀번호를 확인해주세요.');
       }
-    } catch (err) {
+    } catch {
       setError('로그인 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);

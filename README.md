@@ -77,3 +77,26 @@ frontend/
 
 ## 라이선스
 MIT
+
+## 运营 모니터링
+
+### 헬스/레디니스 엔드포인트
+- `GET /health`: 기동 상태와 의존성, 업타임을 반환 (정상 시 200)
+- `GET /readyz`: 템플릿, 문제은행, 브리지 유닛 상태를 포함한 readiness 체크 (정상 시 200/"ready")
+- `GET /healthz`: liveness probe (정상 시 200)
+
+### 주기 점검 예시
+```bash
+curl -s https://your-service-domain/health | jq
+curl -s https://your-service-domain/readyz | jq
+```
+
+### 자동 알림 권장
+- CI/CD 파이프라인 또는 cron에서 위 엔드포인트를 호출하고 실패 시 Slack/Email로 알림
+- Matomo/GA4 커스텀 이벤트(`problem_rt`, `problem_explanation`)로 학습 RT/설명 데이터를 관측
+
+```
+# cron example (run every 5 minutes)
+*/5 * * * * curl -sf https://your-service-domain/health >/dev/null || curl -s https://your-service-domain/readyz | mail -s "Readiness degraded" ops@example.com
+```
+

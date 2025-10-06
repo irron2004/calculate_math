@@ -4,7 +4,7 @@ import {
   Target,
   Compass
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type {
@@ -56,6 +56,15 @@ interface CurriculumProblem {
   instance: GeneratedItem;
 }
 
+interface ProblemFeedback {
+  prompt: string;
+  conceptName: string;
+  step: string;
+  correctAnswer: number;
+  userAnswer: number | null;
+  isCorrect: boolean;
+}
+
 const MathGame: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -66,14 +75,15 @@ const MathGame: React.FC = () => {
   const [currentProblem, setCurrentProblem] = useState<CurriculumProblem | null>(null);
   const [totalQuestions, setTotalQuestions] = useState(0);
 
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME_LIMIT);
   const [timeSpentHistory, setTimeSpentHistory] = useState<number[]>([]);
 
   const [score, setScore] = useState(0);
-  const [streak, setStreak] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, number | null>>({});
+  const [answerInput, setAnswerInput] = useState('');
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [feedback, setFeedback] = useState<ProblemFeedback | null>(null);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [lrcResult, setLrcResult] = useState<LRCEvaluation | null>(null);
@@ -84,11 +94,11 @@ const MathGame: React.FC = () => {
 
   const resetGameState = () => {
     setScore(0);
-    setStreak(0);
     setCorrectCount(0);
     setUserAnswers({});
-    setSelectedAnswer(null);
     setTimeSpentHistory([]);
+    setAnswerInput('');
+    setFeedback(null);
     setLrcResult(null);
     setLrcError(null);
     setIsSubmitted(false);
@@ -266,23 +276,13 @@ const MathGame: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, gameState, currentProblem?.instance.id]);
 
+  const currentProblemId = currentProblem?.instance.id;
+
   useEffect(() => {
-    if (gameState !== 'playing') {
-      return;
+    if (gameState === 'playing' && currentProblemId) {
+      inputRef.current?.focus();
     }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        if (selectedAnswer !== null) {
-          finalizeCurrentProblem(selectedAnswer, false);
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, selectedAnswer]);
+  }, [gameState, currentProblemId]);
 
   const finalizeCurrentProblem = (chosenAnswer: number | null, timedOut = false) => {
     if (!currentProblem) {
@@ -305,19 +305,27 @@ const MathGame: React.FC = () => {
 
     const isCorrect = !timedOut && chosenAnswer === actualAnswer;
 
+    setFeedback({
+      prompt: question.prompt,
+      conceptName: currentProblem.concept.name,
+      step: question.step,
+      correctAnswer: actualAnswer,
+      userAnswer: chosenAnswer,
+      isCorrect
+    });
+
     setCorrectCount((prev) => (isCorrect ? prev + 1 : prev));
     setScore((prev) =>
       isCorrect ? prev + 10 + Math.floor((QUESTION_TIME_LIMIT - timeUsed) / 3) : prev
     );
-    setStreak((prev) => (isCorrect ? prev + 1 : 0));
 
     const nextIndex = currentIndex + 1;
     const nextProblem = problems[nextIndex] ?? null;
 
-    setSelectedAnswer(null);
     setTimeLeft(QUESTION_TIME_LIMIT);
     setCurrentIndex(nextIndex);
     setCurrentProblem(nextProblem);
+    setAnswerInput('');
 
     if (nextProblem) {
       setGameState('playing');
@@ -326,16 +334,26 @@ const MathGame: React.FC = () => {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAnswerInput(event.target.value);
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (selectedAnswer === null) {
+    const trimmed = answerInput.trim();
+    if (!trimmed) {
       return;
     }
-    finalizeCurrentProblem(selectedAnswer, false);
+    const parsed = Number(trimmed);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+    finalizeCurrentProblem(parsed, false);
   };
 
   const handleOptionSelect = (option: number) => {
-    setSelectedAnswer(option);
+    setAnswerInput(option.toString());
+    window.setTimeout(() => inputRef.current?.focus(), 0);
   };
 
   const handleSubmitResults = async () => {
@@ -402,6 +420,9 @@ const MathGame: React.FC = () => {
   }
 
   const questionNumber = Math.min(currentIndex + 1, totalQuestions);
+  const trimmedAnswer = answerInput.trim();
+  const parsedAnswer = Number(trimmedAnswer);
+  const canSubmit = trimmedAnswer !== '' && Number.isFinite(parsedAnswer);
 
   return (
     <div className="math-game">
@@ -442,27 +463,55 @@ const MathGame: React.FC = () => {
               <p className="context-text">컨텍스트: {currentProblem.instance.context}</p>
             </div>
 
-            <div className="options-container">
-              {currentProblem.instance.options.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleOptionSelect(option)}
-                  className={`option-button ${selectedAnswer === option ? 'selected' : ''}`}
-                  type="button"
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
+            <form className="answer-form" onSubmit={handleSubmit}>
+              <input
+                ref={inputRef}
+                className="answer-input"
+                type="text"
+                inputMode="numeric"
+                pattern="-?[0-9]*"
+                value={answerInput}
+                onChange={handleInputChange}
+                placeholder="정답을 입력하세요"
+                aria-label="정답 입력"
+              />
 
-            <button
-              onClick={handleSubmit}
-              disabled={selectedAnswer === null}
-              className="submit-button"
-              type="button"
-            >
-              확인
-            </button>
+              {!!currentProblem.instance.options?.length && (
+                <div className="options-container">
+                  {currentProblem.instance.options.map((option) => {
+                    const isSelected = canSubmit && parsedAnswer === option;
+                    return (
+                      <button
+                        key={option}
+                        onClick={() => handleOptionSelect(option)}
+                        className={`option-button ${isSelected ? 'selected' : ''}`}
+                        type="button"
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              <button
+                disabled={!canSubmit}
+                className="submit-button"
+                type="submit"
+              >
+                확인
+              </button>
+            </form>
+
+            {feedback && (
+              <div className={`feedback ${feedback.isCorrect ? 'correct' : 'incorrect'}`}>
+                <h2>{feedback.isCorrect ? '정답입니다! 👍' : '아쉬워요! 다음에는 맞을 수 있어요.'}</h2>
+                <p>개념: {feedback.conceptName} · {STEP_LABEL[feedback.step] ?? feedback.step}</p>
+                <p>이전 문제: {feedback.prompt}</p>
+                <p>정답: {feedback.correctAnswer}</p>
+                <p>내 답: {feedback.userAnswer ?? '미응답'}</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -542,6 +591,7 @@ const MathGame: React.FC = () => {
               <button onClick={goBack} className="back-to-dashboard" type="button">
                 대시보드로
               </button>
+            </div>
           </div>
         )}
       </div>

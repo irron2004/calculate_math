@@ -3,7 +3,7 @@
 {% block title %}{{ category_display }} 문제 — 360Me Math Lab{% endblock %}
 
 {% block content %}
-<div class="mx-auto w-full max-w-5xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
+<div class="mx-auto w-full max-w-5xl space-y-12 px-4 py-12 sm:px-6 lg:px-8" data-problem-container data-category="{{ category or '' }}">
     <section class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-sky-500 via-primary to-purple-500 px-6 py-14 text-white shadow-2xl sm:px-10">
         <div class="absolute inset-0 opacity-15" aria-hidden="true"
              style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.28) 0, transparent 55%),
@@ -21,7 +21,7 @@
                 <a href="/" class="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-white">
                     <span aria-hidden="true">🏠</span> 허브 홈
                 </a>
-                <a href="http://localhost:8080" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
+                <a href="/" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
                     <span aria-hidden="true">🌐</span> 360Me Hub로 이동
                 </a>
             </div>
@@ -34,12 +34,31 @@
         "곱셈": "✖️",
         "나눗셈": "➗"
     } %}
+    {% set lens_map = {
+        "덧셈": {"icon": "🔺", "label": "차분 렌즈"},
+        "뺄셈": {"icon": "🔺", "label": "차분 렌즈"},
+        "곱셈": {"icon": "➗", "label": "비율 렌즈"},
+        "나눗셈": {"icon": "➗", "label": "비율 렌즈"}
+    } %}
+    {% set context_map = {
+        "life": {"icon": "🏠", "label": "생활"},
+        "data": {"icon": "📊", "label": "데이터"},
+        "geometry": {"icon": "📐", "label": "도형"}
+    } %}
+    {% set current_lens = lens_map.get(category) %}
     <nav aria-label="연산 유형" class="flex flex-wrap items-center justify-center gap-3">
         {% if categories %}
         {% for label in categories %}
         {% set icon = icon_map.get(label, "📘") %}
-        <a href="/problems?category={{ label }}" class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition {% if label == category %}bg-primary text-slate-900 shadow-lg shadow-sky-900/30{% else %}border border-white/20 text-slate-200 hover:bg-white/10{% endif %}">
+        {% set lens = lens_map.get(label) %}
+        <a href="/problems?category={{ label }}" class="inline-flex items-center gap-3 rounded-full px-4 py-2 text-sm font-semibold transition {% if label == category %}bg-primary text-slate-900 shadow-lg shadow-sky-900/30{% else %}border border-white/20 text-slate-200 hover:bg-white/10{% endif %}">
             <span aria-hidden="true">{{ icon }}</span> {{ label }}
+            {% if lens %}
+            <span class="inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-0.5 text-[0.7rem] font-medium uppercase tracking-widest text-white/80">
+                <span aria-hidden="true">{{ lens.icon }}</span>
+                <span>{{ lens.label }}</span>
+            </span>
+            {% endif %}
         </a>
         {% endfor %}
         {% else %}
@@ -56,16 +75,35 @@
             {% for problem in problems %}
             <article class="rounded-2xl border border-white/10 bg-slate-900/70 p-6 shadow-lg shadow-sky-900/5" data-problem-card data-problem-index="{{ loop.index0 }}" data-problem-id="{{ problem.id }}">
                 <header class="flex flex-wrap items-center justify-between gap-3">
-                    <h3 class="text-xl font-semibold text-white">
-                        <span class="mr-2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-base font-semibold text-primary">{{ loop.index }}</span>
-                        문제 {{ loop.index }}: {{ problem.question }}
+                    <h3 class="flex items-center gap-3 text-xl font-semibold text-white">
+                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-base font-semibold text-primary">{{ loop.index }}</span>
+                        <span>문제 {{ loop.index }}: {{ problem.question }}</span>
                     </h3>
-                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70">즉시 채점</span>
+                    <div class="flex items-center gap-2">
+                        {% if current_lens %}
+                        <span class="inline-flex items-center gap-1 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+                            <span aria-hidden="true">{{ current_lens.icon }}</span>
+                            <span>{{ current_lens.label }}</span>
+                        </span>
+                        {% endif %}
+                        {% set context_meta = context_map.get(problem.ctx) %}
+                        {% if context_meta %}
+                        <span class="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
+                            <span aria-hidden="true">{{ context_meta.icon }}</span>
+                            <span>{{ context_meta.label }}</span>
+                        </span>
+                        {% endif %}
+                        <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70">즉시 채점</span>
+                    </div>
                 </header>
-                <form class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center" data-problem-form>
-                    <label for="answer-{{ loop.index }}" class="flex-1">
-                        <span class="sr-only">{{ problem.question }} 정답 입력</span>
+                <form class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] md:items-end" data-problem-form>
+                    <label for="answer-{{ loop.index }}" class="flex flex-col gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">정답</span>
                         <input type="number" inputmode="numeric" pattern="[0-9]*" id="answer-{{ loop.index }}" class="w-full rounded-xl border border-white/15 bg-slate-950/60 px-4 py-3 text-lg text-white placeholder:text-slate-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40" placeholder="정답을 입력하세요" data-input>
+                    </label>
+                    <label for="explanation-{{ loop.index }}" class="flex flex-col gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">설명 <span class="text-slate-500">(선택)</span></span>
+                        <input type="text" id="explanation-{{ loop.index }}" class="w-full rounded-xl border border-white/15 bg-slate-950/40 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="어떻게 풀었나요?" maxlength="180" data-explanation>
                     </label>
                     <button type="button" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-sky-300" data-check>
                         <span aria-hidden="true">✅</span> 답 확인
@@ -165,6 +203,33 @@ const summaryCorrect = document.getElementById('summary-correct');
 const summaryAccuracy = document.getElementById('summary-accuracy');
 const summaryTotal = document.getElementById('summary-total');
 const answered = new Map();
+const explanations = new Map();
+const attemptTimings = new Map();
+const pageContainer = document.querySelector('[data-problem-container]');
+const currentCategory = pageContainer?.dataset?.category ?? null;
+
+function trackProblemRTEvent(payload) {
+    if (window.analytics && typeof window.analytics.trackProblemRT === 'function') {
+        window.analytics.trackProblemRT(payload);
+    } else {
+        console.debug('problem:rt', payload);
+    }
+}
+
+function trackProblemExplanationEvent(payload) {
+    if (window.analytics && typeof window.analytics.trackProblemExplanation === 'function') {
+        window.analytics.trackProblemExplanation(payload);
+    } else {
+        console.debug('problem:explanation', payload);
+    }
+}
+
+function markProblemStart(problemId) {
+    if (!problemId) {
+        return;
+    }
+    attemptTimings.set(problemId, { startedAt: performance.now() });
+}
 
 function renderSummary() {
     const correctCount = Array.from(answered.values()).reduce((acc, value) => acc + (value ? 1 : 0), 0);
@@ -242,6 +307,8 @@ async function handleCheck(card) {
     const rawValue = input?.value ?? '';
     const trimmed = rawValue.trim();
     const userAnswer = Number(trimmed);
+    const explanationInput = card.querySelector('[data-explanation]');
+    const explanationValue = explanationInput?.value?.trim() ?? '';
 
     if (!problemId) {
         setFeedback(feedback, '문제 정보를 찾을 수 없습니다.', 'text-amber-300');
@@ -261,6 +328,16 @@ async function handleCheck(card) {
     }
 
     try {
+        const timing = attemptTimings.get(problemId);
+        let reactionMs = null;
+        if (timing && typeof timing.startedAt === 'number') {
+            reactionMs = Math.max(0, performance.now() - timing.startedAt);
+        }
+        if (explanationValue) {
+            explanations.set(problemId, explanationValue);
+        } else {
+            explanations.delete(problemId);
+        }
         const payload = await submitAttempt(problemId, userAnswer);
         const isCorrect = Boolean(payload?.is_correct);
         if (isCorrect) {
@@ -271,6 +348,22 @@ async function handleCheck(card) {
             setFeedback(feedback, `오답입니다. ${hint}`, 'text-rose-300');
         }
         answered.set(problemId, isCorrect);
+        if (reactionMs !== null) {
+            const elapsedMs = Number(reactionMs.toFixed(2));
+            trackProblemRTEvent({
+                problem_id: problemId,
+                category: currentCategory || 'unknown',
+                elapsed_ms: elapsedMs,
+                is_correct: isCorrect,
+            });
+        }
+        if (explanationValue) {
+            trackProblemExplanationEvent({
+                problem_id: problemId,
+                category: currentCategory || 'unknown',
+                length: explanationValue.length,
+            });
+        }
     } catch (error) {
         const message = error instanceof Error ? error.message : '답안을 채점할 수 없습니다.';
         setFeedback(feedback, message, 'text-amber-300');
@@ -280,6 +373,7 @@ async function handleCheck(card) {
             button.disabled = false;
             button.removeAttribute('aria-busy');
         }
+        attemptTimings.delete(problemId);
         renderSummary();
     }
 }
@@ -311,6 +405,9 @@ async function checkAndAdvance(card) {
 function bindCard(card) {
     const button = card.querySelector('[data-check]');
     const form = card.querySelector('[data-problem-form]');
+    const input = card.querySelector('[data-input]');
+    const explanationField = card.querySelector('[data-explanation]');
+    const problemId = card.dataset.problemId ?? '';
     if (button) {
         button.addEventListener('click', () => {
             void handleCheck(card);
@@ -322,6 +419,23 @@ function bindCard(card) {
             void checkAndAdvance(card);
         });
     }
+    if (input) {
+        input.addEventListener('focus', () => {
+            markProblemStart(problemId);
+        });
+        input.addEventListener('input', () => {
+            if (!attemptTimings.has(problemId)) {
+                markProblemStart(problemId);
+            }
+        }, { once: true });
+    }
+    if (explanationField) {
+        explanationField.addEventListener('focus', () => {
+            if (!attemptTimings.has(problemId)) {
+                markProblemStart(problemId);
+            }
+        });
+    }
 }
 
 problemCards.forEach(bindCard);
@@ -331,11 +445,16 @@ const resetButton = document.querySelector('[data-reset]');
 if (resetButton) {
     resetButton.addEventListener('click', () => {
         answered.clear();
+        explanations.clear();
         problemCards.forEach((card) => {
             const input = card.querySelector('[data-input]');
             const feedback = card.querySelector('[data-feedback]');
+            const explanationField = card.querySelector('[data-explanation]');
             if (input) {
                 input.value = '';
+            }
+            if (explanationField) {
+                explanationField.value = '';
             }
             if (feedback) {
                 feedback.textContent = '';

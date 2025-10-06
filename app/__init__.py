@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
+from time import time
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -10,7 +11,7 @@ from .instrumentation import RequestContextMiddleware, configure_telemetry
 from .problem_bank import refresh_cache, reset_cache
 from .template_engine import refresh_engine, reset_engine
 from .repositories import AttemptRepository, LRCRepository, UserRepository
-from .routers import curriculum, health, invites, pages, practice, problems
+from .routers import bridge, curriculum, health, invites, pages, practice, problems
 
 
 def create_app() -> FastAPI:
@@ -19,6 +20,7 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        app.state.start_time = time()
         problem_repository = refresh_cache(force=True)
         app.state.problem_repository = problem_repository
         app.state.problem_cache_strategy = {
@@ -59,6 +61,8 @@ def create_app() -> FastAPI:
                 delattr(app.state, "template_cache_strategy")
             if hasattr(app.state, "template_engine"):
                 delattr(app.state, "template_engine")
+            if hasattr(app.state, "start_time"):
+                delattr(app.state, "start_time")
             reset_cache()
             reset_engine()
 
@@ -101,6 +105,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(health.router)
+    app.include_router(bridge.router)
     app.include_router(page_router)
     app.include_router(invite_router)
     app.include_router(problems.router)
