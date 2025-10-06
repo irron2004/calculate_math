@@ -37,11 +37,20 @@ def _allowed_categories() -> set[str]:
 class InviteSummaryPayload(BaseModel):
     total: int = Field(ge=0)
     correct: int = Field(ge=0)
+    average_ms: int | None = Field(default=None, ge=0)
+    fast_ratio: float | None = Field(default=None, ge=0.0, le=1.0)
+    explanation_count: int | None = Field(default=None, ge=0)
+    explanation_coverage: float | None = Field(default=None, ge=0.0, le=1.0)
 
     @model_validator(mode="after")
     def validate_correct(cls, values: "InviteSummaryPayload") -> "InviteSummaryPayload":  # type: ignore[override]
         if values.correct > values.total:
             raise ValueError("correct answers cannot exceed total problems")
+        if (
+            values.explanation_count is not None
+            and values.explanation_count > values.total
+        ):
+            raise ValueError("explanation count cannot exceed total problems")
         return values
 
 
@@ -56,7 +65,7 @@ class InviteResponse(BaseModel):
     share_url: str
     expires_at: datetime
     created_at: datetime
-    summary: dict[str, int] | None = None
+    summary: dict[str, object] | None = None
 
 
 def _serialize(session: InviteSession, request: Request) -> InviteResponse:
@@ -94,6 +103,10 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
             summary_model = InviteSummary(
                 total=payload.summary.total,
                 correct=payload.summary.correct,
+                average_ms=payload.summary.average_ms,
+                fast_ratio=payload.summary.fast_ratio,
+                explanation_count=payload.summary.explanation_count,
+                explanation_coverage=payload.summary.explanation_coverage,
             )
 
         session = invite_store.create(

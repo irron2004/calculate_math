@@ -48,7 +48,11 @@
                 </div>
             </dl>
             {% if invite.summary %}
-            <dl class="mt-6 grid grid-cols-3 gap-4 text-center">
+            {% set avg_ms = invite.summary.average_ms %}
+            {% set fast_ratio = invite.summary.fast_ratio %}
+            {% set explain_count = invite.summary.explanation_count %}
+            {% set explain_coverage = invite.summary.explanation_coverage %}
+            <dl class="mt-6 grid grid-cols-3 gap-4 text-center md:grid-cols-5">
                 <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-5">
                     <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">총 문제</dt>
                     <dd class="mt-2 text-2xl font-semibold text-white">{{ invite.summary.total }}</dd>
@@ -60,6 +64,36 @@
                 <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-5">
                     <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">정답률</dt>
                     <dd class="mt-2 text-2xl font-semibold text-white">{{ invite.summary.accuracy }}%</dd>
+                </div>
+                <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-5">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">평균 반응</dt>
+                    <dd class="mt-2 text-2xl font-semibold text-white">
+                        {% if avg_ms is not none %}
+                        {{ (avg_ms / 1000)|round(1, 'common') }}초
+                        {% else %}
+                        —
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-5">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">빠른 응답 · 설명</dt>
+                    <dd class="mt-2 text-2xl font-semibold text-white">
+                        {% if fast_ratio is not none %}
+                        {{ (fast_ratio * 100)|round(0, 'common') }}%
+                        {% else %}
+                        —
+                        {% endif %}
+                    </dd>
+                    <dd class="mt-1 text-xs text-slate-300">
+                        {% if explain_coverage is not none %}
+                        설명 {{ (explain_coverage * 100)|round(0, 'common') }}%
+                        {% if explain_count is not none %}
+                        ({{ explain_count }}개)
+                        {% endif %}
+                        {% else %}
+                        설명 —
+                        {% endif %}
+                    </dd>
                 </div>
             </dl>
             {% endif %}

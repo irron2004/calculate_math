@@ -13,6 +13,10 @@ from .config import get_settings
 class InviteSummary:
     total: int
     correct: int
+    average_ms: int | None = None
+    fast_ratio: float | None = None
+    explanation_count: int | None = None
+    explanation_coverage: float | None = None
 
     @property
     def accuracy(self) -> int:
@@ -21,9 +25,18 @@ class InviteSummary:
         percentage = round((self.correct / self.total) * 100)
         return max(0, min(100, percentage))
 
-    def to_dict(self) -> dict[str, int]:
-        data = asdict(self)
+    def to_dict(self) -> dict[str, object]:
+        data: dict[str, object] = asdict(self)
         data["accuracy"] = self.accuracy
+        # Ensure optional floats are rounded to sensible precision
+        if data.get("fast_ratio") is not None:
+            data["fast_ratio"] = round(
+                max(0.0, min(1.0, float(data["fast_ratio"]))), 3
+            )
+        if data.get("explanation_coverage") is not None:
+            data["explanation_coverage"] = round(
+                max(0.0, min(1.0, float(data["explanation_coverage"]))), 3
+            )
         return data
 
 

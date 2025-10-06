@@ -45,6 +45,11 @@
         "data": {"icon": "📊", "label": "데이터"},
         "geometry": {"icon": "📐", "label": "도형"}
     } %}
+    {% set representation_map = {
+        "P": {"icon": "📊", "label": "표"},
+        "C": {"icon": "💬", "label": "설명"},
+        "A": {"icon": "🧮", "label": "식"}
+    } %}
     {% set current_lens = lens_map.get(category) %}
     <nav aria-label="연산 유형" class="flex flex-wrap items-center justify-center gap-3">
         {% if categories %}
@@ -125,7 +130,7 @@
                 <span aria-hidden="true">🔄</span> 결과 초기화
             </button>
         </header>
-        <dl class="mt-6 grid gap-4 sm:grid-cols-3 text-center">
+        <dl class="mt-6 grid gap-4 sm:grid-cols-5 text-center">
             <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
                 <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">총 문제</dt>
                 <dd class="mt-3 text-3xl font-semibold text-white" id="summary-total">{{ problems|length }}</dd>
@@ -138,9 +143,185 @@
                 <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">정답률</dt>
                 <dd class="mt-3 text-3xl font-semibold text-white" id="summary-accuracy">0%</dd>
             </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
+                <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">평균 반응시간</dt>
+                <dd class="mt-3 text-3xl font-semibold text-white" id="summary-average">—</dd>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
+                <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-300">설명 입력률</dt>
+                <dd class="mt-3 text-3xl font-semibold text-white" id="summary-explanation">0%</dd>
+            </div>
         </dl>
-        <p class="mt-4 text-xs text-slate-400">Tip: 정답률 80% 이상이면 Invite 링크를 생성해 친구나 가족과 함께 풀어보세요.</p>
+        <p class="mt-4 text-xs text-slate-400">Tip: 정확도 85% 이상에 빠른 반응(40%+) 또는 설명 입력률 50% 이상이면 Invite 링크를 생성할 수 있어요.</p>
     </section>
+
+    {% if bridge_unit %}
+    <section class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-sky-900/10" data-bridge-unit data-bridge-sequence="{{ bridge_unit.sequence_id }}">
+        <header class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 class="text-2xl font-semibold text-white">S2 브리지 미니 유닛</h2>
+                <p class="mt-1 text-sm text-slate-300">{{ bridge_unit.description or '표 → 말 → 식으로 표현을 전환하며 전이를 연습해보세요.' }}</p>
+            </div>
+            <div class="inline-flex items-center gap-2 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+                <span aria-hidden="true">{{ bridge_unit.lens or '🔺' }}</span>
+                <span>{{ bridge_unit.node }}</span>
+            </div>
+        </header>
+        <p class="mt-4 text-sm text-slate-300" data-bridge-status>표(P) → 설명(C) → 식(A) 순서로 진행됩니다. 각 단계를 완료하면 다음 단계가 강조됩니다.</p>
+        <ol class="mt-4 flex flex-wrap items-center gap-2 text-sm" data-bridge-progress>
+            {% for bridge_problem in bridge_unit.problems %}
+            {% set rep_meta = representation_map.get(bridge_problem.representation, {'icon': '📘', 'label': bridge_problem.representation}) %}
+            <li class="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-1 text-xs font-semibold text-white/80" data-bridge-step data-bridge-index="{{ loop.index0 }}">
+                <span aria-hidden="true">{{ rep_meta.icon }}</span>
+                <span>{{ loop.index }}단계 · {{ rep_meta.label }}</span>
+            </li>
+            {% endfor %}
+        </ol>
+        <div class="mt-6 space-y-6" data-bridge-problem-list>
+            {% for bridge_problem in bridge_unit.problems %}
+            {% set rep_meta = representation_map.get(bridge_problem.representation, {'icon': '📘', 'label': bridge_problem.representation}) %}
+            <article class="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-inner" data-bridge-problem data-bridge-index="{{ loop.index0 }}" data-bridge-id="{{ bridge_problem.id }}" data-bridge-type="{{ bridge_problem.type }}"
+                {% if bridge_problem.type == 'table_fill' %}
+                    data-answer-missing="{{ bridge_problem.answer.missing_value }}"
+                    data-answer-difference="{{ bridge_problem.answer.common_difference }}"
+                {% elif bridge_problem.type == 'explain' %}
+                    data-answer-keywords="{{ bridge_problem.answer_keywords|join('|') }}"
+                {% elif bridge_problem.type == 'general_term' %}
+                    data-answer-value="{{ bridge_problem.answer }}"
+                {% endif %}>
+                <header class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 text-white">
+                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-sm font-semibold text-primary">{{ loop.index }}</span>
+                        <div>
+                            <h3 class="text-lg font-semibold">{{ bridge_problem.prompt }}</h3>
+                            <p class="text-xs text-slate-400">표현: {{ rep_meta.label }}</p>
+                        </div>
+                    </div>
+                    <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70">
+                        <span aria-hidden="true">{{ rep_meta.icon }}</span>
+                        <span>{{ rep_meta.label }}</span>
+                    </div>
+                </header>
+                <div class="mt-4 space-y-4">
+                    {% if bridge_problem.type == 'table_fill' %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full table-fixed text-center text-sm text-white">
+                            <thead>
+                                <tr class="border-b border-white/10">
+                                    <th scope="col" class="px-3 py-2 font-semibold">n</th>
+                                    <th scope="col" class="px-3 py-2 font-semibold">aₙ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in bridge_problem.table %}
+                                <tr class="border-b border-white/10">
+                                    <td class="px-3 py-2 text-slate-300">{{ row[0] }}</td>
+                                    <td class="px-3 py-2">
+                                        {% if row[1] is none %}
+                                        <input type="number" inputmode="numeric" class="w-full rounded-lg border border-white/20 bg-slate-900/60 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="값" data-bridge-input="missing">
+                                        {% else %}
+                                        <span class="text-white">{{ row[1] }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <form class="grid gap-3 sm:grid-cols-2" data-bridge-form>
+                        <label class="flex flex-col gap-2 text-sm text-slate-200">
+                            <span>빈칸 값</span>
+                            <input type="number" inputmode="numeric" class="rounded-lg border border-white/20 bg-slate-900/60 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="예: 7" data-bridge-input="missing-value">
+                        </label>
+                        <label class="flex flex-col gap-2 text-sm text-slate-200">
+                            <span>공차</span>
+                            <input type="number" inputmode="numeric" class="rounded-lg border border-white/20 bg-slate-900/60 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="예: 2" data-bridge-input="difference">
+                        </label>
+                        <div class="sm:col-span-2">
+                            <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-primary/30 transition hover:-translate-y-0.5 hover:bg-sky-300" data-bridge-submit>
+                                <span aria-hidden="true">✅</span> 답 확인
+                            </button>
+                        </div>
+                    </form>
+                    {% elif bridge_problem.type == 'explain' %}
+                    <form class="space-y-3" data-bridge-form>
+                        <label class="flex flex-col gap-2 text-sm text-slate-200">
+                            <span>규칙을 한 문장으로 설명해보세요.</span>
+                            <textarea rows="3" class="w-full rounded-lg border border-white/20 bg-slate-900/60 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="첫 항과 공차를 언급해보세요." maxlength="200" data-bridge-input="explanation"></textarea>
+                        </label>
+                        <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-primary/30 transition hover:-translate-y-0.5 hover:bg-sky-300" data-bridge-submit>
+                            <span aria-hidden="true">📝</span> 설명 확인
+                        </button>
+                    </form>
+                    {% elif bridge_problem.type == 'general_term' %}
+                    <div class="space-y-3 text-sm text-slate-300">
+                        {% if bridge_problem.given %}
+                        <p>주어진 값: a₁ = {{ bridge_problem.given.a1 }}, d = {{ bridge_problem.given.d }}, n = {{ bridge_problem.given.n }}</p>
+                        {% endif %}
+                        <form class="flex flex-wrap items-end gap-3" data-bridge-form>
+                            <label class="flex flex-col gap-2 text-sm text-slate-200">
+                                <span>aₙ 값을 입력하세요</span>
+                                <input type="number" inputmode="numeric" class="rounded-lg border border-white/20 bg-slate-900/60 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="예: 13" data-bridge-input="term-value">
+                            </label>
+                            <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-primary/30 transition hover:-translate-y-0.5 hover:bg-sky-300" data-bridge-submit>
+                                <span aria-hidden="true">✅</span> 답 확인
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    {% if bridge_problem.hints %}
+                    <details class="rounded-xl border border-white/10 bg-slate-900/40 p-4 text-sm text-slate-200">
+                        <summary class="cursor-pointer font-semibold text-white">힌트 보기</summary>
+                        <ul class="mt-2 list-disc space-y-1 pl-5">
+                            {% for hint in bridge_problem.hints %}
+                            <li>{{ hint }}</li>
+                            {% endfor %}
+                        </ul>
+                    </details>
+                    {% endif %}
+                    {% if bridge_problem.solution_steps %}
+                    <details class="rounded-xl border border-white/10 bg-slate-900/40 p-4 text-sm text-slate-200">
+                        <summary class="cursor-pointer font-semibold text-white">풀이 단계</summary>
+                        <ol class="mt-2 list-decimal space-y-1 pl-5">
+                            {% for step in bridge_problem.solution_steps %}
+                            <li>{{ step }}</li>
+                            {% endfor %}
+                        </ol>
+                    </details>
+                    {% endif %}
+                </div>
+                <p class="mt-3 text-sm text-slate-300" data-bridge-feedback role="status"></p>
+            </article>
+            {% endfor %}
+        </div>
+        <div class="mt-8 hidden rounded-2xl border border-white/10 bg-white/5 p-5" data-bridge-summary>
+            <h3 class="text-lg font-semibold text-white">미니 리포트</h3>
+            <dl class="mt-4 grid gap-3 text-sm text-slate-200 sm:grid-cols-2">
+                <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-3">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">완료한 단계</dt>
+                    <dd class="mt-2 text-xl font-semibold text-white" data-bridge-summary-count>0 / {{ bridge_unit.problems|length }}</dd>
+                </div>
+                <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-3">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">정확도</dt>
+                    <dd class="mt-2 text-xl font-semibold text-white" data-bridge-summary-accuracy>0%</dd>
+                </div>
+                <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-3">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">평균 반응시간</dt>
+                    <dd class="mt-2 text-xl font-semibold text-white" data-bridge-summary-average>—</dd>
+                </div>
+                <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-3">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">빠른 응답 비중</dt>
+                    <dd class="mt-2 text-xl font-semibold text-white" data-bridge-summary-fast>—</dd>
+                </div>
+                <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-3">
+                    <dt class="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">설명 키워드</dt>
+                    <dd class="mt-2 text-xl font-semibold text-white" data-bridge-summary-explanation>—</dd>
+                </div>
+            </dl>
+            <p class="mt-4 text-xs text-slate-300" data-bridge-summary-note>단계를 완료하면 요약이 자동으로 업데이트됩니다.</p>
+        </div>
+    </section>
+    {% endif %}
 
     <section id="invite" data-invite-section data-category="{{ category or '' }}" data-category-available="{{ 'true' if category_available else 'false' }}" tabindex="-1" class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-sky-900/10 focus:outline-none">
         <header class="flex flex-wrap items-center justify-between gap-3">
@@ -163,7 +344,7 @@
         </header>
         <p class="mt-4 text-sm text-slate-300" data-invite-status role="status">
             {% if category_available %}
-            정답률을 확인한 뒤 초대 링크를 생성해보세요.
+            정확도 85% 이상이고 빠른 응답(40%+) 또는 설명 입력률 50% 이상이면 Invite를 생성할 수 있습니다.
             {% else %}
             문제 유형을 선택해야 초대 링크를 생성할 수 있습니다. 상단에서 카테고리를 먼저 선택해주세요.
             {% endif %}
@@ -173,7 +354,7 @@
                 <h3 class="text-lg font-semibold text-white">공유 링크</h3>
                 <a data-invite-url href="#" target="_blank" rel="noopener" class="mt-3 inline-block break-all text-sm text-sky-300 underline underline-offset-4">초대 링크가 아직 생성되지 않았습니다.</a>
                 <p class="mt-3 text-xs text-slate-300">만료 예정: <span data-invite-expiry>—</span></p>
-                <dl class="mt-6 grid grid-cols-3 gap-3 text-center">
+                <dl class="mt-6 grid grid-cols-3 gap-3 text-center md:grid-cols-5">
                     <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-4">
                         <dt class="text-[0.7rem] font-medium uppercase tracking-[0.2em] text-slate-400">총 문제</dt>
                         <dd class="mt-2 text-xl font-semibold text-white" data-invite-summary-total>0</dd>
@@ -185,6 +366,15 @@
                     <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-4">
                         <dt class="text-[0.7rem] font-medium uppercase tracking-[0.2em] text-slate-400">정답률</dt>
                         <dd class="mt-2 text-xl font-semibold text-white" data-invite-summary-accuracy>0%</dd>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-4">
+                        <dt class="text-[0.7rem] font-medium uppercase tracking-[0.2em] text-slate-400">평균 반응</dt>
+                        <dd class="mt-2 text-xl font-semibold text-white" data-invite-summary-average>—</dd>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-4">
+                        <dt class="text-[0.7rem] font-medium uppercase tracking-[0.2em] text-slate-400">빠른 응답 · 설명</dt>
+                        <dd class="mt-2 text-xl font-semibold text-white" data-invite-summary-fast>—</dd>
+                        <dd class="text-xs text-slate-300" data-invite-summary-explanation>—</dd>
                     </div>
                 </dl>
             </div>
@@ -199,16 +389,59 @@
 <script>
 const problemCards = Array.from(document.querySelectorAll('[data-problem-card]'));
 const problemData = {{ problems|tojson }};
+const bridgeUnit = {{ bridge_unit|default(None)|tojson }};
 const summaryCorrect = document.getElementById('summary-correct');
 const summaryAccuracy = document.getElementById('summary-accuracy');
 const summaryTotal = document.getElementById('summary-total');
+const summaryAverage = document.getElementById('summary-average');
+const summaryExplanation = document.getElementById('summary-explanation');
 const answered = new Map();
 const explanations = new Map();
 const attemptTimings = new Map();
+const reactionTimes = new Map();
 const pageContainer = document.querySelector('[data-problem-container]');
 const currentCategory = pageContainer && pageContainer.dataset && pageContainer.dataset.category
     ? pageContainer.dataset.category
     : null;
+
+const MIN_ACCURACY_PERCENT = 85;
+const FAST_THRESHOLD_MS = 6000;
+const FAST_RATIO_THRESHOLD = 0.4;
+const EXPLANATION_COVERAGE_THRESHOLD = 0.5;
+const bridgeSection = document.querySelector('[data-bridge-unit]');
+const bridgeStepElements = bridgeSection
+    ? Array.from(bridgeSection.querySelectorAll('[data-bridge-step]'))
+    : [];
+const bridgeProblems = bridgeSection
+    ? Array.from(bridgeSection.querySelectorAll('[data-bridge-problem]'))
+    : [];
+const bridgeStatus = bridgeSection
+    ? bridgeSection.querySelector('[data-bridge-status]')
+    : null;
+const bridgeSummary = bridgeSection
+    ? bridgeSection.querySelector('[data-bridge-summary]')
+    : null;
+const bridgeSummaryCount = bridgeSummary
+    ? bridgeSummary.querySelector('[data-bridge-summary-count]')
+    : null;
+const bridgeSummaryAccuracy = bridgeSummary
+    ? bridgeSummary.querySelector('[data-bridge-summary-accuracy]')
+    : null;
+const bridgeSummaryAverage = bridgeSummary
+    ? bridgeSummary.querySelector('[data-bridge-summary-average]')
+    : null;
+const bridgeSummaryFast = bridgeSummary
+    ? bridgeSummary.querySelector('[data-bridge-summary-fast]')
+    : null;
+const bridgeSummaryExplanation = bridgeSummary
+    ? bridgeSummary.querySelector('[data-bridge-summary-explanation]')
+    : null;
+const bridgeSummaryNote = bridgeSummary
+    ? bridgeSummary.querySelector('[data-bridge-summary-note]')
+    : null;
+const bridgeTimers = new Map();
+const bridgeResults = new Map();
+const bridgeExplanationStore = new Map();
 
 function trackProblemRTEvent(payload) {
     if (window.analytics && typeof window.analytics.trackProblemRT === 'function') {
@@ -233,19 +466,371 @@ function markProblemStart(problemId) {
     attemptTimings.set(problemId, { startedAt: performance.now() });
 }
 
-function renderSummary() {
-    const correctCount = Array.from(answered.values()).reduce((acc, value) => acc + (value ? 1 : 0), 0);
+function collectSessionMetrics() {
     const total = problemData.length || problemCards.length;
-    const accuracy = total === 0 ? 0 : Math.round((correctCount / total) * 100);
+    const correctCount = Array.from(answered.values()).reduce(
+        (acc, value) => acc + (value ? 1 : 0),
+        0,
+    );
+    const durations = Array.from(reactionTimes.values()).filter((value) => Number.isFinite(value));
+    const totalDuration = durations.reduce((acc, value) => acc + value, 0);
+    const averageMs = durations.length ? totalDuration / durations.length : null;
+    const fastCount = durations.filter((value) => value <= FAST_THRESHOLD_MS).length;
+    const fastRatio = durations.length ? fastCount / durations.length : null;
+    const explanationCount = explanations.size;
+    const explanationCoverage = total > 0 ? explanationCount / total : 0;
+
+    return {
+        total,
+        correctCount,
+        averageMs,
+        fastRatio,
+        explanationCount,
+        explanationCoverage,
+    };
+}
+
+function renderSummary() {
+    const metrics = collectSessionMetrics();
+    const accuracy = metrics.total === 0 ? 0 : Math.round((metrics.correctCount / metrics.total) * 100);
     if (summaryCorrect) {
-        summaryCorrect.textContent = String(correctCount);
+        summaryCorrect.textContent = String(metrics.correctCount);
     }
     if (summaryAccuracy) {
         summaryAccuracy.textContent = `${accuracy}%`;
     }
     if (summaryTotal) {
-        summaryTotal.textContent = String(total);
+        summaryTotal.textContent = String(metrics.total);
     }
+    if (summaryAverage) {
+        if (metrics.averageMs === null) {
+            summaryAverage.textContent = '—';
+        } else {
+            const seconds = (metrics.averageMs / 1000).toFixed(1);
+            summaryAverage.textContent = `${seconds}초`;
+        }
+    }
+    if (summaryExplanation) {
+        const coveragePercent = Math.round(metrics.explanationCoverage * 100);
+        summaryExplanation.textContent = `${coveragePercent}%`;
+    }
+}
+
+function trackBridgeAnalytics(eventName, payload) {
+    if (window.analytics && typeof window.analytics.trackEvent === 'function') {
+        window.analytics.trackEvent(eventName, payload);
+    } else {
+        console.debug(eventName, payload);
+    }
+}
+
+function setBridgeFeedback(article, message, toneClass) {
+    const feedback = article.querySelector('[data-bridge-feedback]');
+    if (!feedback) {
+        return;
+    }
+    feedback.textContent = message;
+    feedback.className = `mt-3 text-sm font-semibold ${toneClass}`;
+}
+
+function startBridgeTimer(problemId) {
+    if (!problemId || bridgeTimers.has(problemId)) {
+        return;
+    }
+    bridgeTimers.set(problemId, performance.now());
+}
+
+function finishBridgeTimer(problemId) {
+    if (!problemId) {
+        return null;
+    }
+    const startedAt = bridgeTimers.get(problemId);
+    if (typeof startedAt !== 'number') {
+        return null;
+    }
+    const elapsed = Math.max(0, performance.now() - startedAt);
+    bridgeTimers.delete(problemId);
+    return elapsed;
+}
+
+function updateBridgeProgress() {
+    bridgeStepElements.forEach((stepEl) => {
+        const index = Number(stepEl.dataset.bridgeIndex || '0');
+        const problem = bridgeProblems[index];
+        const problemId = problem ? problem.dataset.bridgeId : null;
+        const result = problemId ? bridgeResults.get(problemId) : null;
+        stepEl.classList.remove('bg-primary', 'text-slate-900', 'border-white/15', 'bg-white/10', 'text-white/80');
+        if (result && result.correct) {
+            stepEl.classList.add('bg-primary', 'text-slate-900');
+        } else {
+            stepEl.classList.add('bg-white/10', 'text-white/80');
+        }
+    });
+}
+
+function updateBridgeSummary() {
+    if (!bridgeSummary) {
+        return;
+    }
+    const total = bridgeProblems.length;
+    const completed = Array.from(bridgeResults.values()).filter((entry) => entry.correct).length;
+    const accuracy = total === 0 ? 0 : Math.round((completed / total) * 100);
+    const durations = Array.from(bridgeResults.values())
+        .map((entry) => entry.elapsedMs)
+        .filter((value) => typeof value === 'number');
+    const totalDuration = durations.reduce((acc, value) => acc + value, 0);
+    const averageMs = durations.length ? totalDuration / durations.length : null;
+    const fastCount = durations.filter((value) => value <= FAST_THRESHOLD_MS).length;
+    const fastRatio = durations.length ? fastCount / durations.length : null;
+    const explanationCount = bridgeExplanationStore.size;
+    const explanationCoverage = total > 0 ? explanationCount / total : 0;
+
+    if (bridgeSummaryCount) {
+        bridgeSummaryCount.textContent = `${completed} / ${total}`;
+    }
+    if (bridgeSummaryAccuracy) {
+        bridgeSummaryAccuracy.textContent = `${accuracy}%`;
+    }
+    if (bridgeSummaryAverage) {
+        if (averageMs === null) {
+            bridgeSummaryAverage.textContent = '—';
+        } else {
+            bridgeSummaryAverage.textContent = `${(averageMs / 1000).toFixed(1)}초`;
+        }
+    }
+    if (bridgeSummaryFast) {
+        if (fastRatio === null) {
+            bridgeSummaryFast.textContent = '—';
+        } else {
+            bridgeSummaryFast.textContent = `${Math.round(fastRatio * 100)}%`;
+        }
+    }
+    if (bridgeSummaryExplanation) {
+        bridgeSummaryExplanation.textContent = `${Math.round(explanationCoverage * 100)}% (${explanationCount}개)`;
+    }
+
+    if (bridgeSummaryNote) {
+        bridgeSummaryNote.textContent =
+            completed === total
+                ? '모든 단계를 완료했습니다! 연습 문제에서 다룬 규칙을 다른 표현으로 연결해보세요.'
+                : '단계를 완료하면 요약이 자동으로 업데이트됩니다.';
+    }
+
+    if (completed === total) {
+        bridgeSummary.classList.remove('hidden');
+    }
+}
+
+function updateBridgeStatusMessage() {
+    if (!bridgeStatus) {
+        return;
+    }
+    const total = bridgeProblems.length;
+    const completed = Array.from(bridgeResults.values()).filter((entry) => entry.correct).length;
+    if (completed === 0) {
+        bridgeStatus.textContent = '표(P) → 설명(C) → 식(A) 순서로 진행됩니다. 각 단계를 완료하면 다음 단계가 강조됩니다.';
+        return;
+    }
+    if (completed < total) {
+        bridgeStatus.textContent = `${completed}/${total} 단계를 완료했습니다. 다음 단계를 진행해보세요.`;
+        return;
+    }
+    bridgeStatus.textContent = 'S2 브리지 미니 유닛을 모두 완료했습니다! 이제 일반항을 활용해 더 복잡한 문제에 도전해보세요.';
+}
+
+function sanitizeNumber(value) {
+    if (typeof value !== 'string') {
+        return Number(value);
+    }
+    const trimmed = value.trim();
+    if (trimmed === '') {
+        return NaN;
+    }
+    return Number(trimmed);
+}
+
+function handleBridgeSubmission(article) {
+    const problemId = article.dataset.bridgeId || '';
+    const problemType = article.dataset.bridgeType || '';
+    if (!problemId || !problemType) {
+        return;
+    }
+    const alreadyCompleted = bridgeResults.get(problemId);
+    if (alreadyCompleted && alreadyCompleted.correct) {
+        setBridgeFeedback(article, '이미 완료된 단계입니다.', 'text-slate-300');
+        return;
+    }
+
+    if (problemType === 'table_fill') {
+        const missingCell = article.querySelector('[data-bridge-input="missing"]');
+        const missingField = article.querySelector('[data-bridge-input="missing-value"]');
+        const differenceField = article.querySelector('[data-bridge-input="difference"]');
+        const rawMissing = missingField ? missingField.value : (missingCell ? missingCell.value : '');
+        const rawDifference = differenceField ? differenceField.value : '';
+        const missingValue = sanitizeNumber(rawMissing);
+        const differenceValue = sanitizeNumber(rawDifference);
+        if (!Number.isFinite(missingValue)) {
+            setBridgeFeedback(article, '빈칸에 들어갈 값을 숫자로 입력해주세요.', 'text-amber-300');
+            return;
+        }
+        if (!Number.isFinite(differenceValue)) {
+            setBridgeFeedback(article, '공차를 숫자로 입력해주세요.', 'text-amber-300');
+            return;
+        }
+        const expectedMissing = Number(article.dataset.answerMissing);
+        const expectedDifference = Number(article.dataset.answerDifference);
+        if (missingValue !== expectedMissing || differenceValue !== expectedDifference) {
+            setBridgeFeedback(article, '오답입니다. 공차와 빈칸 값을 다시 확인해보세요.', 'text-rose-300');
+            return;
+        }
+        if (missingCell) {
+            missingCell.value = String(expectedMissing);
+            missingCell.disabled = true;
+        }
+        if (missingField) {
+            missingField.value = String(expectedMissing);
+            missingField.disabled = true;
+        }
+        if (differenceField) {
+            differenceField.value = String(expectedDifference);
+            differenceField.disabled = true;
+        }
+        const elapsedMs = finishBridgeTimer(problemId);
+        bridgeResults.set(problemId, {
+            correct: true,
+            elapsedMs,
+        });
+        setBridgeFeedback(article, '정답입니다! 공차를 정확히 찾았어요 👍', 'text-emerald-300');
+        trackBridgeAnalytics('bridge_step_complete', {
+            step: problemId,
+            type: problemType,
+            elapsed_ms: elapsedMs,
+        });
+    } else if (problemType === 'explain') {
+        const explanationField = article.querySelector('[data-bridge-input="explanation"]');
+        if (!explanationField) {
+            return;
+        }
+        const text = explanationField.value.trim();
+        if (!text) {
+            setBridgeFeedback(article, '설명을 입력해주세요. 첫 항과 공차를 언급하면 좋아요.', 'text-amber-300');
+            return;
+        }
+        const keywords = (article.dataset.answerKeywords || '')
+            .split('|')
+            .map((keyword) => keyword.trim())
+            .filter(Boolean);
+        const lower = text.toLowerCase();
+        const missingKeywords = keywords.filter((keyword) => !lower.includes(keyword.toLowerCase()));
+        if (missingKeywords.length) {
+            setBridgeFeedback(
+                article,
+                `오답입니다. 다음 키워드를 포함해보세요: ${missingKeywords.join(', ')}`,
+                'text-rose-300',
+            );
+            return;
+        }
+        explanationField.value = text;
+        explanationField.disabled = true;
+        const elapsedMs = finishBridgeTimer(problemId);
+        bridgeResults.set(problemId, {
+            correct: true,
+            elapsedMs,
+        });
+        bridgeExplanationStore.set(problemId, {
+            text,
+            keyword_count: keywords.length,
+        });
+        setBridgeFeedback(article, '좋아요! 핵심어가 모두 포함되었습니다 👏', 'text-emerald-300');
+        trackBridgeAnalytics('bridge_step_complete', {
+            step: problemId,
+            type: problemType,
+            elapsed_ms: elapsedMs,
+            keyword_count: keywords.length,
+        });
+    } else if (problemType === 'general_term') {
+        const termField = article.querySelector('[data-bridge-input="term-value"]');
+        if (!termField) {
+            return;
+        }
+        const termValue = sanitizeNumber(termField.value);
+        if (!Number.isFinite(termValue)) {
+            setBridgeFeedback(article, 'aₙ 값을 숫자로 입력해주세요.', 'text-amber-300');
+            return;
+        }
+        const expectedValue = Number(article.dataset.answerValue);
+        if (termValue !== expectedValue) {
+            setBridgeFeedback(article, '오답입니다. 공식 aₙ = a₁ + (n-1)d를 활용해보세요.', 'text-rose-300');
+            return;
+        }
+        termField.value = String(expectedValue);
+        termField.disabled = true;
+        const elapsedMs = finishBridgeTimer(problemId);
+        bridgeResults.set(problemId, {
+            correct: true,
+            elapsedMs,
+        });
+        setBridgeFeedback(article, '정답입니다! 일반항을 정확히 계산했어요 🎉', 'text-emerald-300');
+        trackBridgeAnalytics('bridge_step_complete', {
+            step: problemId,
+            type: problemType,
+            elapsed_ms: elapsedMs,
+        });
+    } else {
+        return;
+    }
+
+    article.classList.add('border-primary/60', 'bg-primary/5');
+    updateBridgeProgress();
+    updateBridgeSummary();
+    updateBridgeStatusMessage();
+
+    const index = Number(article.dataset.bridgeIndex || '0');
+    const nextArticle = bridgeProblems[index + 1];
+    if (nextArticle) {
+        nextArticle.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (bridgeSummary) {
+        bridgeSummary.classList.remove('hidden');
+        bridgeSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+function bindBridgeProblem(article) {
+    const problemId = article.dataset.bridgeId || '';
+    const form = article.querySelector('[data-bridge-form]');
+    if (!problemId || !form) {
+        return;
+    }
+    const boundInputs = Array.from(form.querySelectorAll('input, textarea'));
+    const embeddedInputs = Array.from(article.querySelectorAll('table [data-bridge-input="missing"]'));
+    const allInputs = [...boundInputs, ...embeddedInputs];
+
+    allInputs.forEach((input) => {
+        input.addEventListener('focus', () => {
+            startBridgeTimer(problemId);
+        });
+        if (input.dataset.bridgeInput === 'missing-value') {
+            input.addEventListener('input', () => {
+                const mirror = article.querySelector('[data-bridge-input="missing"]');
+                if (mirror && mirror !== input) {
+                    mirror.value = input.value;
+                }
+            });
+        }
+        if (input.dataset.bridgeInput === 'missing') {
+            input.addEventListener('input', () => {
+                const mirror = article.querySelector('[data-bridge-input="missing-value"]');
+                if (mirror && mirror !== input) {
+                    mirror.value = input.value;
+                }
+            });
+        }
+    });
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        handleBridgeSubmission(article);
+    });
 }
 
 function setFeedback(feedbackEl, message, toneClass) {
@@ -311,6 +896,7 @@ async function handleCheck(card) {
     const userAnswer = Number(trimmed);
     const explanationInput = card.querySelector('[data-explanation]');
     const explanationValue = explanationInput ? (explanationInput.value || '').trim() : '';
+    const hasExplanation = explanationValue.length > 0;
 
     if (!problemId) {
         setFeedback(feedback, '문제 정보를 찾을 수 없습니다.', 'text-amber-300');
@@ -320,6 +906,7 @@ async function handleCheck(card) {
     if (trimmed === '' || !Number.isFinite(userAnswer)) {
         setFeedback(feedback, '답을 숫자로 입력해주세요.', 'text-amber-300');
         answered.delete(problemId);
+        reactionTimes.delete(problemId);
         renderSummary();
         return;
     }
@@ -329,17 +916,18 @@ async function handleCheck(card) {
         button.setAttribute('aria-busy', 'true');
     }
 
+    const timing = attemptTimings.get(problemId);
+    let reactionMs = null;
+    if (timing && typeof timing.startedAt === 'number') {
+        reactionMs = Math.max(0, performance.now() - timing.startedAt);
+    }
+    if (hasExplanation) {
+        explanations.set(problemId, explanationValue);
+    } else {
+        explanations.delete(problemId);
+    }
+
     try {
-        const timing = attemptTimings.get(problemId);
-        let reactionMs = null;
-        if (timing && typeof timing.startedAt === 'number') {
-            reactionMs = Math.max(0, performance.now() - timing.startedAt);
-        }
-        if (explanationValue) {
-            explanations.set(problemId, explanationValue);
-        } else {
-            explanations.delete(problemId);
-        }
         const payload = await submitAttempt(problemId, userAnswer);
         const isCorrect = Boolean(payload && payload.is_correct);
         if (isCorrect) {
@@ -351,15 +939,19 @@ async function handleCheck(card) {
         }
         answered.set(problemId, isCorrect);
         if (reactionMs !== null) {
+            reactionTimes.set(problemId, reactionMs);
             const elapsedMs = Number(reactionMs.toFixed(2));
             trackProblemRTEvent({
                 problem_id: problemId,
                 category: currentCategory || 'unknown',
                 elapsed_ms: elapsedMs,
                 is_correct: isCorrect,
+                source: 'api',
             });
+        } else {
+            reactionTimes.delete(problemId);
         }
-        if (explanationValue) {
+        if (hasExplanation) {
             trackProblemExplanationEvent({
                 problem_id: problemId,
                 category: currentCategory || 'unknown',
@@ -367,9 +959,44 @@ async function handleCheck(card) {
             });
         }
     } catch (error) {
-        const message = error instanceof Error ? error.message : '답안을 채점할 수 없습니다.';
-        setFeedback(feedback, message, 'text-amber-300');
-        answered.delete(problemId);
+        const fallbackProblem = Array.isArray(problemData)
+            ? problemData.find((entry) => entry && entry.id === problemId)
+            : null;
+        if (fallbackProblem && typeof fallbackProblem.answer === 'number') {
+            const correctAnswer = Number(fallbackProblem.answer);
+            const isCorrect = userAnswer === correctAnswer;
+            const statusMessage = isCorrect
+                ? '정답입니다! 잘했어요 🎉 (임시 채점)'
+                : `오답입니다. 정답은 ${correctAnswer} 입니다. (임시 채점)`;
+            setFeedback(feedback, statusMessage, isCorrect ? 'text-emerald-300' : 'text-rose-300');
+            answered.set(problemId, isCorrect);
+            if (reactionMs !== null) {
+                reactionTimes.set(problemId, reactionMs);
+                const elapsedMs = Number(reactionMs.toFixed(2));
+                trackProblemRTEvent({
+                    problem_id: problemId,
+                    category: currentCategory || 'unknown',
+                    elapsed_ms: elapsedMs,
+                    is_correct: isCorrect,
+                    source: 'fallback',
+                });
+            } else {
+                reactionTimes.delete(problemId);
+            }
+            if (hasExplanation) {
+                trackProblemExplanationEvent({
+                    problem_id: problemId,
+                    category: currentCategory || 'unknown',
+                    length: explanationValue.length,
+                    source: 'fallback',
+                });
+            }
+        } else {
+            const message = error instanceof Error ? error.message : '답안을 채점할 수 없습니다.';
+            setFeedback(feedback, message, 'text-amber-300');
+            answered.delete(problemId);
+            reactionTimes.delete(problemId);
+        }
     } finally {
         if (button) {
             button.disabled = false;
@@ -443,11 +1070,20 @@ function bindCard(card) {
 problemCards.forEach(bindCard);
 renderSummary();
 
+if (bridgeSection && bridgeProblems.length) {
+    bridgeProblems.forEach((article) => bindBridgeProblem(article));
+    updateBridgeProgress();
+    updateBridgeStatusMessage();
+    updateBridgeSummary();
+}
+
 const resetButton = document.querySelector('[data-reset]');
 if (resetButton) {
     resetButton.addEventListener('click', () => {
         answered.clear();
         explanations.clear();
+        attemptTimings.clear();
+        reactionTimes.clear();
         problemCards.forEach((card) => {
             const input = card.querySelector('[data-input]');
             const feedback = card.querySelector('[data-feedback]');
@@ -483,6 +1119,9 @@ if (inviteSection) {
     const inviteSummaryTotal = inviteSection.querySelector('[data-invite-summary-total]');
     const inviteSummaryCorrect = inviteSection.querySelector('[data-invite-summary-correct]');
     const inviteSummaryAccuracy = inviteSection.querySelector('[data-invite-summary-accuracy]');
+    const inviteSummaryAverage = inviteSection.querySelector('[data-invite-summary-average]');
+    const inviteSummaryFast = inviteSection.querySelector('[data-invite-summary-fast]');
+    const inviteSummaryExplanation = inviteSection.querySelector('[data-invite-summary-explanation]');
     const inviteGenerateLabel = inviteGenerateButton ? inviteGenerateButton.querySelector('[data-label]') : null;
     let inviteState = null;
 
@@ -549,6 +1188,15 @@ if (inviteSection) {
         if (inviteSummaryAccuracy) {
             inviteSummaryAccuracy.textContent = '0%';
         }
+        if (inviteSummaryAverage) {
+            inviteSummaryAverage.textContent = '—';
+        }
+        if (inviteSummaryFast) {
+            inviteSummaryFast.textContent = '—';
+        }
+        if (inviteSummaryExplanation) {
+            inviteSummaryExplanation.textContent = '—';
+        }
     }
 
     function toggleGenerateLoading(isLoading) {
@@ -572,9 +1220,18 @@ if (inviteSection) {
     }
 
     function computeInviteSummary() {
-        const total = problemData.length || problemCards.length;
-        const correct = Array.from(answered.values()).reduce((acc, value) => acc + (value ? 1 : 0), 0);
-        return { total, correct };
+        const metrics = collectSessionMetrics();
+        const averageMs = metrics.averageMs !== null ? Math.round(metrics.averageMs) : null;
+        const fastRatio = metrics.fastRatio !== null ? Number(metrics.fastRatio.toFixed(3)) : null;
+        const explanationCoverage = Number(metrics.explanationCoverage.toFixed(3));
+        return {
+            total: metrics.total,
+            correct: metrics.correctCount,
+            average_ms: averageMs,
+            fast_ratio: fastRatio,
+            explanation_count: metrics.explanationCount,
+            explanation_coverage: explanationCoverage,
+        };
     }
 
     function formatDateTime(isoString) {
@@ -619,6 +1276,32 @@ if (inviteSection) {
         if (inviteSummaryAccuracy && data.summary && data.summary.accuracy != null) {
             inviteSummaryAccuracy.textContent = `${data.summary.accuracy}%`;
         }
+        if (inviteSummaryAverage) {
+            if (data.summary && data.summary.average_ms != null) {
+                const seconds = (Number(data.summary.average_ms) / 1000).toFixed(1);
+                inviteSummaryAverage.textContent = `${seconds}초`;
+            } else {
+                inviteSummaryAverage.textContent = '—';
+            }
+        }
+        if (inviteSummaryFast) {
+            if (data.summary && data.summary.fast_ratio != null) {
+                const percent = Math.round(Number(data.summary.fast_ratio) * 100);
+                inviteSummaryFast.textContent = `${percent}%`;
+            } else {
+                inviteSummaryFast.textContent = '—';
+            }
+        }
+        if (inviteSummaryExplanation) {
+            if (data.summary && data.summary.explanation_coverage != null) {
+                const percent = Math.round(Number(data.summary.explanation_coverage) * 100);
+                const count = data.summary.explanation_count;
+                const label = typeof count === 'number' ? `${percent}% (${count}개)` : `${percent}%`;
+                inviteSummaryExplanation.textContent = label;
+            } else {
+                inviteSummaryExplanation.textContent = '—';
+            }
+        }
     }
 
     async function handleInviteGenerate() {
@@ -633,9 +1316,50 @@ if (inviteSection) {
         toggleGenerateLoading(true);
         setInviteStatus('초대 링크를 생성 중입니다...', 'info');
         try {
+            const summary = computeInviteSummary();
+            const accuracy = summary.total === 0 ? 0 : Math.round((summary.correct / summary.total) * 100);
+            const fastRatioValue = typeof summary.fast_ratio === 'number' ? summary.fast_ratio : null;
+            const explanationCoverageValue = typeof summary.explanation_coverage === 'number'
+                ? summary.explanation_coverage
+                : 0;
+            const accuracyPass = accuracy >= MIN_ACCURACY_PERCENT;
+            const rtPass = fastRatioValue !== null && fastRatioValue >= FAST_RATIO_THRESHOLD;
+            const explanationPass = explanationCoverageValue >= EXPLANATION_COVERAGE_THRESHOLD;
+
+            if (!accuracyPass || !(rtPass || explanationPass)) {
+                const reasons = [];
+                if (!accuracyPass) {
+                    reasons.push(`정확도 ${accuracy}% (목표 ${MIN_ACCURACY_PERCENT}%+)`);
+                }
+                if (!(rtPass || explanationPass)) {
+                    if (!rtPass) {
+                        if (fastRatioValue === null) {
+                            reasons.push('반응시간 데이터를 충분히 모으는 중입니다. 몇 문제만 더 풀어주세요.');
+                        } else {
+                            const fastPercent = Math.round(fastRatioValue * 100);
+                            reasons.push(`빠른 응답 ${fastPercent}% (목표 ${Math.round(FAST_RATIO_THRESHOLD * 100)}%+)`);
+                        }
+                    }
+                    if (!explanationPass) {
+                        const explainPercent = Math.round(explanationCoverageValue * 100);
+                        reasons.push(`설명 입력률 ${explainPercent}% (목표 ${Math.round(EXPLANATION_COVERAGE_THRESHOLD * 100)}%+)`);
+                    }
+                }
+                setInviteStatus(`Invite 생성 조건을 충족하지 못했습니다: ${reasons.join(' / ')}`, 'warning');
+                toggleGenerateLoading(false);
+                return;
+            }
+
             const payload = {
                 category: categoryName,
-                summary: computeInviteSummary(),
+                summary: {
+                    total: summary.total,
+                    correct: summary.correct,
+                    average_ms: summary.average_ms,
+                    fast_ratio: summary.fast_ratio,
+                    explanation_count: summary.explanation_count,
+                    explanation_coverage: summary.explanation_coverage,
+                },
             };
             const response = await fetch('/api/invites', {
                 method: 'POST',
@@ -718,7 +1442,7 @@ if (inviteSection) {
         setInviteStatus('현재 선택된 문제 유형이 없어 초대 링크를 생성할 수 없습니다. 카테고리를 선택한 뒤 다시 시도해주세요.', 'warning');
         return;
     }
-    setInviteStatus('정답률을 확인한 뒤 초대 링크를 생성해보세요.', 'info');
+    setInviteStatus('정확도 85% 이상이고, 빠른 응답(40%+) 또는 설명 입력률 50% 이상이면 Invite를 생성할 수 있습니다.', 'info');
 }
 </script>
 {% endblock %}

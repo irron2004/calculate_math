@@ -11,6 +11,7 @@ from ..category_service import (
     resolve_allowed_categories,
     resolve_primary_category,
 )
+from ..bridge_bank import BridgeDataError, list_bridge_units
 from ..problem_bank import get_problems
 
 
@@ -71,12 +72,29 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
         selected_category = (
             category if category in categories else resolve_primary_category(categories)
         )
+        bridge_unit = None
+        try:
+            bridge_units = list_bridge_units()
+        except BridgeDataError:
+            bridge_units = []
+
+        node_by_category = {
+            "덧셈": "ALG-AP",
+            "뺄셈": "ALG-AP",
+        }
+
         if not selected_category:
             problems_payload: list[dict[str, object]] = []
         else:
             problems_payload = [
                 asdict(problem) for problem in get_problems(selected_category)
             ]
+            target_node = node_by_category.get(selected_category)
+            if target_node:
+                for unit in bridge_units:
+                    if unit.node == target_node:
+                        bridge_unit = unit.to_dict()
+                        break
         return active_templates.TemplateResponse(
             "problems.html",
             {
@@ -87,6 +105,7 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 "categories": categories,
                 "primary_category": resolve_primary_category(categories),
                 "category_available": bool(selected_category),
+                "bridge_unit": bridge_unit,
             },
         )
 
