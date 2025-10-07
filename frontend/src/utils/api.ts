@@ -1,11 +1,11 @@
 import type {
-  APIProblemResponse,
   APISession,
   CurriculumConcept,
   CurriculumGraph,
   CurriculumHomeCopy,
   GeneratedItem,
   LRCEvaluation,
+  ProblemAttemptResponse,
   TemplateSummary
 } from '../types';
 
@@ -37,15 +37,13 @@ export async function createSession(): Promise<APISession> {
 
 // 문제 답안 제출
 export async function submitAnswer(
-  problemId: number, 
-  chosenAnswer: number, 
-  attemptNo: number = 1
-): Promise<APIProblemResponse> {
-  return apiCall<APIProblemResponse>(`/v1/problems/${problemId}`, {
-    method: 'PATCH',
+  problemId: string | number,
+  chosenAnswer: number
+): Promise<ProblemAttemptResponse> {
+  return apiCall<ProblemAttemptResponse>(`/problems/${problemId}/attempts`, {
+    method: 'POST',
     body: JSON.stringify({
-      chosen_answer: chosenAnswer,
-      attempt_no: attemptNo,
+      answer: chosenAnswer,
     }),
   });
 }

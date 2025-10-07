@@ -9,7 +9,14 @@ import random
 from dataclasses import dataclass
 from pathlib import Path
 from threading import RLock
-from typing import Any, List, Mapping, MutableMapping, Optional, Sequence
+from typing import (
+    Any,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+)
 
 from .config import get_settings
 
