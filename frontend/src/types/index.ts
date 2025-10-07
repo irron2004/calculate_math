@@ -74,13 +74,14 @@ export type APISession = {
   problems: APIProblem[];
 };
 
-export type APIProblemResponse = {
-  problem_id: number;
-  chosen_answer: number;
+export type ProblemAttemptResponse = {
+  attempt_id: number;
+  problem_id: string;
+  category: string;
+  submitted_answer: number;
   correct_answer: number;
   is_correct: boolean;
-  attempt_no: number;
-  message: string;
+  attempted_at: string;
 };
 
 export type MathProblem = {
