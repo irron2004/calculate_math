@@ -2,6 +2,8 @@ import type {
   APIProblemResponse,
   APISession,
   CurriculumConcept,
+  CurriculumGraph,
+  CurriculumHomeCopy,
   GeneratedItem,
   LRCEvaluation,
   TemplateSummary
@@ -83,6 +85,18 @@ export async function generateTemplateInstance(
     method: 'POST',
     body: JSON.stringify(payload ?? {}),
   });
+}
+
+export async function fetchCurriculumGraph(): Promise<CurriculumGraph> {
+  return apiCall<CurriculumGraph>('/v1/graph/current');
+}
+
+export async function fetchCurriculumHomeCopy(): Promise<CurriculumHomeCopy> {
+  return apiCall<CurriculumHomeCopy>('/v1/graph/home-copy');
+}
+
+export async function fetchUserCurriculumGraph(userId: string): Promise<CurriculumGraph> {
+  return apiCall<CurriculumGraph>(`/v1/graph/user/${encodeURIComponent(userId)}`);
 }
 
 export async function evaluateLRC(payload: {

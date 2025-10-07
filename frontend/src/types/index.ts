@@ -38,6 +38,62 @@ export type TemplateSummary = {
   parameter_names: string[];
 };
 
+export type CurriculumGraphNode = {
+  id: string;
+  label: string;
+  concept: string;
+  step: 'S1' | 'S2' | 'S3';
+  lens: string[];
+  grade_band: string;
+  micro_skills: string[];
+  mastery: number;
+  lrc?: {
+    acc: number;
+    rt_pct: number;
+    expl: number;
+    passed: boolean;
+  } | null;
+};
+
+export type CurriculumGraphEdge = {
+  id: string;
+  source: string;
+  target: string;
+  type: 'prereq' | 'transfer';
+  lens: string;
+  weight: number;
+  evidence?: {
+    n?: number;
+    uplift?: number;
+    conf?: number;
+  };
+};
+
+export type CurriculumGraphMeta = {
+  palette: Record<string, string>;
+  user?: {
+    id: string;
+    mastery_source?: string;
+  };
+};
+
+export type CurriculumGraph = {
+  meta: CurriculumGraphMeta;
+  nodes: CurriculumGraphNode[];
+  edges: CurriculumGraphEdge[];
+};
+
+export type CurriculumHomeCopy = {
+  version: string;
+  nodes: Record<
+    string,
+    {
+      label: string;
+      tooltip: string;
+    }
+  >;
+};
+
 export type GeneratedItem = {
   id: string;
   template_id: string;

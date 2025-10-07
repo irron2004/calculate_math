@@ -1,0 +1,1011 @@
+{
+  "meta": {
+    "palette": {
+      "difference": "#E4572E",
+      "accumulation": "#17BEBB",
+      "ratio": "#8D99AE",
+      "scale": "#2E86AB",
+      "random": "#F29E4C",
+      "transform": "#6C5CE7",
+      "vector": "#2D6A4F"
+    }
+  },
+  "nodes": [
+    {
+      "id": "ALG-PR-S1",
+      "label": "비율·S1",
+      "concept": "ALG-PR",
+      "step": "S1",
+      "lens": [
+        "ratio"
+      ],
+      "grade_band": "E3-E5",
+      "micro_skills": [
+        "배합표",
+        "단위율(1의 값)",
+        "표채우기"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "ALG-PR-S2",
+      "label": "비례함수·S2",
+      "concept": "ALG-PR",
+      "step": "S2",
+      "lens": [
+        "ratio"
+      ],
+      "grade_band": "E4-E6",
+      "micro_skills": [
+        "y=kx",
+        "기울기=단위율",
+        "표↔그래프"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "ALG-PR-S3",
+      "label": "반비례·S3",
+      "concept": "ALG-PR",
+      "step": "S3",
+      "lens": [
+        "ratio"
+      ],
+      "grade_band": "E5-G1",
+      "micro_skills": [
+        "xy=상수",
+        "모형판별",
+        "단위체크"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "EXP-GR-S1",
+      "label": "곱셈증가·S1",
+      "concept": "EXP-GR",
+      "step": "S1",
+      "lens": [
+        "scale"
+      ],
+      "grade_band": "E3-E5",
+      "micro_skills": [
+        "×k vs +k",
+        "배수증가표"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "EXP-GR-S2",
+      "label": "등비수열·S2",
+      "concept": "EXP-GR",
+      "step": "S2",
+      "lens": [
+        "scale"
+      ],
+      "grade_band": "E5-G1",
+      "micro_skills": [
+        "a·r^(n-1)",
+        "비율해석"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "EXP-GR-S3",
+      "label": "지수·로그·S3",
+      "concept": "EXP-GR",
+      "step": "S3",
+      "lens": [
+        "scale"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "지수함수",
+        "로그전환"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "GEO-SIM-S1",
+      "label": "닮음·S1",
+      "concept": "GEO-SIMTRIG",
+      "step": "S1",
+      "lens": [
+        "scale",
+        "ratio"
+      ],
+      "grade_band": "E4-E6",
+      "micro_skills": [
+        "확대/축소",
+        "길이비"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "GEO-SIM-S2",
+      "label": "삼각비·S2",
+      "concept": "GEO-SIMTRIG",
+      "step": "S2",
+      "lens": [
+        "scale",
+        "ratio"
+      ],
+      "grade_band": "E6-G1",
+      "micro_skills": [
+        "직각삼각비",
+        "기울기연결"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "GEO-SIM-S3",
+      "label": "삼각함수·S3",
+      "concept": "GEO-SIMTRIG",
+      "step": "S3",
+      "lens": [
+        "scale"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "단위원",
+        "사인·코사인"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "CAL-ACC-S1",
+      "label": "누적합·S1",
+      "concept": "CAL-ACC",
+      "step": "S1",
+      "lens": [
+        "accumulation"
+      ],
+      "grade_band": "E5-E6",
+      "micro_skills": [
+        "막대합(폭=1)",
+        "단위해석"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "CAL-ACC-S2",
+      "label": "근사적분·S2",
+      "concept": "CAL-ACC",
+      "step": "S2",
+      "lens": [
+        "accumulation"
+      ],
+      "grade_band": "E6-G1",
+      "micro_skills": [
+        "사다리꼴근사",
+        "Σ표기"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "CAL-ACC-S3",
+      "label": "정적분·S3",
+      "concept": "CAL-ACC",
+      "step": "S3",
+      "lens": [
+        "accumulation"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "넓이해석",
+        "단위체크"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "CAL-AVG-S1",
+      "label": "평균변화율·S1",
+      "concept": "CAL-AVG",
+      "step": "S1",
+      "lens": [
+        "difference"
+      ],
+      "grade_band": "E5-G1",
+      "micro_skills": [
+        "Δy/Δx",
+        "기울기"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "CAL-AVG-S2",
+      "label": "증가·극값·S2",
+      "concept": "CAL-AVG",
+      "step": "S2",
+      "lens": [
+        "difference"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "도함수직관",
+        "기울기판별"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "CAL-AVG-S3",
+      "label": "순간변화율·S3",
+      "concept": "CAL-AVG",
+      "step": "S3",
+      "lens": [
+        "difference"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "접선의미",
+        "극한직관"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "STA-COMB-S1",
+      "label": "경우의수·S1",
+      "concept": "STA-COMB",
+      "step": "S1",
+      "lens": [
+        "random"
+      ],
+      "grade_band": "E5-E6",
+      "micro_skills": [
+        "합·곱법칙",
+        "트리"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "STA-COMB-S2",
+      "label": "확률·이항·S2",
+      "concept": "STA-COMB",
+      "step": "S2",
+      "lens": [
+        "random"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "이항분포",
+        "기댓값"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "STA-COMB-S3",
+      "label": "정규근사·S3",
+      "concept": "STA-COMB",
+      "step": "S3",
+      "lens": [
+        "random"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "근사판단",
+        "오차감"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "STA-NORM-S1",
+      "label": "대푯값·S1",
+      "concept": "STA-NORM",
+      "step": "S1",
+      "lens": [
+        "random"
+      ],
+      "grade_band": "E5-E6",
+      "micro_skills": [
+        "평균·중앙값·최빈값"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "STA-NORM-S2",
+      "label": "산포·S2",
+      "concept": "STA-NORM",
+      "step": "S2",
+      "lens": [
+        "random"
+      ],
+      "grade_band": "E6-G1",
+      "micro_skills": [
+        "분산·표준편차",
+        "상자그림"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "STA-NORM-S3",
+      "label": "정규분포·S3",
+      "concept": "STA-NORM",
+      "step": "S3",
+      "lens": [
+        "random"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "68-95-99.7",
+        "백분위"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "GEO-COORD-S1",
+      "label": "좌표놀이·S1",
+      "concept": "GEO-COORD",
+      "step": "S1",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "E4-E6",
+      "micro_skills": [
+        "좌표읽기",
+        "거리·중점"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "GEO-COORD-S2",
+      "label": "직선·원·S2",
+      "concept": "GEO-COORD",
+      "step": "S2",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "E6-G1",
+      "micro_skills": [
+        "y=mx+b",
+        "(x-a)^2+(y-b)^2=r^2"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "GEO-COORD-S3",
+      "label": "이차곡선·S3",
+      "concept": "GEO-COORD",
+      "step": "S3",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "포물선정의",
+        "성질유도"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "NUM-MOD-S1",
+      "label": "약수·배수·S1",
+      "concept": "NUM-MOD",
+      "step": "S1",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "E5-E6",
+      "micro_skills": [
+        "공약수",
+        "공배수"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "NUM-MOD-S2",
+      "label": "유클리드·S2",
+      "concept": "NUM-MOD",
+      "step": "S2",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "E6-G1",
+      "mastery": 0.0,
+      "micro_skills": [
+        "GCD반복",
+        "나머지"
+      ]
+    },
+    {
+      "id": "NUM-MOD-S3",
+      "label": "모듈러·S3",
+      "concept": "NUM-MOD",
+      "step": "S3",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "합동",
+        "시계산"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "ALG-REC-S1",
+      "label": "패턴·S1",
+      "concept": "ALG-REC",
+      "step": "S1",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "E4-E6",
+      "micro_skills": [
+        "규칙언어화",
+        "표기록"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "ALG-REC-S2",
+      "label": "점화식·S2",
+      "concept": "ALG-REC",
+      "step": "S2",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "E6-G1",
+      "micro_skills": [
+        "a_n=f(a_{n-1})",
+        "초기값"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "ALG-REC-S3",
+      "label": "(선택)행렬·S3",
+      "concept": "ALG-REC",
+      "step": "S3",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "전이행렬",
+        "황금비근사"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "VEC-PROJ-S1",
+      "label": "화살표합·S1",
+      "concept": "VEC-PROJ",
+      "step": "S1",
+      "lens": [
+        "vector"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "평행사변형합"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "VEC-PROJ-S2",
+      "label": "내적·S2",
+      "concept": "VEC-PROJ",
+      "step": "S2",
+      "lens": [
+        "vector"
+      ],
+      "grade_band": "G1-G2",
+      "mastery": 0.0,
+      "micro_skills": [
+        "성분·코사인"
+      ]
+    },
+    {
+      "id": "VEC-PROJ-S3",
+      "label": "투영·최소제곱·S3",
+      "concept": "VEC-PROJ",
+      "step": "S3",
+      "lens": [
+        "vector"
+      ],
+      "grade_band": "G1-G2",
+      "micro_skills": [
+        "그림자길이",
+        "잔차"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "GEO-TRF-S1",
+      "label": "대칭·이동·S1",
+      "concept": "GEO-TRF",
+      "step": "S1",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "E3-E5",
+      "micro_skills": [
+        "밀기·뒤집기·돌리기"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "GEO-TRF-S2",
+      "label": "합성변환·S2",
+      "concept": "GEO-TRF",
+      "step": "S2",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "E4-E6",
+      "micro_skills": [
+        "순서·합성"
+      ],
+      "mastery": 0.0
+    },
+    {
+      "id": "GEO-TRF-S3",
+      "label": "좌표변환·S3",
+      "concept": "GEO-TRF",
+      "step": "S3",
+      "lens": [
+        "transform"
+      ],
+      "grade_band": "E6-G1",
+      "micro_skills": [
+        "대칭·회전의 수식"
+      ],
+      "mastery": 0.0
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-PR-1",
+      "source": "ALG-PR-S1",
+      "target": "ALG-PR-S2",
+      "type": "transfer",
+      "lens": "ratio",
+      "weight": 0.6,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-PR-2",
+      "source": "ALG-PR-S2",
+      "target": "ALG-PR-S3",
+      "type": "transfer",
+      "lens": "ratio",
+      "weight": 0.55,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-EXP-1",
+      "source": "EXP-GR-S1",
+      "target": "EXP-GR-S2",
+      "type": "transfer",
+      "lens": "scale",
+      "weight": 0.58,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-EXP-2",
+      "source": "EXP-GR-S2",
+      "target": "EXP-GR-S3",
+      "type": "transfer",
+      "lens": "scale",
+      "weight": 0.52,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-SIM-1",
+      "source": "GEO-SIM-S1",
+      "target": "GEO-SIM-S2",
+      "type": "transfer",
+      "lens": "scale",
+      "weight": 0.57,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-SIM-2",
+      "source": "GEO-SIM-S2",
+      "target": "GEO-SIM-S3",
+      "type": "transfer",
+      "lens": "scale",
+      "weight": 0.5,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-ACC-1",
+      "source": "CAL-ACC-S1",
+      "target": "CAL-ACC-S2",
+      "type": "transfer",
+      "lens": "accumulation",
+      "weight": 0.56,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-ACC-2",
+      "source": "CAL-ACC-S2",
+      "target": "CAL-ACC-S3",
+      "type": "transfer",
+      "lens": "accumulation",
+      "weight": 0.53,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-AVG-1",
+      "source": "CAL-AVG-S1",
+      "target": "CAL-AVG-S2",
+      "type": "transfer",
+      "lens": "difference",
+      "weight": 0.54,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-AVG-2",
+      "source": "CAL-AVG-S2",
+      "target": "CAL-AVG-S3",
+      "type": "transfer",
+      "lens": "difference",
+      "weight": 0.51,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-COMB-1",
+      "source": "STA-COMB-S1",
+      "target": "STA-COMB-S2",
+      "type": "transfer",
+      "lens": "random",
+      "weight": 0.55,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-COMB-2",
+      "source": "STA-COMB-S2",
+      "target": "STA-COMB-S3",
+      "type": "transfer",
+      "lens": "random",
+      "weight": 0.52,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-NORM-1",
+      "source": "STA-NORM-S1",
+      "target": "STA-NORM-S2",
+      "type": "transfer",
+      "lens": "random",
+      "weight": 0.56,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-NORM-2",
+      "source": "STA-NORM-S2",
+      "target": "STA-NORM-S3",
+      "type": "transfer",
+      "lens": "random",
+      "weight": 0.53,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-COORD-1",
+      "source": "GEO-COORD-S1",
+      "target": "GEO-COORD-S2",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.58,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-COORD-2",
+      "source": "GEO-COORD-S2",
+      "target": "GEO-COORD-S3",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.54,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-MOD-1",
+      "source": "NUM-MOD-S1",
+      "target": "NUM-MOD-S2",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.57,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-MOD-2",
+      "source": "NUM-MOD-S2",
+      "target": "NUM-MOD-S3",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.53,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-REC-1",
+      "source": "ALG-REC-S1",
+      "target": "ALG-REC-S2",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.56,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-REC-2",
+      "source": "ALG-REC-S2",
+      "target": "ALG-REC-S3",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.51,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-VEC-1",
+      "source": "VEC-PROJ-S1",
+      "target": "VEC-PROJ-S2",
+      "type": "transfer",
+      "lens": "vector",
+      "weight": 0.55,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-VEC-2",
+      "source": "VEC-PROJ-S2",
+      "target": "VEC-PROJ-S3",
+      "type": "transfer",
+      "lens": "vector",
+      "weight": 0.52,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-TRF-1",
+      "source": "GEO-TRF-S1",
+      "target": "GEO-TRF-S2",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.58,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "e-TRF-2",
+      "source": "GEO-TRF-S2",
+      "target": "GEO-TRF-S3",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.54,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x1",
+      "source": "ALG-PR-S2",
+      "target": "CAL-AVG-S1",
+      "type": "transfer",
+      "lens": "ratio",
+      "weight": 0.48,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x2",
+      "source": "ALG-PR-S2",
+      "target": "GEO-SIM-S1",
+      "type": "transfer",
+      "lens": "scale",
+      "weight": 0.42,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x3",
+      "source": "GEO-TRF-S2",
+      "target": "GEO-COORD-S2",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.5,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x4",
+      "source": "GEO-COORD-S2",
+      "target": "CAL-AVG-S1",
+      "type": "transfer",
+      "lens": "difference",
+      "weight": 0.46,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x5",
+      "source": "CAL-ACC-S2",
+      "target": "CAL-AVG-S1",
+      "type": "transfer",
+      "lens": "accumulation",
+      "weight": 0.44,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x6",
+      "source": "STA-COMB-S2",
+      "target": "STA-NORM-S3",
+      "type": "transfer",
+      "lens": "random",
+      "weight": 0.62,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x7",
+      "source": "STA-NORM-S2",
+      "target": "VEC-PROJ-S3",
+      "type": "transfer",
+      "lens": "vector",
+      "weight": 0.4,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x8",
+      "source": "EXP-GR-S2",
+      "target": "ALG-REC-S2",
+      "type": "transfer",
+      "lens": "scale",
+      "weight": 0.52,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x9",
+      "source": "NUM-MOD-S2",
+      "target": "STA-COMB-S1",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.38,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x10",
+      "source": "GEO-SIM-S2",
+      "target": "CAL-AVG-S1",
+      "type": "transfer",
+      "lens": "scale",
+      "weight": 0.41,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    },
+    {
+      "id": "x11",
+      "source": "GEO-TRF-S3",
+      "target": "GEO-COORD-S3",
+      "type": "transfer",
+      "lens": "transform",
+      "weight": 0.49,
+      "evidence": {
+        "n": 0,
+        "uplift": 0.0,
+        "conf": 0.5
+      }
+    }
+  ]
+}

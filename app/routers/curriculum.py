@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import List
+from typing import Any, Dict, List
 
 from fastapi import APIRouter, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 
+from ..curriculum_graph import (
+    build_user_graph,
+    get_curriculum_graph,
+    get_home_copy,
+)
 from ..repositories import LRCRepository
 from ..template_engine import (
     ConceptNotFound,
@@ -122,6 +127,21 @@ async def api_list_concepts(step: str | None = Query(default=None)) -> List[Conc
         normalized = step.upper()
         nodes = [node for node in nodes if normalized in {s.upper() for s in node.stage_span}]
     return [ConceptResponse.from_node(node) for node in nodes]
+
+
+@router.get("/graph/current")
+async def api_get_curriculum_graph() -> Dict[str, Any]:
+    return get_curriculum_graph()
+
+
+@router.get("/graph/home-copy")
+async def api_get_home_copy() -> Dict[str, Any]:
+    return get_home_copy()
+
+
+@router.get("/graph/user/{user_id}")
+async def api_get_user_graph(user_id: str) -> Dict[str, Any]:
+    return build_user_graph(user_id)
 
 
 @router.get("/concepts/{concept_id}", response_model=ConceptResponse)

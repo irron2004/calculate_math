@@ -7,6 +7,7 @@ import {
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import HomePathMap from './HomePathMap';
 import './StudentDashboard.css';
 
 const StudentDashboard: React.FC = () => {
@@ -83,6 +84,14 @@ const StudentDashboard: React.FC = () => {
             <span>수학 게임 시작하기</span>
           </button>
         </div>
+
+        <section className="path-map-section">
+          <div className="section-heading">
+            <h2>연결이 보이는 커리큘럼</h2>
+            <p>내가 푼 스텝이 어디로 이어지는지 한눈에 살펴보세요.</p>
+          </div>
+          <HomePathMap />
+        </section>
 
         {/* 학습 옵션 */}
         <div className="learning-options">

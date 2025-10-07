@@ -46,6 +46,32 @@
   margin: 0 auto;
 }
 
+.path-map-section {
+  margin-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.section-heading h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.section-heading p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
 /* 통계 카드 */
 .stats-grid {
   display: grid;
@@ -234,6 +260,10 @@
 
   .dashboard-content {
     padding: 15px;
+  }
+
+  .path-map-section {
+    margin-bottom: 32px;
   }
 
   .stats-grid {
