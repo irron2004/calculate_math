@@ -116,10 +116,14 @@ export type LRCMetric = {
   met: boolean;
 };
 
+export type LRCStatus = 'gold' | 'silver' | 'pending' | 'retry';
+
+export type LRCRecommendation = 'promote' | 'reinforce' | 'remediate' | string;
+
 export type LRCEvaluation = {
   passed: boolean;
-  status: string;
-  recommendation: string;
+  status: LRCStatus;
+  recommendation: LRCRecommendation;
   metrics: Record<string, LRCMetric>;
   focus_concept?: string | null;
   evaluated_at?: string | null;

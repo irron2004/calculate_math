@@ -146,7 +146,7 @@ def test_generate_template_returns_options(client) -> None:
     assert payload["answer"] in payload["options"]
 
 
-def test_lrc_evaluate_promote(client) -> None:
+def test_lrc_evaluate_gold_tier(client) -> None:
     response = client.post(
         "/api/v1/lrc/evaluate",
         json={
@@ -160,36 +160,37 @@ def test_lrc_evaluate_promote(client) -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["passed"] is True
+    assert payload["status"] == "gold"
     assert payload["recommendation"] == "promote"
     assert payload["focus_concept"] == "TEST-CON"
     assert "evaluated_at" in payload
 
 
-def test_lrc_evaluate_near_miss(client) -> None:
+def test_lrc_evaluate_silver_tier(client) -> None:
     response = client.post(
         "/api/v1/lrc/evaluate",
         json={
             "accuracy": 0.88,
-            "rt_percentile": 0.62,
-            "rubric": 0.8,
+            "rt_percentile": 0.65,
+            "rubric": 0.3,
             "user_id": "student-2",
             "focus_concept": "TEST-CON",
         },
     )
     assert response.status_code == 200
     payload = response.json()
-    assert payload["passed"] is False
-    assert payload["status"] == "near-miss"
-    assert payload["recommendation"] == "reinforce"
+    assert payload["passed"] is True
+    assert payload["status"] == "silver"
+    assert payload["recommendation"] == "promote"
 
 
-def test_lrc_evaluate_fail(client) -> None:
+def test_lrc_evaluate_pending(client) -> None:
     response = client.post(
         "/api/v1/lrc/evaluate",
         json={
-            "accuracy": 0.7,
-            "rt_percentile": 0.4,
-            "rubric": 0.5,
+            "accuracy": 0.86,
+            "rt_percentile": 0.42,
+            "rubric": 0.8,
             "user_id": "student-3",
             "focus_concept": "TEST-CON",
         },
@@ -197,6 +198,25 @@ def test_lrc_evaluate_fail(client) -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["passed"] is False
+    assert payload["status"] == "pending"
+    assert payload["recommendation"] == "reinforce"
+
+
+def test_lrc_evaluate_retry(client) -> None:
+    response = client.post(
+        "/api/v1/lrc/evaluate",
+        json={
+            "accuracy": 0.7,
+            "rt_percentile": 0.4,
+            "rubric": 0.5,
+            "user_id": "student-4",
+            "focus_concept": "TEST-CON",
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["passed"] is False
+    assert payload["status"] == "retry"
     assert payload["recommendation"] == "remediate"
 
 
@@ -217,7 +237,7 @@ def test_lrc_last_endpoint_returns_latest(client) -> None:
     response = client.get("/api/v1/lrc/last", params={"user_id": "student-latest"})
     assert response.status_code == 200
     payload = response.json()
-    assert payload["recommendation"] == "reinforce"
+    assert payload["recommendation"] == "promote"
     assert payload["focus_concept"] == "TEST-CON"
     assert "metrics" in payload
 

@@ -1,9 +1,4 @@
-import {
-  ArrowLeft,
-  Clock,
-  Target,
-  Compass
-} from 'lucide-react';
+import { ArrowLeft, Clock, Target } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,7 +6,9 @@ import type {
   APISession,
   CurriculumConcept,
   GeneratedItem,
-  LRCEvaluation
+  LRCEvaluation,
+  LRCStatus,
+  LRCRecommendation
 } from '../types';
 import {
   createSession,
@@ -28,6 +25,8 @@ import {
   resolveFocusConcept,
   stepsForConcept
 } from '../utils/curriculum';
+import { getLensBadges, getLensBadgeTokens } from '../utils/lens';
+import { countKeywordMatches } from '../utils/text';
 import './MathGame.css';
 
 const STEP_LABEL: Record<string, string> = {
@@ -36,6 +35,33 @@ const STEP_LABEL: Record<string, string> = {
   S3: 'S3 · 전이'
 };
 const PREFERRED_CONCEPTS = ['ALG-AP', 'RAT-PRO', 'GEO-LIN'];
+
+const LRC_STATUS_MESSAGES: Record<LRCStatus, { title: string; body: string }> = {
+  gold: {
+    title: 'GOLD 초대 조건을 달성했어요! ✨',
+    body: '정확도와 속도, 설명까지 모두 충족했어요. 바로 다음 단계로 넘어갈 준비가 되었어요.'
+  },
+  silver: {
+    title: 'SILVER 초대 조건이에요! 🥈',
+    body: '정확도와 속도는 충분해요. 설명을 조금만 더 채우면 GOLD에 도전할 수 있어요.'
+  },
+  pending: {
+    title: '거의 다 왔어요! 🔄',
+    body: '정확도와 속도 중 하나만 더 끌어올리면 초대 조건을 만족할 수 있어요.'
+  },
+  retry: {
+    title: '다시 준비해볼까요? 💪',
+    body: '기초 개념을 한 번 더 다져서 초대 조건을 채워봐요.'
+  }
+};
+
+type RecommendationKey = Extract<LRCRecommendation, 'promote' | 'reinforce' | 'remediate'>;
+
+const LRC_RECOMMENDATION_LABELS: Record<RecommendationKey, string> = {
+  promote: '승급 연동',
+  reinforce: '집중 보강',
+  remediate: '기초 복습'
+};
 
 const FALLBACK_CONCEPT: CurriculumConcept = {
   id: 'FALLBACK',
@@ -63,6 +89,10 @@ interface ProblemFeedback {
   correctAnswer: number;
   userAnswer: number | null;
   isCorrect: boolean;
+  explanation: string;
+  keywordsMatched: number;
+  keywordsAvailable: number;
+  hintUsed: boolean;
 }
 
 const MathGame: React.FC = () => {
@@ -82,7 +112,14 @@ const MathGame: React.FC = () => {
   const [correctCount, setCorrectCount] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, number | null>>({});
   const [answerInput, setAnswerInput] = useState('');
+  const [explanationInput, setExplanationInput] = useState('');
+  const [explanations, setExplanations] = useState<Record<string, string>>({});
+  const [hintUsage, setHintUsage] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const explanationValueRef = useRef('');
+  const hintRevealedRef = useRef(false);
+  const questionStartRef = useRef<number | null>(null);
+  const focusStartRef = useRef<number | null>(null);
   const [feedback, setFeedback] = useState<ProblemFeedback | null>(null);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -91,6 +128,7 @@ const MathGame: React.FC = () => {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [latestLRC, setLatestLRC] = useState<LRCEvaluation | null>(null);
+  const [showKeywordHints, setShowKeywordHints] = useState(false);
 
   const resetGameState = () => {
     setScore(0);
@@ -98,6 +136,14 @@ const MathGame: React.FC = () => {
     setUserAnswers({});
     setTimeSpentHistory([]);
     setAnswerInput('');
+    setExplanationInput('');
+    setExplanations({});
+    setHintUsage({});
+    setShowKeywordHints(false);
+    explanationValueRef.current = '';
+    hintRevealedRef.current = false;
+    questionStartRef.current = null;
+    focusStartRef.current = null;
     setFeedback(null);
     setLrcResult(null);
     setLrcError(null);
@@ -279,6 +325,22 @@ const MathGame: React.FC = () => {
   const currentProblemId = currentProblem?.instance.id;
 
   useEffect(() => {
+    if (!currentProblemId || gameState !== 'playing') {
+      return;
+    }
+    questionStartRef.current = performance.now();
+    focusStartRef.current = null;
+    hintRevealedRef.current = false;
+    explanationValueRef.current = '';
+    setExplanationInput('');
+    setShowKeywordHints(false);
+  }, [currentProblemId, gameState]);
+
+  useEffect(() => {
+    explanationValueRef.current = explanationInput;
+  }, [explanationInput]);
+
+  useEffect(() => {
     if (gameState === 'playing' && currentProblemId) {
       inputRef.current?.focus();
     }
@@ -288,20 +350,42 @@ const MathGame: React.FC = () => {
     if (!currentProblem) {
       return;
     }
+
     const question = currentProblem.instance;
     const actualAnswer = question.answer;
-    const timeUsed = timedOut
+    const explanation = explanationValueRef.current.trim();
+    const rubricKeywords = question.rubric_keywords ?? [];
+    const keywordsAvailable = rubricKeywords.length;
+    const keywordMatches = countKeywordMatches(explanation, rubricKeywords);
+
+    const now = performance.now();
+    const start = focusStartRef.current ?? questionStartRef.current;
+    const reactionTimeMs = start !== null ? Math.max(0, Math.round(now - start)) : null;
+    const focusDelayMs =
+      focusStartRef.current !== null && questionStartRef.current !== null
+        ? Math.max(0, Math.round(focusStartRef.current - questionStartRef.current))
+        : null;
+    const fallbackSeconds = timedOut
       ? QUESTION_TIME_LIMIT
-      : Math.min(
-          QUESTION_TIME_LIMIT,
-          Math.max(0, QUESTION_TIME_LIMIT - timeLeft)
-        );
+      : Math.min(QUESTION_TIME_LIMIT, Math.max(0, QUESTION_TIME_LIMIT - timeLeft));
+    const secondsElapsed = reactionTimeMs !== null
+      ? Math.min(QUESTION_TIME_LIMIT, reactionTimeMs / 1000)
+      : fallbackSeconds;
+    const timeLimitMs = QUESTION_TIME_LIMIT * 1000;
 
     setUserAnswers((prev) => ({
       ...prev,
       [question.id]: chosenAnswer
     }));
-    setTimeSpentHistory((prev) => [...prev, timeUsed]);
+    setExplanations((prev) => ({
+      ...prev,
+      [question.id]: explanation
+    }));
+    setHintUsage((prev) => ({
+      ...prev,
+      [question.id]: hintRevealedRef.current
+    }));
+    setTimeSpentHistory((prev) => [...prev, secondsElapsed]);
 
     const isCorrect = !timedOut && chosenAnswer === actualAnswer;
 
@@ -311,13 +395,47 @@ const MathGame: React.FC = () => {
       step: question.step,
       correctAnswer: actualAnswer,
       userAnswer: chosenAnswer,
-      isCorrect
+      isCorrect,
+      explanation,
+      keywordsMatched: keywordMatches,
+      keywordsAvailable,
+      hintUsed: hintRevealedRef.current
     });
 
     setCorrectCount((prev) => (isCorrect ? prev + 1 : prev));
     setScore((prev) =>
-      isCorrect ? prev + 10 + Math.floor((QUESTION_TIME_LIMIT - timeUsed) / 3) : prev
+      isCorrect ? prev + 10 + Math.floor((QUESTION_TIME_LIMIT - secondsElapsed) / 3) : prev
     );
+
+    if (typeof window !== 'undefined' && window.analytics) {
+      const rtPayload: Record<string, unknown> = {
+        problem_id: question.id,
+        concept_id: currentProblem.concept.id,
+        step: question.step,
+        lens: question.lens?.[0],
+        time_limit_ms: timeLimitMs,
+        timed_out,
+        correct: isCorrect,
+        hint_used: hintRevealedRef.current || undefined
+      };
+      if (reactionTimeMs !== null) {
+        rtPayload.rt_ms = reactionTimeMs;
+      }
+      if (focusDelayMs !== null) {
+        rtPayload.focus_delay_ms = focusDelayMs;
+      }
+      window.analytics.trackProblemRT?.(rtPayload);
+
+      window.analytics.trackProblemExplanation?.({
+        problem_id: question.id,
+        concept_id: currentProblem.concept.id,
+        step: question.step,
+        length: explanation.length,
+        keywords_available: keywordsAvailable,
+        keywords_matched: keywordMatches,
+        hint_used: hintRevealedRef.current || undefined
+      });
+    }
 
     const nextIndex = currentIndex + 1;
     const nextProblem = problems[nextIndex] ?? null;
@@ -326,11 +444,39 @@ const MathGame: React.FC = () => {
     setCurrentIndex(nextIndex);
     setCurrentProblem(nextProblem);
     setAnswerInput('');
+    setExplanationInput('');
+    explanationValueRef.current = '';
+    focusStartRef.current = null;
+    questionStartRef.current = null;
+    hintRevealedRef.current = false;
+    setShowKeywordHints(false);
 
     if (nextProblem) {
       setGameState('playing');
     } else {
       setGameState('finished');
+    }
+  };
+
+  const handleExplanationChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = event.target.value;
+    setExplanationInput(value);
+    explanationValueRef.current = value;
+  };
+
+  const handleToggleKeywordHints = () => {
+    setShowKeywordHints((prev) => {
+      const next = !prev;
+      if (next) {
+        hintRevealedRef.current = true;
+      }
+      return next;
+    });
+  };
+
+  const handleAnswerFocus = () => {
+    if (focusStartRef.current === null) {
+      focusStartRef.current = performance.now();
     }
   };
 
@@ -423,6 +569,21 @@ const MathGame: React.FC = () => {
   const trimmedAnswer = answerInput.trim();
   const parsedAnswer = Number(trimmedAnswer);
   const canSubmit = trimmedAnswer !== '' && Number.isFinite(parsedAnswer);
+  const lensBadges = currentProblem ? getLensBadges(currentProblem.instance.lens) : [];
+  const rubricKeywords = currentProblem?.instance.rubric_keywords ?? [];
+  const keywordHintId = showKeywordHints && currentProblemId ? `keyword-hints-${currentProblemId}` : undefined;
+  const lrcCopy = lrcResult
+    ? LRC_STATUS_MESSAGES[lrcResult.status] ?? {
+        title: 'LRC 평가 결과',
+        body: '세부 지표를 확인해주세요.'
+      }
+    : null;
+  const lrcRecommendationKey = lrcResult?.recommendation as RecommendationKey | undefined;
+  const lrcRecommendationCopy = lrcResult
+    ? lrcRecommendationKey
+      ? LRC_RECOMMENDATION_LABELS[lrcRecommendationKey]
+      : lrcResult.recommendation
+    : null;
 
   return (
     <div className="math-game">
@@ -455,15 +616,51 @@ const MathGame: React.FC = () => {
               <div className="problem-meta">
                 <span className="concept-chip">{currentProblem.concept.name}</span>
                 <span className="step-chip">{STEP_LABEL[currentProblem.instance.step] ?? currentProblem.instance.step}</span>
-                <span className="lens-chip">
-                  <Compass size={16} /> {currentProblem.instance.lens.join(', ')}
-                </span>
+                <div className="lens-badges" role="list" aria-label="렌즈 분류">
+                  {lensBadges.map((badge) => (
+                    <span key={badge.id} className="lens-badge" role="listitem" title={`${badge.label} 렌즈`}>
+                      <span aria-hidden="true" className="lens-icon">{badge.icon}</span>
+                      <span className="lens-label">{badge.label}</span>
+                    </span>
+                  ))}
+                </div>
               </div>
               <h2>{currentProblem.instance.prompt}</h2>
               <p className="context-text">컨텍스트: {currentProblem.instance.context}</p>
             </div>
 
             <form className="answer-form" onSubmit={handleSubmit}>
+              <div className="explanation-block">
+                <div className="explanation-header">
+                  <label className="explanation-label" htmlFor="explanation-input">
+                    어떻게 풀었나요?
+                  </label>
+                  {rubricKeywords.length > 0 && (
+                    <button
+                      type="button"
+                      className="hint-toggle"
+                      onClick={handleToggleKeywordHints}
+                    >
+                      {showKeywordHints ? '힌트 숨기기' : '키워드 힌트'}
+                    </button>
+                  )}
+                </div>
+                {showKeywordHints && (
+                  <div className="keyword-hints" id={keywordHintId}>
+                    {rubricKeywords.join(', ')}
+                  </div>
+                )}
+                <textarea
+                  id="explanation-input"
+                  className="explanation-input"
+                  value={explanationInput}
+                  onChange={handleExplanationChange}
+                  placeholder="생각한 방법을 간단히 적어보세요"
+                  rows={3}
+                  aria-label="풀이 설명 입력"
+                  aria-describedby={keywordHintId}
+                />
+              </div>
               <input
                 ref={inputRef}
                 className="answer-input"
@@ -472,6 +669,7 @@ const MathGame: React.FC = () => {
                 pattern="-?[0-9]*"
                 value={answerInput}
                 onChange={handleInputChange}
+                onFocus={handleAnswerFocus}
                 placeholder="정답을 입력하세요"
                 aria-label="정답 입력"
               />
@@ -510,6 +708,11 @@ const MathGame: React.FC = () => {
                 <p>이전 문제: {feedback.prompt}</p>
                 <p>정답: {feedback.correctAnswer}</p>
                 <p>내 답: {feedback.userAnswer ?? '미응답'}</p>
+                <p>내 설명: {feedback.explanation ? feedback.explanation : '작성하지 않았어요'}</p>
+                {feedback.keywordsAvailable > 0 && (
+                  <p>키워드 매칭: {feedback.keywordsMatched}/{feedback.keywordsAvailable}</p>
+                )}
+                <p>힌트 사용: {feedback.hintUsed ? '예' : '아니오'}</p>
               </div>
             )}
           </div>
@@ -539,12 +742,16 @@ const MathGame: React.FC = () => {
               <div className="alert alert-info">LRC 평가를 계산 중입니다...</div>
             )}
 
-            {lrcResult && (
+            {lrcResult && lrcCopy && (
               <div className="lrc-result">
-                <h3>LRC 평가 결과</h3>
-                <p className={`lrc-status ${lrcResult.passed ? 'passed' : 'pending'}`}>
-                  {lrcResult.passed ? '승급 준비 완료!' : `권장 조치: ${lrcResult.recommendation}`}
-                </p>
+                <div className={`lrc-tier ${lrcResult.status}`}>
+                  {lrcResult.status.toUpperCase()}
+                </div>
+                <h3>{lrcCopy.title}</h3>
+                <p className="lrc-description">{lrcCopy.body}</p>
+                {!lrcResult.passed && lrcRecommendationCopy && (
+                  <p className="lrc-recommendation">권장 조치: {lrcRecommendationCopy}</p>
+                )}
                 <div className="lrc-metrics">
                   {Object.entries(lrcResult.metrics).map(([key, metric]) => (
                     <div key={key} className="metric-card">
@@ -569,6 +776,12 @@ const MathGame: React.FC = () => {
                 {problems.map((problem, index) => {
                   const userAnswer = userAnswers[problem.instance.id];
                   const isCorrect = userAnswer === problem.instance.answer;
+                  const explanation = explanations[problem.instance.id] ?? '';
+                  const hintUsed = hintUsage[problem.instance.id] ?? false;
+                  const keywordsAvailable = problem.instance.rubric_keywords?.length ?? 0;
+                  const keywordMatches = explanation
+                    ? countKeywordMatches(explanation, problem.instance.rubric_keywords ?? [])
+                    : 0;
                   return (
                     <div key={problem.instance.id} className={`result-item ${isCorrect ? 'correct' : 'incorrect'}`}>
                       <span className="result-title">
@@ -577,7 +790,12 @@ const MathGame: React.FC = () => {
                       <span className="result-prompt">{problem.instance.prompt}</span>
                       <span>정답: {problem.instance.answer}</span>
                       <span>내 답: {userAnswer ?? '미응답'}</span>
-                      <span>렌즈: {problem.instance.lens.join(', ')}</span>
+                      <span>설명: {explanation || '작성하지 않음'}</span>
+                      {keywordsAvailable > 0 && (
+                        <span>키워드 매칭: {keywordMatches}/{keywordsAvailable}</span>
+                      )}
+                      <span>힌트 사용: {hintUsed ? '예' : '아니오'}</span>
+                      <span>렌즈: {getLensBadgeTokens(problem.instance.lens)}</span>
                     </div>
                   );
                 })}

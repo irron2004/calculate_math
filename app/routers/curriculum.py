@@ -106,11 +106,11 @@ class LRCEvaluateRequest(BaseModel):
 
 
 THRESHOLDS = {
-    "accuracy": 0.90,
+    "accuracy": 0.85,
     "rt_percentile": 0.60,
-    "rubric": 0.75,
+    "rubric": 0.50,
 }
-_NEAR_MISS_MARGIN = 0.05
+_GOLD_RUBRIC_THRESHOLD = 0.75
 
 
 def _resolve_lrc_repository(request: Request) -> LRCRepository | None:
@@ -188,29 +188,40 @@ async def api_generate_template(
 
 @router.post("/lrc/evaluate", response_model=LRCEvaluateResponse)
 async def api_evaluate_lrc(payload: LRCEvaluateRequest, request: Request) -> LRCEvaluateResponse:
-    metrics: dict[str, LRCMetric] = {}
-    misses = 0
-    near_misses = 0
-    for key, threshold in THRESHOLDS.items():
-        value = getattr(payload, key)
-        met = value >= threshold
-        metrics[key] = LRCMetric(value=value, threshold=threshold, met=met)
-        if not met:
-            misses += 1
-            if value >= threshold - _NEAR_MISS_MARGIN:
-                near_misses += 1
-    if misses == 0:
-        recommendation = "promote"
-        status_label = "passed"
+    accuracy_met = payload.accuracy >= THRESHOLDS["accuracy"]
+    rt_met = payload.rt_percentile >= THRESHOLDS["rt_percentile"]
+    rubric_met = payload.rubric >= THRESHOLDS["rubric"]
+
+    metrics: dict[str, LRCMetric] = {
+        "accuracy": LRCMetric(
+            value=payload.accuracy,
+            threshold=THRESHOLDS["accuracy"],
+            met=accuracy_met,
+        ),
+        "rt_percentile": LRCMetric(
+            value=payload.rt_percentile,
+            threshold=THRESHOLDS["rt_percentile"],
+            met=rt_met,
+        ),
+        "rubric": LRCMetric(
+            value=payload.rubric,
+            threshold=THRESHOLDS["rubric"],
+            met=rubric_met,
+        ),
+    }
+
+    if accuracy_met and rt_met:
         passed = True
-    elif misses == 1 and near_misses == 1:
+        status_label = "gold" if payload.rubric >= _GOLD_RUBRIC_THRESHOLD else "silver"
+        recommendation = "promote"
+    elif accuracy_met or rt_met:
+        passed = False
+        status_label = "pending"
         recommendation = "reinforce"
-        status_label = "near-miss"
-        passed = False
     else:
-        recommendation = "remediate"
-        status_label = "retry"
         passed = False
+        status_label = "retry"
+        recommendation = "remediate"
     evaluated_at = datetime.now(timezone.utc)
     recorded_at_iso = evaluated_at.isoformat()
     focus_concept = payload.focus_concept

@@ -152,7 +152,75 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.explanation-block {
+  background: #f8f9fa;
+  border: 2px dashed #dce0f0;
+  border-radius: 16px;
+  padding: 16px;
+  width: 100%;
+  text-align: left;
+}
+
+.explanation-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 8px;
+}
+
+.explanation-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 1rem;
+}
+
+.hint-toggle {
+  border: none;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #3730a3;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hint-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(55, 48, 163, 0.2);
+}
+
+.keyword-hints {
+  background: #eef2ff;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #4338ca;
+  margin-bottom: 10px;
+}
+
+.explanation-input {
+  width: 100%;
+  min-height: 84px;
+  resize: vertical;
+  padding: 12px;
+  border: 3px solid #e1e5e9;
+  border-radius: 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.explanation-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
 .answer-input {
@@ -164,6 +232,7 @@
   text-align: center;
   transition: all 0.3s ease;
   background: #f8f9fa;
+  align-self: center;
 }
 
 .answer-input:focus {
@@ -171,6 +240,29 @@
   border-color: #667eea;
   background: white;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.lens-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.lens-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: #eef2ff;
+  color: #1f2937;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.lens-icon {
+  font-size: 1.1rem;
 }
 
 .submit-button {
@@ -183,6 +275,7 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
+  align-self: center;
 }
 
 .submit-button:hover:not(:disabled) {
@@ -277,8 +370,8 @@
 
 .result-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 6px;
   padding: 12px 16px;
   border-radius: 8px;
   background: white;
@@ -297,13 +390,7 @@
 }
 
 .result-item span {
-  flex: 1;
-  margin-right: 10px;
-}
-
-.result-item span:last-child {
-  flex: none;
-  font-size: 1.2rem;
+  display: block;
 }
 
 .feedback {
@@ -519,8 +606,7 @@
 }
 
 .concept-chip,
-.step-chip,
-.lens-chip {
+.step-chip {
   background: #eef2ff;
   color: #3742a4;
   padding: 6px 12px;
@@ -529,10 +615,6 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-}
-
-.lens-chip svg {
-  color: #5465ff;
 }
 
 .context-text {
@@ -562,22 +644,63 @@
 
 .lrc-result {
   background: #f8fafc;
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 18px;
+  padding: 24px;
   margin: 30px 0;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  text-align: left;
 }
 
-.lrc-status {
+.lrc-tier {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 9999px;
   font-weight: 700;
-  margin-bottom: 12px;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  color: white;
 }
 
-.lrc-status.passed {
-  color: #047857;
+.lrc-tier.gold {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 0 6px 14px rgba(245, 158, 11, 0.3);
 }
 
-.lrc-status.pending {
+.lrc-tier.silver {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  box-shadow: 0 6px 14px rgba(107, 114, 128, 0.25);
+}
+
+.lrc-tier.pending {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  box-shadow: 0 6px 14px rgba(14, 165, 233, 0.2);
+}
+
+.lrc-tier.retry {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.25);
+}
+
+.lrc-result h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 6px 0;
+}
+
+.lrc-description {
+  font-size: 1rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+.lrc-recommendation {
+  margin: 12px 0 0 0;
+  font-weight: 600;
   color: #b45309;
 }
 
