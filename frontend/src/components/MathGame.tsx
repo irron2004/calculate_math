@@ -1,5 +1,5 @@
 import { ArrowLeft, Clock, Target } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type {
@@ -27,6 +27,7 @@ import {
 } from '../utils/curriculum';
 import { getLensBadges, getLensBadgeTokens } from '../utils/lens';
 import { countKeywordMatches } from '../utils/text';
+import SkillTree from './SkillTree';
 import './MathGame.css';
 
 const STEP_LABEL: Record<string, string> = {
@@ -129,6 +130,7 @@ const MathGame: React.FC = () => {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [latestLRC, setLatestLRC] = useState<LRCEvaluation | null>(null);
   const [showKeywordHints, setShowKeywordHints] = useState(false);
+  const [conceptCatalog, setConceptCatalog] = useState<Record<string, CurriculumConcept>>({});
 
   const resetGameState = () => {
     setScore(0);
@@ -164,6 +166,13 @@ const MathGame: React.FC = () => {
     if (!concepts.length) {
       throw new Error('등록된 개념이 없습니다.');
     }
+
+    setConceptCatalog(
+      concepts.reduce<Record<string, CurriculumConcept>>((accumulator, concept) => {
+        accumulator[concept.id] = concept;
+        return accumulator;
+      }, {})
+    );
 
     const focusConceptId = latestEvaluation?.focus_concept ?? null;
     const conceptSelection = pickConcepts(concepts, focusConceptId);
@@ -560,6 +569,51 @@ const MathGame: React.FC = () => {
     return <div>로그인이 필요합니다.</div>;
   }
 
+  const completedNodeIds = useMemo(() => {
+    if (!problems.length) {
+      return [];
+    }
+    const answered = new Set(Object.keys(userAnswers));
+    const ids = problems
+      .filter((problem) => answered.has(problem.instance.id))
+      .map((problem) => {
+        const step = problem.instance.step || 'S1';
+        return `${problem.concept.id}-${step}`;
+      });
+    return Array.from(new Set(ids));
+  }, [problems, userAnswers]);
+
+  const conceptNames = useMemo(() => {
+    return Object.values(conceptCatalog).reduce<Record<string, string>>((accumulator, concept) => {
+      accumulator[concept.id] = concept.name;
+      return accumulator;
+    }, {});
+  }, [conceptCatalog]);
+
+  const accuracyPercent = useMemo(() => {
+    return totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0;
+  }, [correctCount, totalQuestions]);
+
+  const renderFeedback = () => {
+    if (!feedback) {
+      return null;
+    }
+    return (
+      <div className={`feedback ${feedback.isCorrect ? 'correct' : 'incorrect'}`}>
+        <h2>{feedback.isCorrect ? '정답입니다! 👍' : '아쉬워요! 다음에는 맞을 수 있어요.'}</h2>
+        <p>개념: {feedback.conceptName} · {STEP_LABEL[feedback.step] ?? feedback.step}</p>
+        <p>이전 문제: {feedback.prompt}</p>
+        <p>정답: {feedback.correctAnswer}</p>
+        <p>내 답: {feedback.userAnswer ?? '미응답'}</p>
+        <p>내 설명: {feedback.explanation ? feedback.explanation : '작성하지 않았어요'}</p>
+        {feedback.keywordsAvailable > 0 && (
+          <p>키워드 매칭: {feedback.keywordsMatched}/{feedback.keywordsAvailable}</p>
+        )}
+        <p>힌트 사용: {feedback.hintUsed ? '예' : '아니오'}</p>
+      </div>
+    );
+  };
+
   if (gameState === 'loading') {
     return (
       <div className="math-game">
@@ -709,20 +763,7 @@ const MathGame: React.FC = () => {
               </button>
             </div>
 
-            {feedback && (
-              <div className={`feedback ${feedback.isCorrect ? 'correct' : 'incorrect'}`}>
-                <h2>{feedback.isCorrect ? '정답입니다! 👍' : '아쉬워요! 다음에는 맞을 수 있어요.'}</h2>
-                <p>개념: {feedback.conceptName} · {STEP_LABEL[feedback.step] ?? feedback.step}</p>
-                <p>이전 문제: {feedback.prompt}</p>
-                <p>정답: {feedback.correctAnswer}</p>
-                <p>내 답: {feedback.userAnswer ?? '미응답'}</p>
-                <p>내 설명: {feedback.explanation ? feedback.explanation : '작성하지 않았어요'}</p>
-                {feedback.keywordsAvailable > 0 && (
-                  <p>키워드 매칭: {feedback.keywordsMatched}/{feedback.keywordsAvailable}</p>
-                )}
-                <p>힌트 사용: {feedback.hintUsed ? '예' : '아니오'}</p>
-              </div>
-            )}
+            {renderFeedback()}
           </div>
         )}
 
@@ -733,6 +774,11 @@ const MathGame: React.FC = () => {
             <button onClick={handleSubmitResults} className="submit-results-button" type="button">
               제출
             </button>
+            <div className="submit-results-stats" aria-live="polite">
+              <p>정답률 미리보기: {accuracyPercent}%</p>
+              <p>맞은 문제: {correctCount}개 / {totalQuestions}개</p>
+            </div>
+            {renderFeedback()}
           </div>
         )}
 
@@ -741,10 +787,11 @@ const MathGame: React.FC = () => {
             <h2>게임 완료! 🎊</h2>
             <div className="final-score">
               <h3>최종 점수: {score}점</h3>
-              <p>정답률: {totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0}%</p>
+              <p>정답률: {accuracyPercent}%</p>
               <p>맞은 문제: {correctCount}개 / {totalQuestions}개</p>
               <p>평균 풀이 시간: {timeSpentHistory.length ? (timeSpentHistory.reduce((acc, value) => acc + value, 0) / timeSpentHistory.length).toFixed(1) : QUESTION_TIME_LIMIT}초</p>
             </div>
+            {renderFeedback()}
 
             {isEvaluating && (
               <div className="alert alert-info">LRC 평가를 계산 중입니다...</div>
@@ -777,6 +824,18 @@ const MathGame: React.FC = () => {
             {lrcError && (
               <div className="alert alert-warning">{lrcError}</div>
             )}
+
+            <section className="skill-tree-section">
+              <h3>학습 스킬 트리</h3>
+              <p className="skill-tree-description">
+                이번 세션에서 학습한 단계와 이어질 다음 스텝을 살펴보세요.
+              </p>
+              <SkillTree
+                completedNodes={completedNodeIds}
+                focusConceptId={latestLRC?.focus_concept ?? null}
+                conceptNames={conceptNames}
+              />
+            </section>
 
             <div className="problem-results">
               <h3>문제별 결과:</h3>
