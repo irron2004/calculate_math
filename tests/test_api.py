@@ -5,15 +5,13 @@ import json
 import sys
 from pathlib import Path
 
+import httpx
 import pytest
 
 SERVICE_ROOT = Path(__file__).resolve().parents[1]
 
 if str(SERVICE_ROOT) not in sys.path:
     sys.path.insert(0, str(SERVICE_ROOT))
-
-from testing_utils.sync_client import create_client  # noqa: E402
-
 
 # NOTE: Telemetry exporters are validated in integration smoke tests. These
 # tests focus on ensuring middleware behaviour remains backwards compatible.
@@ -34,6 +32,8 @@ get_settings = config_module.get_settings
 AttemptRepository = repositories_module.AttemptRepository
 template_engine_module = _load_module("app.template_engine")
 reset_template_engine = template_engine_module.reset_engine
+
+pytestmark = pytest.mark.asyncio
 
 
 @pytest.fixture
@@ -92,16 +92,16 @@ def app(dataset):
 
 
 @pytest.fixture
-def client(app):
-    test_client = create_client(app)
-    try:
-        yield test_client
-    finally:
-        test_client.close()
+async def client(app):
+    transport = httpx.ASGITransport(app=app, lifespan="on")
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver"
+    ) as async_client:
+        yield async_client
 
 
-def test_health_endpoint_returns_status(client) -> None:
-    response = client.get("/health")
+async def test_health_endpoint_returns_status(client) -> None:
+    response = await client.get("/health")
     assert response.status_code == 200
     payload = response.json()
     assert payload["status"] == "healthy"
@@ -110,8 +110,8 @@ def test_health_endpoint_returns_status(client) -> None:
     assert "dependencies" in payload["details"]
 
 
-def test_healthz_endpoint_reports_dependencies(client) -> None:
-    response = client.get("/healthz")
+async def test_healthz_endpoint_reports_dependencies(client) -> None:
+    response = await client.get("/healthz")
     assert response.status_code == 200
     payload = response.json()
     assert payload["status"] == "healthy"
@@ -119,8 +119,8 @@ def test_healthz_endpoint_reports_dependencies(client) -> None:
     assert dependencies["jinja2"]["status"] == "ok"
 
 
-def test_readyz_endpoint_reports_readiness(client) -> None:
-    response = client.get("/readyz")
+async def test_readyz_endpoint_reports_readiness(client) -> None:
+    response = await client.get("/readyz")
     assert response.status_code == 200
     payload = response.json()
     assert payload["status"] == "ready"
@@ -129,33 +129,35 @@ def test_readyz_endpoint_reports_readiness(client) -> None:
     assert readiness["problem_bank"]["status"] == "ok"
 
 
-def test_default_problem_category_is_returned(client) -> None:
-    response = client.get("/api/problems")
+async def test_default_problem_category_is_returned(client) -> None:
+    response = await client.get("/api/problems")
     assert response.status_code == 200
     body = response.json()
     assert body["category"] == list_categories()[0]
     assert body["total"] == len(body["items"])
 
 
-def test_invalid_category_returns_problem_detail(client) -> None:
-    response = client.get("/api/problems", params={"category": "INVALID"})
+async def test_invalid_category_returns_problem_detail(client) -> None:
+    response = await client.get("/api/problems", params={"category": "INVALID"})
     assert response.status_code == 404
     body = response.json()
     assert body["type"].endswith("invalid-category")
     assert body["status"] == 404
 
 
-def test_request_id_is_preserved(client) -> None:
+async def test_request_id_is_preserved(client) -> None:
     """RequestContextMiddleware should echo back caller provided IDs."""
 
     request_id = "test-request-id"
-    response = client.get("/api/problems", headers={"X-Request-ID": request_id})
+    response = await client.get(
+        "/api/problems", headers={"X-Request-ID": request_id}
+    )
     assert response.status_code == 200
     assert response.headers["X-Request-ID"] == request_id
 
 
-def test_html_routes_emit_noindex_header(client) -> None:
-    response = client.get("/problems")
+async def test_html_routes_emit_noindex_header(client) -> None:
+    response = await client.get("/problems")
     assert response.status_code == 200
     assert response.headers["X-Robots-Tag"] == "noindex"
 

@@ -45,6 +45,27 @@ _instrumented_apps: set[int] = set()
 _meter_provider_configured = False
 
 
+def _is_otlp_configured(signal: str) -> bool:
+    """Return True if an OTLP endpoint is configured for the given signal."""
+
+    endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "").strip()
+    if endpoint:
+        return True
+
+    if signal == "traces":
+        signal_endpoint = os.getenv(
+            "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", ""
+        ).strip()
+    elif signal == "metrics":
+        signal_endpoint = os.getenv(
+            "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", ""
+        ).strip()
+    else:  # pragma: no cover - defensive guard for unexpected values
+        signal_endpoint = ""
+
+    return bool(signal_endpoint)
+
+
 def configure_telemetry(app: FastAPI) -> None:
     """Initialise OTEL tracer/meter providers and instrument the FastAPI app."""
 
@@ -149,6 +170,10 @@ def _get_tracer_provider() -> TracerProvider | None:
     if os.getenv("OTEL_SDK_DISABLED", "false").lower() == "true":
         return None
 
+    if not _is_otlp_configured("traces"):
+        logger.debug("Skipping OTEL trace provider setup; no OTLP endpoint configured")
+        return None
+
     current_provider = trace.get_tracer_provider()
     if isinstance(current_provider, TracerProvider):
         return current_provider
@@ -166,6 +191,12 @@ def _get_meter_provider() -> MeterProvider | None:
         return None
 
     if os.getenv("OTEL_SDK_DISABLED", "false").lower() == "true":
+        return None
+
+    if not _is_otlp_configured("metrics"):
+        logger.debug(
+            "Skipping OTEL meter provider setup; no OTLP endpoint configured"
+        )
         return None
 
     resource = _get_resource()

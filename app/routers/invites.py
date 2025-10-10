@@ -43,15 +43,15 @@ class InviteSummaryPayload(BaseModel):
     explanation_coverage: float | None = Field(default=None, ge=0.0, le=1.0)
 
     @model_validator(mode="after")
-    def validate_correct(cls, values: "InviteSummaryPayload") -> "InviteSummaryPayload":  # type: ignore[override]
-        if values.correct > values.total:
+    def validate_correct(self) -> "InviteSummaryPayload":  # type: ignore[override]
+        if self.correct > self.total:
             raise ValueError("correct answers cannot exceed total problems")
         if (
-            values.explanation_count is not None
-            and values.explanation_count > values.total
+            self.explanation_count is not None
+            and self.explanation_count > self.total
         ):
             raise ValueError("explanation count cannot exceed total problems")
-        return values
+        return self
 
 
 class InviteCreatePayload(BaseModel):

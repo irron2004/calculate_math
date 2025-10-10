@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import pytest
+
 pytest_plugins = ["tests.test_curriculum"]
+pytestmark = pytest.mark.asyncio
 
 
-def test_graph_current_exposes_palette(client) -> None:
-    response = client.get("/api/v1/graph/current")
+async def test_graph_current_exposes_palette(client) -> None:
+    response = await client.get("/api/v1/graph/current")
     assert response.status_code == 200
     payload = response.json()
     assert "meta" in payload
@@ -12,17 +15,17 @@ def test_graph_current_exposes_palette(client) -> None:
     assert payload["meta"]["palette"]["difference"] == "#E4572E"
 
 
-def test_graph_home_copy_contains_tooltip(client) -> None:
-    response = client.get("/api/v1/graph/home-copy")
+async def test_graph_home_copy_contains_tooltip(client) -> None:
+    response = await client.get("/api/v1/graph/home-copy")
     assert response.status_code == 200
     payload = response.json()
     assert payload["version"] == "v0.1"
     assert payload["nodes"]["ALG-PR-S2"]["tooltip"].startswith("y=kx")
 
 
-def test_graph_user_endpoint_adds_user_metadata(client) -> None:
+async def test_graph_user_endpoint_adds_user_metadata(client) -> None:
     user_id = "student-graph"
-    response = client.get(f"/api/v1/graph/user/{user_id}")
+    response = await client.get(f"/api/v1/graph/user/{user_id}")
     assert response.status_code == 200
     payload = response.json()
     assert payload["meta"]["user"]["id"] == user_id

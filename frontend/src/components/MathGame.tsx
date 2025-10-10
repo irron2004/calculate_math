@@ -484,8 +484,7 @@ const MathGame: React.FC = () => {
     setAnswerInput(event.target.value);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleConfirmAnswer = () => {
     const trimmed = answerInput.trim();
     if (!trimmed) {
       return;
@@ -500,6 +499,13 @@ const MathGame: React.FC = () => {
   const handleOptionSelect = (option: number) => {
     setAnswerInput(option.toString());
     window.setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  const handleAnswerKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      handleConfirmAnswer();
+    }
   };
 
   const handleSubmitResults = async () => {
@@ -629,7 +635,7 @@ const MathGame: React.FC = () => {
               <p className="context-text">컨텍스트: {currentProblem.instance.context}</p>
             </div>
 
-            <form className="answer-form" onSubmit={handleSubmit}>
+            <div className="answer-form" role="form" aria-label="정답 제출 폼">
               <div className="explanation-block">
                 <div className="explanation-header">
                   <label className="explanation-label" htmlFor="explanation-input">
@@ -670,6 +676,7 @@ const MathGame: React.FC = () => {
                 value={answerInput}
                 onChange={handleInputChange}
                 onFocus={handleAnswerFocus}
+                onKeyDown={handleAnswerKeyDown}
                 placeholder="정답을 입력하세요"
                 aria-label="정답 입력"
               />
@@ -695,11 +702,12 @@ const MathGame: React.FC = () => {
               <button
                 disabled={!canSubmit}
                 className="submit-button"
-                type="submit"
+                type="button"
+                onClick={handleConfirmAnswer}
               >
                 확인
               </button>
-            </form>
+            </div>
 
             {feedback && (
               <div className={`feedback ${feedback.isCorrect ? 'correct' : 'incorrect'}`}>

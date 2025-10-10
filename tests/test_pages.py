@@ -4,14 +4,13 @@ import importlib
 import sys
 from pathlib import Path
 
+import httpx
 import pytest
 
 SERVICE_ROOT = Path(__file__).resolve().parents[1]
 
 if str(SERVICE_ROOT) not in sys.path:
     sys.path.insert(0, str(SERVICE_ROOT))
-
-from testing_utils.sync_client import create_client  # noqa: E402
 
 
 def _load_module(module_path: str):
@@ -22,6 +21,8 @@ calculate_service_module = _load_module("app")
 create_app = calculate_service_module.create_app
 pages_module = calculate_service_module.pages
 
+pytestmark = pytest.mark.asyncio
+
 
 @pytest.fixture(scope="session")
 def app():
@@ -29,17 +30,17 @@ def app():
 
 
 @pytest.fixture
-def client(app):
-    test_client = create_client(app)
-    try:
-        yield test_client
-    finally:
-        test_client.close()
+async def client(app):
+    transport = httpx.ASGITransport(app=app, lifespan="on")
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver"
+    ) as async_client:
+        yield async_client
 
 
-def test_problems_page_without_categories_shows_invite_notice(client, monkeypatch):
+async def test_problems_page_without_categories_shows_invite_notice(client, monkeypatch):
     monkeypatch.setattr(pages_module, "resolve_allowed_categories", lambda: [])
-    response = client.get("/problems")
+    response = await client.get("/problems")
     assert response.status_code == 200
     body = response.text
     assert 'data-category-available="false"' in body

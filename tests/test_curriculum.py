@@ -3,14 +3,15 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import httpx
 import pytest
-
-from testing_utils.sync_client import create_client
 
 from app import create_app
 from app.config import get_settings
 from app.problem_bank import reset_cache
 from app.template_engine import reset_engine
+
+pytestmark = pytest.mark.asyncio
 
 
 @pytest.fixture
@@ -91,16 +92,16 @@ def app(curriculum_dataset):
 
 
 @pytest.fixture
-def client(app):
-    test_client = create_client(app)
-    try:
-        yield test_client
-    finally:
-        test_client.close()
+async def client(app):
+    transport = httpx.ASGITransport(app=app, lifespan="on")
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver"
+    ) as async_client:
+        yield async_client
 
 
-def test_list_concepts_returns_node(client) -> None:
-    response = client.get("/api/v1/concepts")
+async def test_list_concepts_returns_node(client) -> None:
+    response = await client.get("/api/v1/concepts")
     assert response.status_code == 200
     payload = response.json()
     assert len(payload) == 1
@@ -108,24 +109,26 @@ def test_list_concepts_returns_node(client) -> None:
     assert payload[0]["lens"] == ["difference"]
 
 
-def test_list_concepts_filters_by_step(client) -> None:
-    response = client.get("/api/v1/concepts", params={"step": "S2"})
+async def test_list_concepts_filters_by_step(client) -> None:
+    response = await client.get("/api/v1/concepts", params={"step": "S2"})
     assert response.status_code == 200
     payload = response.json()
     assert len(payload) == 1
-    response = client.get("/api/v1/concepts", params={"step": "S0"})
+    response = await client.get("/api/v1/concepts", params={"step": "S0"})
     assert response.status_code == 200
     assert response.json() == []
 
 
-def test_get_concept_not_found(client) -> None:
-    response = client.get("/api/v1/concepts/UNKNOWN")
+async def test_get_concept_not_found(client) -> None:
+    response = await client.get("/api/v1/concepts/UNKNOWN")
     assert response.status_code == 404
     assert response.json()["detail"] == "concept not found"
 
 
-def test_list_templates_filtered(client) -> None:
-    response = client.get("/api/v1/templates", params={"concept": "TEST-CON"})
+async def test_list_templates_filtered(client) -> None:
+    response = await client.get(
+        "/api/v1/templates", params={"concept": "TEST-CON"}
+    )
     assert response.status_code == 200
     payload = response.json()
     assert len(payload) == 1
@@ -133,8 +136,8 @@ def test_list_templates_filtered(client) -> None:
     assert payload[0]["parameter_names"] == ["left", "right"]
 
 
-def test_generate_template_returns_options(client) -> None:
-    response = client.post(
+async def test_generate_template_returns_options(client) -> None:
+    response = await client.post(
         "/api/v1/templates/TEST-TPL-S1/generate",
         json={"seed": 123, "context": "life"},
     )
@@ -146,8 +149,8 @@ def test_generate_template_returns_options(client) -> None:
     assert payload["answer"] in payload["options"]
 
 
-def test_lrc_evaluate_gold_tier(client) -> None:
-    response = client.post(
+async def test_lrc_evaluate_gold_tier(client) -> None:
+    response = await client.post(
         "/api/v1/lrc/evaluate",
         json={
             "accuracy": 0.95,
@@ -166,8 +169,8 @@ def test_lrc_evaluate_gold_tier(client) -> None:
     assert "evaluated_at" in payload
 
 
-def test_lrc_evaluate_silver_tier(client) -> None:
-    response = client.post(
+async def test_lrc_evaluate_silver_tier(client) -> None:
+    response = await client.post(
         "/api/v1/lrc/evaluate",
         json={
             "accuracy": 0.88,
@@ -184,8 +187,8 @@ def test_lrc_evaluate_silver_tier(client) -> None:
     assert payload["recommendation"] == "promote"
 
 
-def test_lrc_evaluate_pending(client) -> None:
-    response = client.post(
+async def test_lrc_evaluate_pending(client) -> None:
+    response = await client.post(
         "/api/v1/lrc/evaluate",
         json={
             "accuracy": 0.86,

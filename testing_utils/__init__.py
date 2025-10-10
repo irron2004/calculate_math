@@ -1,10 +1,4 @@
 """Shared testing utilities for calculate_math."""
 
-from .sync_client import Headers, Response, SyncASGIClient, create_client
-
-__all__ = [
-    "Headers",
-    "Response",
-    "SyncASGIClient",
-    "create_client",
-]
+# All testing utilities have been moved to use httpx.AsyncClient
+# The old sync_client has been removed as it's no longer needed

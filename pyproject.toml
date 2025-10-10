@@ -23,6 +23,19 @@ dev = [
     "anyio==3.7.1",
 ]
 
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q --maxfail=1 --disable-warnings --cov=app --cov-report=term-missing"
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+env = [
+    "OTEL_SDK_DISABLED=true",
+]
+
 [build-system]
 requires = ["setuptools>=67", "wheel"]
 build-backend = "setuptools.build_meta"

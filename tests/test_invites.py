@@ -4,14 +4,13 @@ import importlib
 import sys
 from pathlib import Path
 
+import httpx
 import pytest
 
 SERVICE_ROOT = Path(__file__).resolve().parents[1]
 
 if str(SERVICE_ROOT) not in sys.path:
     sys.path.insert(0, str(SERVICE_ROOT))
-
-from testing_utils.sync_client import create_client  # noqa: E402
 
 
 def _load_module(module_path: str):
@@ -28,6 +27,8 @@ list_categories = problem_bank_module.list_categories
 get_settings = config_module.get_settings
 AttemptRepository = repositories_module.AttemptRepository
 
+pytestmark = pytest.mark.asyncio
+
 
 @pytest.fixture(scope="session")
 def app():
@@ -35,12 +36,12 @@ def app():
 
 
 @pytest.fixture
-def client(app):
-    test_client = create_client(app)
-    try:
-        yield test_client
-    finally:
-        test_client.close()
+async def client(app):
+    transport = httpx.ASGITransport(app=app, lifespan="on")
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver"
+    ) as async_client:
+        yield async_client
 
 
 @pytest.fixture
@@ -48,8 +49,8 @@ def category() -> str:
     return list_categories()[0]
 
 
-def test_create_invite_returns_token_and_summary(client, category) -> None:
-    response = client.post(
+async def test_create_invite_returns_token_and_summary(client, category) -> None:
+    response = await client.post(
         "/api/invites",
         json={"category": category, "summary": {"total": 10, "correct": 8}},
     )
@@ -62,8 +63,8 @@ def test_create_invite_returns_token_and_summary(client, category) -> None:
     assert "expires_at" in body
 
 
-def test_get_invite_returns_existing_state(client, category) -> None:
-    create_response = client.post(
+async def test_get_invite_returns_existing_state(client, category) -> None:
+    create_response = await client.post(
         "/api/invites",
         json={"category": category, "summary": {"total": 5, "correct": 5}},
     )
@@ -71,39 +72,39 @@ def test_get_invite_returns_existing_state(client, category) -> None:
     payload = create_response.json()
     token = payload["token"]
 
-    fetch_response = client.get(f"/api/invites/{token}")
+    fetch_response = await client.get(f"/api/invites/{token}")
     assert fetch_response.status_code == 200
     fetched = fetch_response.json()
     assert fetched["token"] == token
     assert fetched["summary"]["accuracy"] == 100
 
-    share_response = client.get(f"/share/{token}")
+    share_response = await client.get(f"/share/{token}")
     assert share_response.status_code == 200
     assert "초대장" in share_response.text
     assert share_response.headers["X-Robots-Tag"] == "noindex"
 
 
-def test_invite_expire_flow(client, category) -> None:
-    create_response = client.post(
+async def test_invite_expire_flow(client, category) -> None:
+    create_response = await client.post(
         "/api/invites",
         json={"category": category, "summary": {"total": 4, "correct": 1}},
     )
     assert create_response.status_code == 201
     token = create_response.json()["token"]
 
-    expire_response = client.delete(f"/api/invites/{token}")
+    expire_response = await client.delete(f"/api/invites/{token}")
     assert expire_response.status_code == 204
 
-    lookup_response = client.get(f"/api/invites/{token}")
+    lookup_response = await client.get(f"/api/invites/{token}")
     assert lookup_response.status_code == 404
 
-    share_response = client.get(f"/share/{token}")
+    share_response = await client.get(f"/share/{token}")
     assert share_response.status_code == 410
     assert "만료" in share_response.text
 
 
-def test_invite_with_invalid_category_returns_not_found(client) -> None:
-    response = client.post(
+async def test_invite_with_invalid_category_returns_not_found(client) -> None:
+    response = await client.post(
         "/api/invites",
         json={"category": "NOT-A-CATEGORY", "summary": {"total": 1, "correct": 1}},
     )

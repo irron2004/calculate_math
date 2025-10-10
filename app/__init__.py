@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 from time import time
@@ -14,20 +15,33 @@ from .repositories import AttemptRepository, LRCRepository, UserRepository
 from .routers import bridge, curriculum, health, invites, pages, practice, problems
 
 
+startup_logger = logging.getLogger("calculate_service.startup")
+
+
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application instance."""
     settings = get_settings()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        startup_logger.debug("lifespan setup start for app id=%s", id(app))
         app.state.start_time = time()
+        startup_logger.debug(
+            "refreshing problem cache from %s", settings.problem_data_path
+        )
         problem_repository = refresh_cache(force=True)
+        startup_logger.debug("problem cache ready with %d items", len(problem_repository))
         app.state.problem_repository = problem_repository
         app.state.problem_cache_strategy = {
             "strategy": "file-mtime",
             "source": str(problem_repository.source_path),
         }
 
+        startup_logger.debug(
+            "refreshing template engine with concept=%s template=%s",
+            settings.concept_data_path,
+            settings.template_data_path,
+        )
         template_engine = refresh_engine(force=True)
         app.state.template_engine = template_engine
         app.state.template_cache_strategy = {
@@ -35,18 +49,29 @@ def create_app() -> FastAPI:
             "template_source": str(template_engine.template_path),
         }
 
+        startup_logger.debug(
+            "initialising AttemptRepository at %s", settings.attempts_database_path
+        )
         attempt_repository = AttemptRepository(settings.attempts_database_path)
         app.state.attempt_repository = attempt_repository
 
+        startup_logger.debug(
+            "initialising UserRepository at %s", settings.attempts_database_path
+        )
         user_repository = UserRepository(settings.attempts_database_path)
         app.state.user_repository = user_repository
 
+        startup_logger.debug(
+            "initialising LRCRepository at %s", settings.attempts_database_path
+        )
         lrc_repository = LRCRepository(settings.attempts_database_path)
         app.state.lrc_repository = lrc_repository
 
         try:
+            startup_logger.debug("lifespan setup complete for app id=%s", id(app))
             yield
         finally:
+            startup_logger.debug("lifespan teardown start for app id=%s", id(app))
             if hasattr(app.state, "attempt_repository"):
                 delattr(app.state, "attempt_repository")
             if hasattr(app.state, "user_repository"):
@@ -65,6 +90,7 @@ def create_app() -> FastAPI:
                 delattr(app.state, "start_time")
             reset_cache()
             reset_engine()
+            startup_logger.debug("lifespan teardown complete for app id=%s", id(app))
 
     app = FastAPI(
         title=settings.app_name,
