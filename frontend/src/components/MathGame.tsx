@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import type {
   APISession,
   CurriculumConcept,
+  CurriculumGraphNode,
   GeneratedItem,
   LRCEvaluation,
   LRCStatus,
@@ -14,6 +15,7 @@ import {
   createSession,
   evaluateLRC,
   fetchConcepts,
+  fetchCurriculumGraph,
   fetchTemplates,
   fetchLatestLRC,
   generateTemplateInstance
@@ -80,6 +82,14 @@ interface CurriculumProblem {
   instance: GeneratedItem;
 }
 
+type SequenceEntry = {
+  conceptId: string;
+  step: StepID;
+  nodeId: string;
+  label: string;
+  lens: string[];
+};
+
 interface ProblemFeedback {
   prompt: string;
   conceptName: string;
@@ -132,6 +142,8 @@ const MathGame: React.FC = () => {
   const [selectedConcept, setSelectedConcept] = useState<CurriculumConcept | null>(null);
   const [selectedStep, setSelectedStep] = useState<StepID | null>(null);
   const [completedStepsByConcept, setCompletedStepsByConcept] = useState<Record<string, StepID[]>>({});
+  const [curriculumSequence, setCurriculumSequence] = useState<SequenceEntry[]>([]);
+  const [sequenceIndex, setSequenceIndex] = useState<number | null>(null);
 
   const resetRoundState = () => {
     setScore(0);
@@ -203,6 +215,12 @@ const MathGame: React.FC = () => {
         [conceptId]: Array.from(existing)
       };
     });
+    const sequencePosition = curriculumSequence.findIndex(
+      (entry) => entry.conceptId === conceptId && entry.step === step
+    );
+    if (sequencePosition !== -1) {
+      setSequenceIndex(sequencePosition);
+    }
   };
 
   const getNextSequentialStep = (step: StepID): StepID | null => {
@@ -211,6 +229,47 @@ const MathGame: React.FC = () => {
       return null;
     }
     return STEP_SEQUENCE[index + 1] ?? null;
+  };
+
+  const isStepCompleted = (conceptId: string, step: StepID): boolean => {
+    return (completedStepsByConcept[conceptId] ?? []).includes(step);
+  };
+
+  const buildCurriculumSequence = (nodes: CurriculumGraphNode[]): SequenceEntry[] => {
+    return nodes
+      .filter((node) => (STEP_SEQUENCE as readonly string[]).includes(node.step))
+      .map((node) => ({
+        conceptId: node.concept,
+        step: node.step as StepID,
+        nodeId: node.id,
+        label: node.label,
+        lens: node.lens ?? [],
+      }));
+  };
+
+  const reorderConceptsBySequence = (
+    sequence: SequenceEntry[],
+    catalog: Record<string, CurriculumConcept>
+  ): CurriculumConcept[] => {
+    const ordered: CurriculumConcept[] = [];
+    const seen = new Set<string>();
+    sequence.forEach((entry) => {
+      if (seen.has(entry.conceptId)) {
+        return;
+      }
+      const concept = catalog[entry.conceptId];
+      if (concept) {
+        ordered.push(concept);
+        seen.add(entry.conceptId);
+      }
+    });
+    Object.values(catalog).forEach((concept) => {
+      if (!seen.has(concept.id)) {
+        ordered.push(concept);
+        seen.add(concept.id);
+      }
+    });
+    return ordered;
   };
 *** End Patch
 
@@ -387,7 +446,12 @@ const MathGame: React.FC = () => {
             return null;
           })
         : Promise.resolve(null);
-      const [latest, conceptList] = await Promise.all([latestPromise, fetchConcepts()]);
+
+      const [latest, conceptList, curriculumGraph] = await Promise.all([
+        latestPromise,
+        fetchConcepts(),
+        fetchCurriculumGraph(),
+      ]);
       setLatestLRC(latest);
 
       if (!conceptList.length) {
@@ -395,36 +459,62 @@ const MathGame: React.FC = () => {
       }
 
       const catalog = upsertConceptCatalog(conceptList);
-      const focusConceptId = latest?.focus_concept ?? null;
-      const candidateIds = [
-        focusConceptId,
-        ...PREFERRED_CONCEPTS
+      const sequence = buildCurriculumSequence(curriculumGraph.nodes ?? []);
+      if (!sequence.length) {
+        throw new Error('커리큘럼 노드가 없습니다.');
+      }
+      setCurriculumSequence(sequence);
+
+      const orderedConcepts = reorderConceptsBySequence(sequence, catalog);
+      setConcepts(orderedConcepts);
+
+      const preferredConcepts = [
+        latest?.focus_concept ?? null,
+        ...PREFERRED_CONCEPTS,
       ].filter((value): value is string => Boolean(value));
 
-      let initialConcept: CurriculumConcept | undefined;
-      for (const candidateId of candidateIds) {
-        const concept = catalog[candidateId];
-        if (concept) {
-          initialConcept = concept;
-          break;
+      const pickNextIndex = (candidates: string[]): number => {
+        for (const conceptId of candidates) {
+          const nextStep = determineNextStepForConcept(conceptId) ?? 'S1';
+          const idx = sequence.findIndex(
+            (entry) => entry.conceptId === conceptId && entry.step === nextStep
+          );
+          if (idx !== -1) {
+            return idx;
+          }
         }
-      }
+        return sequence.findIndex(
+          (entry) => !isStepCompleted(entry.conceptId, entry.step)
+        );
+      };
 
-      if (!initialConcept) {
-        initialConcept = conceptList[0];
+      let startingIndex = pickNextIndex(preferredConcepts);
+      if (startingIndex < 0) {
+        startingIndex = 0;
       }
+      const startingEntry = sequence[startingIndex];
+      const startingConcept =
+        catalog[startingEntry.conceptId] ??
+        conceptList.find((concept) => concept.id === startingEntry.conceptId) ??
+        conceptList[0] ??
+        FALLBACK_CONCEPT;
 
-      if (!initialConcept) {
-        throw new Error('선택할 수 있는 개념이 없습니다.');
-      }
-
-      const startingStep = determineNextStepForConcept(initialConcept.id) ?? 'S1';
-      await loadProblemsForStep(initialConcept, startingStep);
+      await loadProblemsForStep(startingConcept, startingEntry.step);
+      setSequenceIndex(startingIndex);
     } catch (error) {
       console.error('초기 문제 준비 실패:', error);
       setLatestLRC(null);
       setConcepts([FALLBACK_CONCEPT]);
       setConceptCatalog({ [FALLBACK_CONCEPT.id]: FALLBACK_CONCEPT });
+      setCurriculumSequence([
+        {
+          conceptId: FALLBACK_CONCEPT.id,
+          step: 'S1',
+          nodeId: 'FALLBACK-S1',
+          label: '기본 덧셈 · S1',
+          lens: FALLBACK_CONCEPT.lens,
+        },
+      ]);
       resetRoundState();
       setSelectedConcept(FALLBACK_CONCEPT);
       setSelectedStep('S1');
@@ -433,6 +523,7 @@ const MathGame: React.FC = () => {
       setTotalQuestions(fallbackProblems.length);
       setCurrentProblem(fallbackProblems[0] ?? null);
       setGameState(fallbackProblems.length ? 'playing' : 'finished');
+      setSequenceIndex(0);
       setLoadError('기본 문제 세트로 시작합니다.');
     }
   };
@@ -442,16 +533,22 @@ const MathGame: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const handleConceptSelect = (conceptId: string) => {
+  const handleConceptSelect = async (conceptId: string) => {
     const concept = conceptCatalog[conceptId];
     if (!concept) {
       return;
     }
     const nextStep = determineNextStepForConcept(conceptId) ?? 'S1';
-    void loadProblemsForStep(concept, nextStep);
+    const targetIndex = curriculumSequence.findIndex(
+      (entry) => entry.conceptId === conceptId && entry.step === nextStep
+    );
+    await loadProblemsForStep(concept, nextStep);
+    if (targetIndex !== -1) {
+      setSequenceIndex(targetIndex);
+    }
   };
 
-  const handleStepSelect = (conceptId: string, step: StepID) => {
+  const handleStepSelect = async (conceptId: string, step: StepID) => {
     if (!isStepAvailable(conceptId, step)) {
       return;
     }
@@ -463,18 +560,49 @@ const MathGame: React.FC = () => {
     if (selectedConcept?.id === conceptId && selectedStep === step && gameState === 'playing') {
       return;
     }
-    void loadProblemsForStep(concept, step);
+    const targetIndex = curriculumSequence.findIndex(
+      (entry) => entry.conceptId === conceptId && entry.step === step
+    );
+    await loadProblemsForStep(concept, step);
+    if (targetIndex !== -1) {
+      setSequenceIndex(targetIndex);
+    }
   };
 
   const startNextStep = () => {
-    if (!selectedConcept || !selectedStep) {
+    if (!curriculumSequence.length) {
       return;
     }
-    const nextStep = getNextSequentialStep(selectedStep);
-    if (!nextStep || !isStepAvailable(selectedConcept.id, nextStep)) {
+    const currentIndex = sequenceIndex ?? -1;
+    const findNextIndex = (start: number) =>
+      curriculumSequence.findIndex((entry, idx) => {
+        if (idx < start) {
+          return false;
+        }
+        if (isStepCompleted(entry.conceptId, entry.step)) {
+          return false;
+        }
+        return isStepAvailable(entry.conceptId, entry.step);
+      });
+
+    let nextIndex = findNextIndex(currentIndex + 1);
+    if (nextIndex === -1) {
+      nextIndex = findNextIndex(0);
+    }
+    if (nextIndex === -1) {
       return;
     }
-    void loadProblemsForStep(selectedConcept, nextStep);
+    const nextEntry = curriculumSequence[nextIndex];
+    const concept =
+      conceptCatalog[nextEntry.conceptId] ??
+      (nextEntry.conceptId === FALLBACK_CONCEPT.id ? FALLBACK_CONCEPT : null);
+    if (!concept) {
+      return;
+    }
+    void (async () => {
+      await loadProblemsForStep(concept, nextEntry.step);
+      setSequenceIndex(nextIndex);
+    })();
   };
 
   useEffect(() => {
@@ -871,7 +999,9 @@ const MathGame: React.FC = () => {
                     key={concept.id}
                     type="button"
                     className={`concept-tab${isActive ? ' concept-tab--active' : ''}`}
-                    onClick={() => handleConceptSelect(concept.id)}
+                    onClick={() => {
+                      void handleConceptSelect(concept.id);
+                    }}
                     aria-pressed={isActive}
                   >
                     {concept.name}

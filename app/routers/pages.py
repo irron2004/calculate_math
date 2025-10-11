@@ -1,5 +1,5 @@
+from collections import defaultdict
 from dataclasses import asdict
-
 from typing import Callable
 
 from fastapi import APIRouter, Query, Request
@@ -13,6 +13,8 @@ from ..category_service import (
 )
 from ..bridge_bank import BridgeDataError, list_bridge_units
 from ..problem_bank import get_problems
+from ..curriculum_graph import get_curriculum_graph
+from ..template_engine import list_concepts
 
 
 def _templates_resolver(
@@ -48,6 +50,59 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 break
             if secondary_category is None:
                 secondary_category = primary_category
+        graph_payload = get_curriculum_graph()
+        concept_nodes = list_concepts()
+        concept_lookup = {node.id: node for node in concept_nodes}
+
+        sequence_order: list[str] = []
+        for node in graph_payload.get("nodes", []):
+            concept_id = node.get("concept")
+            if concept_id and concept_id not in sequence_order:
+                sequence_order.append(concept_id)
+
+        step_priority = {"S1": 0, "S2": 1, "S3": 2}
+        grouped_nodes: dict[str, dict[str, object]] = defaultdict(lambda: {"steps": []})
+        for node in graph_payload.get("nodes", []):
+            step_value = str(node.get("step", "")).upper()
+            if step_value not in step_priority:
+                continue
+            concept_id = node.get("concept")
+            if not concept_id:
+                continue
+            group = grouped_nodes[concept_id]
+            group.setdefault("concept_id", concept_id)
+            concept_meta = concept_lookup.get(concept_id)
+            if concept_meta is not None:
+                group.setdefault("name", concept_meta.name)
+                group.setdefault("lens", list(concept_meta.lens))
+                group.setdefault("summary", concept_meta.summary)
+            steps_list = group.setdefault("steps", [])
+            if isinstance(steps_list, list):
+                steps_list.append(
+                    {
+                        "id": node.get("id"),
+                        "label": node.get("label", f"{concept_id} · {step_value}"),
+                        "step": step_value,
+                        "lens": node.get("lens", []),
+                        "grade_band": node.get("grade_band"),
+                    }
+                )
+        skill_tree = []
+        for concept_id, group in grouped_nodes.items():
+            steps = group.get("steps", [])
+            if isinstance(steps, list):
+                steps.sort(key=lambda item: step_priority.get(item.get("step", ""), 99))
+            group.setdefault("name", concept_id)
+            group.setdefault("lens", [])
+            group.setdefault("summary", "")
+            skill_tree.append(group)
+        skill_tree.sort(
+            key=lambda item: sequence_order.index(item["concept_id"])  # type: ignore[index]
+            if item["concept_id"] in sequence_order  # type: ignore[operator]
+            else len(sequence_order)
+        )
+        palette = graph_payload.get("meta", {}).get("palette", {})
+
         return active_templates.TemplateResponse(
             "index.html",
             {
@@ -59,6 +114,8 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 "cta_primary_category": primary_category
                 or (categories[0] if categories else None),
                 "category_count": len(cards),
+                "skill_tree": skill_tree,
+                "skill_palette": palette,
             },
         )
 
