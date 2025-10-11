@@ -96,6 +96,30 @@
   background: rgba(148, 163, 184, 0.35);
 }
 
+.skill-tree__node-trigger {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+}
+
+.skill-tree__node-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.skill-tree__node--selected .skill-tree__node-badge {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.35);
+}
+
+.skill-tree__node--selected .skill-tree__node-badge,
+.skill-tree__node--selected .skill-tree__node-label {
+  color: #1d4ed8;
+}
+
 .skill-tree__node-badge {
   display: inline-flex;
   flex-direction: column;
@@ -161,9 +185,14 @@
   color: #475569;
 }
 
+.skill-tree__node-trigger:focus-visible {
+  outline: 3px solid rgba(99, 102, 241, 0.45);
+  border-radius: 12px;
+  outline-offset: 4px;
+}
+
 @media (min-width: 768px) {
   .skill-tree {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   }
 }
-

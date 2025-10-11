@@ -13,6 +13,9 @@ type SkillTreeProps = {
   completedNodes: string[];
   focusConceptId?: string | null;
   conceptNames?: Record<string, string>;
+  activeConceptId?: string | null;
+  selectedNodeId?: string | null;
+  onSelectStep?: (conceptId: string, step: string) => void;
 };
 
 const buildOptions = (conceptNames?: Record<string, string>): BuildSkillTreeOptions => {
@@ -22,7 +25,10 @@ const buildOptions = (conceptNames?: Record<string, string>): BuildSkillTreeOpti
 const SkillTree: React.FC<SkillTreeProps> = ({
   completedNodes,
   focusConceptId,
-  conceptNames
+  conceptNames,
+  activeConceptId,
+  selectedNodeId,
+  onSelectStep
 }) => {
   const [graph, setGraph] = useState<CurriculumGraph | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +72,13 @@ const SkillTree: React.FC<SkillTreeProps> = ({
     return buildSkillTree(graph, completedNodes, buildOptions(conceptNames));
   }, [graph, completedNodes, conceptNames]);
 
+  const filteredBranches = useMemo(() => {
+    if (!activeConceptId) {
+      return branches;
+    }
+    return branches.filter((branch) => branch.conceptId === activeConceptId);
+  }, [branches, activeConceptId]);
+
   if (isLoading) {
     return (
       <div className="skill-tree skill-tree--loading" role="status" aria-live="polite">
@@ -82,7 +95,7 @@ const SkillTree: React.FC<SkillTreeProps> = ({
     );
   }
 
-  if (!branches.length) {
+  if (!filteredBranches.length) {
     return (
       <div className="skill-tree skill-tree--empty">
         표시할 스킬 트리 데이터가 없습니다.
@@ -92,7 +105,7 @@ const SkillTree: React.FC<SkillTreeProps> = ({
 
   return (
     <div className="skill-tree" aria-live="polite">
-      {branches.map((branch) => {
+      {filteredBranches.map((branch) => {
         const isFocus = focusConceptId
           ? branch.conceptId === focusConceptId
           : false;
@@ -121,32 +134,13 @@ const SkillTree: React.FC<SkillTreeProps> = ({
             </header>
             <ol className="skill-tree__level-list">
               {branch.nodes.map((node) => (
-                <li
+                <SkillTreeNodeItem
                   key={node.id}
-                  className={`skill-tree__node skill-tree__node--${node.status}`}
-                >
-                  <div className="skill-tree__node-badge">
-                    <span className="skill-tree__node-step">{node.step}</span>
-                    <span className="skill-tree__node-label">{node.label}</span>
-                  </div>
-                  <div className="skill-tree__node-body">
-                    <p className="skill-tree__node-mastery">
-                      숙련도 {Math.round(node.mastery * 100)}%
-                    </p>
-                    {node.microSkills.length > 0 && (
-                      <ul className="skill-tree__micro-skills">
-                        {node.microSkills.slice(0, 3).map((skill) => (
-                          <li key={skill}>{skill}</li>
-                        ))}
-                      </ul>
-                    )}
-                    {node.status === 'locked' && node.prerequisites.length > 0 && (
-                      <p className="skill-tree__node-prereq">
-                        선행: {node.prerequisites.join(', ')}
-                      </p>
-                    )}
-                  </div>
-                </li>
+                  branch={branch}
+                  node={node}
+                  selectedNodeId={selectedNodeId}
+                  onSelectStep={onSelectStep}
+                />
               ))}
             </ol>
           </section>
@@ -158,3 +152,68 @@ const SkillTree: React.FC<SkillTreeProps> = ({
 
 export default SkillTree;
 
+type NodeItemProps = {
+  branch: SkillTreeBranch;
+  node: SkillTreeBranch['nodes'][number];
+  selectedNodeId?: string | null;
+  onSelectStep?: (conceptId: string, step: string) => void;
+};
+
+const SkillTreeNodeItem: React.FC<NodeItemProps> = ({
+  branch,
+  node,
+  selectedNodeId,
+  onSelectStep
+}) => {
+  const nodeKey = `${branch.conceptId}-${node.step}`;
+  const isSelected = nodeKey === selectedNodeId;
+  const isInteractive = typeof onSelectStep === 'function' && node.status !== 'locked';
+
+  const handleClick = () => {
+    if (!isInteractive) {
+      return;
+    }
+    onSelectStep?.(branch.conceptId, node.step);
+  };
+
+  return (
+    <li
+      className={`skill-tree__node skill-tree__node--${node.status}${
+        isSelected ? ' skill-tree__node--selected' : ''
+      }`}
+      data-status={node.status}
+      data-selected={isSelected ? 'true' : 'false'}
+    >
+      <button
+        type="button"
+        className="skill-tree__node-trigger"
+        onClick={handleClick}
+        disabled={!isInteractive}
+        aria-pressed={isSelected}
+        aria-current={isSelected ? 'step' : undefined}
+      >
+        <div className="skill-tree__node-badge">
+          <span className="skill-tree__node-step">{node.step}</span>
+          <span className="skill-tree__node-label">{node.label}</span>
+        </div>
+        <div className="skill-tree__node-body">
+          <p className="skill-tree__node-mastery">
+            숙련도 {Math.round(node.mastery * 100)}%
+          </p>
+          {node.microSkills.length > 0 && (
+            <ul className="skill-tree__micro-skills">
+              {node.microSkills.slice(0, 3).map((skill) => (
+                <li key={skill}>{skill}</li>
+              ))}
+            </ul>
+          )}
+          {node.status === 'locked' && node.prerequisites.length > 0 && (
+            <p className="skill-tree__node-prereq">
+              선행: {node.prerequisites.join(', ')}
+            </p>
+          )}
+        </div>
+      </button>
+    </li>
+  );
+};

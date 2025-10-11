@@ -18,13 +18,7 @@ import {
   fetchLatestLRC,
   generateTemplateInstance
 } from '../utils/api';
-import {
-  DEFAULT_STEP_ORDER,
-  limitPracticeToFocus,
-  reorderConcepts,
-  resolveFocusConcept,
-  stepsForConcept
-} from '../utils/curriculum';
+import { resolveFocusConcept } from '../utils/curriculum';
 import { getLensBadges, getLensBadgeTokens } from '../utils/lens';
 import { countKeywordMatches } from '../utils/text';
 import SkillTree from './SkillTree';
@@ -77,6 +71,9 @@ const FALLBACK_CONCEPT: CurriculumConcept = {
 
 const FALLBACK_TEMPLATE_ID = 'fallback-inline';
 const QUESTION_TIME_LIMIT = 30;
+type StepID = 'S1' | 'S2' | 'S3';
+const STEP_SEQUENCE: ReadonlyArray<StepID> = ['S1', 'S2', 'S3'];
+const PROBLEMS_PER_STEP = 6;
 
 interface CurriculumProblem {
   concept: CurriculumConcept;
@@ -131,8 +128,12 @@ const MathGame: React.FC = () => {
   const [latestLRC, setLatestLRC] = useState<LRCEvaluation | null>(null);
   const [showKeywordHints, setShowKeywordHints] = useState(false);
   const [conceptCatalog, setConceptCatalog] = useState<Record<string, CurriculumConcept>>({});
+  const [concepts, setConcepts] = useState<CurriculumConcept[]>([]);
+  const [selectedConcept, setSelectedConcept] = useState<CurriculumConcept | null>(null);
+  const [selectedStep, setSelectedStep] = useState<StepID | null>(null);
+  const [completedStepsByConcept, setCompletedStepsByConcept] = useState<Record<string, StepID[]>>({});
 
-  const resetGameState = () => {
+  const resetRoundState = () => {
     setScore(0);
     setCorrectCount(0);
     setUserAnswers({});
@@ -153,71 +154,86 @@ const MathGame: React.FC = () => {
     setCurrentIndex(0);
     setCurrentProblem(null);
     setTimeLeft(QUESTION_TIME_LIMIT);
+    setProblems([]);
   };
 
-  const pickConcepts = (concepts: CurriculumConcept[], focusConceptId: string | null): CurriculumConcept[] => {
-    return reorderConcepts(concepts, PREFERRED_CONCEPTS, focusConceptId).slice(0, 3);
+  const upsertConceptCatalog = (list: CurriculumConcept[]) => {
+    const mapping = list.reduce<Record<string, CurriculumConcept>>((accumulator, concept) => {
+      accumulator[concept.id] = concept;
+      return accumulator;
+    }, {});
+    setConceptCatalog(mapping);
+    setConcepts(list);
+    return mapping;
   };
 
-  const generateCurriculumProblems = async (
-    latestEvaluation: LRCEvaluation | null
-  ): Promise<CurriculumProblem[]> => {
-    const concepts = await fetchConcepts();
-    if (!concepts.length) {
-      throw new Error('등록된 개념이 없습니다.');
+  const getCompletedSteps = (conceptId: string): Set<string> => {
+    return new Set(completedStepsByConcept[conceptId] ?? []);
+  };
+
+  const isStepAvailable = (conceptId: string, step: StepID): boolean => {
+    if (step === 'S1') {
+      return true;
     }
+    const completed = getCompletedSteps(conceptId);
+    const targetIndex = STEP_SEQUENCE.indexOf(step);
+    if (targetIndex <= 0) {
+      return true;
+    }
+    const required = STEP_SEQUENCE.slice(0, targetIndex);
+    return required.every((requiredStep) => completed.has(requiredStep));
+  };
 
-    setConceptCatalog(
-      concepts.reduce<Record<string, CurriculumConcept>>((accumulator, concept) => {
-        accumulator[concept.id] = concept;
-        return accumulator;
-      }, {})
-    );
-
-    const focusConceptId = latestEvaluation?.focus_concept ?? null;
-    const conceptSelection = pickConcepts(concepts, focusConceptId);
-    const generated: CurriculumProblem[] = [];
-    const limitToFocus = limitPracticeToFocus(latestEvaluation?.recommendation);
-
-    for (const concept of conceptSelection) {
-      const isFocus = focusConceptId !== null && concept.id === focusConceptId;
-      const steps = stepsForConcept(latestEvaluation?.recommendation, isFocus, DEFAULT_STEP_ORDER);
-
-      for (const step of steps) {
-        const templates = await fetchTemplates(concept.id, step);
-        if (!templates.length) {
-          continue;
-        }
-        const template = templates[Math.floor(Math.random() * templates.length)];
-        const seed = Math.floor(Math.random() * 1_000_000);
-        const instance = await generateTemplateInstance(template.id, { seed });
-        generated.push({ concept, instance });
-      }
-
-      if (limitToFocus && isFocus) {
-        break;
+  const determineNextStepForConcept = (conceptId: string): StepID | null => {
+    const completed = getCompletedSteps(conceptId);
+    for (const step of STEP_SEQUENCE) {
+      if (!completed.has(step) && isStepAvailable(conceptId, step)) {
+        return step;
       }
     }
-
-    return generated;
+    return STEP_SEQUENCE[STEP_SEQUENCE.length - 1] ?? null;
   };
 
-  const convertSessionToCurriculum = (session: APISession): CurriculumProblem[] => {
+  const markStepCompleted = (conceptId: string, step: StepID) => {
+    setCompletedStepsByConcept((previous) => {
+      const existing = new Set(previous[conceptId] ?? []);
+      existing.add(step);
+      return {
+        ...previous,
+        [conceptId]: Array.from(existing)
+      };
+    });
+  };
+
+  const getNextSequentialStep = (step: StepID): StepID | null => {
+    const index = STEP_SEQUENCE.indexOf(step);
+    if (index === -1 || index === STEP_SEQUENCE.length - 1) {
+      return null;
+    }
+    return STEP_SEQUENCE[index + 1] ?? null;
+  };
+*** End Patch
+
+  const convertSessionToCurriculum = (
+    session: APISession,
+    concept: CurriculumConcept,
+    step: StepID
+  ): CurriculumProblem[] => {
     return session.problems.map((problem, index) => ({
-      concept: FALLBACK_CONCEPT,
+      concept,
       instance: {
         id: `${FALLBACK_TEMPLATE_ID}-${index}`,
         template_id: FALLBACK_TEMPLATE_ID,
-        concept: FALLBACK_CONCEPT.id,
-        step: 'S1',
+        concept: concept.id,
+        step,
         prompt: `${problem.left} + ${problem.right} = ?`,
         explanation: '두 수를 더해 답을 구합니다.',
         answer: problem.answer,
         options: problem.options,
         context: 'life',
-        lens: FALLBACK_CONCEPT.lens,
+        lens: concept.lens,
         representation: 'C',
-        rubric_keywords: ['덧셈'],
+        rubric_keywords: concept.focus_keywords.length ? concept.focus_keywords : ['덧셈'],
         variables: {
           left: problem.left,
           right: problem.right
@@ -226,7 +242,11 @@ const MathGame: React.FC = () => {
     }));
   };
 
-  const generateLocalFallback = (count: number): CurriculumProblem[] => {
+  const generateLocalFallback = (
+    count: number,
+    concept: CurriculumConcept,
+    step: StepID
+  ): CurriculumProblem[] => {
     return Array.from({ length: count }, (_, index) => {
       const left = Math.floor(Math.random() * 9) + 1;
       const right = Math.floor(Math.random() * 9) + 1;
@@ -239,20 +259,20 @@ const MathGame: React.FC = () => {
         }
       }
       return {
-        concept: FALLBACK_CONCEPT,
+        concept,
         instance: {
           id: `${FALLBACK_TEMPLATE_ID}-local-${index}`,
           template_id: FALLBACK_TEMPLATE_ID,
-          concept: FALLBACK_CONCEPT.id,
-          step: 'S1',
+          concept: concept.id,
+          step,
           prompt: `${left} + ${right} = ?`,
           explanation: '두 수를 더해 답을 구합니다.',
           answer,
           options: Array.from(options),
           context: 'life',
-          lens: FALLBACK_CONCEPT.lens,
+          lens: concept.lens,
           representation: 'C',
-          rubric_keywords: ['덧셈'],
+          rubric_keywords: concept.focus_keywords.length ? concept.focus_keywords : ['덧셈'],
           variables: {
             left,
             right
@@ -262,56 +282,200 @@ const MathGame: React.FC = () => {
     });
   };
 
-  const loadProblems = async () => {
-    resetGameState();
-    setLoadError(null);
-    setGameState('loading');
-
-    try {
-      let latest: LRCEvaluation | null = null;
-      if (user) {
+  const generateProblemsForStep = async (
+    concept: CurriculumConcept,
+    step: StepID
+  ): Promise<CurriculumProblem[]> => {
+    const templates = await fetchTemplates(concept.id, step);
+    if (!templates.length) {
+      throw new Error(`템플릿이 없습니다: ${concept.id}/${step}`);
+    }
+    const pool = [...templates].sort(() => Math.random() - 0.5);
+    const generated: CurriculumProblem[] = [];
+    let index = 0;
+    while (generated.length < PROBLEMS_PER_STEP) {
+      const summary = pool[index % pool.length];
+      const contexts = summary.context_pack.length ? summary.context_pack : ['life'];
+      const contextChoice = contexts[generated.length % contexts.length];
+      const seed = Math.floor(Math.random() * 1_000_000);
+      try {
+        const instance = await generateTemplateInstance(summary.id, {
+          seed,
+          context: contextChoice,
+        });
+        generated.push({ concept, instance });
+      } catch (generationError) {
+        console.warn('템플릿 생성 실패:', generationError);
+      }
+      index += 1;
+      if (index > PROBLEMS_PER_STEP * Math.max(1, pool.length) * 2) {
+        break;
+      }
+    }
+    if (generated.length < PROBLEMS_PER_STEP && pool.length) {
+      const fallbackSummary = pool[0];
+      const contexts = fallbackSummary.context_pack.length ? fallbackSummary.context_pack : ['life'];
+      while (generated.length < PROBLEMS_PER_STEP) {
+        const contextChoice = contexts[generated.length % contexts.length];
+        const seed = Math.floor(Math.random() * 1_000_000);
         try {
-          latest = await fetchLatestLRC(user.id);
-        } catch (latestError) {
-          console.warn('Failed to fetch latest LRC result:', latestError);
+          const instance = await generateTemplateInstance(fallbackSummary.id, {
+            seed,
+            context: contextChoice,
+          });
+          generated.push({ concept, instance });
+        } catch (retryError) {
+          console.warn('템플릿 재생성 실패:', retryError);
+          break;
         }
       }
-      setLatestLRC(latest);
+    }
+    if (!generated.length) {
+      throw new Error('템플릿 생성에 모두 실패했습니다.');
+    }
+    return generated.slice(0, PROBLEMS_PER_STEP);
+  };
 
-      const generated = await generateCurriculumProblems(latest);
+  const loadProblemsForStep = async (
+    concept: CurriculumConcept,
+    step: StepID
+  ) => {
+    resetRoundState();
+    setSelectedConcept(concept);
+    setSelectedStep(step);
+    setGameState('loading');
+    setLoadError(null);
+
+    try {
+      const generated = await generateProblemsForStep(concept, step);
       if (!generated.length) {
         throw new Error('생성된 문제가 없습니다.');
       }
       setProblems(generated);
-      setCurrentProblem(generated[0]);
       setTotalQuestions(generated.length);
+      setCurrentProblem(generated[0]);
       setGameState('playing');
+      return;
     } catch (error) {
-      console.error('Curriculum generation failed:', error);
-      setLoadError('커리큘럼 데이터를 불러오지 못했습니다. 덧셈 예비 문제로 대체합니다.');
-      try {
-        const session = await createSession();
-        const fallback = convertSessionToCurriculum(session);
-        setProblems(fallback);
-        setCurrentProblem(fallback[0] ?? null);
-        setTotalQuestions(fallback.length);
-        setGameState(fallback.length ? 'playing' : 'finished');
-      } catch (fallbackError) {
-        console.error('Fallback session failed:', fallbackError);
-        const localFallback = generateLocalFallback(12);
-        setProblems(localFallback);
-        setCurrentProblem(localFallback[0] ?? null);
-        setTotalQuestions(localFallback.length);
-        setGameState(localFallback.length ? 'playing' : 'finished');
+      console.error('문제 불러오기 실패:', error);
+      setLoadError('커리큘럼 데이터를 불러오지 못했습니다. 예비 문제로 대체합니다.');
+    }
+
+    try {
+      const session = await createSession();
+      const fallbackProblems = convertSessionToCurriculum(session, concept, step);
+      setProblems(fallbackProblems);
+      setTotalQuestions(fallbackProblems.length);
+      setCurrentProblem(fallbackProblems[0] ?? null);
+      setGameState(fallbackProblems.length ? 'playing' : 'finished');
+    } catch (fallbackError) {
+      console.error('Fallback session 불러오기 실패:', fallbackError);
+      const localFallback = generateLocalFallback(12, concept, step);
+      setProblems(localFallback);
+      setTotalQuestions(localFallback.length);
+      setCurrentProblem(localFallback[0] ?? null);
+      setGameState(localFallback.length ? 'playing' : 'finished');
+    }
+  };
+
+  const initialiseGame = async () => {
+    setLoadError(null);
+    try {
+      const latestPromise = user
+        ? fetchLatestLRC(user.id).catch((latestError) => {
+            console.warn('Failed to fetch latest LRC result:', latestError);
+            return null;
+          })
+        : Promise.resolve(null);
+      const [latest, conceptList] = await Promise.all([latestPromise, fetchConcepts()]);
+      setLatestLRC(latest);
+
+      if (!conceptList.length) {
+        throw new Error('등록된 개념이 없습니다.');
       }
+
+      const catalog = upsertConceptCatalog(conceptList);
+      const focusConceptId = latest?.focus_concept ?? null;
+      const candidateIds = [
+        focusConceptId,
+        ...PREFERRED_CONCEPTS
+      ].filter((value): value is string => Boolean(value));
+
+      let initialConcept: CurriculumConcept | undefined;
+      for (const candidateId of candidateIds) {
+        const concept = catalog[candidateId];
+        if (concept) {
+          initialConcept = concept;
+          break;
+        }
+      }
+
+      if (!initialConcept) {
+        initialConcept = conceptList[0];
+      }
+
+      if (!initialConcept) {
+        throw new Error('선택할 수 있는 개념이 없습니다.');
+      }
+
+      const startingStep = determineNextStepForConcept(initialConcept.id) ?? 'S1';
+      await loadProblemsForStep(initialConcept, startingStep);
+    } catch (error) {
+      console.error('초기 문제 준비 실패:', error);
       setLatestLRC(null);
+      setConcepts([FALLBACK_CONCEPT]);
+      setConceptCatalog({ [FALLBACK_CONCEPT.id]: FALLBACK_CONCEPT });
+      resetRoundState();
+      setSelectedConcept(FALLBACK_CONCEPT);
+      setSelectedStep('S1');
+      const fallbackProblems = generateLocalFallback(12, FALLBACK_CONCEPT, 'S1');
+      setProblems(fallbackProblems);
+      setTotalQuestions(fallbackProblems.length);
+      setCurrentProblem(fallbackProblems[0] ?? null);
+      setGameState(fallbackProblems.length ? 'playing' : 'finished');
+      setLoadError('기본 문제 세트로 시작합니다.');
     }
   };
 
   useEffect(() => {
-    loadProblems();
+    void initialiseGame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
+  const handleConceptSelect = (conceptId: string) => {
+    const concept = conceptCatalog[conceptId];
+    if (!concept) {
+      return;
+    }
+    const nextStep = determineNextStepForConcept(conceptId) ?? 'S1';
+    void loadProblemsForStep(concept, nextStep);
+  };
+
+  const handleStepSelect = (conceptId: string, step: StepID) => {
+    if (!isStepAvailable(conceptId, step)) {
+      return;
+    }
+    const concept =
+      conceptCatalog[conceptId] ?? (conceptId === FALLBACK_CONCEPT.id ? FALLBACK_CONCEPT : null);
+    if (!concept) {
+      return;
+    }
+    if (selectedConcept?.id === conceptId && selectedStep === step && gameState === 'playing') {
+      return;
+    }
+    void loadProblemsForStep(concept, step);
+  };
+
+  const startNextStep = () => {
+    if (!selectedConcept || !selectedStep) {
+      return;
+    }
+    const nextStep = getNextSequentialStep(selectedStep);
+    if (!nextStep || !isStepAvailable(selectedConcept.id, nextStep)) {
+      return;
+    }
+    void loadProblemsForStep(selectedConcept, nextStep);
+  };
 
   useEffect(() => {
     if (gameState !== 'playing') {
@@ -525,6 +689,10 @@ const MathGame: React.FC = () => {
       return;
     }
 
+    if (selectedConcept && selectedStep) {
+      markStepCompleted(selectedConcept.id, selectedStep);
+    }
+
     const accuracy = totalQuestions ? correctCount / totalQuestions : 0;
     const averageTime = timeSpentHistory.length
       ? timeSpentHistory.reduce((acc, value) => acc + value, 0) / timeSpentHistory.length
@@ -558,7 +726,11 @@ const MathGame: React.FC = () => {
   };
 
   const restartGame = () => {
-    loadProblems();
+    if (selectedConcept && selectedStep) {
+      void loadProblemsForStep(selectedConcept, selectedStep);
+      return;
+    }
+    void initialiseGame();
   };
 
   const goBack = () => {
@@ -570,18 +742,10 @@ const MathGame: React.FC = () => {
   }
 
   const completedNodeIds = useMemo(() => {
-    if (!problems.length) {
-      return [];
-    }
-    const answered = new Set(Object.keys(userAnswers));
-    const ids = problems
-      .filter((problem) => answered.has(problem.instance.id))
-      .map((problem) => {
-        const step = problem.instance.step || 'S1';
-        return `${problem.concept.id}-${step}`;
-      });
-    return Array.from(new Set(ids));
-  }, [problems, userAnswers]);
+    return Object.entries(completedStepsByConcept).flatMap(([conceptId, steps]) =>
+      steps.map((step) => `${conceptId}-${step}`)
+    );
+  }, [completedStepsByConcept]);
 
   const conceptNames = useMemo(() => {
     return Object.values(conceptCatalog).reduce<Record<string, string>>((accumulator, concept) => {
@@ -589,6 +753,23 @@ const MathGame: React.FC = () => {
       return accumulator;
     }, {});
   }, [conceptCatalog]);
+
+  const selectedConceptId = selectedConcept?.id ?? null;
+  const selectedNodeId = selectedConcept && selectedStep ? `${selectedConcept.id}-${selectedStep}` : null;
+
+  const nextStepCandidate = useMemo(() => {
+    if (!selectedConcept || !selectedStep) {
+      return null;
+    }
+    return getNextSequentialStep(selectedStep);
+  }, [selectedConcept, selectedStep]);
+
+  const canStartNextStep = useMemo(() => {
+    if (!selectedConcept || !nextStepCandidate) {
+      return false;
+    }
+    return isStepAvailable(selectedConcept.id, nextStepCandidate);
+  }, [selectedConcept, nextStepCandidate]);
 
   const accuracyPercent = useMemo(() => {
     return totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0;
@@ -670,6 +851,45 @@ const MathGame: React.FC = () => {
       )}
 
       <div className="game-content">
+        {concepts.length > 0 && (
+          <section className="skill-tree-panel" aria-labelledby="skill-tree-heading">
+            <div className="skill-tree-panel__header">
+              <h2 id="skill-tree-heading">
+                {selectedConcept ? `${selectedConcept.name} 단계` : '학습 단계'}
+              </h2>
+              <p className="skill-tree-panel__summary">
+                {selectedConcept?.summary
+                  ? selectedConcept.summary
+                  : 'S1부터 차례로 도전하면 다음 단계가 자동으로 열립니다.'}
+              </p>
+            </div>
+            <div className="concept-selector" role="tablist" aria-label="학습 개념 선택">
+              {concepts.map((concept) => {
+                const isActive = selectedConceptId === concept.id;
+                return (
+                  <button
+                    key={concept.id}
+                    type="button"
+                    className={`concept-tab${isActive ? ' concept-tab--active' : ''}`}
+                    onClick={() => handleConceptSelect(concept.id)}
+                    aria-pressed={isActive}
+                  >
+                    {concept.name}
+                  </button>
+                );
+              })}
+            </div>
+            <SkillTree
+              completedNodes={completedNodeIds}
+              focusConceptId={latestLRC?.focus_concept ?? null}
+              conceptNames={conceptNames}
+              activeConceptId={selectedConceptId}
+              selectedNodeId={selectedNodeId}
+              onSelectStep={handleStepSelect}
+            />
+          </section>
+        )}
+
         {gameState === 'playing' && currentProblem && (
           <div className="problem-container">
             <div className="problem-display">
@@ -834,6 +1054,9 @@ const MathGame: React.FC = () => {
                 completedNodes={completedNodeIds}
                 focusConceptId={latestLRC?.focus_concept ?? null}
                 conceptNames={conceptNames}
+                activeConceptId={selectedConceptId}
+                selectedNodeId={selectedNodeId}
+                onSelectStep={handleStepSelect}
               />
             </section>
 
@@ -870,6 +1093,11 @@ const MathGame: React.FC = () => {
             </div>
 
             <div className="result-actions">
+              {canStartNextStep && (
+                <button onClick={startNextStep} className="next-step-button" type="button">
+                  다음 단계 시작
+                </button>
+              )}
               <button onClick={restartGame} className="restart-button" type="button">
                 다시 하기
               </button>

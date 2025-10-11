@@ -72,6 +72,8 @@ class TemplateGenerateResponse(BaseModel):
     representation: str
     rubric_keywords: List[str]
     variables: dict[str, object]
+    difficulty_est: float | None = None
+    tags: Dict[str, Any] | None = None
 
     @classmethod
     def from_instance(cls, instance: ItemInstance) -> "TemplateGenerateResponse":
@@ -79,6 +81,8 @@ class TemplateGenerateResponse(BaseModel):
         payload["options"] = list(payload["options"])
         payload["lens"] = list(payload["lens"])
         payload["rubric_keywords"] = list(payload["rubric_keywords"])
+        if payload.get("tags") is None:
+            payload["tags"] = {}
         return cls(**payload)
 
 

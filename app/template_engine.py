@@ -101,6 +101,10 @@ class ParameterSpec:
         raise TemplateEngineError(f"Unsupported parameter type: {self.value_type}")
 
 
+PromptTemplate = str | Mapping[str, str]
+ExplanationTemplate = str | Mapping[str, str]
+
+
 @dataclass(frozen=True, slots=True)
 class ProblemTemplate:
     id: str
@@ -111,11 +115,14 @@ class ProblemTemplate:
     context_pack: tuple[str, ...]
     parameters: Mapping[str, ParameterSpec]
     computed_values: Mapping[str, str]
-    prompt: str
-    explanation: str
+    prompt: PromptTemplate
+    explanation: ExplanationTemplate
     answer_expression: str
     option_offsets: tuple[Any, ...]
+    distractor_expressions: tuple[Any, ...]
     rubric_keywords: tuple[str, ...]
+    difficulty_est: float | None
+    tags: Mapping[str, Any]
 
     def to_brief_dict(self) -> dict[str, Any]:
         return {
@@ -145,6 +152,8 @@ class ItemInstance:
     representation: str
     rubric_keywords: tuple[str, ...]
     variables: Mapping[str, Any]
+    difficulty_est: float | None
+    tags: Mapping[str, Any]
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -161,6 +170,8 @@ class ItemInstance:
             "representation": self.representation,
             "rubric_keywords": list(self.rubric_keywords),
             "variables": dict(self.variables),
+            "difficulty_est": self.difficulty_est,
+            "tags": dict(self.tags),
         }
 
 
@@ -282,16 +293,20 @@ class TemplateEngine:
         lens = template.lens
         representation = template.representation
         context_value = self._resolve_context(template, context, rng)
-        options = self._build_options(
-            answer_int, template.option_offsets, variables, rng
-        )
-
-        prompt = template.prompt.format(**variables)
-        explanation = template.explanation.format(**variables)
-        instance_id = f"{template.id}-{rng.randrange(1_000, 99_999)}"
 
         enriched_variables = dict(variables)
         enriched_variables["answer"] = answer_int
+        enriched_variables["context"] = context_value
+
+        options = self._build_options(
+            template, answer_int, enriched_variables, rng
+        )
+
+        prompt = self._render_text(template.prompt, context_value, enriched_variables)
+        explanation = self._render_text(
+            template.explanation, context_value, enriched_variables
+        )
+        instance_id = f"{template.id}-{rng.randrange(1_000, 99_999)}"
 
         return ItemInstance(
             id=instance_id,
@@ -307,6 +322,8 @@ class TemplateEngine:
             representation=representation,
             rubric_keywords=template.rubric_keywords,
             variables=enriched_variables,
+            difficulty_est=template.difficulty_est,
+            tags=template.tags,
         )
 
     def _ensure_loaded(self) -> None:
@@ -386,6 +403,35 @@ class TemplateEngine:
             rubric_keywords = tuple(
                 str(keyword) for keyword in entry.get("rubric_keywords", [])
             )
+            raw_prompt = entry.get("prompt", "")
+            if isinstance(raw_prompt, Mapping):
+                prompt: PromptTemplate = {
+                    str(key): str(value) for key, value in raw_prompt.items()
+                }
+            else:
+                prompt = str(raw_prompt)
+
+            raw_explanation = entry.get("explanation", "")
+            if isinstance(raw_explanation, Mapping):
+                explanation: ExplanationTemplate = {
+                    str(key): str(value)
+                    for key, value in raw_explanation.items()
+                }
+            else:
+                explanation = str(raw_explanation)
+
+            distractor_expressions = tuple(
+                entry.get("distractor_expressions", [])
+            )
+            difficulty_est = entry.get("difficulty_est")
+            tags_entry = entry.get("tags") or {}
+            if isinstance(tags_entry, Mapping):
+                tags: Mapping[str, Any] = {
+                    str(key): value for key, value in tags_entry.items()
+                }
+            else:
+                tags = {}
+
             template = ProblemTemplate(
                 id=template_id,
                 concept=str(entry.get("concept")),
@@ -397,11 +443,14 @@ class TemplateEngine:
                 ),
                 parameters=parameters,
                 computed_values=computed_values,
-                prompt=str(entry.get("prompt", "")),
-                explanation=str(entry.get("explanation", "")),
+                prompt=prompt,
+                explanation=explanation,
                 answer_expression=str(entry.get("answer_expression", "")),
                 option_offsets=option_offsets,
+                distractor_expressions=distractor_expressions,
                 rubric_keywords=rubric_keywords,
+                difficulty_est=float(difficulty_est) if difficulty_est is not None else None,
+                tags=tags,
             )
             templates[template.id] = template
         return templates
@@ -471,22 +520,34 @@ class TemplateEngine:
 
     def _build_options(
         self,
+        template: ProblemTemplate,
         answer: int,
-        offsets: Sequence[Any],
         variables: Mapping[str, Any],
         rng: random.Random,
     ) -> List[int]:
         option_set = {answer}
-        for raw_offset in offsets:
-            delta = self._resolve_offset(raw_offset, variables)
-            candidate = answer + delta
-            if candidate <= 0 or candidate == answer:
-                continue
-            option_set.add(candidate)
+
+        enriched_variables = dict(variables)
+        enriched_variables.setdefault("answer", answer)
+
+        if template.distractor_expressions:
+            for raw_expr in template.distractor_expressions:
+                candidate = self._resolve_distractor(raw_expr, enriched_variables)
+                if candidate <= 0 or candidate == answer:
+                    continue
+                option_set.add(candidate)
+        else:
+            for raw_offset in template.option_offsets:
+                delta = self._resolve_offset(raw_offset, enriched_variables)
+                candidate = answer + delta
+                if candidate <= 0 or candidate == answer:
+                    continue
+                option_set.add(candidate)
+
         # Ensure at least 4 unique options
         guard = 0
         max_span = max(5, abs(answer))
-        while len(option_set) < 4 and guard < 20:
+        while len(option_set) < 4 and guard < 32:
             guard += 1
             delta = rng.randint(1, max_span)
             candidate = answer + delta if guard % 2 else max(1, answer - delta)
@@ -496,6 +557,26 @@ class TemplateEngine:
         rng.shuffle(options)
         return options
 
+    def _render_text(
+        self,
+        source: PromptTemplate | ExplanationTemplate,
+        context: str,
+        variables: Mapping[str, Any],
+    ) -> str:
+        if isinstance(source, Mapping):
+            if context in source:
+                template = source[context]
+            elif "default" in source:
+                template = source["default"]
+            elif source:
+                # fall back to the first available entry
+                template = next(iter(source.values()))
+            else:
+                template = ""
+        else:
+            template = source
+        return str(template).format(**variables)
+
     def _resolve_offset(self, raw_offset: Any, variables: Mapping[str, Any]) -> int:
         if isinstance(raw_offset, (int, float)):
             return self._coerce_int(raw_offset)
@@ -503,6 +584,14 @@ class TemplateEngine:
             value = self._evaluate_expression(raw_offset, variables)
             return self._coerce_int(value)
         raise TemplateEngineError("offset must be numeric or expression string")
+
+    def _resolve_distractor(self, raw_value: Any, variables: Mapping[str, Any]) -> int:
+        if isinstance(raw_value, (int, float)):
+            return self._coerce_int(raw_value)
+        if isinstance(raw_value, str):
+            evaluated = self._evaluate_expression(raw_value, variables)
+            return self._coerce_int(evaluated)
+        raise TemplateEngineError("distractor must be numeric or expression string")
 
 
 _engine_lock = RLock()

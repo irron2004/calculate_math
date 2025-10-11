@@ -108,6 +108,8 @@ export type GeneratedItem = {
   representation: string;
   rubric_keywords: string[];
   variables: Record<string, unknown>;
+  difficulty_est?: number | null;
+  tags?: Record<string, unknown>;
 };
 
 export type LRCMetric = {
