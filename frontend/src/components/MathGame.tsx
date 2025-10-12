@@ -25,6 +25,14 @@ import { getLensBadges, getLensBadgeTokens } from '../utils/lens';
 import { countKeywordMatches } from '../utils/text';
 import SkillTree from './SkillTree';
 import './MathGame.css';
+import {
+  trackBossPassed,
+  trackSessionStartedFromTree,
+  trackSkillUnlocked,
+  trackSkillViewed,
+  type SkillViewSource,
+  type StepID
+} from '../utils/analytics';
 
 const STEP_LABEL: Record<string, string> = {
   S1: 'S1 · 기초',
@@ -73,7 +81,6 @@ const FALLBACK_CONCEPT: CurriculumConcept = {
 
 const FALLBACK_TEMPLATE_ID = 'fallback-inline';
 const QUESTION_TIME_LIMIT = 30;
-type StepID = 'S1' | 'S2' | 'S3';
 const STEP_SEQUENCE: ReadonlyArray<StepID> = ['S1', 'S2', 'S3'];
 const PROBLEMS_PER_STEP = 6;
 
@@ -95,6 +102,14 @@ type SequenceEntry = {
   nodeId: string;
   label: string;
   lens: string[];
+};
+
+type TreeTrigger = 'skill_node';
+
+type LoadProblemsOptions = {
+  source?: SkillViewSource;
+  sequenceEntry?: SequenceEntry | null;
+  triggeredByTree?: TreeTrigger | null;
 };
 
 interface ProblemFeedback {
@@ -217,20 +232,46 @@ const MathGame: React.FC = () => {
   };
 
   const markStepCompleted = (conceptId: string, step: StepID) => {
-    setCompletedStepsByConcept((previous) => {
-      const existing = new Set(previous[conceptId] ?? []);
-      existing.add(step);
-      return {
-        ...previous,
-        [conceptId]: Array.from(existing)
-      };
-    });
-    const sequencePosition = curriculumSequence.findIndex(
-      (entry) => entry.conceptId === conceptId && entry.step === step
-    );
-    if (sequencePosition !== -1) {
-      setSequenceIndex(sequencePosition);
+    const existingSteps = new Set(completedStepsByConcept[conceptId] ?? []);
+    if (existingSteps.has(step)) {
+      return;
     }
+
+    const updatedSteps = new Set(existingSteps);
+    updatedSteps.add(step);
+
+    setCompletedStepsByConcept((previous) => ({
+      ...previous,
+      [conceptId]: Array.from(updatedSteps)
+    }));
+
+    const { index } = findSequenceInfo(conceptId, step);
+    if (index !== null) {
+      setSequenceIndex(index);
+    }
+
+    const nextStep = getNextSequentialStep(step);
+    if (!nextStep) {
+      return;
+    }
+    const requiredSteps = STEP_SEQUENCE.slice(0, STEP_SEQUENCE.indexOf(nextStep));
+    const prerequisitesMet = requiredSteps.every((required) => updatedSteps.has(required));
+    if (!prerequisitesMet || updatedSteps.has(nextStep)) {
+      return;
+    }
+
+    const nextInfo = findSequenceInfo(conceptId, nextStep);
+    const concept =
+      conceptCatalog[conceptId] ?? (conceptId === FALLBACK_CONCEPT.id ? FALLBACK_CONCEPT : null);
+    trackSkillUnlocked({
+      conceptId,
+      conceptName: concept?.name ?? conceptId,
+      unlockedStep: nextStep,
+      previousStep: step,
+      nodeId: nextInfo.entry?.nodeId ?? `${conceptId}-${nextStep}`,
+      sequenceIndex: nextInfo.index,
+      lens: nextInfo.entry?.lens?.[0] ?? concept?.lens?.[0] ?? null,
+    });
   };
 
   const getNextSequentialStep = (step: StepID): StepID | null => {
@@ -280,6 +321,16 @@ const MathGame: React.FC = () => {
       }
     });
     return ordered;
+  };
+
+  const findSequenceInfo = (conceptId: string, step: StepID) => {
+    const index = curriculumSequence.findIndex(
+      (entry) => entry.conceptId === conceptId && entry.step === step
+    );
+    if (index === -1) {
+      return { entry: null, index: null } as const;
+    }
+    return { entry: curriculumSequence[index], index } as const;
   };
 *** End Patch
 
@@ -407,7 +458,8 @@ const MathGame: React.FC = () => {
 
   const loadProblemsForStep = async (
     concept: CurriculumConcept,
-    step: StepID
+    step: StepID,
+    options: LoadProblemsOptions = {}
   ) => {
     resetRoundState();
     setSelectedConcept(concept);
@@ -415,19 +467,28 @@ const MathGame: React.FC = () => {
     setGameState('loading');
     setLoadError(null);
 
+    let problems: CurriculumProblem[] = [];
+    let problemsSource: 'generated' | 'session_fallback' | 'local_fallback' = 'generated';
+
     try {
       const generated = await generateProblemsForStep(concept, step);
       if (!generated.length) {
         throw new Error('생성된 문제가 없습니다.');
       }
-      setProblems(generated);
-      setTotalQuestions(generated.length);
-      setCurrentProblem(generated[0]);
-      setGameState('playing');
-      return;
+      problems = generated;
     } catch (error) {
       console.error('문제 불러오기 실패:', error);
       setLoadError('커리큘럼 데이터를 불러오지 못했습니다. 예비 문제로 대체합니다.');
+
+      try {
+        const session = await createSession();
+        problems = convertSessionToCurriculum(session, concept, step);
+        problemsSource = 'session_fallback';
+      } catch (fallbackError) {
+        console.error('Fallback session 불러오기 실패:', fallbackError);
+        problems = generateLocalFallback(12, concept, step);
+        problemsSource = 'local_fallback';
+      }
     }
 
     try {
@@ -494,7 +555,11 @@ const MathGame: React.FC = () => {
           const targetIndex = sequence.findIndex(
             (entry) => entry.conceptId === requestedConceptId && entry.step === requestedStep
           );
-          await loadProblemsForStep(targetConcept, requestedStep);
+          const targetEntry = targetIndex !== -1 ? sequence[targetIndex] : null;
+          await loadProblemsForStep(targetConcept, requestedStep, {
+            source: 'query_param',
+            sequenceEntry: targetEntry,
+          });
           if (targetIndex !== -1) {
             setSequenceIndex(targetIndex);
           }
@@ -528,7 +593,10 @@ const MathGame: React.FC = () => {
         conceptList[0] ??
         FALLBACK_CONCEPT;
 
-      await loadProblemsForStep(startingConcept, startingEntry.step);
+      await loadProblemsForStep(startingConcept, startingEntry.step, {
+        source: 'initial',
+        sequenceEntry: startingEntry,
+      });
       setSequenceIndex(startingIndex);
     } catch (error) {
       console.error('초기 문제 준비 실패:', error);
@@ -554,6 +622,19 @@ const MathGame: React.FC = () => {
       setGameState(fallbackProblems.length ? 'playing' : 'finished');
       setSequenceIndex(0);
       setLoadError('기본 문제 세트로 시작합니다.');
+      trackSkillViewed({
+        conceptId: FALLBACK_CONCEPT.id,
+        conceptName: FALLBACK_CONCEPT.name,
+        step: 'S1',
+        nodeId: 'FALLBACK-S1',
+        source: 'initial',
+        sequenceIndex: 0,
+        available: true,
+        completed: false,
+        lens: FALLBACK_CONCEPT.lens?.[0] ?? null,
+        problemCount: fallbackProblems.length,
+        problemsSource: 'local_fallback',
+      });
     }
   };
 
@@ -568,12 +649,13 @@ const MathGame: React.FC = () => {
       return;
     }
     const nextStep = determineNextStepForConcept(conceptId) ?? 'S1';
-    const targetIndex = curriculumSequence.findIndex(
-      (entry) => entry.conceptId === conceptId && entry.step === nextStep
-    );
-    await loadProblemsForStep(concept, nextStep);
-    if (targetIndex !== -1) {
-      setSequenceIndex(targetIndex);
+    const { entry, index } = findSequenceInfo(conceptId, nextStep);
+    await loadProblemsForStep(concept, nextStep, {
+      source: 'concept_tab',
+      sequenceEntry: entry,
+    });
+    if (index !== null) {
+      setSequenceIndex(index);
     }
   };
 
@@ -589,12 +671,14 @@ const MathGame: React.FC = () => {
     if (selectedConcept?.id === conceptId && selectedStep === step && gameState === 'playing') {
       return;
     }
-    const targetIndex = curriculumSequence.findIndex(
-      (entry) => entry.conceptId === conceptId && entry.step === step
-    );
-    await loadProblemsForStep(concept, step);
-    if (targetIndex !== -1) {
-      setSequenceIndex(targetIndex);
+    const { entry, index } = findSequenceInfo(conceptId, step);
+    await loadProblemsForStep(concept, step, {
+      source: 'skill_node',
+      sequenceEntry: entry,
+      triggeredByTree: 'skill_node',
+    });
+    if (index !== null) {
+      setSequenceIndex(index);
     }
   };
 
@@ -629,7 +713,10 @@ const MathGame: React.FC = () => {
       return;
     }
     void (async () => {
-      await loadProblemsForStep(concept, nextEntry.step);
+      await loadProblemsForStep(concept, nextEntry.step, {
+        source: 'auto_progress',
+        sequenceEntry: nextEntry,
+      });
       setSequenceIndex(nextIndex);
     })();
   };
@@ -873,6 +960,26 @@ const MathGame: React.FC = () => {
       setLrcResult(response);
       setLatestLRC(response);
       setLrcError(null);
+      if (response.passed && selectedConcept && selectedStep === 'S3') {
+        const { entry, index } = findSequenceInfo(selectedConcept.id, selectedStep);
+        trackBossPassed({
+          conceptId: selectedConcept.id,
+          conceptName: selectedConcept.name,
+          step: selectedStep,
+          nodeId: entry?.nodeId ?? `${selectedConcept.id}-${selectedStep}`,
+          sequenceIndex: index,
+          status: response.status,
+          recommendation: response.recommendation,
+          metrics: {
+            accuracy,
+            rt_percentile: rtPercentile,
+            rubric: rubricScore,
+          },
+          score,
+          totalQuestions,
+          correctCount,
+        });
+      }
     } catch (error) {
       console.error('LRC evaluation failed:', error);
       setLrcError('LRC 평가 호출에 실패했습니다. 나중에 다시 시도해주세요.');
@@ -884,7 +991,11 @@ const MathGame: React.FC = () => {
 
   const restartGame = () => {
     if (selectedConcept && selectedStep) {
-      void loadProblemsForStep(selectedConcept, selectedStep);
+      const { entry } = findSequenceInfo(selectedConcept.id, selectedStep);
+      void loadProblemsForStep(selectedConcept, selectedStep, {
+        source: 'restart',
+        sequenceEntry: entry,
+      });
       return;
     }
     void initialiseGame();
