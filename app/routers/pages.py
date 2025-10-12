@@ -31,6 +31,23 @@ def _templates_resolver(
     return _resolve
 
 
+def _is_truthy_flag(value: str | None) -> bool:
+    if value is None:
+        return False
+    normalized = value.strip().lower()
+    return normalized in {"1", "true", "yes", "on"}
+
+
+def _should_show_compliance(request: Request) -> bool:
+    if _is_truthy_flag(request.query_params.get("staff")):
+        return True
+    if _is_truthy_flag(request.query_params.get("preview")):
+        return True
+    if _is_truthy_flag(request.headers.get("X-Staff-Preview")):
+        return True
+    return False
+
+
 def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
     router = APIRouter(tags=["pages"])
     resolve_templates = _templates_resolver(templates)
@@ -116,6 +133,7 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 "category_count": len(cards),
                 "skill_tree": skill_tree,
                 "skill_palette": palette,
+                "show_compliance_details": _should_show_compliance(request),
             },
         )
 
@@ -163,6 +181,7 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 "primary_category": resolve_primary_category(categories),
                 "category_available": bool(selected_category),
                 "bridge_unit": bridge_unit,
+                "show_compliance_details": _should_show_compliance(request),
             },
         )
 
