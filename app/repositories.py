@@ -158,6 +158,16 @@ class UserRepository:
             return None
         return self._row_to_record(row)
 
+    def get_by_id(self, user_id: int) -> Optional[UserRecord]:
+        with self._lock, self._connect() as connection:
+            row = connection.execute(
+                "SELECT id, nickname, password_hash, role, locale FROM users WHERE id = ?",
+                (user_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return self._row_to_record(row)
+
     def create_user(
         self,
         *,
@@ -193,6 +203,183 @@ class UserRepository:
             password_hash=str(password_hash),
             role=str(role),
             locale=str(locale),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class SessionRecord:
+    id: int
+    user_id: int
+    token_hash: str
+    issued_at: datetime
+    expires_at: datetime
+    last_seen_at: datetime
+    is_active: bool
+    user_agent: str | None
+
+
+class SessionRepository:
+    """SQLite-backed repository for session metadata."""
+
+    def __init__(self, database_path: Path):
+        self.database_path = Path(database_path)
+        self.database_path.parent.mkdir(parents=True, exist_ok=True)
+        self._lock = RLock()
+        self._initialize()
+
+    def _initialize(self) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS sessions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    token_hash TEXT NOT NULL UNIQUE,
+                    issued_at TEXT NOT NULL,
+                    expires_at TEXT NOT NULL,
+                    last_seen_at TEXT NOT NULL,
+                    is_active INTEGER NOT NULL DEFAULT 1,
+                    user_agent TEXT
+                )
+                """
+            )
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)"
+            )
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token_hash)"
+            )
+            connection.commit()
+
+    def _connect(self) -> sqlite3.Connection:
+        return sqlite3.connect(
+            self.database_path,
+            detect_types=sqlite3.PARSE_DECLTYPES,
+            check_same_thread=False,
+        )
+
+    def create_session(
+        self,
+        *,
+        user_id: int,
+        token_hash: str,
+        issued_at: datetime,
+        expires_at: datetime,
+        user_agent: str | None = None,
+    ) -> SessionRecord:
+        last_seen_at = issued_at
+        with self._lock, self._connect() as connection:
+            cursor = connection.execute(
+                """
+                INSERT INTO sessions (
+                    user_id, token_hash, issued_at, expires_at, last_seen_at, is_active, user_agent
+                )
+                VALUES (?, ?, ?, ?, ?, 1, ?)
+                """,
+                (
+                    int(user_id),
+                    token_hash,
+                    issued_at.isoformat(),
+                    expires_at.isoformat(),
+                    last_seen_at.isoformat(),
+                    user_agent,
+                ),
+            )
+            connection.commit()
+            session_id = int(cursor.lastrowid)
+        return SessionRecord(
+            id=session_id,
+            user_id=int(user_id),
+            token_hash=token_hash,
+            issued_at=issued_at,
+            expires_at=expires_at,
+            last_seen_at=last_seen_at,
+            is_active=True,
+            user_agent=user_agent,
+        )
+
+    def get_by_token_hash(self, token_hash: str) -> Optional[SessionRecord]:
+        with self._lock, self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT id, user_id, token_hash, issued_at, expires_at, last_seen_at, is_active, user_agent
+                FROM sessions
+                WHERE token_hash = ?
+                """,
+                (token_hash,),
+            ).fetchone()
+        if row is None:
+            return None
+        return self._row_to_record(row)
+
+    def list_active_sessions_for_user(self, user_id: int) -> List[SessionRecord]:
+        with self._lock, self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT id, user_id, token_hash, issued_at, expires_at, last_seen_at, is_active, user_agent
+                FROM sessions
+                WHERE user_id = ? AND is_active = 1
+                ORDER BY issued_at DESC
+                """,
+                (int(user_id),),
+            ).fetchall()
+        return [self._row_to_record(row) for row in rows]
+
+    def touch_session(self, session_id: int) -> None:
+        now = datetime.now(timezone.utc).isoformat()
+        with self._lock, self._connect() as connection:
+            connection.execute(
+                "UPDATE sessions SET last_seen_at = ? WHERE id = ?",
+                (now, int(session_id)),
+            )
+            connection.commit()
+
+    def deactivate_session(self, session_id: int) -> None:
+        with self._lock, self._connect() as connection:
+            connection.execute(
+                "UPDATE sessions SET is_active = 0 WHERE id = ?",
+                (int(session_id),),
+            )
+            connection.commit()
+
+    def deactivate_sessions_for_user(self, user_id: int) -> None:
+        with self._lock, self._connect() as connection:
+            connection.execute(
+                "UPDATE sessions SET is_active = 0 WHERE user_id = ?",
+                (int(user_id),),
+            )
+            connection.commit()
+
+    def _row_to_record(self, row: Iterable[object]) -> SessionRecord:
+        (
+            session_id,
+            user_id,
+            token_hash,
+            issued_at,
+            expires_at,
+            last_seen_at,
+            is_active,
+            user_agent,
+        ) = row
+        issued_at_dt = datetime.fromisoformat(str(issued_at))
+        expires_at_dt = datetime.fromisoformat(str(expires_at))
+        last_seen_at_dt = datetime.fromisoformat(str(last_seen_at))
+        if issued_at_dt.tzinfo is None:
+            issued_at_dt = issued_at_dt.replace(tzinfo=timezone.utc)
+        if expires_at_dt.tzinfo is None:
+            expires_at_dt = expires_at_dt.replace(tzinfo=timezone.utc)
+        if last_seen_at_dt.tzinfo is None:
+            last_seen_at_dt = last_seen_at_dt.replace(tzinfo=timezone.utc)
+        user_agent_str = str(user_agent) if user_agent is not None else None
+        return SessionRecord(
+            id=int(session_id),
+            user_id=int(user_id),
+            token_hash=str(token_hash),
+            issued_at=issued_at_dt,
+            expires_at=expires_at_dt,
+            last_seen_at=last_seen_at_dt,
+            is_active=bool(is_active),
+            user_agent=user_agent_str,
         )
 
 
@@ -348,6 +535,8 @@ __all__ = [
     "AttemptRepository",
     "UserRecord",
     "UserRepository",
+    "SessionRecord",
+    "SessionRepository",
     "LRCRecord",
     "LRCRepository",
 ]

@@ -80,6 +80,10 @@ class Settings:
     allowed_problem_categories: List[str] | None
     invite_token_ttl_minutes: int
     invite_token_bytes: int
+    session_token_secret: str
+    session_token_ttl_minutes: int
+    session_cookie_name: str
+    session_cookie_secure: bool
     problem_data_path: Path
     attempts_database_path: Path
     concept_data_path: Path
@@ -115,6 +119,14 @@ def _build_settings() -> Settings:
         ),
         template_data_path=_resolve_path(
             os.getenv("TEMPLATE_DATA_PATH"), default=DEFAULT_TEMPLATE_PATH
+        ),
+        session_token_secret=os.getenv("SESSION_TOKEN_SECRET", "calculate-dev-secret"),
+        session_token_ttl_minutes=_parse_int(
+            os.getenv("SESSION_TOKEN_TTL_MINUTES"), 1440
+        ),
+        session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "session_token"),
+        session_cookie_secure=_parse_bool(
+            os.getenv("SESSION_COOKIE_SECURE"), False
         ),
     )
 

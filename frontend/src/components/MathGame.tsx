@@ -126,7 +126,7 @@ interface ProblemFeedback {
 }
 
 const MathGame: React.FC = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestedConceptParam = searchParams.get('concept');
@@ -491,47 +491,20 @@ const MathGame: React.FC = () => {
       }
     }
 
-    setProblems(problems);
-    setTotalQuestions(problems.length);
-    setCurrentProblem(problems[0] ?? null);
-    setGameState(problems.length ? 'playing' : 'finished');
-
-    const sequenceInfo = options.sequenceEntry
-      ? findSequenceInfo(options.sequenceEntry.conceptId, options.sequenceEntry.step)
-      : findSequenceInfo(concept.id, step);
-    const resolvedEntry = options.sequenceEntry ?? sequenceInfo.entry;
-    const nodeId = resolvedEntry?.nodeId ?? `${concept.id}-${step}`;
-    const primaryLens = resolvedEntry?.lens?.[0] ?? concept.lens?.[0] ?? null;
-    const available = isStepAvailable(concept.id, step);
-    const completed = isStepCompleted(concept.id, step);
-    const source: SkillViewSource = options.source ?? 'unknown';
-
-    trackSkillViewed({
-      conceptId: concept.id,
-      conceptName: concept.name,
-      step,
-      nodeId,
-      source,
-      sequenceIndex: sequenceInfo.index,
-      available,
-      completed,
-      lens: primaryLens,
-      problemCount: problems.length,
-      problemsSource,
-    });
-
-    if (options.triggeredByTree === 'skill_node') {
-      trackSessionStartedFromTree({
-        conceptId: concept.id,
-        conceptName: concept.name,
-        step,
-        nodeId,
-        sequenceIndex: sequenceInfo.index,
-        triggeredBy: 'skill_node',
-        available,
-        completed,
-        lens: primaryLens,
-      });
+    try {
+      const session = await createSession(token ?? undefined);
+      const fallbackProblems = convertSessionToCurriculum(session, concept, step);
+      setProblems(fallbackProblems);
+      setTotalQuestions(fallbackProblems.length);
+      setCurrentProblem(fallbackProblems[0] ?? null);
+      setGameState(fallbackProblems.length ? 'playing' : 'finished');
+    } catch (fallbackError) {
+      console.error('Fallback session 불러오기 실패:', fallbackError);
+      const localFallback = generateLocalFallback(12, concept, step);
+      setProblems(localFallback);
+      setTotalQuestions(localFallback.length);
+      setCurrentProblem(localFallback[0] ?? null);
+      setGameState(localFallback.length ? 'playing' : 'finished');
     }
   };
 

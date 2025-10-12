@@ -30,6 +30,7 @@ list_categories = problem_bank_module.list_categories
 reset_problem_cache = problem_bank_module.reset_cache
 get_settings = config_module.get_settings
 AttemptRepository = repositories_module.AttemptRepository
+SessionRepository = repositories_module.SessionRepository
 template_engine_module = _load_module("app.template_engine")
 reset_template_engine = template_engine_module.reset_engine
 
@@ -69,6 +70,7 @@ def dataset(tmp_path, monkeypatch):
 
     monkeypatch.setenv("PROBLEM_DATA_PATH", str(problems_path))
     monkeypatch.setenv("ATTEMPTS_DATABASE_PATH", str(attempts_path))
+    monkeypatch.setenv("SESSION_TOKEN_SECRET", "integration-secret")
 
     get_settings.cache_clear()  # type: ignore[attr-defined]
     reset_problem_cache()
@@ -98,6 +100,17 @@ async def client(app):
         transport=transport, base_url="http://testserver"
     ) as async_client:
         yield async_client
+
+
+async def _login_and_get_token(
+    client: httpx.AsyncClient, nickname: str = "student01", password: str = "secret"
+) -> tuple[str, httpx.Response]:
+    response = await client.post(
+        "/api/v1/login",
+        json={"nickname": nickname, "password": password},
+    )
+    payload = response.json()
+    return payload.get("session_token", ""), response
 
 
 async def test_health_endpoint_returns_status(client) -> None:
@@ -221,10 +234,9 @@ def test_submit_attempt_without_answer_returns_validation_error(client, dataset)
     assert payload["detail"][0]["loc"][-1] == "answer"
 
 
-def test_login_creates_and_returns_user(client) -> None:
-    response = client.post(
-        "/api/v1/login",
-        json={"nickname": "student01", "password": "secret"},
+async def test_login_creates_and_returns_user(client, dataset) -> None:
+    token, response = await _login_and_get_token(
+        client, nickname="student01", password="secret"
     )
 
     assert response.status_code == 200
@@ -232,45 +244,61 @@ def test_login_creates_and_returns_user(client) -> None:
     assert payload["nickname"] == "student01"
     assert payload["role"] == "student"
     assert payload["message"].startswith("새 계정")
+    assert payload["session_token"] == token
+    assert payload["expires_at"] > 0
+    assert response.cookies.get("session_token") == token
+
+    repository = SessionRepository(dataset["attempts_path"])
+    sessions = repository.list_active_sessions_for_user(payload["user_id"])
+    assert len(sessions) == 1
 
 
-def test_login_trims_whitespace_and_reuses_account(client) -> None:
-    first = client.post(
-        "/api/v1/login",
-        json={"nickname": "  spaced-user  ", "password": "secret"},
+async def test_login_trims_whitespace_and_reuses_account(client) -> None:
+    first_token, first_response = await _login_and_get_token(
+        client, nickname="  spaced-user  ", password="secret"
     )
-    assert first.status_code == 200
-    created = first.json()
+    assert first_response.status_code == 200
+    created = first_response.json()
     assert created["nickname"] == "spaced-user"
+    assert first_token
 
-    second = client.post(
-        "/api/v1/login",
-        json={"nickname": "\t spaced-user\n", "password": "secret"},
+    second_token, second_response = await _login_and_get_token(
+        client, nickname="\t spaced-user\n", password="secret"
     )
-    assert second.status_code == 200
-    payload = second.json()
+    assert second_response.status_code == 200
+    payload = second_response.json()
 
     assert payload["user_id"] == created["user_id"]
     assert payload["nickname"] == "spaced-user"
     assert payload["message"] == "로그인 성공"
+    assert second_token
+    assert second_token != first_token
 
 
-def test_login_with_wrong_password_returns_error(client) -> None:
-    success = client.post(
-        "/api/v1/login",
-        json={"nickname": "student02", "password": "secret"},
+async def test_login_with_wrong_password_returns_error(client) -> None:
+    success_token, success_response = await _login_and_get_token(
+        client, nickname="student02", password="secret"
     )
-    assert success.status_code == 200
+    assert success_response.status_code == 200
+    assert success_token
 
-    failure = client.post(
+    failure = await client.post(
         "/api/v1/login",
         json={"nickname": "student02", "password": "bad"},
     )
     assert failure.status_code == 401
+    payload = failure.json()
+    assert payload["detail"]["message"] == "비밀번호가 일치하지 않습니다."
 
 
-def test_create_session_returns_twenty_problems(client) -> None:
-    response = client.post("/api/v1/sessions")
+async def test_create_session_returns_twenty_problems(client) -> None:
+    token, login_response = await _login_and_get_token(client)
+    assert login_response.status_code == 200
+
+    response = await client.post(
+        "/api/v1/sessions",
+        headers={"Authorization": f"Bearer {token}"},
+    )
     assert response.status_code == 200
     payload = response.json()
     assert payload["session_id"]
@@ -278,6 +306,32 @@ def test_create_session_returns_twenty_problems(client) -> None:
     first = payload["problems"][0]
     assert set(first.keys()) == {"id", "left", "right", "answer", "options"}
     assert len(first["options"]) == 4
+
+
+async def test_create_session_requires_authentication(client) -> None:
+    response = await client.post("/api/v1/sessions")
+    assert response.status_code == 401
+
+
+async def test_create_session_reuses_token_across_requests(client) -> None:
+    token, login_response = await _login_and_get_token(client)
+    assert login_response.status_code == 200
+    headers = {"Authorization": f"Bearer {token}"}
+
+    first = await client.post("/api/v1/sessions", headers=headers)
+    assert first.status_code == 200
+
+    second = await client.post("/api/v1/sessions", headers=headers)
+    assert second.status_code == 200
+    assert second.json()["session_id"] != first.json()["session_id"]
+
+
+async def test_create_session_rejects_unknown_token(client) -> None:
+    response = await client.post(
+        "/api/v1/sessions",
+        headers={"Authorization": "Bearer invalid-token"},
+    )
+    assert response.status_code == 401
 
 
 def test_daily_stats_endpoint_returns_summary(client) -> None:

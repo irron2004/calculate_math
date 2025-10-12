@@ -6,11 +6,16 @@ import time
 from dataclasses import dataclass
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, Field
 
-from ..repositories import UserRepository
-from ..config import get_settings
+from ..dependencies.auth import (
+    SessionTokenService,
+    get_current_user,
+    get_session_token_service,
+    get_user_repository,
+)
+from ..repositories import UserRecord, UserRepository
 
 router = APIRouter(prefix="/api", tags=["practice"])
 
@@ -34,6 +39,8 @@ class LoginResponse(BaseModel):
     nickname: str
     role: str
     message: str
+    session_token: str
+    expires_at: float
 
 
 class SessionProblem(BaseModel):
@@ -53,15 +60,17 @@ def _hash_password(raw: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def _get_user_repository(request: Request) -> UserRepository:
-    repository = getattr(request.app.state, "user_repository", None)
-    if isinstance(repository, UserRepository):
-        return repository
-
-    settings = getattr(request.app.state, "settings", None) or get_settings()
-    repository = UserRepository(settings.attempts_database_path)
-    request.app.state.user_repository = repository
-    return repository
+def _set_session_cookie(
+    response: Response, session_service: SessionTokenService, token: str
+) -> None:
+    response.set_cookie(
+        key=session_service.cookie_name,
+        value=token,
+        httponly=True,
+        secure=session_service.cookie_secure,
+        samesite="lax",
+        max_age=session_service.ttl_seconds,
+    )
 
 
 def _generate_problem(problem_id: int) -> GeneratedProblem:
@@ -89,7 +98,13 @@ def _generate_problem(problem_id: int) -> GeneratedProblem:
 
 
 @router.post("/v1/login", response_model=LoginResponse)
-async def login(payload: LoginRequest, repository: UserRepository = Depends(_get_user_repository)) -> LoginResponse:
+async def login(
+    payload: LoginRequest,
+    response: Response,
+    request: Request,
+    repository: UserRepository = Depends(get_user_repository),
+    session_service: SessionTokenService = Depends(get_session_token_service),
+) -> LoginResponse:
     normalized_nickname = payload.nickname.strip()
     if not normalized_nickname:
         raise HTTPException(
@@ -106,11 +121,18 @@ async def login(payload: LoginRequest, repository: UserRepository = Depends(_get
             password_hash=password_hash,
             role="student",
         )
+        session_token, session_record = session_service.issue_session(
+            user_id=created.id,
+            user_agent=request.headers.get("user-agent"),
+        )
+        _set_session_cookie(response, session_service, session_token)
         return LoginResponse(
             user_id=created.id,
             nickname=created.nickname,
             role=created.role,
             message="새 계정이 생성되었습니다",
+            session_token=session_token,
+            expires_at=session_record.expires_at.timestamp(),
         )
 
     if existing.password_hash != password_hash:
@@ -119,16 +141,25 @@ async def login(payload: LoginRequest, repository: UserRepository = Depends(_get
             detail={"message": "비밀번호가 일치하지 않습니다."},
         )
 
+    session_token, session_record = session_service.issue_session(
+        user_id=existing.id,
+        user_agent=request.headers.get("user-agent"),
+    )
+    _set_session_cookie(response, session_service, session_token)
     return LoginResponse(
         user_id=existing.id,
         nickname=existing.nickname,
         role=existing.role,
         message="로그인 성공",
+        session_token=session_token,
+        expires_at=session_record.expires_at.timestamp(),
     )
 
 
 @router.post("/v1/sessions", response_model=SessionResponse)
-async def create_session() -> SessionResponse:
+async def create_session(
+    _current_user: UserRecord = Depends(get_current_user),
+) -> SessionResponse:
     problems = [_generate_problem(index + 1) for index in range(20)]
     session_id = int(time.time() * 1000) % 1_000_000
 
