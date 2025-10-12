@@ -34,6 +34,12 @@ async def test_skill_tree_endpoint_returns_experiment_payload(client):
     data = response.json()
     assert "graph" in data and "nodes" in data["graph"]
     assert "bipartite_graph" in data and data["bipartite_graph"]["nodes"]
+    progress = data["progress"]
+    assert progress["user_id"] is not None
+    assert "nodes" in progress and isinstance(progress["nodes"], dict)
+    assert "skills" in progress and isinstance(progress["skills"], dict)
+    unlocked = data["unlocked"]
+    assert isinstance(unlocked, dict)
     assert "experiment" in data
     experiment = data["experiment"]
     assert experiment["name"] == "skill_tree_layout"
@@ -49,3 +55,18 @@ async def test_skill_tree_respects_existing_cookie(client):
     second = await client.get("/api/v1/skills/tree")
     second_variant = second.json()["experiment"]["variant"]
     assert second_variant == first_variant
+
+
+async def test_skill_progress_update_mutates_snapshot(client):
+    initial = await client.get("/api/v1/skills/tree")
+    initial_data = initial.json()
+    base_xp = initial_data["progress"]["nodes"].get("C01-S1", {}).get("xp_earned", 0)
+
+    response = await client.post(
+        "/api/v1/skills/progress",
+        json={"course_step_id": "C01-S1", "user_id": "1", "correct": True},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["nodes"]["C01-S1"]["xp_earned"] >= base_xp + 10
+    assert payload["skills"]["AS.PV.DECOMP"]["level"] >= 1

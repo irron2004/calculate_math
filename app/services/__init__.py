@@ -6,11 +6,13 @@ from .progress_metrics import (
     ProgressMetricsService,
     UserProgressMetrics,
 )
+from .skill_progress import SkillProgressService
 
 __all__ = [
     "AttemptMetrics",
     "ProgressBreakdown",
     "ProgressMetricsService",
     "UserProgressMetrics",
+    "SkillProgressService",
 ]
 

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from threading import RLock
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Callable, Dict, Iterable, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -157,6 +157,62 @@ class ProgressStore:
         if self._cache is None:
             return []
         return list(self._cache.keys())
+
+    def update_snapshot(
+        self,
+        user_id: str | int,
+        mutator: Callable[[ProgressSnapshot], None],
+    ) -> ProgressSnapshot:
+        with self._lock:
+            self._ensure_loaded()
+            if self._cache is None:
+                raise ProgressDataError("Progress store is not initialised")
+
+            key = str(user_id)
+            snapshot = self._cache.get(key)
+            if snapshot is None:
+                snapshot = ProgressSnapshot(
+                    user_id=key,
+                    updated_at=datetime.now(tz=timezone.utc),
+                )
+                self._cache[key] = snapshot
+
+            mutator(snapshot)
+            snapshot.updated_at = datetime.now(tz=timezone.utc)
+            self._persist()
+            return snapshot
+
+    def _persist(self) -> None:
+        if self._cache is None:
+            return
+
+        payload = {
+            "meta": self._meta,
+            "users": [
+                {
+                    "user_id": snapshot.user_id,
+                    "updated_at": snapshot.updated_at.isoformat(),
+                    "total_xp": snapshot.total_xp,
+                    "nodes": {
+                        node_id: progress.dict()
+                        for node_id, progress in snapshot.nodes.items()
+                    },
+                    "skills": {
+                        skill_id: progress.dict()
+                        for skill_id, progress in snapshot.skills.items()
+                    },
+                }
+                for snapshot in self._cache.values()
+            ],
+        }
+
+        tmp_path = self.source_path.with_suffix(".tmp")
+        tmp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp_path.replace(self.source_path)
+        try:
+            self._last_loaded_at = self.source_path.stat().st_mtime
+        except FileNotFoundError:
+            self._last_loaded_at = None
 
 
 _store_lock = RLock()
