@@ -56,6 +56,15 @@ def _parse_int(value: str | None, default: int) -> int:
         return default
 
 
+def _clamp_percentage(value: str | None, default: int) -> int:
+    candidate = _parse_int(value, default)
+    if candidate < 0:
+        return 0
+    if candidate > 100:
+        return 100
+    return candidate
+
+
 def _parse_categories(value: str | None) -> List[str] | None:
     if value is None or not value.strip():
         return None
@@ -92,6 +101,7 @@ class Settings:
     template_data_path: Path
     dag_data_path: Path
     progress_data_path: Path
+    skill_tree_list_rollout_percentage: int
 
 
 def _build_settings() -> Settings:
@@ -137,6 +147,9 @@ def _build_settings() -> Settings:
         session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "session_token"),
         session_cookie_secure=_parse_bool(
             os.getenv("SESSION_COOKIE_SECURE"), False
+        ),
+        skill_tree_list_rollout_percentage=_clamp_percentage(
+            os.getenv("SKILL_TREE_LIST_ROLLOUT"), default=50
         ),
     )
 

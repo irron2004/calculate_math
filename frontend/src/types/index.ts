@@ -139,10 +139,20 @@ export type SkillGraph = {
   edges: SkillEdge[];
 };
 
+export type SkillTreeExperiment = {
+  name: string;
+  variant: 'tree' | 'list';
+  source: string;
+  request_id?: string | null;
+  rollout?: number | null;
+  bucket?: number | string | null;
+};
+
 export type SkillTreeResponse = {
   graph: SkillGraph;
   progress: Record<string, unknown>;
   unlocked: Record<string, boolean>;
+  experiment?: SkillTreeExperiment;
 };
 
 export type CurriculumHomeCopy = {
