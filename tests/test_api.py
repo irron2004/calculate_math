@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
@@ -25,6 +26,7 @@ calculate_service_module = _load_module("app")
 problem_bank_module = _load_module("app.problem_bank")
 config_module = _load_module("app.config")
 repositories_module = _load_module("app.repositories")
+progress_store_module = _load_module("app.progress_store")
 create_app = calculate_service_module.create_app
 list_categories = problem_bank_module.list_categories
 reset_problem_cache = problem_bank_module.reset_cache
@@ -33,6 +35,7 @@ AttemptRepository = repositories_module.AttemptRepository
 SessionRepository = repositories_module.SessionRepository
 template_engine_module = _load_module("app.template_engine")
 reset_template_engine = template_engine_module.reset_engine
+reset_progress_store = progress_store_module.reset_progress_store
 
 pytestmark = pytest.mark.asyncio
 
@@ -43,6 +46,7 @@ def dataset(tmp_path, monkeypatch):
     data_dir.mkdir()
     problems_path = data_dir / "problems.json"
     attempts_path = data_dir / "attempts.db"
+    progress_path = data_dir / "dag_progress.json"
     sample_problems = [
         {
             "id": "sample-add-1",
@@ -68,24 +72,62 @@ def dataset(tmp_path, monkeypatch):
         encoding="utf-8",
     )
 
+    progress_payload = {
+        "meta": {
+            "xp": {"daily_target": 5},
+        },
+        "users": [
+            {
+                "user_id": "1",
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "total_xp": 120,
+                "nodes": {
+                    "ALG-AP-S1": {
+                        "unlocked": True,
+                        "completed": True,
+                    },
+                    "ALG-AP-S2": {
+                        "unlocked": True,
+                        "completed": False,
+                    },
+                },
+                "skills": {
+                    "addition": {
+                        "level": 2,
+                        "xp": 40,
+                    }
+                },
+            }
+        ],
+    }
+    progress_path.write_text(
+        json.dumps(progress_payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
     monkeypatch.setenv("PROBLEM_DATA_PATH", str(problems_path))
     monkeypatch.setenv("ATTEMPTS_DATABASE_PATH", str(attempts_path))
     monkeypatch.setenv("SESSION_TOKEN_SECRET", "integration-secret")
+    monkeypatch.setenv("DAG_PROGRESS_PATH", str(progress_path))
 
     get_settings.cache_clear()  # type: ignore[attr-defined]
     reset_problem_cache()
     reset_template_engine()
+    reset_progress_store()
 
     try:
         yield {
             "problems_path": problems_path,
             "attempts_path": attempts_path,
             "problems": sample_problems,
+            "progress_path": progress_path,
+            "progress_payload": progress_payload,
         }
     finally:
         reset_problem_cache()
         reset_template_engine()
         get_settings.cache_clear()  # type: ignore[attr-defined]
+        reset_progress_store()
 
 
 @pytest.fixture
@@ -196,6 +238,41 @@ def test_submit_correct_attempt_records_success(client, dataset) -> None:
     assert len(attempts) == 1
     assert attempts[0].is_correct is True
     assert attempts[0].submitted_answer == target["answer"]
+
+
+async def test_metrics_endpoint_requires_authentication(client) -> None:
+    response = await client.get("/api/v1/metrics/me")
+    assert response.status_code == 401
+
+
+async def test_metrics_endpoint_returns_personalised_stats(client, dataset) -> None:
+    token, _ = await _login_and_get_token(client)
+    first = dataset["problems"][0]
+    second = dataset["problems"][1]
+
+    await client.post(
+        f"/api/problems/{first['id']}/attempts",
+        json={"answer": first["answer"]},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    await client.post(
+        f"/api/problems/{second['id']}/attempts",
+        json={"answer": 0},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    response = await client.get(
+        "/api/v1/metrics/me",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["user_id"] == "1"
+    assert payload["attempts"]["total"] == 2
+    assert payload["attempts"]["correct"] == 1
+    assert payload["progress"]["total_xp"] == dataset["progress_payload"]["users"][0]["total_xp"]
+    assert payload["progress"]["completed_nodes"] == 1
+    assert payload["progress"]["unlocked_nodes"] == 2
 
 
 def test_submit_incorrect_attempt_is_logged(client, dataset) -> None:

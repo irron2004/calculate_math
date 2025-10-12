@@ -6,6 +6,7 @@ __all__ = [
     "dag",
     "health",
     "invites",
+    "metrics",
     "pages",
     "practice",
     "problems",

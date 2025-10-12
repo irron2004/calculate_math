@@ -7,6 +7,7 @@ import type {
   LRCEvaluation,
   ProblemAttemptResponse,
   SkillTreeResponse,
+  UserProgressMetrics,
   TemplateSummary
 } from '../types';
 
@@ -59,6 +60,17 @@ export async function submitAnswer(
 export async function getDailyStats(days: number = 30) {
   return apiCall(`/v1/stats/daily?days=${days}`, {
     method: 'GET',
+  });
+}
+
+export async function fetchUserMetrics(token?: string): Promise<UserProgressMetrics> {
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return apiCall<UserProgressMetrics>('/v1/metrics/me', {
+    method: 'GET',
+    headers,
   });
 }
 

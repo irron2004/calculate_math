@@ -16,7 +16,8 @@ from ..problem_bank import (
     get_problems,
     get_repository as get_problem_repository,
 )
-from ..repositories import AttemptRepository
+from ..dependencies.auth import get_optional_user
+from ..repositories import AttemptRepository, UserRecord
 
 router = APIRouter(prefix="/api", tags=["problems"])
 
@@ -112,6 +113,7 @@ async def submit_attempt(
     payload: ProblemAttemptRequest,
     problem_repository: ProblemRepository = Depends(_get_problem_repository),
     attempt_repository: AttemptRepository = Depends(_get_attempt_repository),
+    user: UserRecord | None = Depends(get_optional_user),
 ) -> ProblemAttemptResponse:
     try:
         problem = problem_repository.get_problem(problem_id)
@@ -131,6 +133,7 @@ async def submit_attempt(
         problem_id=problem.id,
         submitted_answer=payload.answer,
         is_correct=is_correct,
+        user_id=user.id if user is not None else None,
     )
 
     return ProblemAttemptResponse(

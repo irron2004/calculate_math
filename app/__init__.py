@@ -18,7 +18,18 @@ from .repositories import (
     SessionRepository,
     UserRepository,
 )
-from .routers import bridge, curriculum, dag, health, invites, pages, practice, problems, skills
+from .routers import (
+    bridge,
+    curriculum,
+    dag,
+    health,
+    invites,
+    metrics,
+    pages,
+    practice,
+    problems,
+    skills,
+)
 from .progress_store import (
     refresh_progress_store,
     reset_progress_store,
@@ -164,6 +175,7 @@ def create_app() -> FastAPI:
     app.include_router(invite_router)
     app.include_router(problems.router)
     app.include_router(practice.router)
+    app.include_router(metrics.router)
     app.include_router(curriculum.router)
     app.include_router(dag.router)
     app.include_router(skills.router)

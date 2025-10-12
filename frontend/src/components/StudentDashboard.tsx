@@ -4,21 +4,60 @@ import {
     Settings,
     Trophy
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import type { UserProgressMetrics } from '../types';
+import { fetchUserMetrics } from '../utils/api';
 import HomePathMap from './HomePathMap';
 import './StudentDashboard.css';
 
 const StudentDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
-  const [stats] = useState({
-    totalGames: 15,
-    averageScore: 85,
-    totalTime: 120,
-    streak: 5
-  });
+  const [metrics, setMetrics] = useState<UserProgressMetrics | null>(null);
+  const [loadingMetrics, setLoadingMetrics] = useState(false);
+  const [metricsError, setMetricsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    if (!user || user.role === 'guest') {
+      setMetrics(null);
+      setMetricsError(null);
+      setLoadingMetrics(false);
+      return () => {
+        active = false;
+      };
+    }
+
+    const loadMetrics = async () => {
+      try {
+        setLoadingMetrics(true);
+        const response = await fetchUserMetrics(token ?? undefined);
+        if (!active) {
+          return;
+        }
+        setMetrics(response);
+        setMetricsError(null);
+      } catch (error) {
+        console.error('학습 지표 로드 실패:', error);
+        if (!active) {
+          return;
+        }
+        setMetricsError('개인화 학습 지표를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+      } finally {
+        if (active) {
+          setLoadingMetrics(false);
+        }
+      }
+    };
+
+    void loadMetrics();
+
+    return () => {
+      active = false;
+    };
+  }, [token, user]);
 
   // const handleLogout = () => {
   //   logout();
@@ -37,13 +76,26 @@ const StudentDashboard: React.FC = () => {
     return <div>접근 권한이 없습니다.</div>;
   }
 
+  const totalAttempts = metrics?.attempts.total ?? 0;
+  const accuracyRate = Math.round(metrics?.attempts.accuracy_rate ?? 0);
+  const totalXp = metrics?.progress.total_xp ?? 0;
+  const streakDays = metrics?.attempts.streak_days ?? 0;
+  const unlockedNodes = metrics?.progress.unlocked_nodes ?? 0;
+  const completedNodes = metrics?.progress.completed_nodes ?? 0;
+  const targetSteps = unlockedNodes > 0 ? unlockedNodes : 5;
+  const completedForGoal = Math.min(completedNodes, targetSteps);
+  const goalProgressRatio = targetSteps > 0 ? completedForGoal / targetSteps : 0;
+  const goalProgressWidth = `${Math.round(goalProgressRatio * 100)}%`;
+  const goalText = `${completedForGoal}/${targetSteps} 스텝 완료`;
+  const isGuest = user.role === 'guest';
+
   return (
     <div className="student-dashboard">
       <header className="dashboard-header">
         <h1>안녕하세요, {user.name}님! <span role="img" aria-label="wave">👋</span></h1>
         <p>학년 수학 학습을 시작해보세요</p>
       </header>
-      {user.role === 'student' ? (
+      {isGuest ? (
         <div className="stat-card guest-message">
           게스트는 기록이 저장되지 않습니다
         </div>
@@ -52,31 +104,44 @@ const StudentDashboard: React.FC = () => {
           <div className="stat-card">
             <span className="stat-icon">🏆</span>
             <div>
-              <div className="stat-value">{stats.totalGames}</div>
-              <div className="stat-label">총 게임 수</div>
+              <div className="stat-value">
+                {loadingMetrics ? '불러오는 중…' : totalAttempts}
+              </div>
+              <div className="stat-label">총 풀이 시도</div>
             </div>
           </div>
           <div className="stat-card">
             <span className="stat-icon">⭐</span>
             <div>
-              <div className="stat-value">{stats.averageScore}%</div>
-              <div className="stat-label">평균 점수</div>
+              <div className="stat-value">
+                {loadingMetrics ? '불러오는 중…' : `${accuracyRate}%`}
+              </div>
+              <div className="stat-label">정답률</div>
             </div>
           </div>
           <div className="stat-card">
             <span className="stat-icon">⏰</span>
             <div>
-              <div className="stat-value">{stats.totalTime}분</div>
-              <div className="stat-label">총 학습 시간</div>
+              <div className="stat-value">
+                {loadingMetrics ? '불러오는 중…' : `${totalXp} XP`}
+              </div>
+              <div className="stat-label">누적 경험치</div>
             </div>
           </div>
           <div className="stat-card">
             <span className="stat-icon">🎯</span>
             <div>
-              <div className="stat-value">{stats.streak}일</div>
+              <div className="stat-value">
+                {loadingMetrics ? '불러오는 중…' : `${streakDays}일`}
+              </div>
               <div className="stat-label">연속 학습</div>
             </div>
           </div>
+        </div>
+      )}
+      {!isGuest && metricsError && (
+        <div className="stat-card guest-message">
+          {metricsError}
         </div>
       )}
 
@@ -136,11 +201,11 @@ const StudentDashboard: React.FC = () => {
           <div className="goal-card">
             <div className="goal-progress">
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width: '60%' }}></div>
+                <div className="progress-fill" style={{ width: goalProgressWidth }}></div>
               </div>
-              <span className="progress-text">3/5 문제 완료</span>
+              <span className="progress-text">{goalText}</span>
             </div>
-            <p>오늘 5개의 수학 문제를 풀어보세요!</p>
+            <p>오늘 {targetSteps}개의 스텝을 완료해보세요!</p>
           </div>
         </div>
       </div>

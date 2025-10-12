@@ -175,12 +175,35 @@ async def get_current_user(
     return user
 
 
+def resolve_optional_user(request: Request) -> UserRecord | None:
+    """Resolve the authenticated user for a request if present."""
+
+    session_repository = get_session_repository(request)
+    session_service = get_session_token_service(request, repository=session_repository)
+    user_repository = get_user_repository(request)
+    token = _extract_token_from_request(request, session_service.cookie_name)
+    if not token:
+        return None
+    validation = session_service.verify_session(token)
+    if validation is None:
+        return None
+    return user_repository.get_by_id(validation.record.user_id)
+
+
+async def get_optional_user(request: Request) -> UserRecord | None:
+    """FastAPI dependency that returns the user when authenticated."""
+
+    return resolve_optional_user(request)
+
+
 __all__ = [
     "SessionTokenService",
     "SessionValidationResult",
     "get_current_session",
     "get_current_user",
+    "get_optional_user",
     "get_session_repository",
     "get_session_token_service",
+    "resolve_optional_user",
     "get_user_repository",
 ]
