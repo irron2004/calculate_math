@@ -149,3 +149,25 @@ export type AnalyticsEvents =
   | BossPassedPayload
   | SessionStartedPayload;
 
+export interface ExperimentExposurePayload {
+  experiment: string;
+  variant: string;
+  source?: string;
+  bucket?: string | number | null;
+  requestId?: string | null;
+  rollout?: number | null;
+  surface?: string;
+}
+
+export const trackExperimentExposure = (payload: ExperimentExposurePayload) => {
+  emitEvent('experiment_exposure', {
+    experiment: payload.experiment,
+    variant: payload.variant,
+    source: payload.source,
+    bucket: payload.bucket,
+    request_id: payload.requestId,
+    rollout: payload.rollout,
+    surface: payload.surface,
+  });
+};
+
