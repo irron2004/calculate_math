@@ -6,6 +6,22 @@
 - [ ] Web Vitals·WCAG 관련 안내는 내부 품질 체크리스트로만 유지하고, 학습 화면에는 노출하지 않도록 정리
 - [ ] 학습 화면에서 ‘허브로 돌아가기’ 등 공유/탐색용 버튼을 제거하여 개인 학습 흐름에 집중
 - [ ] 메인 화면에서 헬스체크/허브 공유 안내를 제거하고 학습 전용 메시지로 단순화 (`app/templates/index.html`)
+- [ ] `docs/dag.md`에 정의된 DAG 스펙을 JSON/모델로 로딩하는 백엔드 모듈 구축 (노드/엣지, XP 테이블, tier/boss 메타 반영)
+- [ ] DAG 노드/엣지, XP 진행 상황, LRC 임계치 등을 조회하는 API 추가 (`GET /api/v1/dag/nodes`, `/api/v1/dag/edges`, `/api/v1/dag/progress`) – 세부 요구사항은 `docs/dag.md` 참고
+- [ ] MathGame/대시보드에서 DAG 기반 단계·XP UI를 노출하고 보스전/티어 진행을 시각화 (`docs/dag.md` 참고)
+- [ ] 세션 완료 시 DAG 노드 경험치/레벨 업데이트 로직 구현 및 LRC 조건 반영 (`docs/dag.md` 참고)
+- [ ] 스킬 그래프 스키마 검증 스크립트와 순환 감지 작성 (`기획안.md` Epic A-1, `docs/dag.md`)
+- [ ] 잠금/해제 규칙 엔진(`ALL/ANY`, `min_level`, 보스전 통과) 단위 테스트 15케이스 작성 (`기획안.md` Epic A-2)
+- [ ] `GET /api/v1/skills/tree` 엔드포인트 구현 (캐시 키 `version:user_id`, 진행도 포함) (`기획안.md` Epic B-3)
+- [ ] `POST /api/v1/skills/progress` 엔드포인트 구현 및 경쟁 상태 방지 (`기획안.md` Epic B-4)
+- [ ] React 스킬 트리 컴포넌트 (팬/줌/키보드 내비/스크린리더 지원) 구현 (`기획안.md` Epic C-5)
+- [ ] 노드 상태(locked/unlockable/unlocked/mastered) 색상·툴팁·아이콘·i18n 구현 (`기획안.md` Epic C-6)
+- [ ] 티어 평가(보스전) 라우트 및 다음 티어 일괄 해제 규칙 구현 (`기획안.md` Epic D-7)
+- [ ] Matomo/GA4 이벤트 훅(`skill_viewed`, `skill_unlocked`, `boss_passed`, `session_started_from_tree`) 추가 (`기획안.md` Epic E-8)
+- [ ] 스킬 트리 콘텐츠 가이드(i18n/난이도 문구/아이콘) 문서화 (`기획안.md` Epic F-9)
+- [ ] 스킬 트리 vs 리스트 A/B 실험 설계 및 계측 플래그 준비 (`기획안.md` Epic F-10)
+- [ ] 해제 규칙 엔진을 ALL 조건만 허용하도록 반영 (`기획안.md` 의사결정: ANY 불가)
+- [ ] 스킬 트리 노드 클릭 시 대응 학습 세션(문제 세트)로 진입하는 화면/라우트 구현 (`기획안.md` First Sprint + UI) – MathGame 연동
 - [x] `docs/problem_generation_plan.md` 지침에 따라 템플릿·문제 데이터 구조와 파라미터를 업데이트해 생성 문제를 개선 (`app/data/templates.json`, `app/template_engine.py`, `app/routers/curriculum.py`)
 - [x] 덧셈 등 개념 선택 시 S1→S2→S3를 스킬 트리 단계별로 노출하고 단계 완료 시 다음 단계가 활성화되도록 UX 재구성 (`frontend/src/components/MathGame.tsx`, `frontend/src/components/SkillTree.tsx`, `frontend/src/components/MathGame.css`, `frontend/src/components/SkillTree.css`)
 - [ ] MathGame에서 정답 입력 후 `확인` 버튼/엔터를 눌러도 제출되지 않는 사례를 재현하고 입력 검증 로직을 개선

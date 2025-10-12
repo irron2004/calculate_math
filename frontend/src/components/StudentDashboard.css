@@ -141,6 +141,18 @@
   box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
 }
 
+.start-game-button.secondary {
+  margin-left: 16px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: none;
+  color: #e2e8f0;
+}
+
+.start-game-button.secondary:hover {
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.35);
+}
+
 /* 학습 옵션 */
 .learning-options {
   margin-bottom: 40px;

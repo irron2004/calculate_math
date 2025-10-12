@@ -83,6 +83,46 @@ export type CurriculumGraph = {
   edges: CurriculumGraphEdge[];
 };
 
+export type SkillNode = {
+  id: string;
+  label: string;
+  tier: number;
+  kind: string;
+  requires: {
+    all_of?: string[] | null;
+    any_of?: string[] | null;
+    min_level?: number | null;
+  } | null;
+  xp_per_try: number;
+  xp_per_correct: number;
+  xp_to_level: number[];
+  lens: string[];
+  keywords?: string[];
+  micro_skills?: string[];
+  misconceptions?: string[];
+  boss?: string | null;
+};
+
+export type SkillEdge = {
+  from: string;
+  to: string;
+  type: string;
+  lens?: string;
+};
+
+export type SkillGraph = {
+  version: string;
+  palette: Record<string, string>;
+  nodes: SkillNode[];
+  edges: SkillEdge[];
+};
+
+export type SkillTreeResponse = {
+  graph: SkillGraph;
+  progress: Record<string, unknown>;
+  unlocked: Record<string, boolean>;
+};
+
 export type CurriculumHomeCopy = {
   version: string;
   nodes: Record<

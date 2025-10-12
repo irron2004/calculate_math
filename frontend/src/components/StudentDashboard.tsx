@@ -29,6 +29,10 @@ const StudentDashboard: React.FC = () => {
     navigate('/game');
   };
 
+  const openSkillTree = () => {
+    navigate('/skills');
+  };
+
   if (!user || (user.role !== 'student' && user.role !== 'guest')) {
     return <div>접근 권한이 없습니다.</div>;
   }
@@ -82,6 +86,9 @@ const StudentDashboard: React.FC = () => {
           <button onClick={startGame} className="start-game-button">
             <Play size={30} />
             <span>수학 게임 시작하기</span>
+          </button>
+          <button onClick={openSkillTree} className="start-game-button secondary">
+            <span>스킬 트리 열기</span>
           </button>
         </div>
 

@@ -6,6 +6,7 @@ import type {
   GeneratedItem,
   LRCEvaluation,
   ProblemAttemptResponse,
+  SkillTreeResponse,
   TemplateSummary
 } from '../types';
 
@@ -131,4 +132,8 @@ export async function fetchLatestLRC(userId: string): Promise<LRCEvaluation | nu
     throw new Error(`LRC 조회 실패: ${response.status}`);
   }
   return response.json();
+}
+
+export async function fetchSkillTree(): Promise<SkillTreeResponse> {
+  return apiCall<SkillTreeResponse>('/v1/skills/tree');
 }

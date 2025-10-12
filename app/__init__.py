@@ -12,7 +12,7 @@ from .instrumentation import RequestContextMiddleware, configure_telemetry
 from .problem_bank import refresh_cache, reset_cache
 from .template_engine import refresh_engine, reset_engine
 from .repositories import AttemptRepository, LRCRepository, UserRepository
-from .routers import bridge, curriculum, health, invites, pages, practice, problems
+from .routers import bridge, curriculum, health, invites, pages, practice, problems, skills
 
 
 startup_logger = logging.getLogger("calculate_service.startup")
@@ -137,6 +137,7 @@ def create_app() -> FastAPI:
     app.include_router(problems.router)
     app.include_router(practice.router)
     app.include_router(curriculum.router)
+    app.include_router(skills.router)
 
     return app
 

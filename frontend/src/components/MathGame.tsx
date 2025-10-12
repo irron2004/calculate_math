@@ -1,6 +1,6 @@
 import { ArrowLeft, Clock, Target } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type {
   APISession,
@@ -77,6 +77,13 @@ type StepID = 'S1' | 'S2' | 'S3';
 const STEP_SEQUENCE: ReadonlyArray<StepID> = ['S1', 'S2', 'S3'];
 const PROBLEMS_PER_STEP = 6;
 
+const parseStepParam = (value: string | null): StepID | null => {
+  if (value === 'S1' || value === 'S2' || value === 'S3') {
+    return value;
+  }
+  return null;
+};
+
 interface CurriculumProblem {
   concept: CurriculumConcept;
   instance: GeneratedItem;
@@ -106,6 +113,9 @@ interface ProblemFeedback {
 const MathGame: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const requestedConceptParam = searchParams.get('concept');
+  const requestedStepParam = parseStepParam(searchParams.get('step'));
 
   const [gameState, setGameState] = useState<'loading' | 'playing' | 'finished' | 'submitted'>('loading');
   const [problems, setProblems] = useState<CurriculumProblem[]>([]);
@@ -465,6 +475,11 @@ const MathGame: React.FC = () => {
       }
       setCurriculumSequence(sequence);
 
+      const requestedConceptId = requestedConceptParam && catalog[requestedConceptParam]
+        ? requestedConceptParam
+        : null;
+      const requestedStep = requestedStepParam;
+
       const orderedConcepts = reorderConceptsBySequence(sequence, catalog);
       setConcepts(orderedConcepts);
 
@@ -472,6 +487,20 @@ const MathGame: React.FC = () => {
         latest?.focus_concept ?? null,
         ...PREFERRED_CONCEPTS,
       ].filter((value): value is string => Boolean(value));
+
+      if (requestedConceptId && requestedStep) {
+        const targetConcept = catalog[requestedConceptId];
+        if (targetConcept) {
+          const targetIndex = sequence.findIndex(
+            (entry) => entry.conceptId === requestedConceptId && entry.step === requestedStep
+          );
+          await loadProblemsForStep(targetConcept, requestedStep);
+          if (targetIndex !== -1) {
+            setSequenceIndex(targetIndex);
+          }
+          return;
+        }
+      }
 
       const pickNextIndex = (candidates: string[]): number => {
         for (const conceptId of candidates) {
@@ -531,7 +560,7 @@ const MathGame: React.FC = () => {
   useEffect(() => {
     void initialiseGame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, requestedConceptParam, requestedStepParam]);
 
   const handleConceptSelect = async (conceptId: string) => {
     const concept = conceptCatalog[conceptId];
