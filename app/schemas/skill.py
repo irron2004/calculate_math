@@ -25,7 +25,6 @@ class EdgeType(str, Enum):
     REQUIRES = "requires"
     ENABLES = "enables"
 
-
 class RequirementSpec(BaseModel):
     """Prerequisite requirements for unlocking a skill."""
 
@@ -38,8 +37,6 @@ class RequirementSpec(BaseModel):
         if value is not None and value < 0:
             raise ValueError("min_level must be non-negative when provided")
         return value
-
-
 class SkillNode(BaseModel):
     """A node within the curriculum DAG."""
 
@@ -75,8 +72,6 @@ class SkillNode(BaseModel):
         if value is None:
             return []
         return list(value)
-
-
 class SkillEdge(BaseModel):
     """A directional edge between two skills."""
 
@@ -86,8 +81,6 @@ class SkillEdge(BaseModel):
     lens: Optional[str] = None
 
     model_config = ConfigDict(populate_by_name=True)
-
-
 class SkillGraphSpec(BaseModel):
     """Top-level representation of the curriculum skill DAG."""
 
@@ -169,4 +162,3 @@ __all__ = [
     "SkillKind",
     "SkillNode",
 ]
-
