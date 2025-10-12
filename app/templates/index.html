@@ -11,7 +11,7 @@
                     radial-gradient(circle at 50% 100%, rgba(255,255,255,0.2) 0, transparent 50%);"></div>
         <div class="relative z-10 mx-auto max-w-4xl space-y-8 text-center">
             <span class="inline-flex items-center justify-center rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
-                칸반 FE-01 · FE-02 · FE-05 학습 모드
+                맞춤 학습 모드 활성화
                 {% if show_compliance_details %}
                 <span class="ml-2 inline-flex items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold tracking-[0.3em] text-white/70">
                     WCAG 2.2 · Web Vitals
@@ -30,7 +30,7 @@
               {% set show_featured_link = featured_label is not none %}
               {% set show_secondary_link = secondary_label is not none and secondary_label != featured_label %}
             <p class="text-lg text-white/90 sm:text-xl">
-                초등 연산 {{ featured_count if featured_count else 4 }}종을 개인 연습 중심으로 구성해 학습에만 집중할 수 있는 환경을 제공합니다.
+                초등 연산 {{ featured_count if featured_count else 4 }}종을 개인 연습 중심으로 구성해 학습 리듬을 만들고 꾸준히 성장할 수 있도록 도와드립니다.
             </p>
             <div class="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
                 {% if show_featured_link %}
@@ -72,8 +72,7 @@
         <header class="max-w-3xl space-y-3">
             <h2 id="section-categories" class="text-3xl font-semibold text-white sm:text-4xl">연산 유형 선택</h2>
             <p class="text-base text-slate-300">
-                Tasks.md의 FE-02 요구에 맞춰 {{ featured_count if featured_count else 4 }}가지 연산을 분리된 카드로 제공하고,
-                각 유형은 키보드 접근성과 포커스 링을 포함합니다.
+                {{ featured_count if featured_count else 4 }}가지 핵심 연산을 카드 형식으로 제공하여 원하는 난이도를 빠르게 고르고, 키보드와 화면 읽기 도구로도 쉽게 탐색할 수 있습니다.
             </p>
         </header>
         <div class="grid gap-6 md:grid-cols-2">
@@ -107,39 +106,38 @@
             <header class="space-y-2">
                 <h2 id="section-tips" class="text-3xl font-semibold text-white sm:text-4xl">학습 팁 & 진행 전략</h2>
                 <p class="text-base text-slate-300">
-                    FE-01 스켈레톤/로딩 패턴과 Self → Invite → Aggregate 철학을 학습 단계에 맞게 적용했습니다.
+                    학습자가 집중 루틴을 만들고 친구와 함께 성장할 수 있도록 실천 가능한 조언을 모았습니다.
                 </p>
             </header>
             <div class="grid gap-4 sm:grid-cols-2">
                 <article class="glass-card rounded-2xl p-5">
-                    <h3 class="text-lg font-semibold text-white">📝 풀이 워크플로</h3>
+                    <h3 class="text-lg font-semibold text-white">📝 풀이 루틴</h3>
                     <ul class="mt-3 space-y-2 text-sm text-slate-200">
-                        <li>• 문제를 음성으로 읽어 이해도를 확인하세요.</li>
-                        <li>• 초안 계산은 초등 맞춤 격자 노트 형식으로 작성합니다.</li>
-                        <li>• 정답 제출 후 즉시 피드백을 통해 오답노트를 보완하세요.</li>
+                        <li>• 문제를 소리 내어 읽고 핵심 정보를 표시해 보세요.</li>
+                        <li>• 초안을 작성한 뒤 계산 과정을 한 번 더 점검합니다.</li>
+                        <li>• 정답 확인 후 오답노트에 개선 방법을 기록하세요.</li>
                     </ul>
                 </article>
                 <article class="glass-card rounded-2xl p-5">
                     <h3 class="text-lg font-semibold text-white">🎯 학습 목표</h3>
                     <ul class="mt-3 space-y-2 text-sm text-slate-200">
-                        <li>• 기본 연산 속도와 정확도 향상</li>
-                        <li>• 수 모델(수직선·배열·묶음) 활용 능력 강화</li>
-                        <li>• 친구 초대를 통한 비교(Invite)로 동기 부여</li>
+                        <li>• 기본 연산 속도와 정확도를 조금씩 끌어올리기</li>
+                        <li>• 수 모델(수직선·배열·묶음)을 활용해 다양한 풀이법 탐색</li>
+                        <li>• 친구와 진행 상황을 나누며 서로 응원하기</li>
                     </ul>
                 </article>
                 <article class="glass-card rounded-2xl p-5">
-                    <h3 class="text-lg font-semibold text-white">🛡️ 안전 & 프라이버시</h3>
+                    <h3 class="text-lg font-semibold text-white">🛡️ 안전한 학습</h3>
                     <ul class="mt-3 space-y-2 text-sm text-slate-200">
-                        <li>• 학습 데이터는 익명 토큰으로 계산됩니다.</li>
-                        <li>• noindex 헤더와 X-Request-ID를 기본 활성화합니다.</li>
-                        <li>• RFC 9457 Problem Details 로 오류를 안내합니다.</li>
+                        <li>• 학습 기록은 보호자와 학생만 확인할 수 있게 관리합니다.</li>
+                        <li>• 안전한 비공개 공간에서 연습할 수 있도록 보호 장치를 제공합니다.</li>
+                        <li>• 어려움이 생기면 안내 메시지로 다음 단계를 알려드립니다.</li>
                     </ul>
                 </article>
                 <article class="glass-card rounded-2xl p-5">
-                    <h3 class="text-lg font-semibold text-white">⚙️ 로컬 개발 가이드</h3>
+                    <h3 class="text-lg font-semibold text-white">🧭 학습 준비 체크리스트</h3>
                     <p class="mt-3 text-sm text-slate-200">
-                        `uvicorn app.main:app --reload --port 8080` 으로 허브를, `uvicorn app.main:app --reload --port 8000`
-                        으로 Arcade를 동시 실행하면 Self → Invite → Aggregate까지 빠르게 확인할 수 있습니다.
+                        시작 전에 목표 시간을 정하고, 조용한 공간을 마련해 주세요. 준비물을 챙긴 뒤 오늘의 학습 목표를 친구나 보호자와 함께 공유하면 꾸준함을 유지하는 데 도움이 됩니다.
                     </p>
                 </article>
             </div>
