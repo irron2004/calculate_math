@@ -46,3 +46,19 @@ async def test_problems_page_without_categories_shows_invite_notice(client, monk
     assert 'data-category-available="false"' in body
     assert "활성화된 문제 유형이 없습니다" in body
     assert "초대 링크를 생성할 수 없습니다" in body
+
+
+async def test_home_page_hides_compliance_copy_for_learners(client):
+    response = await client.get("/")
+    assert response.status_code == 200
+    body = response.text
+    assert "Web Vitals" not in body
+    assert "WCAG" not in body
+
+
+async def test_home_page_shows_compliance_copy_for_staff_toggle(client):
+    response = await client.get("/?staff=1")
+    assert response.status_code == 200
+    body = response.text
+    assert "Web Vitals" in body
+    assert "WCAG 2.2" in body

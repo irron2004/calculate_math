@@ -11,7 +11,12 @@
                     radial-gradient(circle at 50% 100%, rgba(255,255,255,0.2) 0, transparent 50%);"></div>
         <div class="relative z-10 mx-auto max-w-4xl space-y-8 text-center">
             <span class="inline-flex items-center justify-center rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
-                칸반 FE-01 · FE-02 · FE-05 · Web Vitals 준비완료
+                칸반 FE-01 · FE-02 · FE-05 학습 모드
+                {% if show_compliance_details %}
+                <span class="ml-2 inline-flex items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold tracking-[0.3em] text-white/70">
+                    WCAG 2.2 · Web Vitals
+                </span>
+                {% endif %}
             </span>
             <h1 class="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
                 360Me Math Lab
@@ -51,8 +56,13 @@
                     <dd class="mt-2 text-lg font-semibold text-white">20개 샘플</dd>
                 </div>
                 <div class="glass-card rounded-2xl px-5 py-4">
-                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">A11y · Observability</dt>
-                    <dd class="mt-2 text-lg font-semibold text-white">WCAG 2.2 · RFC 9457</dd>
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">학습 지원</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">읽기 도우미 · 진행 로그</dd>
+                    {% if show_compliance_details %}
+                    <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.35em] text-white/60" data-compliance-note>
+                        WCAG 2.2 AA · Web Vitals LCP ≤ 2.5s
+                    </p>
+                    {% endif %}
                 </div>
             </dl>
         </div>
@@ -149,10 +159,12 @@
                     <dt class="text-slate-300">Self → Share 평균</dt>
                     <dd class="text-lg font-semibold text-white">2.4일</dd>
                 </div>
-                <div class="flex items-start justify-between gap-4">
-                    <dt class="text-slate-300">Web Vitals 목표</dt>
-                    <dd class="text-lg font-semibold text-white">LCP ≤ 2.5s</dd>
+                {% if show_compliance_details %}
+                <div class="flex items-start justify-between gap-4" data-compliance-note>
+                    <dt class="text-slate-300">품질 기준</dt>
+                    <dd class="text-lg font-semibold text-white">WCAG 2.2 AA · LCP ≤ 2.5s</dd>
                 </div>
+                {% endif %}
             </dl>
         </aside>
     </section>
