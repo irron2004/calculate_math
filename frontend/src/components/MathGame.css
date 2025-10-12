@@ -11,21 +11,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.back-button {
-  background: #f8f9fa;
-  border: none;
-  border-radius: 8px;
-  padding: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.back-button:hover {
-  background: #e9ecef;
-  transform: translateX(-2px);
 }
 
 .game-info {
@@ -39,6 +26,39 @@
   gap: 5px;
   font-weight: bold;
   color: #333;
+}
+
+.progress-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.progress-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.progress-bar {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.4s ease;
 }
 
 .game-content {
@@ -576,8 +596,7 @@
 }
 
 .next-step-button,
-.restart-button,
-.back-to-dashboard {
+.restart-button {
   padding: 12px 24px;
   border: none;
   border-radius: 10px;
@@ -607,25 +626,25 @@
   box-shadow: 0 10px 24px rgba(102, 126, 234, 0.3);
 }
 
-.back-to-dashboard {
-  background: #f8f9fa;
-  color: #333;
-  border: 2px solid #e1e5e9;
-}
-
-.back-to-dashboard:hover {
-  background: #e9ecef;
-  transform: translateY(-2px);
-}
-
 /* 태블릿 반응형 */
 @media (max-width: 768px) {
   .game-header {
     padding: 10px 15px;
+    gap: 12px;
   }
 
   .game-info {
     gap: 15px;
+  }
+
+  .progress-indicator {
+    align-items: flex-start;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .progress-bar {
+    height: 6px;
   }
 
   .info-item {

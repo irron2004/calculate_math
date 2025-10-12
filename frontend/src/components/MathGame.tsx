@@ -1,6 +1,6 @@
-import { ArrowLeft, Clock, Target } from 'lucide-react';
+import { Clock, Target } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type {
   APISession,
@@ -127,7 +127,6 @@ interface ProblemFeedback {
 
 const MathGame: React.FC = () => {
   const { user, token } = useAuth();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestedConceptParam = searchParams.get('concept');
   const requestedStepParam = parseStepParam(searchParams.get('step'));
@@ -332,7 +331,6 @@ const MathGame: React.FC = () => {
     }
     return { entry: curriculumSequence[index], index } as const;
   };
-*** End Patch
 
   const convertSessionToCurriculum = (
     session: APISession,
@@ -1001,10 +999,6 @@ const MathGame: React.FC = () => {
     void initialiseGame();
   };
 
-  const goBack = () => {
-    navigate('/student');
-  };
-
   if (!user) {
     return <div>로그인이 필요합니다.</div>;
   }
@@ -1093,14 +1087,14 @@ const MathGame: React.FC = () => {
       ? LRC_RECOMMENDATION_LABELS[lrcRecommendationKey]
       : lrcResult.recommendation
     : null;
+  const progressPercent = totalQuestions
+    ? Math.min(100, Math.max(0, Math.round((questionNumber / totalQuestions) * 100)))
+    : 0;
 
   return (
     <div className="math-game">
       <header className="game-header">
-        <button onClick={goBack} className="back-button" type="button">
-          <ArrowLeft size={24} />
-        </button>
-        <div className="game-info">
+        <div className="game-info" role="group" aria-label="현재 진행 상황">
           <div className="info-item">
             <Target size={20} />
             <span>문제 {Math.max(1, questionNumber)}/{totalQuestions || 1}</span>
@@ -1108,6 +1102,19 @@ const MathGame: React.FC = () => {
           <div className="info-item">
             <Clock size={20} />
             <span>{timeLeft}초</span>
+          </div>
+        </div>
+        <div className="progress-indicator">
+          <span className="progress-label">진행률</span>
+          <div
+            className="progress-bar"
+            role="progressbar"
+            aria-label="문제 풀이 진행률"
+            aria-valuenow={progressPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div className="progress-bar__fill" style={{ width: `${progressPercent}%` }} />
           </div>
         </div>
       </header>
@@ -1370,9 +1377,6 @@ const MathGame: React.FC = () => {
               )}
               <button onClick={restartGame} className="restart-button" type="button">
                 다시 하기
-              </button>
-              <button onClick={goBack} className="back-to-dashboard" type="button">
-                대시보드로
               </button>
             </div>
           </div>
