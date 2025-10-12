@@ -139,6 +139,48 @@ export type SkillGraph = {
   edges: SkillEdge[];
 };
 
+export type BipartiteSkillNode = {
+  type: 'skill';
+  id: string;
+  label: string;
+  domain: string;
+  lens: string[];
+  levels: number;
+  xp_per_try: number;
+  xp_per_correct: number;
+};
+
+export type BipartiteCourseStepNode = {
+  type: 'course_step';
+  id: string;
+  label: string;
+  tier: number;
+  lens: string[];
+  misconceptions: string[];
+  xp: {
+    per_try: number;
+    per_correct: number;
+  };
+  lrc_min?: Record<string, number>;
+};
+
+export type BipartiteGraphNode = BipartiteSkillNode | BipartiteCourseStepNode;
+
+export type BipartiteGraphEdge = {
+  from: string;
+  to: string;
+  type: 'requires' | 'teaches' | 'enables';
+  min_level?: number;
+  delta_level?: number;
+};
+
+export type BipartiteGraph = {
+  version: string;
+  palette: Record<string, string>;
+  nodes: BipartiteGraphNode[];
+  edges: BipartiteGraphEdge[];
+};
+
 export type SkillTreeExperiment = {
   name: string;
   variant: 'tree' | 'list';
@@ -150,6 +192,7 @@ export type SkillTreeExperiment = {
 
 export type SkillTreeResponse = {
   graph: SkillGraph;
+  bipartite_graph?: BipartiteGraph;
   progress: Record<string, unknown>;
   unlocked: Record<string, boolean>;
   experiment?: SkillTreeExperiment;

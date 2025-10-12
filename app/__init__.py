@@ -9,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 
 from .config import get_settings
 from .dag_loader import reset_graph_cache
+from .bipartite_loader import reset_bipartite_graph_cache
 from .instrumentation import RequestContextMiddleware, configure_telemetry
 from .problem_bank import refresh_cache, reset_cache
 from .template_engine import refresh_engine, reset_engine
@@ -129,6 +130,7 @@ def create_app() -> FastAPI:
             reset_engine()
             reset_progress_store()
             reset_graph_cache()
+            reset_bipartite_graph_cache()
             startup_logger.debug("lifespan teardown complete for app id=%s", id(app))
 
     app = FastAPI(

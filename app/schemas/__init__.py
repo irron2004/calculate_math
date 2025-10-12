@@ -8,6 +8,16 @@ from .skill import (
     SkillKind,
     SkillNode,
 )
+from .bipartite import (
+    AtomicSkillNode,
+    BipartiteGraphSpec,
+    CourseStepNode,
+    EdgeType as BipartiteEdgeType,
+    GraphEdge as BipartiteGraphEdge,
+    NodeSpec as BipartiteNodeSpec,
+    NodeType,
+    XPReward,
+)
 
 __all__ = [
     "EdgeType",
@@ -16,5 +26,12 @@ __all__ = [
     "SkillGraphSpec",
     "SkillKind",
     "SkillNode",
+    "AtomicSkillNode",
+    "BipartiteGraphSpec",
+    "CourseStepNode",
+    "BipartiteEdgeType",
+    "BipartiteGraphEdge",
+    "BipartiteNodeSpec",
+    "NodeType",
+    "XPReward",
 ]
-

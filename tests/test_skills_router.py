@@ -32,6 +32,8 @@ async def test_skill_tree_endpoint_returns_experiment_payload(client):
     response = await client.get("/api/v1/skills/tree")
     assert response.status_code == 200
     data = response.json()
+    assert "graph" in data and "nodes" in data["graph"]
+    assert "bipartite_graph" in data and data["bipartite_graph"]["nodes"]
     assert "experiment" in data
     experiment = data["experiment"]
     assert experiment["name"] == "skill_tree_layout"
