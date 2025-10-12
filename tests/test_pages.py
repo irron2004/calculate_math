@@ -60,6 +60,9 @@ async def test_home_page_hides_compliance_copy_for_learners(client):
     assert "Self → Invite → Aggregate" not in body
     assert "맞춤 학습 모드 활성화" in body
     assert "학습 준비 체크리스트" in body
+    assert "읽기 → 풀이 → 피드백" in body
+    assert "오늘의 문제" in body
+    assert "학습 공유 링크만 생성" not in body
 
 
 async def test_home_page_shows_compliance_copy_for_staff_toggle(client):

@@ -48,21 +48,16 @@
             </div>
             <dl class="mt-10 grid gap-4 text-left sm:grid-cols-3">
                 <div class="glass-card rounded-2xl px-5 py-4">
-                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">문제 유형</dt>
-                    <dd class="mt-2 text-lg font-semibold text-white">{{ featured_count if featured_count else 4 }}가지 연산</dd>
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">학습 흐름</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">읽기 → 풀이 → 피드백</dd>
                 </div>
                 <div class="glass-card rounded-2xl px-5 py-4">
-                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">총 문항</dt>
-                    <dd class="mt-2 text-lg font-semibold text-white">20개 샘플</dd>
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">집중 시간</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">하루 15분 루틴</dd>
                 </div>
                 <div class="glass-card rounded-2xl px-5 py-4">
-                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">학습 지원</dt>
-                    <dd class="mt-2 text-lg font-semibold text-white">읽기 도우미 · 진행 로그</dd>
-                    {% if show_compliance_details %}
-                    <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.35em] text-white/60" data-compliance-note>
-                        WCAG 2.2 AA · Web Vitals LCP ≤ 2.5s
-                    </p>
-                    {% endif %}
+                    <dt class="text-xs font-semibold uppercase tracking-widest text-sky-200/80">오늘의 문제</dt>
+                    <dd class="mt-2 text-lg font-semibold text-white">{{ featured_count if featured_count else 4 }}세트 · 20문항</dd>
                 </div>
             </dl>
         </div>
@@ -174,24 +169,24 @@
         </header>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <article class="surface-card rounded-2xl p-5 text-center shadow-lg shadow-sky-900/10">
-                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">문제 유형</h3>
-                <p class="mt-3 text-3xl font-semibold text-white">4</p>
-                <p class="mt-1 text-xs text-slate-400">덧셈 · 뺄셈 · 곱셈 · 나눗셈</p>
-            </article>
-            <article class="surface-card rounded-2xl p-5 text-center shadow-lg shadow-sky-900/10">
-                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">총 문제</h3>
+                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">오늘의 문제</h3>
                 <p class="mt-3 text-3xl font-semibold text-white">20</p>
-                <p class="mt-1 text-xs text-slate-400">연산별 5문항 기준</p>
+                <p class="mt-1 text-xs text-slate-400">연산별 5문항 세트 구성</p>
             </article>
             <article class="surface-card rounded-2xl p-5 text-center shadow-lg shadow-sky-900/10">
-                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">추천 대상</h3>
-                <p class="mt-3 text-3xl font-semibold text-white">초등</p>
-                <p class="mt-1 text-xs text-slate-400">2~4학년 권장 난이도</p>
+                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">학습 흐름</h3>
+                <p class="mt-3 text-3xl font-semibold text-white">3단계</p>
+                <p class="mt-1 text-xs text-slate-400">읽기 → 풀이 → 리뷰</p>
             </article>
             <article class="surface-card rounded-2xl p-5 text-center shadow-lg shadow-sky-900/10">
-                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">이용 요금</h3>
-                <p class="mt-3 text-3xl font-semibold text-white">무료</p>
-                <p class="mt-1 text-xs text-slate-400">학습 공유 링크만 생성</p>
+                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">집중 시간</h3>
+                <p class="mt-3 text-3xl font-semibold text-white">15분</p>
+                <p class="mt-1 text-xs text-slate-400">꾸준히 이어가는 데일리 루틴</p>
+            </article>
+            <article class="surface-card rounded-2xl p-5 text-center shadow-lg shadow-sky-900/10">
+                <h3 class="text-sm font-medium text-slate-300 uppercase tracking-[0.2em]">피드백 메모</h3>
+                <p class="mt-3 text-3xl font-semibold text-white">자동</p>
+                <p class="mt-1 text-xs text-slate-400">풀이 로그와 개선점 저장</p>
             </article>
         </div>
 </section>
