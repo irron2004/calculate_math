@@ -1,0 +1,2534 @@
+{
+  "version": "2025-10-12.bipartite.v1",
+  "palette": {
+    "difference": "#E4572E",
+    "accumulation": "#17BEBB",
+    "ratio": "#8D99AE",
+    "scale": "#2E86AB",
+    "random": "#F29E4C",
+    "transform": "#6C5CE7",
+    "vector": "#2D6A4F"
+  },
+  "nodes": [
+    {
+      "id": "AS.PV.READ",
+      "type": "skill",
+      "label": "자릿값 읽기",
+      "domain": "자릿값",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.PV.DECOMP",
+      "type": "skill",
+      "label": "분해/재구성",
+      "domain": "분해/재구성",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.PV.EXCHANGE",
+      "type": "skill",
+      "label": "10↔1 교환",
+      "domain": "10↔1",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.REP.NUMBERLINE",
+      "type": "skill",
+      "label": "수직선 이동",
+      "domain": "수직선",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.REP.TAB2EXP",
+      "type": "skill",
+      "label": "표→식 전환",
+      "domain": "표→식",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.REP.EXP2TAB",
+      "type": "skill",
+      "label": "식→표 전환",
+      "domain": "식→표",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.REP.GRAPHREAD",
+      "type": "skill",
+      "label": "그래프 읽기 기초",
+      "domain": "그래프",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.REP.ALIGN",
+      "type": "skill",
+      "label": "자리 정렬(세로셈/소수)",
+      "domain": "자리",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.ADD.COMP",
+      "type": "skill",
+      "label": "친한 수 보정(+/−k)",
+      "domain": "친한",
+      "lens": [
+        "accumulation"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.ADD.CARRY",
+      "type": "skill",
+      "label": "받아올림",
+      "domain": "받아올림",
+      "lens": [
+        "accumulation"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.ADD.ALGOR",
+      "type": "skill",
+      "label": "덧셈 알고리즘(세로셈)",
+      "domain": "덧셈",
+      "lens": [
+        "accumulation"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.SUB.BORROW",
+      "type": "skill",
+      "label": "받아내림",
+      "domain": "받아내림",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.SUB.ALGOR",
+      "type": "skill",
+      "label": "뺄셈 알고리즘(세로셈)",
+      "domain": "뺄셈",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.DIFF.READ",
+      "type": "skill",
+      "label": "차이 읽기(Δ)",
+      "domain": "차이",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.CHK.INV_SUM",
+      "type": "skill",
+      "label": "합의 보존/검산",
+      "domain": "합의",
+      "lens": [
+        "accumulation"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.ADD.EST",
+      "type": "skill",
+      "label": "어림셈(덧셈/뺄셈)",
+      "domain": "어림셈(덧셈/뺄셈)",
+      "lens": [
+        "accumulation"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.MUL.FACTS",
+      "type": "skill",
+      "label": "곱셈 사실 0–9",
+      "domain": "곱셈",
+      "lens": [
+        "scale"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.MUL.POW10",
+      "type": "skill",
+      "label": "×10/×100 스케일",
+      "domain": "×10/×100",
+      "lens": [
+        "scale"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.MUL.TWOxONE",
+      "type": "skill",
+      "label": "두자리×한자리",
+      "domain": "두자리×한자리",
+      "lens": [
+        "scale"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.MUL.TWOxTWO",
+      "type": "skill",
+      "label": "두자리×두자리",
+      "domain": "두자리×두자리",
+      "lens": [
+        "scale"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.MUL.AREA",
+      "type": "skill",
+      "label": "배열/면적 모델",
+      "domain": "배열/면적",
+      "lens": [
+        "scale"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.MUL.DIST",
+      "type": "skill",
+      "label": "분배법칙",
+      "domain": "분배법칙",
+      "lens": [
+        "scale"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.DIV.SHARE",
+      "type": "skill",
+      "label": "등분 나눗셈",
+      "domain": "등분",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.DIV.MEASURE",
+      "type": "skill",
+      "label": "측정 나눗셈",
+      "domain": "측정",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.DIV.REL",
+      "type": "skill",
+      "label": "곱·나눗셈 역관계",
+      "domain": "곱·나눗셈",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.DIV.LONG",
+      "type": "skill",
+      "label": "나눗셈 서술(긴 나눗셈)",
+      "domain": "나눗셈",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.FRAC.PARTWHOLE",
+      "type": "skill",
+      "label": "분수: 부분/전체",
+      "domain": "분수:",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.FRAC.EQ",
+      "type": "skill",
+      "label": "동치분수/기약화",
+      "domain": "동치분수/기약화",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.FRAC.ADD",
+      "type": "skill",
+      "label": "분수 덧셈(동분모)",
+      "domain": "분수",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.FRAC.MUL",
+      "type": "skill",
+      "label": "분수×분수 모델",
+      "domain": "분수×분수",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.FRAC.MIXED",
+      "type": "skill",
+      "label": "대분수↔가분수",
+      "domain": "대분수↔가분수",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.DEC.READ",
+      "type": "skill",
+      "label": "소수 읽기/표기",
+      "domain": "소수",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.DEC.PLACE",
+      "type": "skill",
+      "label": "소수 자릿값",
+      "domain": "소수",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.DEC.ADD",
+      "type": "skill",
+      "label": "소수 덧셈 자리정렬",
+      "domain": "소수",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.RATIO.UNIT",
+      "type": "skill",
+      "label": "단위율(1의 값)",
+      "domain": "단위율(1의",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.RATIO.TABLE",
+      "type": "skill",
+      "label": "비례표 완성",
+      "domain": "비례표",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.RATIO.GRAPH",
+      "type": "skill",
+      "label": "비례 그래프",
+      "domain": "비례",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.PERC.BASIC",
+      "type": "skill",
+      "label": "백분율 기초",
+      "domain": "백분율",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.SEQ.DIFFCONST",
+      "type": "skill",
+      "label": "차분 상수 판별",
+      "domain": "차분",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.SEQ.GENERAL",
+      "type": "skill",
+      "label": "일반항 언어화",
+      "domain": "일반항",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.SEQ.SUMAP",
+      "type": "skill",
+      "label": "등차수열 합",
+      "domain": "등차수열",
+      "lens": [
+        "accumulation"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.LIN.SLOPE",
+      "type": "skill",
+      "label": "기울기(Δy/Δx)",
+      "domain": "기울기(Δy/Δx)",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.LIN.INTERCEPT",
+      "type": "skill",
+      "label": "절편 해석",
+      "domain": "절편",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.LIN.FORM",
+      "type": "skill",
+      "label": "표↔그래프↔식 왕복",
+      "domain": "표↔그래프↔식",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.LIN.SOLVE",
+      "type": "skill",
+      "label": "일차방정식 풀이",
+      "domain": "일차방정식",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.REC.REL",
+      "type": "skill",
+      "label": "점화식 이해",
+      "domain": "점화식",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.COORD.READ",
+      "type": "skill",
+      "label": "좌표 읽기",
+      "domain": "좌표",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.COORD.DISTMID",
+      "type": "skill",
+      "label": "거리/중점",
+      "domain": "거리/중점",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.COORD.LINEEQ",
+      "type": "skill",
+      "label": "직선 방정식 세우기",
+      "domain": "직선",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.GEO.TRANS",
+      "type": "skill",
+      "label": "대칭/이동/회전",
+      "domain": "대칭/이동/회전",
+      "lens": [
+        "transform"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.GEO.SIM",
+      "type": "skill",
+      "label": "닮음/스케일 비",
+      "domain": "닮음/스케일",
+      "lens": [
+        "scale"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.TRIG.RATIO",
+      "type": "skill",
+      "label": "직각삼각비",
+      "domain": "직각삼각비",
+      "lens": [
+        "scale"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.ACC.SUMRECT",
+      "type": "skill",
+      "label": "막대합=면적",
+      "domain": "막대합=면적",
+      "lens": [
+        "accumulation"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.ACC.TRAP",
+      "type": "skill",
+      "label": "사다리꼴 근사",
+      "domain": "사다리꼴",
+      "lens": [
+        "accumulation"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.ACC.SIGMA",
+      "type": "skill",
+      "label": "Σ 표기",
+      "domain": "Σ",
+      "lens": [
+        "accumulation"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.RATE.AVG",
+      "type": "skill",
+      "label": "평균변화율",
+      "domain": "평균변화율",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.RATE.UNIT",
+      "type": "skill",
+      "label": "단위 일관성/해석",
+      "domain": "단위",
+      "lens": [
+        "ratio"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.RATE.INST",
+      "type": "skill",
+      "label": "순간변화율 직관",
+      "domain": "순간변화율",
+      "lens": [
+        "difference"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.STATS.CENTER",
+      "type": "skill",
+      "label": "평균/중앙/최빈",
+      "domain": "평균/중앙/최빈",
+      "lens": [
+        "random"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.STATS.SPREAD",
+      "type": "skill",
+      "label": "산포(범위/표준편차 직관)",
+      "domain": "산포(범위/표준편차",
+      "lens": [
+        "random"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.STATS.BOX",
+      "type": "skill",
+      "label": "상자그림",
+      "domain": "상자그림",
+      "lens": [
+        "random"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.COUNT.RULES",
+      "type": "skill",
+      "label": "합/곱 법칙",
+      "domain": "합/곱",
+      "lens": [
+        "random"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.PROB.BI",
+      "type": "skill",
+      "label": "이항 모형",
+      "domain": "이항",
+      "lens": [
+        "random"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "AS.PROB.COND",
+      "type": "skill",
+      "label": "조건부확률(기초)",
+      "domain": "조건부확률(기초)",
+      "lens": [
+        "random"
+      ],
+      "levels": 3,
+      "xp_per_try": 1,
+      "xp_per_correct": 2
+    },
+    {
+      "id": "C01-S1",
+      "type": "course_step",
+      "label": "C01·S1 자리가치·분해",
+      "tier": 1,
+      "lens": [
+        "transform"
+      ],
+      "misconceptions": [
+        "0은 빈칸으로 착각",
+        "자릿값 가중치 혼동"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C01-S2",
+      "type": "course_step",
+      "label": "C01·S2 표↔식↔말·친한 수",
+      "tier": 1,
+      "lens": [
+        "transform",
+        "accumulation"
+      ],
+      "misconceptions": [
+        "보정하면 값이 바뀐다고 착각"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C01-S3",
+      "type": "course_step",
+      "label": "C01·S3 짝보정·암산",
+      "tier": 1,
+      "lens": [
+        "accumulation",
+        "difference"
+      ],
+      "misconceptions": [
+        "보정량 상쇄 불가",
+        "합의 보존 오해"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C02-S1",
+      "type": "course_step",
+      "label": "C02·S1 무받올/무받내",
+      "tier": 1,
+      "lens": [
+        "accumulation",
+        "difference"
+      ],
+      "misconceptions": [
+        "세로 정렬 불일치"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C02-S2",
+      "type": "course_step",
+      "label": "C02·S2 받아올림/받아내림",
+      "tier": 1,
+      "lens": [
+        "accumulation",
+        "difference"
+      ],
+      "misconceptions": [
+        "이월/빌림 과정 누락"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C02-S3",
+      "type": "course_step",
+      "label": "C02·S3 혼합·검산·어림셈",
+      "tier": 1,
+      "lens": [
+        "accumulation",
+        "difference"
+      ],
+      "misconceptions": [
+        "검산 목적 오해"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C03-S1",
+      "type": "course_step",
+      "label": "C03·S1 곱셈 사실·배열",
+      "tier": 2,
+      "lens": [
+        "scale"
+      ],
+      "misconceptions": [
+        "교환법칙 미이해"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C03-S2",
+      "type": "course_step",
+      "label": "C03·S2 ×10/×100·분배",
+      "tier": 2,
+      "lens": [
+        "scale"
+      ],
+      "misconceptions": [
+        "0 붙이기 기계화"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C03-S3",
+      "type": "course_step",
+      "label": "C03·S3 두자리×한자리",
+      "tier": 2,
+      "lens": [
+        "scale"
+      ],
+      "misconceptions": [
+        "부분곱 누락"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C04-S1",
+      "type": "course_step",
+      "label": "C04·S1 등분/측정 나눗셈",
+      "tier": 2,
+      "lens": [
+        "ratio"
+      ],
+      "misconceptions": [
+        "나머지 해석 오류"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C04-S2",
+      "type": "course_step",
+      "label": "C04·S2 긴 나눗셈(1자리 나눔)",
+      "tier": 2,
+      "lens": [
+        "ratio"
+      ],
+      "misconceptions": [
+        "자리 내림 실수"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C04-S3",
+      "type": "course_step",
+      "label": "C04·S3 긴 나눗셈(다자리)",
+      "tier": 2,
+      "lens": [
+        "ratio"
+      ],
+      "misconceptions": [
+        "검산 누락"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C05-S1",
+      "type": "course_step",
+      "label": "C05·S1 부분/전체·등분",
+      "tier": 3,
+      "lens": [
+        "ratio"
+      ],
+      "misconceptions": [
+        "전체 정의 불명확"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C05-S2",
+      "type": "course_step",
+      "label": "C05·S2 동치/가분수/덧셈",
+      "tier": 3,
+      "lens": [
+        "ratio"
+      ],
+      "misconceptions": [
+        "분자/분모 혼동"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C05-S3",
+      "type": "course_step",
+      "label": "C05·S3 분수×분수·비율 연결",
+      "tier": 3,
+      "lens": [
+        "ratio"
+      ],
+      "misconceptions": [
+        "곱하면 커진다고 일반화"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C06-S1",
+      "type": "course_step",
+      "label": "C06·S1 소수 읽기/자릿값",
+      "tier": 3,
+      "lens": [
+        "transform"
+      ],
+      "misconceptions": [
+        "소수점 위치 오류"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C06-S2",
+      "type": "course_step",
+      "label": "C06·S2 소수 덧셈·단위율",
+      "tier": 3,
+      "lens": [
+        "transform",
+        "ratio"
+      ],
+      "misconceptions": [
+        "자리 정렬 누락"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C06-S3",
+      "type": "course_step",
+      "label": "C06·S3 백분율·비례표·그래프",
+      "tier": 3,
+      "lens": [
+        "ratio"
+      ],
+      "misconceptions": [
+        "비율과 차이 혼동"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C07-S1",
+      "type": "course_step",
+      "label": "C07·S1 차분 상수 판별",
+      "tier": 3,
+      "lens": [
+        "difference"
+      ],
+      "misconceptions": [
+        "불규칙을 규칙으로 오해"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C07-S2",
+      "type": "course_step",
+      "label": "C07·S2 일반항 언어화",
+      "tier": 3,
+      "lens": [
+        "difference"
+      ],
+      "misconceptions": [
+        "n과 항 번호 혼동"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C07-S3",
+      "type": "course_step",
+      "label": "C07·S3 등차 합 응용",
+      "tier": 3,
+      "lens": [
+        "accumulation",
+        "difference"
+      ],
+      "misconceptions": [
+        "항 개수/마지막 항 혼동"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C08-S1",
+      "type": "course_step",
+      "label": "C08·S1 좌표 읽기·거리/중점",
+      "tier": 4,
+      "lens": [
+        "transform"
+      ],
+      "misconceptions": [
+        "(x,y) 순서 오류"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C08-S2",
+      "type": "course_step",
+      "label": "C08·S2 기울기·절편·표↔그래프",
+      "tier": 4,
+      "lens": [
+        "difference",
+        "transform"
+      ],
+      "misconceptions": [
+        "축 스케일 오독"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C08-S3",
+      "type": "course_step",
+      "label": "C08·S3 일차방정식 응용",
+      "tier": 4,
+      "lens": [
+        "difference"
+      ],
+      "misconceptions": [
+        "미지수 정리 순서 오류"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C09-S1",
+      "type": "course_step",
+      "label": "C09·S1 대칭/이동/회전",
+      "tier": 4,
+      "lens": [
+        "transform"
+      ],
+      "misconceptions": [
+        "변환 순서 무시"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C09-S2",
+      "type": "course_step",
+      "label": "C09·S2 닮음·스케일 비",
+      "tier": 4,
+      "lens": [
+        "scale",
+        "ratio"
+      ],
+      "misconceptions": [
+        "대응점 불일치"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C09-S3",
+      "type": "course_step",
+      "label": "C09·S3 직각삼각비",
+      "tier": 4,
+      "lens": [
+        "scale",
+        "ratio"
+      ],
+      "misconceptions": [
+        "밑변/높이 혼동"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C10-S1",
+      "type": "course_step",
+      "label": "C10·S1 막대합=면적",
+      "tier": 5,
+      "lens": [
+        "accumulation"
+      ],
+      "misconceptions": [
+        "폭·단위 무시"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C10-S2",
+      "type": "course_step",
+      "label": "C10·S2 사다리꼴 근사·Σ",
+      "tier": 5,
+      "lens": [
+        "accumulation"
+      ],
+      "misconceptions": [
+        "근사/정확 구분 불가"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C10-S3",
+      "type": "course_step",
+      "label": "C10·S3 평균변화율 연결",
+      "tier": 5,
+      "lens": [
+        "difference",
+        "accumulation"
+      ],
+      "misconceptions": [
+        "속도=위치로 오해"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C11-S1",
+      "type": "course_step",
+      "label": "C11·S1 대표값",
+      "tier": 5,
+      "lens": [
+        "random",
+        "accumulation"
+      ],
+      "misconceptions": [
+        "평균/중앙값 구분 실패"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C11-S2",
+      "type": "course_step",
+      "label": "C11·S2 산포·상자그림",
+      "tier": 5,
+      "lens": [
+        "random"
+      ],
+      "misconceptions": [
+        "이상치 영향 무시"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C11-S3",
+      "type": "course_step",
+      "label": "C11·S3 경우의 수·이항/조건부",
+      "tier": 5,
+      "lens": [
+        "random"
+      ],
+      "misconceptions": [
+        "중복/순서 착각"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C12-S1",
+      "type": "course_step",
+      "label": "C12·S1 평균변화율 심화",
+      "tier": 5,
+      "lens": [
+        "difference"
+      ],
+      "misconceptions": [
+        "단위 누락"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C12-S2",
+      "type": "course_step",
+      "label": "C12·S2 순간변화율 직관",
+      "tier": 5,
+      "lens": [
+        "difference"
+      ],
+      "misconceptions": [
+        "접선 의미 오해"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    },
+    {
+      "id": "C12-S3",
+      "type": "course_step",
+      "label": "C12·S3 근사적분 심화",
+      "tier": 5,
+      "lens": [
+        "accumulation"
+      ],
+      "misconceptions": [
+        "Riemann 합 의미 오해"
+      ],
+      "xp": {
+        "per_try": 5,
+        "per_correct": 10
+      },
+      "lrc_min": {
+        "acc": 0.9
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "AS.PV.READ",
+      "to": "C01-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.PV.DECOMP",
+      "to": "C01-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.MUL.POW10",
+      "to": "C01-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.PV.DECOMP",
+      "to": "C01-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.REP.TAB2EXP",
+      "to": "C01-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.ADD.COMP",
+      "to": "C01-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.PV.DECOMP",
+      "to": "C01-S3",
+      "type": "requires",
+      "min_level": 2
+    },
+    {
+      "from": "AS.PV.EXCHANGE",
+      "to": "C02-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.REP.ALIGN",
+      "to": "C02-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.DIFF.READ",
+      "to": "C02-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.ADD.CARRY",
+      "to": "C02-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.SUB.BORROW",
+      "to": "C02-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.CHK.INV_SUM",
+      "to": "C02-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.ADD.EST",
+      "to": "C02-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.DIFF.READ",
+      "to": "C02-S3",
+      "type": "requires",
+      "min_level": 2
+    },
+    {
+      "from": "AS.MUL.FACTS",
+      "to": "C03-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.MUL.AREA",
+      "to": "C03-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.MUL.POW10",
+      "to": "C03-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.MUL.DIST",
+      "to": "C03-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.MUL.TWOxONE",
+      "to": "C03-S3",
+      "type": "requires",
+      "min_level": 2
+    },
+    {
+      "from": "AS.MUL.FACTS",
+      "to": "C03-S3",
+      "type": "requires",
+      "min_level": 2
+    },
+    {
+      "from": "AS.DIV.SHARE",
+      "to": "C04-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.MUL.FACTS",
+      "to": "C04-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.DIV.LONG",
+      "to": "C04-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.DIV.REL",
+      "to": "C04-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.DIV.LONG",
+      "to": "C04-S3",
+      "type": "requires",
+      "min_level": 2
+    },
+    {
+      "from": "AS.DIV.MEASURE",
+      "to": "C04-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.FRAC.PARTWHOLE",
+      "to": "C05-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.REP.TAB2EXP",
+      "to": "C05-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.FRAC.EQ",
+      "to": "C05-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.FRAC.ADD",
+      "to": "C05-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.FRAC.MUL",
+      "to": "C05-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.RATIO.UNIT",
+      "to": "C05-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.DEC.READ",
+      "to": "C06-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.DEC.PLACE",
+      "to": "C06-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.DEC.ADD",
+      "to": "C06-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.RATIO.UNIT",
+      "to": "C06-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.PERC.BASIC",
+      "to": "C06-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.RATIO.TABLE",
+      "to": "C06-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.SEQ.DIFFCONST",
+      "to": "C07-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.REP.TAB2EXP",
+      "to": "C07-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.SEQ.GENERAL",
+      "to": "C07-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.SEQ.SUMAP",
+      "to": "C07-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.MUL.TWOxONE",
+      "to": "C07-S3",
+      "type": "requires",
+      "min_level": 2
+    },
+    {
+      "from": "AS.COORD.READ",
+      "to": "C08-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.COORD.DISTMID",
+      "to": "C08-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.LIN.SLOPE",
+      "to": "C08-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.LIN.INTERCEPT",
+      "to": "C08-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.LIN.SOLVE",
+      "to": "C08-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.REP.TAB2EXP",
+      "to": "C08-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.GEO.TRANS",
+      "to": "C09-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.GEO.SIM",
+      "to": "C09-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.RATIO.UNIT",
+      "to": "C09-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.TRIG.RATIO",
+      "to": "C09-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.GEO.SIM",
+      "to": "C09-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.ACC.SUMRECT",
+      "to": "C10-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.RATE.UNIT",
+      "to": "C10-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.ACC.TRAP",
+      "to": "C10-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.ACC.SIGMA",
+      "to": "C10-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.RATE.AVG",
+      "to": "C10-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.LIN.SLOPE",
+      "to": "C10-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.STATS.CENTER",
+      "to": "C11-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.STATS.SPREAD",
+      "to": "C11-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.STATS.BOX",
+      "to": "C11-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.COUNT.RULES",
+      "to": "C11-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.PROB.BI",
+      "to": "C11-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.PROB.COND",
+      "to": "C11-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.RATE.AVG",
+      "to": "C12-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.RATE.UNIT",
+      "to": "C12-S1",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.RATE.INST",
+      "to": "C12-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.LIN.SLOPE",
+      "to": "C12-S2",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.ACC.TRAP",
+      "to": "C12-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "AS.ACC.SIGMA",
+      "to": "C12-S3",
+      "type": "requires",
+      "min_level": 1
+    },
+    {
+      "from": "C01-S1",
+      "to": "AS.PV.DECOMP",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C01-S1",
+      "to": "AS.PV.EXCHANGE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C01-S2",
+      "to": "AS.REP.TAB2EXP",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C01-S2",
+      "to": "AS.ADD.COMP",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C01-S3",
+      "to": "AS.ADD.COMP",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C01-S3",
+      "to": "AS.CHK.INV_SUM",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C02-S1",
+      "to": "AS.ADD.ALGOR",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C02-S1",
+      "to": "AS.SUB.ALGOR",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C02-S2",
+      "to": "AS.ADD.CARRY",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C02-S2",
+      "to": "AS.SUB.BORROW",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C02-S3",
+      "to": "AS.CHK.INV_SUM",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C02-S3",
+      "to": "AS.ADD.EST",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C03-S1",
+      "to": "AS.MUL.FACTS",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C03-S1",
+      "to": "AS.MUL.AREA",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C03-S2",
+      "to": "AS.MUL.POW10",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C03-S2",
+      "to": "AS.MUL.DIST",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C03-S3",
+      "to": "AS.MUL.TWOxONE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C03-S3",
+      "to": "AS.MUL.DIST",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C04-S1",
+      "to": "AS.DIV.REL",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C04-S1",
+      "to": "AS.DIV.MEASURE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C04-S2",
+      "to": "AS.DIV.LONG",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C04-S2",
+      "to": "AS.DIV.REL",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C04-S3",
+      "to": "AS.DIV.LONG",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C04-S3",
+      "to": "AS.DIV.MEASURE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C05-S1",
+      "to": "AS.FRAC.PARTWHOLE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C05-S1",
+      "to": "AS.FRAC.EQ",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C05-S2",
+      "to": "AS.FRAC.ADD",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C05-S2",
+      "to": "AS.FRAC.MIXED",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C05-S3",
+      "to": "AS.FRAC.MUL",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C05-S3",
+      "to": "AS.RATIO.TABLE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C06-S1",
+      "to": "AS.DEC.PLACE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C06-S1",
+      "to": "AS.DEC.ADD",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C06-S2",
+      "to": "AS.RATIO.UNIT",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C06-S2",
+      "to": "AS.RATIO.TABLE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C06-S3",
+      "to": "AS.PERC.BASIC",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C06-S3",
+      "to": "AS.RATIO.GRAPH",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C07-S1",
+      "to": "AS.SEQ.DIFFCONST",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C07-S1",
+      "to": "AS.DIFF.READ",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C07-S2",
+      "to": "AS.SEQ.GENERAL",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C07-S2",
+      "to": "AS.LIN.SLOPE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C07-S3",
+      "to": "AS.SEQ.SUMAP",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C07-S3",
+      "to": "AS.LIN.FORM",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C08-S1",
+      "to": "AS.COORD.DISTMID",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C08-S1",
+      "to": "AS.REP.GRAPHREAD",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C08-S2",
+      "to": "AS.LIN.FORM",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C08-S2",
+      "to": "AS.LIN.SLOPE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C08-S3",
+      "to": "AS.LIN.SOLVE",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C08-S3",
+      "to": "AS.COORD.LINEEQ",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C09-S1",
+      "to": "AS.GEO.TRANS",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C09-S2",
+      "to": "AS.GEO.SIM",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C09-S2",
+      "to": "AS.RATIO.GRAPH",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C09-S3",
+      "to": "AS.TRIG.RATIO",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C09-S3",
+      "to": "AS.RATIO.UNIT",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C10-S1",
+      "to": "AS.ACC.SUMRECT",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C10-S1",
+      "to": "AS.RATE.UNIT",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C10-S2",
+      "to": "AS.ACC.TRAP",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C10-S2",
+      "to": "AS.ACC.SIGMA",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C10-S3",
+      "to": "AS.RATE.AVG",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C11-S1",
+      "to": "AS.STATS.CENTER",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C11-S2",
+      "to": "AS.STATS.SPREAD",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C11-S2",
+      "to": "AS.STATS.BOX",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C11-S3",
+      "to": "AS.COUNT.RULES",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C11-S3",
+      "to": "AS.PROB.BI",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C12-S1",
+      "to": "AS.RATE.AVG",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C12-S1",
+      "to": "AS.RATE.UNIT",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C12-S2",
+      "to": "AS.RATE.INST",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C12-S2",
+      "to": "AS.ACC.SIGMA",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C12-S3",
+      "to": "AS.ACC.TRAP",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C12-S3",
+      "to": "AS.RATE.INST",
+      "type": "teaches",
+      "delta_level": 1
+    },
+    {
+      "from": "C01-S1",
+      "to": "C01-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C01-S2",
+      "to": "C01-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C02-S1",
+      "to": "C02-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C02-S2",
+      "to": "C02-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C03-S1",
+      "to": "C03-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C03-S2",
+      "to": "C03-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C04-S1",
+      "to": "C04-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C04-S2",
+      "to": "C04-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C05-S1",
+      "to": "C05-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C05-S2",
+      "to": "C05-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C06-S1",
+      "to": "C06-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C06-S2",
+      "to": "C06-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C07-S1",
+      "to": "C07-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C07-S2",
+      "to": "C07-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C08-S1",
+      "to": "C08-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C08-S2",
+      "to": "C08-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C09-S1",
+      "to": "C09-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C09-S2",
+      "to": "C09-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C10-S1",
+      "to": "C10-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C10-S2",
+      "to": "C10-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C11-S1",
+      "to": "C11-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C11-S2",
+      "to": "C11-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C12-S1",
+      "to": "C12-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C12-S2",
+      "to": "C12-S3",
+      "type": "enables"
+    },
+    {
+      "from": "C01-S3",
+      "to": "C02-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C01-S3",
+      "to": "C03-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C02-S3",
+      "to": "C03-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C02-S3",
+      "to": "C04-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C03-S3",
+      "to": "C04-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C03-S3",
+      "to": "C07-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C04-S3",
+      "to": "C05-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C05-S3",
+      "to": "C06-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C06-S3",
+      "to": "C07-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C06-S3",
+      "to": "C08-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C07-S3",
+      "to": "C08-S2",
+      "type": "enables"
+    },
+    {
+      "from": "C08-S3",
+      "to": "C09-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C08-S3",
+      "to": "C10-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C08-S3",
+      "to": "C11-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C10-S3",
+      "to": "C12-S1",
+      "type": "enables"
+    },
+    {
+      "from": "C11-S3",
+      "to": "C12-S1",
+      "type": "enables"
+    }
+  ]
+}

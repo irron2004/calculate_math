@@ -7,6 +7,7 @@
 - [ ] 학습 화면에서 ‘허브로 돌아가기’ 등 공유/탐색용 버튼을 제거하여 개인 학습 흐름에 집중
 - [ ] 메인 화면에서 헬스체크/허브 공유 안내를 제거하고 학습 전용 메시지로 단순화 (`app/templates/index.html`)
 - [ ] `docs/dag.md`에 정의된 DAG 스펙을 JSON/모델로 로딩하는 백엔드 모듈 구축 (노드/엣지, XP 테이블, tier/boss 메타 반영)
+- [ ] `graph.bipartite.json`을 로드해 코스·스텝 ↔ 원자 스킬 이중 레이어 트리를 구성하고 데이터 파이프라인에 통합
 - [ ] DAG 노드/엣지, XP 진행 상황, LRC 임계치 등을 조회하는 API 추가 (`GET /api/v1/dag/nodes`, `/api/v1/dag/edges`, `/api/v1/dag/progress`) – 세부 요구사항은 `docs/dag.md` 참고
 - [ ] MathGame/대시보드에서 DAG 기반 단계·XP UI를 노출하고 보스전/티어 진행을 시각화 (`docs/dag.md` 참고)
 - [ ] 세션 완료 시 DAG 노드 경험치/레벨 업데이트 로직 구현 및 LRC 조건 반영 (`docs/dag.md` 참고)
