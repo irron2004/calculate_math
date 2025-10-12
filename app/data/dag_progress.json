@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "xp": {
+      "milestones": [100, 250, 500, 1000],
+      "daily_target": 180
+    },
+    "lrc": {
+      "status_colors": {
+        "gold": "#f1c40f",
+        "silver": "#bdc3c7",
+        "pending": "#95a5a6",
+        "retry": "#e74c3c"
+      }
+    }
+  },
+  "users": [
+    {
+      "user_id": "1",
+      "updated_at": "2024-02-15T09:00:00+00:00",
+      "total_xp": 320,
+      "nodes": {
+        "C01-S1": {
+          "xp_earned": 120,
+          "xp_required": 120,
+          "level": 1,
+          "unlocked": true,
+          "completed": true,
+          "lrc_status": "gold",
+          "lrc_metrics": {
+            "accuracy": 0.94,
+            "rt_percentile": 0.67,
+            "rubric": 0.82
+          },
+          "attempts": 6
+        },
+        "C01-S2": {
+          "xp_earned": 80,
+          "xp_required": 140,
+          "level": 1,
+          "unlocked": true,
+          "completed": false,
+          "lrc_status": "pending",
+          "lrc_metrics": {
+            "accuracy": 0.78,
+            "rt_percentile": 0.55,
+            "rubric": 0.6
+          },
+          "attempts": 4
+        }
+      },
+      "skills": {
+        "AS.MUL.POW10": {
+          "level": 2,
+          "xp": 180
+        },
+        "AS.ADD.COMP": {
+          "level": 1,
+          "xp": 90
+        }
+      }
+    }
+  ]
+}

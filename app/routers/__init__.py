@@ -1,3 +1,13 @@
-from . import health, invites, pages, practice, problems
+from . import bridge, curriculum, dag, health, invites, pages, practice, problems, skills
 
-__all__ = ["health", "invites", "pages", "practice", "problems"]
+__all__ = [
+    "bridge",
+    "curriculum",
+    "dag",
+    "health",
+    "invites",
+    "pages",
+    "practice",
+    "problems",
+    "skills",
+]
