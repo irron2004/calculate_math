@@ -54,6 +54,12 @@ async def test_home_page_hides_compliance_copy_for_learners(client):
     body = response.text
     assert "Web Vitals" not in body
     assert "WCAG" not in body
+    assert "Tasks.md" not in body
+    assert "로컬 개발 가이드" not in body
+    assert "FE-01" not in body
+    assert "Self → Invite → Aggregate" not in body
+    assert "맞춤 학습 모드 활성화" in body
+    assert "학습 준비 체크리스트" in body
 
 
 async def test_home_page_shows_compliance_copy_for_staff_toggle(client):
