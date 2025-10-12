@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Dict, Iterable, List, Optional, Set
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, root_validator, validator
 
 
 class SkillKind(str, Enum):
@@ -33,7 +33,7 @@ class RequirementSpec(BaseModel):
     any_of: List[str] = Field(default_factory=list)
     min_level: Optional[int] = None
 
-    @field_validator("min_level")
+    @validator("min_level")
     def _check_min_level(cls, value: Optional[int]) -> Optional[int]:
         if value is not None and value < 0:
             raise ValueError("min_level must be non-negative when provided")
@@ -58,7 +58,7 @@ class SkillNode(BaseModel):
     misconceptions: List[str] = Field(default_factory=list)
     lrc_min: Optional[Dict[str, float]] = None
 
-    @field_validator("xp_to_level")
+    @validator("xp_to_level")
     def _validate_xp_table(cls, value: List[int]) -> List[int]:
         if not value:
             raise ValueError("xp_to_level must contain at least one entry")
@@ -68,8 +68,8 @@ class SkillNode(BaseModel):
             raise ValueError("xp_to_level entries must be strictly increasing")
         return value
 
-    @field_validator("lens", "keywords", "micro_skills", "misconceptions", mode="before")
-    def _ensure_list(cls, value: Optional[Iterable[str]]) -> List[str]:
+    @validator("lens", "keywords", "micro_skills", "misconceptions", pre=True)
+    def _ensure_list(cls, value: Iterable[str]) -> List[str]:
         if value is None:
             return []
         return list(value)
@@ -83,7 +83,8 @@ class SkillEdge(BaseModel):
     type: EdgeType
     lens: Optional[str] = None
 
-    model_config = ConfigDict(populate_by_name=True)
+    class Config:
+        allow_population_by_field_name = True
 
 
 class SkillGraphSpec(BaseModel):
@@ -94,7 +95,7 @@ class SkillGraphSpec(BaseModel):
     nodes: List[SkillNode]
     edges: List[SkillEdge]
 
-    @field_validator("palette")
+    @validator("palette")
     def _validate_palette(cls, palette: Dict[str, str]) -> Dict[str, str]:
         for key, value in palette.items():
             if not value or not isinstance(value, str):
@@ -103,11 +104,11 @@ class SkillGraphSpec(BaseModel):
                 raise ValueError(f"Palette colour '{value}' for '{key}' must be a hex string")
         return palette
 
-    @model_validator(mode="after")
-    def _cross_field_validation(self) -> "SkillGraphSpec":
-        palette = self.palette
-        nodes = self.nodes
-        edges = self.edges
+    @root_validator
+    def _cross_field_validation(cls, values: Dict[str, object]) -> Dict[str, object]:
+        palette: Dict[str, str] = values.get("palette", {})  # type: ignore[assignment]
+        nodes: List[SkillNode] = values.get("nodes", [])  # type: ignore[assignment]
+        edges: List[SkillEdge] = values.get("edges", [])  # type: ignore[assignment]
 
         node_ids: Set[str] = {node.id for node in nodes}
         palette_keys: Set[str] = set(palette)
@@ -116,11 +117,11 @@ class SkillGraphSpec(BaseModel):
 
         for node in nodes:
             if node.requires:
-                type(self)._validate_requirements(node, node_ids)
+                cls._validate_requirements(node, node_ids)
             if node.boss is not None and node.boss not in node_ids:
                 raise ValueError(f"Node '{node.id}' references unknown boss '{node.boss}'")
             if node.kind is SkillKind.BOSS:
-                type(self)._validate_boss_node(node)
+                cls._validate_boss_node(node)
 
             missing_lens.update(set(node.lens) - palette_keys)
 
@@ -137,7 +138,7 @@ class SkillGraphSpec(BaseModel):
                 "Palette is missing definitions for lens keys: " + ", ".join(sorted(missing_lens))
             )
 
-        return self
+        return values
 
     @classmethod
     def _validate_requirements(cls, node: SkillNode, node_ids: Set[str]) -> None:
