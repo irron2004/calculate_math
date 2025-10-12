@@ -4,6 +4,9 @@
 
 {% block content %}
 <div class="mx-auto w-full max-w-6xl space-y-16 px-4 py-12 sm:px-6 lg:px-8 lg:py-18">
+    {% set metrics = progress_metrics or {} %}
+    {% set attempts = metrics.get('attempts', {}) %}
+    {% set progress = metrics.get('progress', {}) %}
     <section class="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-sky-500 via-primary to-purple-500 px-6 py-16 text-white shadow-2xl sm:px-10 lg:px-16">
         <div class="absolute inset-0 opacity-15" aria-hidden="true"
              style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.28) 0, transparent 55%),
@@ -141,21 +144,21 @@
             <h3 class="text-lg font-semibold text-white">실시간 학습 지표</h3>
             <dl class="mt-6 space-y-4 text-sm text-slate-200">
                 <div class="flex items-start justify-between gap-4">
-                    <dt class="text-slate-300">총 문제 수</dt>
-                    <dd class="text-lg font-semibold text-white">20</dd>
+                    <dt class="text-slate-300">총 풀이 시도</dt>
+                    <dd class="text-lg font-semibold text-white">{{ attempts.get('total', 0) }}</dd>
                 </div>
                 <div class="flex items-start justify-between gap-4">
-                    <dt class="text-slate-300">권장 학습 시간</dt>
-                    <dd class="text-lg font-semibold text-white">1일 15분</dd>
+                    <dt class="text-slate-300">정답률</dt>
+                    <dd class="text-lg font-semibold text-white">{{ '%.0f'|format(attempts.get('accuracy_rate', 0)) }}%</dd>
                 </div>
                 <div class="flex items-start justify-between gap-4">
-                    <dt class="text-slate-300">Self → Share 평균</dt>
-                    <dd class="text-lg font-semibold text-white">2.4일</dd>
+                    <dt class="text-slate-300">연속 학습</dt>
+                    <dd class="text-lg font-semibold text-white">{{ attempts.get('streak_days', 0) }}일</dd>
                 </div>
                 {% if show_compliance_details %}
                 <div class="flex items-start justify-between gap-4" data-compliance-note>
-                    <dt class="text-slate-300">품질 기준</dt>
-                    <dd class="text-lg font-semibold text-white">WCAG 2.2 AA · LCP ≤ 2.5s</dd>
+                    <dt class="text-slate-300">커리큘럼 진행</dt>
+                    <dd class="text-lg font-semibold text-white">완료 {{ progress.get('completed_nodes', 0) }} · 해제 {{ progress.get('unlocked_nodes', 0) }}</dd>
                 </div>
                 {% endif %}
             </dl>

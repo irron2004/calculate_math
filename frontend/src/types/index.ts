@@ -8,6 +8,28 @@ export type User = {
   children?: string[];
 };
 
+export type AttemptMetrics = {
+  total: number;
+  correct: number;
+  accuracy_rate: number;
+  streak_days: number;
+  last_attempt_at?: string | null;
+};
+
+export type ProgressBreakdown = {
+  total_xp: number;
+  unlocked_nodes: number;
+  completed_nodes: number;
+  mastered_skills: number;
+};
+
+export type UserProgressMetrics = {
+  user_id: string;
+  attempts: AttemptMetrics;
+  progress: ProgressBreakdown;
+  skill_levels: Record<string, number>;
+};
+
 export type APIProblem = {
   id: number;
   left: number;
