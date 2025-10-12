@@ -9,7 +9,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, error: authError } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,11 +18,10 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      const success = await login(nickname, password);
-      if (success) {
-        // 사용자 역할에 따라 다른 페이지로 이동
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        switch (user.role) {
+      const result = await login(nickname, password);
+      if (result.success && result.user) {
+        const role = result.user.role;
+        switch (role) {
           case 'student':
             navigate('/student');
             break;
@@ -36,7 +35,7 @@ const Login: React.FC = () => {
             navigate('/student');
         }
       } else {
-        setError('로그인에 실패했습니다. 닉네임과 비밀번호를 확인해주세요.');
+        setError(result.error ?? '로그인에 실패했습니다. 닉네임과 비밀번호를 확인해주세요.');
       }
     } catch {
       setError('로그인 중 오류가 발생했습니다.');
@@ -47,14 +46,6 @@ const Login: React.FC = () => {
 
   const handleGuestLogin = () => {
     // 게스트 계정 정보
-    const guestUser = {
-      id: 'guest',
-      username: 'guest',
-      role: 'guest',
-      name: '게스트'
-    };
-    localStorage.setItem('user', JSON.stringify(guestUser));
-    // 게스트는 학생 대시보드로 이동(원하면 별도 페이지로 변경 가능)
     navigate('/student');
   };
 
@@ -96,7 +87,9 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {(error || authError) && (
+            <div className="error-message">{error || authError}</div>
+          )}
 
           <button 
             type="submit" 

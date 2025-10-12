@@ -6,6 +6,7 @@ from fastapi import APIRouter, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from ..config import get_settings
 from ..category_service import (
     build_category_cards,
     resolve_allowed_categories,
@@ -15,6 +16,10 @@ from ..bridge_bank import BridgeDataError, list_bridge_units
 from ..problem_bank import get_problems
 from ..curriculum_graph import get_curriculum_graph
 from ..template_engine import list_concepts
+from ..dependencies.auth import resolve_optional_user
+from ..progress_store import ProgressStore, refresh_progress_store
+from ..repositories import AttemptRepository
+from ..services.progress_metrics import ProgressMetricsService
 
 
 def _templates_resolver(
@@ -29,6 +34,23 @@ def _templates_resolver(
         return templates
 
     return _resolve
+
+
+def _is_truthy_flag(value: str | None) -> bool:
+    if value is None:
+        return False
+    normalized = value.strip().lower()
+    return normalized in {"1", "true", "yes", "on"}
+
+
+def _should_show_compliance(request: Request) -> bool:
+    if _is_truthy_flag(request.query_params.get("staff")):
+        return True
+    if _is_truthy_flag(request.query_params.get("preview")):
+        return True
+    if _is_truthy_flag(request.headers.get("X-Staff-Preview")):
+        return True
+    return False
 
 
 def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
@@ -53,6 +75,24 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
         graph_payload = get_curriculum_graph()
         concept_nodes = list_concepts()
         concept_lookup = {node.id: node for node in concept_nodes}
+
+        progress_metrics_data = None
+        user = resolve_optional_user(request)
+        if user is not None:
+            attempt_repository = getattr(request.app.state, "attempt_repository", None)
+            if not isinstance(attempt_repository, AttemptRepository):
+                settings = getattr(request.app.state, "settings", None) or get_settings()
+                attempt_repository = AttemptRepository(settings.attempts_database_path)
+                request.app.state.attempt_repository = attempt_repository
+            progress_store = getattr(request.app.state, "dag_progress_store", None)
+            if not isinstance(progress_store, ProgressStore):
+                progress_store = refresh_progress_store(force=True)
+                request.app.state.dag_progress_store = progress_store
+            metrics_service = ProgressMetricsService(
+                attempt_repository=attempt_repository,
+                progress_store=progress_store,
+            )
+            progress_metrics_data = metrics_service.get_metrics_for_user(user.id).dict()
 
         sequence_order: list[str] = []
         for node in graph_payload.get("nodes", []):
@@ -116,6 +156,8 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 "category_count": len(cards),
                 "skill_tree": skill_tree,
                 "skill_palette": palette,
+                "show_compliance_details": _should_show_compliance(request),
+                "progress_metrics": progress_metrics_data,
             },
         )
 
@@ -163,6 +205,7 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 "primary_category": resolve_primary_category(categories),
                 "category_available": bool(selected_category),
                 "bridge_unit": bridge_unit,
+                "show_compliance_details": _should_show_compliance(request),
             },
         )
 

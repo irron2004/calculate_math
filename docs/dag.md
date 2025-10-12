@@ -1,437 +1,134 @@
-# Curriculum Progression DAG Specification
+# Curriculum Progression DAG v2 — Bipartite Specification
 
-아래 JSON은 제공하신 DAG 설계안을 그대로 정리한 것입니다. 구현 시 이 데이터를 참고하세요.
+이 문서는 기존 커리큘럼 DAG를 **코스 스텝(CourseStep)**과 **원자 스킬(AtomicSkill)**의 이중 레이어 그래프로 재구성하기 위한 사양입니다. 곱셈처럼 여러 코스·스텝에서 공유하는 스킬을 하나의 노드로 관리할 수 있도록 설계되었습니다.
 
-```json
-{
-"version": "2025-10-11",
-"palette": {
-"difference": "#E4572E",
-"accumulation": "#17BEBB",
-"ratio": "#8D99AE",
-"scale": "#2E86AB",
-"random": "#F29E4C",
-"transform": "#6C5CE7",
-"vector": "#2D6A4F"
-},
-"nodes": [
-{
-"id": "num_pv_s1",
-"label": "자리가치·S1",
-"tier": 1,
-"kind": "core",
-"requires": null,
-"xp_per_try": 4,
-"xp_per_correct": 8,
-"xp_to_level": [0, 40, 120, 240],
-"lens": ["transform"],
-"keywords": ["자릿값", "분해", "재구성", "교환(10↔1)", "0은 자리값"],
-"micro_skills": ["자릿값읽기", "분해/재구성", "10↔1교환"],
-"misconceptions": ["0은 빈칸", "자릿값 가중치 혼동"],
-"lrc_min": { "acc": 0.85 }
-},
-{
-"id": "num_pv_s2",
-"label": "자리가치·S2(표↔식↔말·친한 수)",
-"tier": 1,
-"kind": "core",
-"requires": { "all_of": ["num_pv_s1"], "any_of": [], "min_level": 1 },
-"xp_per_try": 4,
-"xp_per_correct": 8,
-"xp_to_level": [0, 40, 120, 240],
-"lens": ["transform", "accumulation"],
-"keywords": ["표↔식↔말", "친한 수", "합의 보존"],
-"micro_skills": ["표↔식↔말전환", "친한수보정", "합확인"],
-"misconceptions": ["보정하면 값이 바뀜"],
-"lrc_min": { "acc": 0.9 }
-},
-{
-"id": "num_pv_s3",
-"label": "자리가치·S3(짝보정·암산)",
-"tier": 1,
-"kind": "core",
-"requires": { "all_of": ["num_pv_s2"], "any_of": [], "min_level": 1 },
-"xp_per_try": 5,
-"xp_per_correct": 9,
-"xp_to_level": [0, 50, 150, 300],
-"lens": ["transform", "accumulation", "difference"],
-"keywords": ["짝보정", "두 단계 기준점", "합의 보존"],
-"micro_skills": ["짝보정", "두단계기준점", "암산전략"],
-"misconceptions": ["보정량 상쇄 불가"],
-"lrc_min": { "acc": 0.9, "rt_pct": 0.55, "explanation": 0.6 }
-},
-{
-  "id": "add_1d",
-  "label": "덧셈(한 자리)",
-  "tier": 1,
-  "kind": "core",
-  "requires": { "all_of": ["num_pv_s2"], "any_of": [], "min_level": 1 },
-  "xp_per_try": 4,
-  "xp_per_correct": 8,
-  "xp_to_level": [0, 40, 120, 240],
-  "lens": ["accumulation"],
-  "keywords": ["합", "보정", "교환법칙", "결합법칙"],
-  "micro_skills": ["세로셈셋업", "보정", "합확인"],
-  "misconceptions": ["일→십 이월 미이해"],
-  "lrc_min": { "acc": 0.9 }
-},
-{
-  "id": "sub_1d",
-  "label": "뺄셈(한 자리)",
-  "tier": 1,
-  "kind": "core",
-  "requires": { "all_of": ["num_pv_s2"], "any_of": [], "min_level": 1 },
-  "xp_per_try": 4,
-  "xp_per_correct": 8,
-  "xp_to_level": [0, 40, 120, 240],
-  "lens": ["difference"],
-  "keywords": ["차", "보완", "가수(빌림)"],
-  "micro_skills": ["차계산", "받아내림"],
-  "misconceptions": ["자릿수 불일치 계산"]
-},
+---
 
-{ "id": "tier1_exam", "label": "보스전: 티어1", "tier": 1, "kind": "boss", "requires": null, "xp_per_try": 0, "xp_per_correct": 0, "xp_to_level": [0], "lens": [], "keywords": [], "micro_skills": [], "misconceptions": [] },
+## 1. 설계 개요
 
-{
-  "id": "add_2d_nc",
-  "label": "덧셈(두 자리·받아올림X)",
-  "tier": 2,
-  "kind": "core",
-  "requires": { "all_of": ["add_1d"], "any_of": [], "min_level": 1 },
-  "xp_per_try": 5,
-  "xp_per_correct": 10,
-  "xp_to_level": [0, 50, 150, 300],
-  "lens": ["accumulation"],
-  "keywords": ["정렬", "합", "보정"],
-  "micro_skills": ["세로정렬", "부분합"],
-  "misconceptions": ["열정렬 미스매치"]
-},
-{
-  "id": "add_2d_c",
-  "label": "덧셈(두 자리·받아올림)",
-  "tier": 2,
-  "kind": "core",
-  "requires": { "all_of": ["add_2d_nc"], "any_of": [], "min_level": 1 },
-  "xp_per_try": 6,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["accumulation"],
-  "keywords": ["이월", "합"],
-  "micro_skills": ["받아올림", "합검산"],
-  "misconceptions": ["받아올림 누락"]
-},
-{
-  "id": "sub_2d_b",
-  "label": "뺄셈(두 자리·받아내림)",
-  "tier": 2,
-  "kind": "core",
-  "requires": { "all_of": ["sub_1d"], "any_of": [], "min_level": 1 },
-  "xp_per_try": 6,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["difference"],
-  "keywords": ["빌림", "차"],
-  "micro_skills": ["받아내림", "차검산"],
-  "misconceptions": ["빌림 자리 오류"]
-},
-{
-  "id": "mul_table",
-  "label": "구구단(곱셈 표)",
-  "tier": 2,
-  "kind": "core",
-  "requires": { "all_of": ["add_2d_nc"], "any_of": [], "min_level": 2 },
-  "xp_per_try": 5,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["scale"],
-  "keywords": ["배수", "반복덧셈", "곱셈"],
-  "micro_skills": ["배수세기", "곱셈사실"],
-  "misconceptions": ["순서 혼동(교환법칙 미이해)"]
-},
-{
-  "id": "div_table",
-  "label": "나눗셈 기초",
-  "tier": 2,
-  "kind": "core",
-  "requires": { "all_of": ["mul_table"], "any_of": [], "min_level": 1 },
-  "xp_per_try": 5,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["ratio", "scale"],
-  "keywords": ["묶음", "등분", "역연산"],
-  "micro_skills": ["몫/나머지", "역관계"],
-  "misconceptions": ["나머지 처리를 합으로 이해"]
-},
-{
-  "id": "coord_s1",
-  "label": "좌표놀이·S1(수직선/격자)",
-  "tier": 2,
-  "kind": "concept",
-  "requires": { "all_of": [], "any_of": ["add_2d_nc", "sub_2d_b"], "min_level": 1 },
-  "xp_per_try": 5,
-  "xp_per_correct": 10,
-  "xp_to_level": [0, 50, 150, 300],
-  "lens": ["transform"],
-  "keywords": ["좌표", "거리", "중점"],
-  "micro_skills": ["좌표읽기", "격자이동"],
-  "misconceptions": ["(x,y) 순서 뒤바꿈"]
-},
-{
-  "id": "decimal_s1",
-  "label": "소수·S1(자릿값 확장)",
-  "tier": 2,
-  "kind": "concept",
-  "requires": { "all_of": ["num_pv_s3"], "any_of": [], "min_level": 1 },
-  "xp_per_try": 5,
-  "xp_per_correct": 10,
-  "xp_to_level": [0, 50, 150, 300],
-  "lens": ["transform"],
-  "keywords": ["소수점", "자릿값", "분수연결"],
-  "micro_skills": ["소수읽기", "소수↔분수"],
-  "misconceptions": ["0의 위치 오해"]
-},
+| 레이어 | 노드 타입 | 예시 | 설명 |
+| ------ | ---------- | ---- | ---- |
+| A | `course_step` | `C01-S1`, `C03-S3` | 학습 세션 단위. 스텝 시작 시 필요한 스킬 레벨(`requires`)과 완료 시 상승하는 스킬(`teaches`)을 정의합니다. |
+| B | `skill` | `AS.MUL.FACTS`, `AS.ADD.COMP` | 여러 스텝에서 재사용되는 원자 스킬. 레벨(0~3)을 추적해 잠금/추천에 활용합니다. |
 
-{ "id": "tier2_exam", "label": "보스전: 티어2", "tier": 2, "kind": "boss", "requires": null, "xp_per_try": 0, "xp_per_correct": 0, "xp_to_level": [0], "lens": [], "keywords": [], "micro_skills": [], "misconceptions": [] },
+**엣지 타입**
 
-{
-  "id": "fraction_s1",
-  "label": "분수·S1(부분/전체)",
-  "tier": 3,
-  "kind": "concept",
-  "requires": { "all_of": ["mul_table", "add_2d_c"], "any_of": [], "min_level": 2 },
-  "boss": "tier2_exam",
-  "xp_per_try": 6,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["ratio"],
-  "keywords": ["부분/전체", "공통분모"],
-  "micro_skills": ["그림→분수", "동분모"],
-  "misconceptions": ["분자/분모 역할 혼동"]
-},
-{
-  "id": "ratio_s1",
-  "label": "비율·S1(단위율)",
-  "tier": 3,
-  "kind": "concept",
-  "requires": { "all_of": ["mul_table"], "any_of": [], "min_level": 2 },
-  "boss": "tier2_exam",
-  "xp_per_try": 6,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["ratio"],
-  "keywords": ["단위율", "k", "비례"],
-  "micro_skills": ["1의값", "비례표"],
-  "misconceptions": ["차이로 비례 판별"]
-},
-{
-  "id": "pattern_seq_s1",
-  "label": "규칙성→등차 씨앗",
-  "tier": 3,
-  "kind": "concept",
-  "requires": { "all_of": ["add_2d_c"], "any_of": [], "min_level": 1 },
-  "boss": "tier2_exam",
-  "xp_per_try": 6,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["difference"],
-  "keywords": ["같은 만큼", "차분"],
-  "micro_skills": ["차이읽기", "표완성"],
-  "misconceptions": ["불규칙 오해"]
-},
-{
-  "id": "coord_line_s2",
-  "label": "좌표·S2(직선 기초)",
-  "tier": 3,
-  "kind": "algebra",
-  "requires": { "all_of": ["coord_s1"], "any_of": [], "min_level": 2 },
-  "boss": "tier2_exam",
-  "xp_per_try": 6,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["transform", "difference"],
-  "keywords": ["기울기", "절편"],
-  "micro_skills": ["두점→식", "Δy/Δx"],
-  "misconceptions": ["축스케일 오독"]
-},
-{
-  "id": "linear_s1",
-  "label": "일차함수·S1(y=mx+b)",
-  "tier": 3,
-  "kind": "algebra",
-  "requires": { "all_of": ["coord_line_s2", "ratio_s1"], "any_of": [], "min_level": 1 },
-  "boss": "tier2_exam",
-  "xp_per_try": 7,
-  "xp_per_correct": 14,
-  "xp_to_level": [0, 70, 210, 420],
-  "lens": ["difference", "ratio"],
-  "keywords": ["기울기=단위율", "절편", "원점 통과 여부"],
-  "micro_skills": ["표↔그래프↔식", "기울기계산"],
-  "misconceptions": ["Δx/Δy 혼동"]
-},
-{
-  "id": "ap_s1",
-  "label": "등차수열·S1(같은 만큼)",
-  "tier": 3,
-  "kind": "algebra",
-  "requires": { "all_of": [], "any_of": ["pattern_seq_s1", "add_2d_c"], "min_level": 2 },
-  "boss": "tier2_exam",
-  "xp_per_try": 6,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["difference"],
-  "keywords": ["공차", "첫항", "n-1"],
-  "micro_skills": ["일반항언어화", "표→식"],
-  "misconceptions": ["공차=첫항 혼동"]
-},
+* `skill → course_step` (`requires`): 스텝 시작 전 필요 스킬과 요구 레벨.
+* `course_step → skill` (`teaches`): 스텝 완료 시 상승하는 스킬과 상승량.
+* `course_step → course_step` (`enables`): 구조적 전이/추천 경로.
+* `skill → skill` (`decomposes`): 스킬 분해 관계(온보딩/리미디얼 추천).
 
-{ "id": "tier3_exam", "label": "보스전: 티어3", "tier": 3, "kind": "boss", "requires": null, "xp_per_try": 0, "xp_per_correct": 0, "xp_to_level": [0], "lens": [], "keywords": [], "micro_skills": [], "misconceptions": [] },
+---
 
+## 2. 데이터 스키마(JSON)
+
+샘플 JSON은 `docs/graph_bipartite_example.json`에 저장되어 있습니다. 주요 구조는 아래와 같습니다.
+
+```jsonc
 {
-  "id": "ap_s2",
-  "label": "등차수열·S2(일반항/합)",
-  "tier": 4,
-  "kind": "algebra",
-  "requires": { "all_of": ["ap_s1"], "any_of": [], "min_level": 2 },
-  "boss": "tier3_exam",
-  "xp_per_try": 7,
-  "xp_per_correct": 14,
-  "xp_to_level": [0, 70, 210, 420],
-  "lens": ["difference", "accumulation"],
-  "keywords": ["a1+d(n-1)", "합 공식", "부분합"],
-  "micro_skills": ["일반항", "합계산"],
-  "misconceptions": ["n과 항개수 혼동"]
-},
-{
-  "id": "linear_s2",
-  "label": "일차함수·S2(기울기·절편 해석)",
-  "tier": 4,
-  "kind": "algebra",
-  "requires": { "all_of": ["linear_s1", "ap_s2"], "any_of": [], "min_level": 1 },
-  "boss": "tier3_exam",
-  "xp_per_try": 7,
-  "xp_per_correct": 14,
-  "xp_to_level": [0, 70, 210, 420],
-  "lens": ["difference", "ratio"],
-  "keywords": ["증가/감소", "평행/수직", "해석"],
-  "micro_skills": ["그래프해석", "평행/수직 기울기"],
-  "misconceptions": ["절편/기울기 혼동"]
-},
-{
-  "id": "accum_s1",
-  "label": "누적합·S1(막대합=면적)",
-  "tier": 4,
-  "kind": "calculus",
-  "requires": { "all_of": ["add_2d_c"], "any_of": [], "min_level": 2 },
-  "boss": "tier3_exam",
-  "xp_per_try": 7,
-  "xp_per_correct": 14,
-  "xp_to_level": [0, 70, 210, 420],
-  "lens": ["accumulation"],
-  "keywords": ["면적", "폭", "단위", "Σ(합)"],
-  "micro_skills": ["막대합", "단위체크"],
-  "misconceptions": ["높이합=면적"]
-},
-{
-  "id": "stats_s1",
-  "label": "통계·S1(대표값/산포)",
-  "tier": 4,
-  "kind": "statistics",
-  "requires": { "all_of": [], "any_of": ["add_2d_c", "mul_table"], "min_level": 2 },
-  "boss": "tier3_exam",
-  "xp_per_try": 6,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["random", "accumulation"],
-  "keywords": ["평균", "중앙값", "표준편차"],
-  "micro_skills": ["대표값계산", "산포비교"],
-  "misconceptions": ["이상치 영향 미이해"]
-},
-{
-  "id": "prob_s1",
-  "label": "경우의 수·S1",
-  "tier": 4,
-  "kind": "statistics",
-  "requires": { "all_of": ["mul_table"], "any_of": [], "min_level": 2 },
-  "boss": "tier3_exam",
-  "xp_per_try": 6,
-  "xp_per_correct": 12,
-  "xp_to_level": [0, 60, 180, 360],
-  "lens": ["random"],
-  "keywords": ["합법칙", "곱법칙", "트리"],
-  "micro_skills": ["표본공간", "트리도식"],
-  "misconceptions": ["중복/순서 착각"]
-},
-
-{ "id": "tier4_exam", "label": "보스전: 티어4", "tier": 4, "kind": "boss", "requires": null, "xp_per_try": 0, "xp_per_correct": 0, "xp_to_level": [0], "lens": [], "keywords": [], "micro_skills": [], "misconceptions": [] },
-
-{
-  "id": "avg_rate_s1",
-  "label": "평균변화율·S1(기울기 해석)",
-  "tier": 5,
-  "kind": "calculus",
-  "requires": { "all_of": ["linear_s2"], "any_of": [], "min_level": 2 },
-  "boss": "tier4_exam",
-  "xp_per_try": 8,
-  "xp_per_correct": 16,
-  "xp_to_level": [0, 80, 240, 480],
-  "lens": ["difference"],
-  "keywords": ["Δy/Δx", "기울기", "증가율"],
-  "micro_skills": ["구간기울기", "단위율연결"],
-  "misconceptions": ["y값=속도 혼동"]
-},
-{
-  "id": "int_intro_s1",
-  "label": "근사적분·S1(사다리꼴)",
-  "tier": 5,
-  "kind": "calculus",
-  "requires": { "all_of": ["accum_s1", "avg_rate_s1"], "any_of": [], "min_level": 1 },
-  "boss": "tier4_exam",
-  "xp_per_try": 8,
-  "xp_per_correct": 16,
-  "xp_to_level": [0, 80, 240, 480],
-  "lens": ["accumulation"],
-  "keywords": ["사다리꼴근사", "넓이", "단위"],
-  "micro_skills": ["근사합", "폭×평균높이"],
-  "misconceptions": ["축 단위 무시"]
-},
-
-{ "id": "tier5_exam", "label": "보스전: 티어5", "tier": 5, "kind": "boss", "requires": null, "xp_per_try": 0, "xp_per_correct": 0, "xp_to_level": [0], "lens": [], "keywords": [], "micro_skills": [], "misconceptions": [] }
-],
- "edges": [
-{ "from": "num_pv_s1", "to": "num_pv_s2", "type": "requires", "lens": "transform" },
-{ "from": "num_pv_s2", "to": "num_pv_s3", "type": "requires", "lens": "transform" },
-{ "from": "num_pv_s2", "to": "add_1d", "type": "requires", "lens": "accumulation" },
-{ "from": "num_pv_s2", "to": "sub_1d", "type": "requires", "lens": "difference" },
-{ "from": "add_1d", "to": "add_2d_nc", "type": "requires", "lens": "accumulation" },
-{ "from": "add_2d_nc", "to": "add_2d_c", "type": "requires", "lens": "accumulation" },
-{ "from": "sub_1d", "to": "sub_2d_b", "type": "requires", "lens": "difference" },
-{ "from": "add_2d_nc", "to": "mul_table", "type": "requires", "lens": "scale" },
-{ "from": "mul_table", "to": "div_table", "type": "requires", "lens": "ratio" },
-{ "from": "num_pv_s3", "to": "decimal_s1", "type": "requires", "lens": "transform" },
-
-{ "from": "mul_table", "to": "ratio_s1", "type": "requires", "lens": "ratio" },
-{ "from": "add_2d_c", "to": "fraction_s1", "type": "requires", "lens": "ratio" },
-{ "from": "mul_table", "to": "fraction_s1", "type": "requires", "lens": "ratio" },
-{ "from": "coord_s1", "to": "coord_line_s2", "type": "requires", "lens": "transform" },
-{ "from": "ratio_s1", "to": "linear_s1", "type": "requires", "lens": "ratio" },
-{ "from": "coord_line_s2", "to": "linear_s1", "type": "requires", "lens": "difference" },
-{ "from": "pattern_seq_s1", "to": "ap_s1", "type": "requires", "lens": "difference" },
-
-{ "from": "ap_s1", "to": "ap_s2", "type": "requires", "lens": "difference" },
-{ "from": "linear_s1", "to": "linear_s2", "type": "requires", "lens": "difference" },
-{ "from": "add_2d_c", "to": "accum_s1", "type": "requires", "lens": "accumulation" },
-
-{ "from": "linear_s2", "to": "avg_rate_s1", "type": "requires", "lens": "difference" },
-{ "from": "accum_s1", "to": "int_intro_s1", "type": "requires", "lens": "accumulation" },
-{ "from": "avg_rate_s1", "to": "int_intro_s1", "type": "requires", "lens": "accumulation" },
-
-{ "from": "num_pv_s3", "to": "add_2d_c", "type": "enables", "lens": "accumulation" },
-{ "from": "add_2d_c", "to": "pattern_seq_s1", "type": "enables", "lens": "difference" },
-{ "from": "ap_s2", "to": "linear_s1", "type": "enables", "lens": "difference" },
-{ "from": "ratio_s1", "to": "linear_s2", "type": "enables", "lens": "ratio" },
-{ "from": "linear_s2", "to": "avg_rate_s1", "type": "enables", "lens": "difference" },
-{ "from": "accum_s1", "to": "avg_rate_s1", "type": "enables", "lens": "accumulation" },
-{ "from": "prob_s1", "to": "stats_s1", "type": "enables", "lens": "random" }
-]
+  "version": "2025-10-12",
+  "nodes": [
+    { "id": "C01-S1", "type": "course_step", "label": "코스01·S1", "lens": ["transform"], "tier": 1 },
+    { "id": "AS.MUL.FACTS", "type": "skill", "label": "곱셈 사실(0~9)", "domain": "연산·스케일", "levels": 3 }
+  ],
+  "edges": [
+    { "from": "AS.MUL.FACTS", "to": "C03-S3", "type": "requires", "min_level": 2 },
+    { "from": "C03-S3", "to": "AS.MUL.TWOxONE", "type": "teaches", "delta_level": 1 }
+  ]
 }
 ```
+
+필요 시 `palette`, `xp` 등 기존 필드를 확장해 포함할 수 있습니다.
+
+---
+
+## 3. 원자 스킬 목록(v1.0 초안)
+
+초기 운영을 위해 56개 스킬을 권장합니다. 대표 예시는 아래와 같으며, 전체 목록은 부록에 수록했습니다.
+
+* 수·자릿값·표현: `AS.PV.READ`, `AS.REP.TAB2EXP`, `AS.REP.NUMBERLINE`
+* 덧셈/뺄셈: `AS.ADD.COMP`, `AS.ADD.CARRY`, `AS.SUB.BORROW`
+* 곱셈/나눗셈: `AS.MUL.FACTS`, `AS.MUL.POW10`, `AS.MUL.TWOxONE`, `AS.DIV.REL`
+* 분수/소수/비율: `AS.FRAC.PARTWHOLE`, `AS.RATIO.TABLE`
+* 규칙성/일차: `AS.SEQ.DIFFCONST`, `AS.LIN.FORM`
+* 좌표/도형: `AS.COORD.READ`, `AS.GEO.TRANS`
+* 누적/변화: `AS.ACC.SUMRECT`, `AS.RATE.UNIT`
+* 통계/확률: `AS.STATS.CENTER`, `AS.PROB.BI`
+
+각 스킬은 레벨 `0~3`을 사용합니다.
+
+---
+
+## 4. 잠금 및 숙련도 로직
+
+1. **잠금 해제**: 모든 `requires` 조건의 `min_level` 이상일 때 스텝이 열립니다.
+2. **스킬 레벨 갱신**: 문항에 태깅된 스킬에 대해 EWMA 방식으로 정확도/속도/설명 점수를 반영합니다.
+3. **스텝 완료 보상**: `teaches` 엣지를 따라 해당 스킬 레벨을 `delta_level`만큼 상승(최대 레벨 3).
+
+---
+
+## 5. CSV 포맷 예시
+
+운영 도구와의 연동을 위해 CSV 형태를 병행할 수 있습니다.
+
+```csv
+id,type,label,domain-levels
+AS.MUL.FACTS,skill,곱셈 사실(0~9),연산·스케일-3
+AS.MUL.POW10,skill,×10/×100 스케일,연산·스케일-3
+AS.ADD.COMP,skill,친한 수 보정(+/−k),연산·누적-3
+```
+
+```csv
+cs_id,requires_skills,teaches_skills
+C01-S1,"AS.MUL.POW10:1;AS.ADD.COMP:1","AS.MUL.POW10:+1;AS.ADD.COMP:+1"
+C03-S3,"AS.MUL.TWOxONE:2;AS.MUL.FACTS:2;AS.DIFF.READ:2;AS.REP.TAB2EXP:1","AS.MUL.TWOxONE:+1;AS.REP.TAB2EXP:+1"
+```
+
+---
+
+## 6. 운영 체크리스트
+
+1. 원자 스킬 사전 확정 → 중복/동의어 정리.
+2. 코스/스텝 정의 시 `requires`/`teaches` 각각 3~6, 2~4개로 유지.
+3. 문항 템플릿에 `skills` 태그(1~2개 권장) 추가.
+4. 순환/누락 검사를 자동화하는 검증 스크립트 준비.
+5. UI에는 스킬 레이어 토글, 부족 스킬 표시, 추천 스텝 노출.
+6. 추천: 부족 레벨 평균(`gap_score`)과 보상(`teaches`)의 균형으로 정렬.
+
+---
+
+## 7. 예시: 곱셈 스킬 공유
+
+* `C01-S1`은 `AS.MUL.POW10(레벨 ≥1)`을 요구하고 완료 시 같은 스킬을 올려 줍니다.
+* `C03-S3`은 `AS.MUL.TWOxONE`, `AS.MUL.FACTS` 등 곱셈 스킬을 레벨 ≥2로 요구합니다.
+* 사용자가 `C01-S1`을 완료하면 곱셈 관련 스킬 레벨이 상승하여 `C03-S3` 잠금 해제에 기여합니다.
+
+이 구조를 통해 동일 스킬이 여러 코스·스텝에서 동시에 활용되고, 학습 결과가 곧바로 다른 경로의 잠금 해제로 반영됩니다.
+
+---
+
+## 부록: 원자 스킬 전체 목록(카테고리별)
+
+### A. 수·자릿값·표현
+`AS.PV.READ`, `AS.PV.DECOMP`, `AS.PV.EXCHANGE`, `AS.REP.TAB2EXP`, `AS.REP.EXP2TAB`, `AS.REP.NUMBERLINE`, `AS.REP.GRAPHREAD`
+
+### B. 덧셈/뺄셈(누적/차분)
+`AS.ADD.COMP`, `AS.ADD.CARRY`, `AS.SUB.BORROW`, `AS.DIFF.READ`, `AS.CHK.INV_SUM`
+
+### C. 곱셈/나눗셈(스케일)
+`AS.MUL.FACTS`, `AS.MUL.POW10`, `AS.MUL.TWOxONE`, `AS.MUL.AREA`, `AS.DIV.SHARE`, `AS.DIV.MEASURE`, `AS.DIV.REL`
+
+### D. 분수/소수/비율
+`AS.FRAC.PARTWHOLE`, `AS.FRAC.EQ`, `AS.FRAC.ADD`, `AS.FRAC.MUL`, `AS.DEC.READ`, `AS.RATIO.UNIT`, `AS.RATIO.TABLE`, `AS.RATIO.SLOPE`
+
+### E. 규칙성/수열/일차
+`AS.SEQ.DIFFCONST`, `AS.SEQ.GENERAL`, `AS.LIN.SLOPE`, `AS.LIN.INTERCEPT`, `AS.LIN.FORM`
+
+### F. 좌표/도형(변환)
+`AS.COORD.READ`, `AS.COORD.DISTMID`, `AS.GEO.TRANS`, `AS.GEO.SIM`, `AS.TRIG.RATIO`
+
+### G. 누적/변화(해석 직관)
+`AS.ACC.SUMRECT`, `AS.ACC.TRAP`, `AS.RATE.AVG`, `AS.RATE.UNIT`
+
+### H. 통계/확률
+`AS.STATS.CENTER`, `AS.STATS.SPREAD`, `AS.COUNT.RULES`, `AS.PROB.BI`, `AS.NORM.EMP`

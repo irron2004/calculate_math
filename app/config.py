@@ -13,6 +13,8 @@ DEFAULT_DATA_PATH = (SERVICE_ROOT / "data" / "problems.json").resolve()
 DEFAULT_DB_PATH = (SERVICE_ROOT / "data" / "attempts.db").resolve()
 DEFAULT_CONCEPT_PATH = (SERVICE_ROOT / "data" / "concepts.json").resolve()
 DEFAULT_TEMPLATE_PATH = (SERVICE_ROOT / "data" / "templates.json").resolve()
+DEFAULT_DAG_PATH = (SERVICE_ROOT / "data" / "dag.json").resolve()
+DEFAULT_PROGRESS_PATH = (SERVICE_ROOT / "data" / "dag_progress.json").resolve()
 
 
 def _load_env_file() -> None:
@@ -54,6 +56,15 @@ def _parse_int(value: str | None, default: int) -> int:
         return default
 
 
+def _clamp_percentage(value: str | None, default: int) -> int:
+    candidate = _parse_int(value, default)
+    if candidate < 0:
+        return 0
+    if candidate > 100:
+        return 100
+    return candidate
+
+
 def _parse_categories(value: str | None) -> List[str] | None:
     if value is None or not value.strip():
         return None
@@ -80,10 +91,17 @@ class Settings:
     allowed_problem_categories: List[str] | None
     invite_token_ttl_minutes: int
     invite_token_bytes: int
+    session_token_secret: str
+    session_token_ttl_minutes: int
+    session_cookie_name: str
+    session_cookie_secure: bool
     problem_data_path: Path
     attempts_database_path: Path
     concept_data_path: Path
     template_data_path: Path
+    dag_data_path: Path
+    progress_data_path: Path
+    skill_tree_list_rollout_percentage: int
 
 
 def _build_settings() -> Settings:
@@ -115,6 +133,23 @@ def _build_settings() -> Settings:
         ),
         template_data_path=_resolve_path(
             os.getenv("TEMPLATE_DATA_PATH"), default=DEFAULT_TEMPLATE_PATH
+        ),
+        dag_data_path=_resolve_path(
+            os.getenv("DAG_DATA_PATH"), default=DEFAULT_DAG_PATH
+        ),
+        progress_data_path=_resolve_path(
+            os.getenv("DAG_PROGRESS_PATH"), default=DEFAULT_PROGRESS_PATH
+        ),
+        session_token_secret=os.getenv("SESSION_TOKEN_SECRET", "calculate-dev-secret"),
+        session_token_ttl_minutes=_parse_int(
+            os.getenv("SESSION_TOKEN_TTL_MINUTES"), 1440
+        ),
+        session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "session_token"),
+        session_cookie_secure=_parse_bool(
+            os.getenv("SESSION_COOKIE_SECURE"), False
+        ),
+        skill_tree_list_rollout_percentage=_clamp_percentage(
+            os.getenv("SKILL_TREE_LIST_ROLLOUT"), default=50
         ),
     )
 

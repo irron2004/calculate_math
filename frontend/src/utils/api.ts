@@ -7,6 +7,7 @@ import type {
   LRCEvaluation,
   ProblemAttemptResponse,
   SkillTreeResponse,
+  UserProgressMetrics,
   TemplateSummary
 } from '../types';
 
@@ -19,6 +20,7 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
       'Content-Type': 'application/json',
       ...options?.headers,
     },
+    credentials: 'include',
     ...options,
   });
 
@@ -30,9 +32,14 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
 }
 
 // 세션 생성 (20문제 세트)
-export async function createSession(): Promise<APISession> {
+export async function createSession(token?: string): Promise<APISession> {
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
   return apiCall<APISession>('/v1/sessions', {
     method: 'POST',
+    headers,
   });
 }
 
@@ -53,6 +60,17 @@ export async function submitAnswer(
 export async function getDailyStats(days: number = 30) {
   return apiCall(`/v1/stats/daily?days=${days}`, {
     method: 'GET',
+  });
+}
+
+export async function fetchUserMetrics(token?: string): Promise<UserProgressMetrics> {
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return apiCall<UserProgressMetrics>('/v1/metrics/me', {
+    method: 'GET',
+    headers,
   });
 }
 

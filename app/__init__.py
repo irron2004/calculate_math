@@ -8,11 +8,32 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .config import get_settings
+from .dag_loader import reset_graph_cache
 from .instrumentation import RequestContextMiddleware, configure_telemetry
 from .problem_bank import refresh_cache, reset_cache
 from .template_engine import refresh_engine, reset_engine
-from .repositories import AttemptRepository, LRCRepository, UserRepository
-from .routers import bridge, curriculum, health, invites, pages, practice, problems, skills
+from .repositories import (
+    AttemptRepository,
+    LRCRepository,
+    SessionRepository,
+    UserRepository,
+)
+from .routers import (
+    bridge,
+    curriculum,
+    dag,
+    health,
+    invites,
+    metrics,
+    pages,
+    practice,
+    problems,
+    skills,
+)
+from .progress_store import (
+    refresh_progress_store,
+    reset_progress_store,
+)
 
 
 startup_logger = logging.getLogger("calculate_service.startup")
@@ -62,10 +83,22 @@ def create_app() -> FastAPI:
         app.state.user_repository = user_repository
 
         startup_logger.debug(
+            "initialising SessionRepository at %s", settings.attempts_database_path
+        )
+        session_repository = SessionRepository(settings.attempts_database_path)
+        app.state.session_repository = session_repository
+
+        startup_logger.debug(
             "initialising LRCRepository at %s", settings.attempts_database_path
         )
         lrc_repository = LRCRepository(settings.attempts_database_path)
         app.state.lrc_repository = lrc_repository
+
+        startup_logger.debug(
+            "initialising DAG progress store at %s", settings.progress_data_path
+        )
+        dag_progress_store = refresh_progress_store(force=True)
+        app.state.dag_progress_store = dag_progress_store
 
         try:
             startup_logger.debug("lifespan setup complete for app id=%s", id(app))
@@ -76,8 +109,12 @@ def create_app() -> FastAPI:
                 delattr(app.state, "attempt_repository")
             if hasattr(app.state, "user_repository"):
                 delattr(app.state, "user_repository")
+            if hasattr(app.state, "session_repository"):
+                delattr(app.state, "session_repository")
             if hasattr(app.state, "lrc_repository"):
                 delattr(app.state, "lrc_repository")
+            if hasattr(app.state, "dag_progress_store"):
+                delattr(app.state, "dag_progress_store")
             if hasattr(app.state, "problem_cache_strategy"):
                 delattr(app.state, "problem_cache_strategy")
             if hasattr(app.state, "problem_repository"):
@@ -90,6 +127,8 @@ def create_app() -> FastAPI:
                 delattr(app.state, "start_time")
             reset_cache()
             reset_engine()
+            reset_progress_store()
+            reset_graph_cache()
             startup_logger.debug("lifespan teardown complete for app id=%s", id(app))
 
     app = FastAPI(
@@ -136,7 +175,9 @@ def create_app() -> FastAPI:
     app.include_router(invite_router)
     app.include_router(problems.router)
     app.include_router(practice.router)
+    app.include_router(metrics.router)
     app.include_router(curriculum.router)
+    app.include_router(dag.router)
     app.include_router(skills.router)
 
     return app
