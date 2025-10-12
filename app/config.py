@@ -13,6 +13,8 @@ DEFAULT_DATA_PATH = (SERVICE_ROOT / "data" / "problems.json").resolve()
 DEFAULT_DB_PATH = (SERVICE_ROOT / "data" / "attempts.db").resolve()
 DEFAULT_CONCEPT_PATH = (SERVICE_ROOT / "data" / "concepts.json").resolve()
 DEFAULT_TEMPLATE_PATH = (SERVICE_ROOT / "data" / "templates.json").resolve()
+DEFAULT_DAG_PATH = (SERVICE_ROOT / "data" / "dag.json").resolve()
+DEFAULT_PROGRESS_PATH = (SERVICE_ROOT / "data" / "dag_progress.json").resolve()
 
 
 def _load_env_file() -> None:
@@ -88,6 +90,8 @@ class Settings:
     attempts_database_path: Path
     concept_data_path: Path
     template_data_path: Path
+    dag_data_path: Path
+    progress_data_path: Path
 
 
 def _build_settings() -> Settings:
@@ -119,6 +123,12 @@ def _build_settings() -> Settings:
         ),
         template_data_path=_resolve_path(
             os.getenv("TEMPLATE_DATA_PATH"), default=DEFAULT_TEMPLATE_PATH
+        ),
+        dag_data_path=_resolve_path(
+            os.getenv("DAG_DATA_PATH"), default=DEFAULT_DAG_PATH
+        ),
+        progress_data_path=_resolve_path(
+            os.getenv("DAG_PROGRESS_PATH"), default=DEFAULT_PROGRESS_PATH
         ),
         session_token_secret=os.getenv("SESSION_TOKEN_SECRET", "calculate-dev-secret"),
         session_token_ttl_minutes=_parse_int(
