@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   trackBossPassed,
+  trackExperimentExposure,
   trackSessionStartedFromTree,
   trackSkillUnlocked,
   trackSkillViewed,
@@ -137,6 +138,28 @@ describe('analytics utility wrappers', () => {
       available: true,
       completed: false,
       lens: 'ratio',
+    });
+  });
+
+  it('emits experiment_exposure event with metadata', () => {
+    trackExperimentExposure({
+      experiment: 'skill_tree_layout',
+      variant: 'list',
+      source: 'assignment',
+      bucket: 42,
+      requestId: 'req-1',
+      rollout: 50,
+      surface: 'skill_tree_page',
+    });
+
+    expect(trackEventMock).toHaveBeenLastCalledWith('experiment_exposure', {
+      experiment: 'skill_tree_layout',
+      variant: 'list',
+      source: 'assignment',
+      bucket: 42,
+      request_id: 'req-1',
+      rollout: 50,
+      surface: 'skill_tree_page',
     });
   });
 });
