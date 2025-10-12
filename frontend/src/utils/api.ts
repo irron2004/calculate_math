@@ -19,6 +19,7 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
       'Content-Type': 'application/json',
       ...options?.headers,
     },
+    credentials: 'include',
     ...options,
   });
 
@@ -30,9 +31,14 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
 }
 
 // 세션 생성 (20문제 세트)
-export async function createSession(): Promise<APISession> {
+export async function createSession(token?: string): Promise<APISession> {
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
   return apiCall<APISession>('/v1/sessions', {
     method: 'POST',
+    headers,
   });
 }
 

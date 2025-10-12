@@ -11,7 +11,12 @@ from .config import get_settings
 from .instrumentation import RequestContextMiddleware, configure_telemetry
 from .problem_bank import refresh_cache, reset_cache
 from .template_engine import refresh_engine, reset_engine
-from .repositories import AttemptRepository, LRCRepository, UserRepository
+from .repositories import (
+    AttemptRepository,
+    LRCRepository,
+    SessionRepository,
+    UserRepository,
+)
 from .routers import bridge, curriculum, health, invites, pages, practice, problems, skills
 
 
@@ -62,6 +67,12 @@ def create_app() -> FastAPI:
         app.state.user_repository = user_repository
 
         startup_logger.debug(
+            "initialising SessionRepository at %s", settings.attempts_database_path
+        )
+        session_repository = SessionRepository(settings.attempts_database_path)
+        app.state.session_repository = session_repository
+
+        startup_logger.debug(
             "initialising LRCRepository at %s", settings.attempts_database_path
         )
         lrc_repository = LRCRepository(settings.attempts_database_path)
@@ -76,6 +87,8 @@ def create_app() -> FastAPI:
                 delattr(app.state, "attempt_repository")
             if hasattr(app.state, "user_repository"):
                 delattr(app.state, "user_repository")
+            if hasattr(app.state, "session_repository"):
+                delattr(app.state, "session_repository")
             if hasattr(app.state, "lrc_repository"):
                 delattr(app.state, "lrc_repository")
             if hasattr(app.state, "problem_cache_strategy"):

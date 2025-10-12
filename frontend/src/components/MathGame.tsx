@@ -111,7 +111,7 @@ interface ProblemFeedback {
 }
 
 const MathGame: React.FC = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestedConceptParam = searchParams.get('concept');
@@ -431,7 +431,7 @@ const MathGame: React.FC = () => {
     }
 
     try {
-      const session = await createSession();
+      const session = await createSession(token ?? undefined);
       const fallbackProblems = convertSessionToCurriculum(session, concept, step);
       setProblems(fallbackProblems);
       setTotalQuestions(fallbackProblems.length);
