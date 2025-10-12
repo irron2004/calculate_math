@@ -15,6 +15,7 @@ class AttemptRecord:
     submitted_answer: int
     is_correct: bool
     attempted_at: datetime
+    user_id: str | None = None
 
 
 class AttemptRepository:
@@ -35,11 +36,19 @@ class AttemptRepository:
                     problem_id TEXT NOT NULL,
                     submitted_answer INTEGER NOT NULL,
                     is_correct INTEGER NOT NULL,
-                    attempted_at TEXT NOT NULL
+                    attempted_at TEXT NOT NULL,
+                    user_id TEXT
                 )
                 """
             )
+            self._ensure_user_id_column(connection)
             connection.commit()
+
+    def _ensure_user_id_column(self, connection: sqlite3.Connection) -> None:
+        columns = connection.execute("PRAGMA table_info(attempts)").fetchall()
+        has_user_id = any(column[1] == "user_id" for column in columns)
+        if not has_user_id:
+            connection.execute("ALTER TABLE attempts ADD COLUMN user_id TEXT")
 
     def _connect(self) -> sqlite3.Connection:
         return sqlite3.connect(
@@ -49,20 +58,29 @@ class AttemptRepository:
         )
 
     def record_attempt(
-        self, *, problem_id: str, submitted_answer: int, is_correct: bool
+        self,
+        *,
+        problem_id: str,
+        submitted_answer: int,
+        is_correct: bool,
+        user_id: str | int | None = None,
     ) -> AttemptRecord:
         attempted_at = datetime.now(timezone.utc)
+        stored_user_id = str(user_id) if user_id is not None else None
         with self._lock, self._connect() as connection:
             cursor = connection.execute(
                 """
-                INSERT INTO attempts (problem_id, submitted_answer, is_correct, attempted_at)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO attempts (
+                    problem_id, submitted_answer, is_correct, attempted_at, user_id
+                )
+                VALUES (?, ?, ?, ?, ?)
                 """,
                 (
                     problem_id,
                     int(submitted_answer),
                     1 if is_correct else 0,
                     attempted_at.isoformat(),
+                    stored_user_id,
                 ),
             )
             connection.commit()
@@ -73,20 +91,36 @@ class AttemptRepository:
             submitted_answer=int(submitted_answer),
             is_correct=is_correct,
             attempted_at=attempted_at,
+            user_id=stored_user_id,
         )
 
-    def list_attempts(self, problem_id: str | None = None) -> List[AttemptRecord]:
-        query = "SELECT id, problem_id, submitted_answer, is_correct, attempted_at FROM attempts"
-        params: tuple[object, ...] = ()
+    def list_attempts(
+        self,
+        problem_id: str | None = None,
+        user_id: str | int | None = None,
+    ) -> List[AttemptRecord]:
+        query = (
+            "SELECT id, problem_id, submitted_answer, is_correct, attempted_at, user_id FROM attempts"
+        )
+        clauses: list[str] = []
+        params: list[object] = []
         if problem_id is not None:
-            query += " WHERE problem_id = ?"
-            params = (problem_id,)
+            clauses.append("problem_id = ?")
+            params.append(problem_id)
+        if user_id is not None:
+            clauses.append("user_id = ?")
+            params.append(str(user_id))
+        if clauses:
+            query += " WHERE " + " AND ".join(clauses)
         query += " ORDER BY id ASC"
 
         with self._lock, self._connect() as connection:
-            rows = connection.execute(query, params).fetchall()
+            rows = connection.execute(query, tuple(params)).fetchall()
 
         return [self._row_to_record(row) for row in rows]
+
+    def list_attempts_for_user(self, user_id: str | int) -> List[AttemptRecord]:
+        return self.list_attempts(user_id=user_id)
 
     def clear(self) -> None:
         with self._lock, self._connect() as connection:
@@ -94,7 +128,12 @@ class AttemptRepository:
             connection.commit()
 
     def _row_to_record(self, row: Iterable[object]) -> AttemptRecord:
-        id_, problem_id, submitted_answer, is_correct, attempted_at = row
+        id_, problem_id, submitted_answer, is_correct, attempted_at, *rest = row
+        user_id = None
+        if rest:
+            user_id = rest[0]
+            if user_id is not None:
+                user_id = str(user_id)
         attempted_at_dt = datetime.fromisoformat(str(attempted_at))
         if attempted_at_dt.tzinfo is None:
             attempted_at_dt = attempted_at_dt.replace(tzinfo=timezone.utc)
@@ -104,6 +143,7 @@ class AttemptRepository:
             submitted_answer=int(submitted_answer),
             is_correct=bool(is_correct),
             attempted_at=attempted_at_dt,
+            user_id=user_id,
         )
 
 
