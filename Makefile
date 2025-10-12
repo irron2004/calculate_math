@@ -1,4 +1,4 @@
-.PHONY: install dev run test lint
+.PHONY: install dev run test lint validate-dag
 
 install:
 	pip install -r requirements.txt
@@ -12,5 +12,8 @@ run:
 test:
 	pytest -q
 
-lint:
+lint: validate-dag
 	python -m compileall app
+
+validate-dag:
+	python scripts/validate_skill_graph.py
