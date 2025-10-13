@@ -24,6 +24,34 @@ export const skillToConceptStep: Record<string, ConceptStep> = {
   accum_s1: { concept: 'GEO-LIN', step: 'S2' },
 };
 
+const COURSE_TO_CONCEPT: Record<string, ConceptStep['concept']> = {
+  C01: 'ALG-AP',
+  C02: 'ALG-AP',
+  C03: 'ALG-AP',
+  C04: 'ALG-AP',
+  C05: 'RAT-PRO',
+  C06: 'RAT-PRO',
+  C07: 'ALG-AP',
+  C08: 'GEO-COORD',
+  C09: 'GEO-COORD',
+  C10: 'GEO-LIN',
+  C11: 'FALLBACK',
+  C12: 'GEO-LIN',
+};
+
 export function resolveConceptStep(skillId: string): ConceptStep | null {
-  return skillToConceptStep[skillId] ?? null;
+  if (skillToConceptStep[skillId]) {
+    return skillToConceptStep[skillId];
+  }
+  const match = skillId.match(/^(C\\d{2})-S([123])$/);
+  if (!match) {
+    return null;
+  }
+  const [, courseId, stepDigit] = match;
+  const concept = COURSE_TO_CONCEPT[courseId];
+  if (!concept) {
+    return null;
+  }
+  const step = `S${stepDigit}` as ConceptStep['step'];
+  return { concept, step };
 }

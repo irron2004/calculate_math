@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type {
   APISession,
+  CourseSessionConfig,
   CurriculumConcept,
   CurriculumGraphNode,
   GeneratedItem,
@@ -84,6 +85,104 @@ const QUESTION_TIME_LIMIT = 30;
 const STEP_SEQUENCE: ReadonlyArray<StepID> = ['S1', 'S2', 'S3'];
 const PROBLEMS_PER_STEP = 6;
 
+const parseSessionConfigParam = (raw: string | null): CourseSessionConfig | null => {
+  if (!raw) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') {
+      return null;
+    }
+    const concept =
+      typeof parsed.concept === 'string' && parsed.concept.trim().length > 0
+        ? parsed.concept
+        : null;
+    const step =
+      parsed.step === 'S1' || parsed.step === 'S2' || parsed.step === 'S3'
+        ? parsed.step
+        : null;
+    const problemCount =
+      typeof parsed.problem_count === 'number' && Number.isFinite(parsed.problem_count)
+        ? parsed.problem_count
+        : null;
+    const generator =
+      typeof parsed.generator === 'string' && parsed.generator.trim().length > 0
+        ? parsed.generator
+        : null;
+    const parameters =
+      parsed.parameters && typeof parsed.parameters === 'object' ? parsed.parameters : {};
+    return {
+      concept,
+      step,
+      problem_count: problemCount,
+      generator,
+      parameters: parameters as Record<string, unknown>,
+    };
+  } catch {
+    return null;
+  }
+};
+
+const randomInt = (min: number, max: number): number => {
+  const lower = Math.ceil(min);
+  const upper = Math.floor(max);
+  return Math.floor(Math.random() * (upper - lower + 1)) + lower;
+};
+
+const randomNumberWithDigits = (digits: number): number => {
+  const safeDigits = Math.max(1, Math.min(6, Math.floor(digits)));
+  const min = safeDigits === 1 ? 1 : 10 ** (safeDigits - 1);
+  const max = 10 ** safeDigits - 1;
+  return randomInt(min, max);
+};
+
+const hasAdditionCarry = (a: number, b: number): boolean => {
+  let left = a;
+  let right = b;
+  while (left > 0 || right > 0) {
+    const sum = (left % 10) + (right % 10);
+    if (sum >= 10) {
+      return true;
+    }
+    left = Math.floor(left / 10);
+    right = Math.floor(right / 10);
+  }
+  return false;
+};
+
+const hasSubtractionBorrow = (a: number, b: number): boolean => {
+  let left = a;
+  let right = b;
+  while (left > 0 || right > 0) {
+    const leftDigit = left % 10;
+    const rightDigit = right % 10;
+    if (leftDigit < rightDigit) {
+      return true;
+    }
+    left = Math.floor(left / 10);
+    right = Math.floor(right / 10);
+  }
+  return false;
+};
+
+const buildNumericOptions = (answer: number): number[] => {
+  const options = new Set<number>([answer]);
+  const magnitude = Math.max(5, Math.abs(answer) / 10);
+  while (options.size < 4) {
+    const offset = randomInt(-Math.ceil(magnitude), Math.ceil(magnitude));
+    if (offset === 0) {
+      continue;
+    }
+    const candidate = answer + offset;
+    if (candidate < 0) {
+      continue;
+    }
+    options.add(candidate);
+  }
+  return Array.from(options).sort(() => Math.random() - 0.5);
+};
+
 const parseStepParam = (value: string | null): StepID | null => {
   if (value === 'S1' || value === 'S2' || value === 'S3') {
     return value;
@@ -110,6 +209,7 @@ type LoadProblemsOptions = {
   source?: SkillViewSource;
   sequenceEntry?: SequenceEntry | null;
   triggeredByTree?: TreeTrigger | null;
+  sessionConfig?: CourseSessionConfig | null;
 };
 
 interface ProblemFeedback {
@@ -130,6 +230,11 @@ const MathGame: React.FC = () => {
   const [searchParams] = useSearchParams();
   const requestedConceptParam = searchParams.get('concept');
   const requestedStepParam = parseStepParam(searchParams.get('step'));
+  const requestedSessionParam = searchParams.get('session');
+  const requestedSessionConfig = useMemo(
+    () => parseSessionConfigParam(requestedSessionParam),
+    [requestedSessionParam]
+  );
 
   const [gameState, setGameState] = useState<'loading' | 'playing' | 'finished' | 'submitted'>('loading');
   const [problems, setProblems] = useState<CurriculumProblem[]>([]);
@@ -400,6 +505,242 @@ const MathGame: React.FC = () => {
     });
   };
 
+  const generateArithmeticProblemSet = (
+    concept: CurriculumConcept,
+    step: StepID,
+    session: CourseSessionConfig,
+    targetCount: number
+  ): CurriculumProblem[] => {
+    const params = session.parameters ?? {};
+    const count = Math.max(1, Math.min(60, Math.floor(targetCount)));
+    const rawOps = Array.isArray((params as Record<string, unknown>).ops)
+      ? ((params as Record<string, unknown>).ops as string[])
+      : null;
+    const ops =
+      rawOps?.filter((value) => value === 'add' || value === 'sub' || value === 'mul' || value === 'div') ?? [];
+    const singleOp =
+      typeof (params as Record<string, unknown>).op === 'string'
+        ? String((params as Record<string, unknown>).op)
+        : null;
+    const allowCarry = Boolean((params as Record<string, unknown>).allow_carry ?? true);
+    const allowRemainder = Boolean((params as Record<string, unknown>).allow_remainder ?? false);
+    const digitsParam = Array.isArray((params as Record<string, unknown>).digits)
+      ? (params as Record<string, unknown>).digits
+      : null;
+    const leftDigits =
+      typeof (params as Record<string, unknown>).left_digits === 'number'
+        ? Number((params as Record<string, unknown>).left_digits)
+        : null;
+    const rightDigits =
+      typeof (params as Record<string, unknown>).right_digits === 'number'
+        ? Number((params as Record<string, unknown>).right_digits)
+        : null;
+    const dividendDigits =
+      typeof (params as Record<string, unknown>).dividend_digits === 'number'
+        ? Number((params as Record<string, unknown>).dividend_digits)
+        : null;
+    const divisorDigits =
+      typeof (params as Record<string, unknown>).divisor_digits === 'number'
+        ? Number((params as Record<string, unknown>).divisor_digits)
+        : null;
+    const includePow10 = Boolean((params as Record<string, unknown>).include_pow10 ?? false);
+
+    const minValue =
+      typeof (params as Record<string, unknown>).min === 'number'
+        ? Number((params as Record<string, unknown>).min)
+        : 10;
+    const maxValue =
+      typeof (params as Record<string, unknown>).max === 'number'
+        ? Number((params as Record<string, unknown>).max)
+        : 999;
+
+    const problems: CurriculumProblem[] = [];
+
+    const selectOp = (): 'add' | 'sub' | 'mul' | 'div' => {
+      if (ops.length) {
+        const candidate = ops[randomInt(0, ops.length - 1)] as 'add' | 'sub' | 'mul' | 'div';
+        return candidate;
+      }
+      if (singleOp && (singleOp === 'add' || singleOp === 'sub' || singleOp === 'mul' || singleOp === 'div')) {
+        return singleOp as 'add' | 'sub' | 'mul' | 'div';
+      }
+      return 'add';
+    };
+
+    for (let index = 0; index < count; index += 1) {
+      const op = selectOp();
+      let left: number;
+      let right: number;
+      let answer: number;
+
+      if (op === 'mul') {
+        const leftNumber =
+          leftDigits && leftDigits > 0
+            ? randomNumberWithDigits(leftDigits)
+            : digitsParam && digitsParam.length > 0
+            ? randomNumberWithDigits(digitsParam[0])
+            : randomInt(Math.max(2, minValue), Math.max(9, Math.min(maxValue, 99)));
+        let rightNumber =
+          rightDigits && rightDigits > 0
+            ? randomNumberWithDigits(rightDigits)
+            : digitsParam && digitsParam.length > 1
+            ? randomNumberWithDigits(digitsParam[1])
+            : randomInt(2, 9);
+        if (includePow10 && Math.random() < 0.3) {
+          rightNumber = Math.random() < 0.5 ? 10 : 100;
+        }
+        left = leftNumber;
+        right = rightNumber;
+        answer = leftNumber * rightNumber;
+      } else if (op === 'div') {
+        const divisorNumber =
+          divisorDigits && divisorDigits > 0 ? randomNumberWithDigits(divisorDigits) : randomInt(2, 9);
+        let dividendNumber: number;
+        if (!allowRemainder) {
+          const quotientDigits = dividendDigits ? Math.max(1, dividendDigits - (divisorDigits ?? 1) + 1) : 2;
+          let attempts = 0;
+          while (true) {
+            const quotient = randomNumberWithDigits(quotientDigits);
+            dividendNumber = quotient * divisorNumber;
+            if (!dividendDigits || String(dividendNumber).length === Math.max(1, dividendDigits)) {
+              break;
+            }
+            attempts += 1;
+            if (attempts > 25) {
+              break;
+            }
+          }
+        } else {
+          const digits = dividendDigits ?? Math.max(2, divisorDigits ? divisorDigits + 1 : 3);
+          dividendNumber = randomNumberWithDigits(digits);
+          if (dividendNumber < divisorNumber) {
+            dividendNumber += divisorNumber;
+          }
+        }
+        left = dividendNumber;
+        right = divisorNumber;
+        const quotient = dividendNumber / divisorNumber;
+        answer = allowRemainder ? Math.floor(quotient) : quotient;
+      } else {
+        const [defaultLeftDigits, defaultRightDigits] =
+          digitsParam && digitsParam.length >= 2 ? digitsParam : [2, 2];
+        const leftRangeMin =
+          defaultLeftDigits > 0 ? Math.max(minValue, 10 ** (defaultLeftDigits - 1)) : Math.max(1, minValue);
+        const leftRangeMax =
+          defaultLeftDigits > 0
+            ? Math.min(maxValue, 10 ** defaultLeftDigits - 1)
+            : Math.max(maxValue, leftRangeMin);
+        const rightRangeMin =
+          defaultRightDigits > 0 ? Math.max(minValue, 10 ** (defaultRightDigits - 1)) : Math.max(1, minValue);
+        const rightRangeMax =
+          defaultRightDigits > 0
+            ? Math.min(maxValue, 10 ** defaultRightDigits - 1)
+            : Math.max(maxValue, rightRangeMin);
+
+        let attempts = 0;
+        let generatedLeft = randomInt(leftRangeMin, leftRangeMax);
+        let generatedRight = randomInt(rightRangeMin, rightRangeMax);
+
+        if (op === 'add' && !allowCarry) {
+          while (attempts < 50 && hasAdditionCarry(generatedLeft, generatedRight)) {
+            generatedLeft = randomInt(leftRangeMin, leftRangeMax);
+            generatedRight = randomInt(rightRangeMin, rightRangeMax);
+            attempts += 1;
+          }
+        }
+        if (op === 'sub') {
+          if (generatedLeft < generatedRight) {
+            [generatedLeft, generatedRight] = [generatedRight, generatedLeft];
+          }
+          if (!allowCarry) {
+            while (attempts < 50 && hasSubtractionBorrow(generatedLeft, generatedRight)) {
+              generatedLeft = randomInt(leftRangeMin, leftRangeMax);
+              generatedRight = randomInt(rightRangeMin, rightRangeMax);
+              if (generatedLeft < generatedRight) {
+                [generatedLeft, generatedRight] = [generatedRight, generatedLeft];
+              }
+              attempts += 1;
+            }
+          }
+        }
+        left = generatedLeft;
+        right = generatedRight;
+        if (op === 'add') {
+          answer = left + right;
+        } else if (op === 'sub') {
+          answer = left - right;
+        } else {
+          answer = left + right;
+        }
+      }
+
+      let prompt: string;
+      switch (op) {
+        case 'add':
+          prompt = `${left} + ${right} = ?`;
+          break;
+        case 'sub':
+          prompt = `${left} - ${right} = ?`;
+          break;
+        case 'mul':
+          prompt = `${left} × ${right} = ?`;
+          break;
+        case 'div':
+          prompt = `${left} ÷ ${right} = ?`;
+          break;
+        default:
+          prompt = `${left} + ${right} = ?`;
+          break;
+      }
+      const instanceId = `session-${op}-${index}`;
+      const numericAnswer = typeof answer === 'number' ? answer : Number(answer);
+      const options = buildNumericOptions(numericAnswer);
+      problems.push({
+        concept,
+        instance: {
+          id: instanceId,
+          template_id: `session-${op}`,
+          concept: concept.id,
+          step,
+          prompt,
+          explanation: '계산 규칙을 적용해 답을 구합니다.',
+          answer: numericAnswer,
+          options,
+          context: 'life',
+          lens: concept.lens,
+          representation: 'C',
+          rubric_keywords: concept.focus_keywords.length ? concept.focus_keywords : ['연산'],
+          variables: { left, right, op },
+        },
+      });
+    }
+
+    return problems;
+  };
+
+  const generateProblemsFromSessionConfig = (
+    concept: CurriculumConcept,
+    step: StepID,
+    sessionConfig: CourseSessionConfig | null
+  ): CurriculumProblem[] | null => {
+    if (!sessionConfig) {
+      return null;
+    }
+    const explicitCount =
+      typeof sessionConfig.problem_count === 'number' && Number.isFinite(sessionConfig.problem_count)
+        ? sessionConfig.problem_count
+        : null;
+    const parameterCount =
+      sessionConfig.parameters && typeof sessionConfig.parameters.count === 'number'
+        ? Number(sessionConfig.parameters.count)
+        : null;
+    const targetCount = explicitCount ?? parameterCount ?? PROBLEMS_PER_STEP;
+    if (sessionConfig.generator === 'arithmetic') {
+      return generateArithmeticProblemSet(concept, step, sessionConfig, targetCount);
+    }
+    return null;
+  };
+
   const generateProblemsForStep = async (
     concept: CurriculumConcept,
     step: StepID
@@ -464,22 +805,36 @@ const MathGame: React.FC = () => {
     setSelectedStep(step);
     setGameState('loading');
     setLoadError(null);
+    setActiveSessionConfig(options.sessionConfig ?? null);
 
-    let problems: CurriculumProblem[] = [];
-    let problemsSource: 'generated' | 'session_fallback' | 'local_fallback' = 'generated';
+    let problems: CurriculumProblem[] | null = null;
+    let problemsSource: 'session_config' | 'generated' | 'session_fallback' | 'local_fallback' = 'generated';
 
-    try {
-      const generated = await generateProblemsForStep(concept, step);
-      if (!generated.length) {
-        throw new Error('생성된 문제가 없습니다.');
-      }
-      problems = generated;
-    } catch (error) {
-      console.error('문제 불러오기 실패:', error);
-      setLoadError('커리큘럼 데이터를 불러오지 못했습니다. 예비 문제로 대체합니다.');
-
+    const configured = generateProblemsFromSessionConfig(
+      concept,
+      step,
+      options.sessionConfig ?? activeSessionConfig
+    );
+    if (configured && configured.length) {
+      problems = configured;
+      problemsSource = 'session_config';
+    } else {
       try {
-        const session = await createSession();
+        const generated = await generateProblemsForStep(concept, step);
+        if (!generated.length) {
+          throw new Error('생성된 문제가 없습니다.');
+        }
+        problems = generated;
+        problemsSource = 'generated';
+      } catch (error) {
+        console.error('문제 불러오기 실패:', error);
+        setLoadError('커리큘럼 데이터를 불러오지 못했습니다. 예비 문제로 대체합니다.');
+      }
+    }
+
+    if (!problems || !problems.length) {
+      try {
+        const session = await createSession(token ?? undefined);
         problems = convertSessionToCurriculum(session, concept, step);
         problemsSource = 'session_fallback';
       } catch (fallbackError) {
@@ -489,21 +844,45 @@ const MathGame: React.FC = () => {
       }
     }
 
-    try {
-      const session = await createSession(token ?? undefined);
-      const fallbackProblems = convertSessionToCurriculum(session, concept, step);
-      setProblems(fallbackProblems);
-      setTotalQuestions(fallbackProblems.length);
-      setCurrentProblem(fallbackProblems[0] ?? null);
-      setGameState(fallbackProblems.length ? 'playing' : 'finished');
-    } catch (fallbackError) {
-      console.error('Fallback session 불러오기 실패:', fallbackError);
-      const localFallback = generateLocalFallback(12, concept, step);
-      setProblems(localFallback);
-      setTotalQuestions(localFallback.length);
-      setCurrentProblem(localFallback[0] ?? null);
-      setGameState(localFallback.length ? 'playing' : 'finished');
+    if (!problems || !problems.length) {
+      setGameState('finished');
+      return;
     }
+
+    setProblems(problems);
+    setTotalQuestions(problems.length);
+    setCurrentProblem(problems[0] ?? null);
+    setGameState(problems.length ? 'playing' : 'finished');
+
+    if (options.source === 'skill_node' || options.triggeredByTree) {
+      trackSessionStartedFromTree({
+        conceptId: concept.id,
+        conceptName: concept.name,
+        step,
+        nodeId: options.sequenceEntry?.nodeId ?? `${concept.id}-${step}`,
+        sequenceIndex: options.sequenceEntry ? curriculumSequence.indexOf(options.sequenceEntry) : null,
+        triggeredBy: 'skill_node',
+        available: true,
+        completed: false,
+        lens: concept.lens?.[0] ?? null,
+      });
+    }
+
+    trackSkillViewed({
+      conceptId: concept.id,
+      conceptName: concept.name,
+      step,
+      nodeId: options.sequenceEntry?.nodeId ?? `${concept.id}-${step}`,
+      source: options.source ?? 'unknown',
+      sequenceIndex: options.sequenceEntry
+        ? curriculumSequence.indexOf(options.sequenceEntry)
+        : sequenceIndex,
+      available: true,
+      completed: false,
+      lens: concept.lens?.[0] ?? null,
+      problemCount: problems.length,
+      problemsSource,
+    });
   };
 
   const initialiseGame = async () => {

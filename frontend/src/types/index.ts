@@ -105,80 +105,84 @@ export type CurriculumGraph = {
   edges: CurriculumGraphEdge[];
 };
 
-export type SkillNode = {
+export type CourseSessionConfig = {
+  concept: string | null;
+  step: 'S1' | 'S2' | 'S3' | null;
+  problem_count: number | null;
+  generator: string | null;
+  parameters: Record<string, unknown>;
+};
+
+export type SkillTreeRequirement = {
+  skill_id: string;
+  label: string;
+  domain: string;
+  lens: string[];
+  min_level: number;
+  current_level: number;
+  met: boolean;
+};
+
+export type SkillTreeTeaching = {
+  skill_id: string;
+  label: string;
+  domain: string;
+  lens: string[];
+  delta_level: number;
+};
+
+export type SkillTreeNodeState = {
+  value: 'locked' | 'available' | 'completed';
+  completed: boolean;
+  available: boolean;
+  unlocked: boolean;
+};
+
+export type SkillTreeNode = {
   id: string;
   label: string;
+  course: string;
+  group: string;
   tier: number;
-  kind: string;
-  requires: {
-    all_of?: string[] | null;
-    any_of?: string[] | null;
-    min_level?: number | null;
-  } | null;
-  xp_per_try: number;
-  xp_per_correct: number;
-  xp_to_level: number[];
   lens: string[];
-  keywords?: string[];
-  micro_skills?: string[];
-  misconceptions?: string[];
-  boss?: string | null;
+  primary_color?: string | null;
+  session: CourseSessionConfig | null;
+  requires: SkillTreeRequirement[];
+  teaches: SkillTreeTeaching[];
+  xp: {
+    per_try: number;
+    per_correct: number;
+  };
+  lrc_min: Record<string, number>;
+  misconceptions: string[];
+  state: SkillTreeNodeState;
+  progress: SkillNodeProgress;
 };
 
-export type SkillEdge = {
+export type SkillTreeGroup = {
+  id: string;
+  label: string;
+  order: number;
+  course_ids: string[];
+};
+
+export type SkillTreeEdge = {
   from: string;
   to: string;
-  type: string;
-  lens?: string;
 };
 
-export type SkillGraph = {
-  version: string;
-  palette: Record<string, string>;
-  nodes: SkillNode[];
-  edges: SkillEdge[];
-};
-
-export type BipartiteSkillNode = {
-  type: 'skill';
+export type SkillSummary = {
   id: string;
   label: string;
   domain: string;
   lens: string[];
   levels: number;
-  xp_per_try: number;
-  xp_per_correct: number;
-};
-
-export type BipartiteCourseStepNode = {
-  type: 'course_step';
-  id: string;
-  label: string;
-  tier: number;
-  lens: string[];
-  misconceptions: string[];
+  level: number;
   xp: {
     per_try: number;
     per_correct: number;
+    earned: number;
   };
-  lrc_min?: Record<string, number>;
-};
-
-export type BipartiteGraphNode = BipartiteSkillNode | BipartiteCourseStepNode;
-
-export type BipartiteGraphEdge = {
-  from: string;
-  to: string;
-  type: 'requires' | 'teaches' | 'enables';
-  min_level?: number;
-  delta_level?: number;
-};
-
-export type BipartiteGraph = {
-  version: string;
-  palette: Record<string, string>;
-  nodes: BipartiteGraphNode[];
-  edges: BipartiteGraphEdge[];
 };
 
 export type SkillTreeExperiment = {
@@ -215,11 +219,18 @@ export type SkillTreeProgress = {
 };
 
 export type SkillTreeResponse = {
-  graph: SkillGraph;
-  bipartite_graph?: BipartiteGraph;
-  progress?: SkillTreeProgress;
-  unlocked: Record<string, boolean>;
+  version: string | null;
+  palette: Record<string, string>;
+  groups: SkillTreeGroup[];
+  nodes: SkillTreeNode[];
+  edges: SkillTreeEdge[];
+  skills: SkillSummary[];
+  progress: SkillTreeProgress;
   experiment?: SkillTreeExperiment;
+  error?: {
+    message: string;
+    kind: string;
+  };
 };
 
 export type CurriculumHomeCopy = {

@@ -3,33 +3,17 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type {
-  BipartiteCourseStepNode,
-  BipartiteGraph,
-  BipartiteGraphEdge,
-  BipartiteSkillNode,
-  SkillNode,
-  SkillTreeProgress,
   SkillNodeProgress,
-  AtomicSkillProgress,
+  SkillSummary,
+  SkillTreeGroup,
+  SkillTreeNode,
+  SkillTreeProgress,
+  SkillTreeRequirement,
+  SkillTreeTeaching,
 } from '../types';
-import { trackExperimentExposure } from '../utils/analytics';
 import { fetchSkillTree } from '../utils/api';
+import { trackExperimentExposure } from '../utils/analytics';
 import { resolveConceptStep } from '../utils/skillMappings';
-
-type TierGroup = {
-  tier: number;
-  nodes: SkillNode[];
-};
-
-type CourseTierGroup = {
-  tier: number;
-  nodes: BipartiteCourseStepNode[];
-};
-
-type AtomicDomainGroup = {
-  domain: string;
-  nodes: BipartiteSkillNode[];
-};
 
 type ExperimentAssignment = {
   name: string;
@@ -40,35 +24,22 @@ type ExperimentAssignment = {
   bucket: string | number | null;
 };
 
-type RequirementEntry = {
-  skill: BipartiteSkillNode;
-  minLevel: number;
-};
-
-type TeachesEntry = {
-  skill: BipartiteSkillNode;
-  deltaLevel: number;
-};
-
-type TaughtByEntry = {
-  course: BipartiteCourseStepNode;
-  deltaLevel: number;
-};
-
-const statusClass =
-  'rounded-2xl border p-4 transition hover:-translate-y-1 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500';
-
 const TEXT = {
-  requirementsLabel: '필요 스킬',
-  teachesLabel: '강화 스킬',
-  taughtByLabel: '학습 코스',
   totalXpLabel: '총 XP',
   lastUpdatedLabel: '업데이트',
-  lockedTooltip: '해당 스킬은 아직 잠금 상태입니다.',
-  unlocked: '해제됨',
+  requirementsLabel: '필요 스킬',
+  teachesLabel: '강화 스킬',
+  lockedTooltip: '해당 스텝은 아직 잠금 상태입니다.',
+  startButton: '학습 시작',
   locked: '잠김',
-  completed: '완료',
   available: '진행 가능',
+  completed: '완료',
+};
+
+const STATUS_BADGE_CLASSES: Record<string, string> = {
+  locked: 'border-slate-700 text-slate-300 bg-slate-900/80',
+  available: 'border-sky-500/60 text-sky-300 bg-sky-500/10',
+  completed: 'border-emerald-500/60 text-emerald-300 bg-emerald-500/10',
 };
 
 const createEmptyProgress = (): SkillTreeProgress => ({
@@ -87,24 +58,57 @@ const normaliseProgress = (raw?: SkillTreeProgress | null): SkillTreeProgress =>
   skills: raw?.skills ?? {},
 });
 
-export const SkillTreePage: React.FC = () => {
+type GroupTierView = {
+  group: SkillTreeGroup;
+  tiers: Array<{ tier: number; nodes: SkillTreeNode[] }>;
+};
+
+const formatXpSummary = (progress?: SkillNodeProgress): string | null => {
+  if (!progress) {
+    return null;
+  }
+  if (progress.xp_required && progress.xp_required > 0) {
+    return `${progress.xp_earned.toLocaleString()} / ${progress.xp_required.toLocaleString()} XP`;
+  }
+  return `${progress.xp_earned.toLocaleString()} XP`;
+};
+
+const lensDisplay = (
+  lens: string,
+  palette: Record<string, string>,
+  key?: string | number
+) => {
+  const color = palette[lens];
+  const style = color
+    ? { borderColor: color, color }
+    : undefined;
+  return (
+    <span
+      key={key ?? lens}
+      className="rounded-full border border-slate-700 px-3 py-1 text-xs uppercase tracking-wide"
+      style={style}
+    >
+      {lens}
+    </span>
+  );
+};
+
+const SkillTreePage: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [nodes, setNodes] = useState<SkillNode[]>([]);
-  const [courseSteps, setCourseSteps] = useState<BipartiteCourseStepNode[]>([]);
-  const [atomicSkills, setAtomicSkills] = useState<BipartiteSkillNode[]>([]);
-  const [bipartitePalette, setBipartitePalette] = useState<Record<string, string>>({});
-  const [requiresMap, setRequiresMap] = useState<Record<string, RequirementEntry[]>>({});
-  const [teachesMap, setTeachesMap] = useState<Record<string, TeachesEntry[]>>({});
-  const [taughtByMap, setTaughtByMap] = useState<Record<string, TaughtByEntry[]>>({});
+  const [version, setVersion] = useState<string | null>(null);
+  const [palette, setPalette] = useState<Record<string, string>>({});
+  const [groups, setGroups] = useState<SkillTreeGroup[]>([]);
+  const [nodes, setNodes] = useState<SkillTreeNode[]>([]);
+  const [edges, setEdges] = useState<SkillTreeResponse['edges']>([]);
+  const [skills, setSkills] = useState<SkillSummary[]>([]);
   const [progress, setProgress] = useState<SkillTreeProgress>(createEmptyProgress());
-  const [unlockedMap, setUnlockedMap] = useState<Record<string, boolean>>({});
-  const [viewMode, setViewMode] = useState<'course' | 'skill' | 'atomic'>('skill');
   const [experiment, setExperiment] = useState<ExperimentAssignment | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+
     const load = async () => {
       setIsLoading(true);
       try {
@@ -112,116 +116,44 @@ export const SkillTreePage: React.FC = () => {
         if (cancelled) {
           return;
         }
-        setNodes(payload.graph.nodes ?? []);
 
-        if (payload.bipartite_graph) {
-          const normalized = payload.bipartite_graph as BipartiteGraph;
-          const nextCourse: BipartiteCourseStepNode[] = [];
-          const nextAtomic: BipartiteSkillNode[] = [];
-          (normalized.nodes ?? []).forEach((node) => {
-            if (node.type === 'course_step') {
-              nextCourse.push(node);
-            } else if (node.type === 'skill') {
-              nextAtomic.push(node);
-            }
-          });
-          setCourseSteps(nextCourse);
-          setAtomicSkills(nextAtomic);
-          setBipartitePalette(normalized.palette ?? {});
+        setVersion(payload.version ?? null);
+        setPalette(payload.palette ?? {});
+        setGroups(Array.isArray(payload.groups) ? payload.groups : []);
+        setNodes(Array.isArray(payload.nodes) ? payload.nodes : []);
+        setEdges(Array.isArray(payload.edges) ? payload.edges : []);
+        setSkills(Array.isArray(payload.skills) ? payload.skills : []);
+        setProgress(normaliseProgress(payload.progress));
 
-          const skillLookup = Object.fromEntries(nextAtomic.map((skill) => [skill.id, skill]));
-          const courseLookup = Object.fromEntries(nextCourse.map((course) => [course.id, course]));
-          const nextRequires: Record<string, RequirementEntry[]> = {};
-          const nextTeaches: Record<string, TeachesEntry[]> = {};
-          const nextTaughtBy: Record<string, TaughtByEntry[]> = {};
-
-          (normalized.edges ?? []).forEach((edge: BipartiteGraphEdge) => {
-            if (edge.type === 'requires') {
-              const skill = skillLookup[edge.from];
-              if (!skill) {
-                return;
-              }
-              if (!nextRequires[edge.to]) {
-                nextRequires[edge.to] = [];
-              }
-              nextRequires[edge.to].push({ skill, minLevel: edge.min_level ?? 0 });
-            } else if (edge.type === 'teaches') {
-              const skill = skillLookup[edge.to];
-              const course = courseLookup[edge.from];
-              if (!skill || !course) {
-                return;
-              }
-              if (!nextTeaches[edge.from]) {
-                nextTeaches[edge.from] = [];
-              }
-              nextTeaches[edge.from].push({ skill, deltaLevel: edge.delta_level ?? 0 });
-
-              if (!nextTaughtBy[edge.to]) {
-                nextTaughtBy[edge.to] = [];
-              }
-              nextTaughtBy[edge.to].push({ course, deltaLevel: edge.delta_level ?? 0 });
-            }
-          });
-
-          setRequiresMap(nextRequires);
-          setTeachesMap(nextTeaches);
-          setTaughtByMap(nextTaughtBy);
-          setViewMode((prev) => {
-            if (prev !== 'skill') {
-              return prev;
-            }
-            if (nextCourse.length > 0) {
-              return 'course';
-            }
-            if (nextAtomic.length > 0) {
-              return 'atomic';
-            }
-            return prev;
-          });
-        } else {
-          setCourseSteps([]);
-          setAtomicSkills([]);
-          setBipartitePalette({});
-          setRequiresMap({});
-          setTeachesMap({});
-          setTaughtByMap({});
-        }
-
-        const normalisedProgress = normaliseProgress(payload.progress as SkillTreeProgress | undefined);
-        setProgress(normalisedProgress);
-        setUnlockedMap(payload.unlocked ?? {});
-
-        const nextExperiment: ExperimentAssignment | null = payload.experiment
-          ? {
-              name: payload.experiment.name,
-              variant: payload.experiment.variant === 'list' ? 'list' : 'tree',
-              source: payload.experiment.source ?? 'unknown',
-              requestId: payload.experiment.request_id ?? null,
-              rollout: payload.experiment.rollout ?? null,
-              bucket: payload.experiment.bucket ?? null,
-            }
-          : null;
-        if (nextExperiment) {
+        if (payload.experiment) {
+          const assignment: ExperimentAssignment = {
+            name: payload.experiment.name,
+            variant: payload.experiment.variant === 'list' ? 'list' : 'tree',
+            source: payload.experiment.source ?? 'unknown',
+            requestId: payload.experiment.request_id ?? null,
+            rollout: payload.experiment.rollout ?? null,
+            bucket: payload.experiment.bucket ?? null,
+          };
+          setExperiment(assignment);
           trackExperimentExposure({
-            experiment: nextExperiment.name,
-            variant: nextExperiment.variant,
-            source: nextExperiment.source,
-            bucket: nextExperiment.bucket ?? undefined,
-            requestId: nextExperiment.requestId ?? undefined,
-            rollout: nextExperiment.rollout ?? undefined,
+            experiment: assignment.name,
+            variant: assignment.variant,
+            source: assignment.source,
+            bucket: assignment.bucket ?? undefined,
+            requestId: assignment.requestId ?? undefined,
+            rollout: assignment.rollout ?? undefined,
             surface: 'skill_tree_page',
           });
-        }
-        setExperiment(nextExperiment);
-        if (payload.error && typeof (payload.error as { message?: unknown }).message === 'string') {
-          const message = (payload.error as { message?: unknown }).message;
-          setError(typeof message === 'string' ? message : null);
         } else {
-          setError(null);
+          setExperiment(null);
         }
+
+        setError(payload.error?.message ?? null);
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : '스킬 트리를 불러오지 못했습니다.');
+          const message =
+            err instanceof Error ? err.message : '스킬 트리를 불러오지 못했습니다.';
+          setError(message);
           setExperiment(null);
         }
       } finally {
@@ -237,163 +169,137 @@ export const SkillTreePage: React.FC = () => {
     };
   }, []);
 
-  const tierGroups: TierGroup[] = useMemo(() => {
-    const map = new Map<number, SkillNode[]>();
+  const groupLookup = useMemo(() => {
+    const map = new Map<string, SkillTreeGroup>();
+    groups.forEach((group) => map.set(group.id, group));
+    return map;
+  }, [groups]);
+
+  const groupedView: GroupTierView[] = useMemo(() => {
+    const tierMap = new Map<string, Map<number, SkillTreeNode[]>>();
     nodes.forEach((node) => {
-      const list = map.get(node.tier) ?? [];
+      const groupId = node.group;
+      const tiers = tierMap.get(groupId) ?? new Map<number, SkillTreeNode[]>();
+      const list = tiers.get(node.tier) ?? [];
       list.push(node);
-      map.set(node.tier, list);
+      tiers.set(node.tier, list);
+      tierMap.set(groupId, tiers);
     });
-    return Array.from(map.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([tier, list]) => ({
-        tier,
-        nodes: list.sort((a, b) => a.label.localeCompare(b.label, 'ko')),
-      }));
-  }, [nodes]);
 
-  const courseTierGroups: CourseTierGroup[] = useMemo(() => {
-    const map = new Map<number, BipartiteCourseStepNode[]>();
-    courseSteps.forEach((node) => {
-      const list = map.get(node.tier) ?? [];
-      list.push(node);
-      map.set(node.tier, list);
-    });
-    return Array.from(map.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([tier, list]) => ({
-        tier,
-        nodes: list.sort((a, b) => a.label.localeCompare(b.label, 'ko')),
-      }));
-  }, [courseSteps]);
+    const groupIds = new Set<string>([
+      ...tierMap.keys(),
+      ...groups.map((group) => group.id),
+    ]);
 
-  const atomicDomainGroups: AtomicDomainGroup[] = useMemo(() => {
-    const map = new Map<string, BipartiteSkillNode[]>();
-    atomicSkills.forEach((skill) => {
-      const key = skill.domain || '기타';
-      const list = map.get(key) ?? [];
-      list.push(skill);
-      map.set(key, list);
-    });
-    return Array.from(map.entries())
-      .sort((a, b) => a[0].localeCompare(b[0], 'ko'))
-      .map(([domain, list]) => ({
-        domain,
-        nodes: list.sort((a, b) => a.label.localeCompare(b.label, 'ko')),
-      }));
-  }, [atomicSkills]);
+    return Array.from(groupIds).map((groupId) => {
+      const base =
+        groupLookup.get(groupId) ??
+        ({
+          id: groupId,
+          label: groupId === 'general' ? '기타' : groupId,
+          order: Number.MAX_SAFE_INTEGER,
+          course_ids: [],
+        } as SkillTreeGroup);
+      const tiers = Array.from(tierMap.get(groupId)?.entries() ?? [])
+        .sort((a, b) => a[0] - b[0])
+        .map(([tier, tierNodes]) => ({
+          tier,
+          nodes: tierNodes.slice().sort((a, b) => a.label.localeCompare(b.label, 'ko')),
+        }));
+      return { group: base, tiers };
+    }).sort((a, b) => a.group.order - b.group.order);
+  }, [groups, groupLookup, nodes]);
 
-  const getCourseNodeProgress = (id: string): SkillNodeProgress | undefined => progress.nodes[id];
-  const getAtomicSkillProgress = (id: string): AtomicSkillProgress | undefined => progress.skills[id];
-
-  const getUnlockedState = (id: string): boolean => {
-    if (unlockedMap[id] !== undefined) {
-      return unlockedMap[id];
+  const determineFallbackConcept = (node: SkillTreeNode): string => {
+    const courseId = node.course;
+    if (['C01', 'C02', 'C03', 'C04', 'C07'].includes(courseId)) {
+      return 'ALG-AP';
     }
-    const courseState = getCourseNodeProgress(id);
-    if (courseState) {
-      return courseState.unlocked;
+    if (['C05', 'C06'].includes(courseId)) {
+      return 'RAT-PRO';
     }
-    const skillState = getAtomicSkillProgress(id);
-    if (skillState) {
-      return skillState.level > 0;
+    if (['C08', 'C09'].includes(courseId)) {
+      return 'GEO-COORD';
     }
-    return false;
+    if (['C10', 'C12'].includes(courseId)) {
+      return 'GEO-LIN';
+    }
+    return 'FALLBACK';
   };
 
-  const getCompletionState = (id: string): boolean => getCourseNodeProgress(id)?.completed ?? false;
-
-  const getNodeXpSummary = (entry?: SkillNodeProgress) => {
-    if (!entry) {
-      return null;
+  const determineStepFromNode = (node: SkillTreeNode): 'S1' | 'S2' | 'S3' => {
+    const fromId = node.id.match(/S([123])/);
+    if (fromId) {
+      const step = `S${fromId[1]}` as 'S1' | 'S2' | 'S3';
+      return step;
     }
-    if (entry.xp_required && entry.xp_required > 0) {
-      return `${entry.xp_earned}/${entry.xp_required} XP`;
+    const fromLabel = node.label.match(/S([123])/);
+    if (fromLabel) {
+      const step = `S${fromLabel[1]}` as 'S1' | 'S2' | 'S3';
+      return step;
     }
-    return `${entry.xp_earned} XP`;
+    return 'S1';
   };
 
-  const handleStartSkill = (skillId: string) => {
-    if (!getUnlockedState(skillId)) {
+  const handleStartCourse = (node: SkillTreeNode) => {
+    if (!node.state.available) {
       window.alert(TEXT.lockedTooltip);
       return;
     }
-    const mapping = resolveConceptStep(skillId);
-    if (!mapping) {
-      window.alert('이 스킬은 아직 세션과 연결되지 않았습니다.');
-      return;
+    const mapping = resolveConceptStep(node.id);
+    const conceptId = node.session?.concept ?? mapping?.concept ?? determineFallbackConcept(node);
+    const fallbackStep = determineStepFromNode(node);
+    const step = (node.session?.step ?? mapping?.step ?? fallbackStep) as 'S1' | 'S2' | 'S3';
+    const params = new URLSearchParams();
+    params.set('skill', node.id);
+    if (conceptId) {
+      params.set('concept', conceptId);
     }
-    navigate(`/game?skill=${encodeURIComponent(skillId)}&concept=${encodeURIComponent(mapping.concept)}&step=${mapping.step}`);
+    if (step) {
+      params.set('step', step);
+    }
+    if (node.session) {
+      params.set('session', JSON.stringify(node.session));
+    }
+    navigate(`/game?${params.toString()}`);
   };
 
-  const lensChip = (lens: string, key?: string) => {
-    const color = bipartitePalette[lens];
-    const style = color ? { borderColor: color, color } : undefined;
-    return (
-      <span
-        key={key ?? lens}
-        className="rounded-full border border-slate-700 px-3 py-1 text-xs uppercase"
-        style={style}
-      >
-        {lens}
-      </span>
-    );
-  };
-
-  const renderRequirements = (courseId: string) => {
-    const entries = requiresMap[courseId];
-    if (!entries?.length) {
+  const renderRequirementChips = (requirements: SkillTreeRequirement[]) => {
+    if (!requirements.length) {
       return null;
     }
     return (
-      <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-300" data-testid={`requirements-${courseId}`}>
+      <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-300">
         <span className="font-semibold text-slate-200">{TEXT.requirementsLabel}</span>
-        {entries.map(({ skill, minLevel }) => {
-          const current = getAtomicSkillProgress(skill.id)?.level ?? 0;
-          const meets = current >= minLevel;
-          return (
-            <span
-              key={`${courseId}-req-${skill.id}`}
-              className={`rounded-full border px-3 py-1 ${
-                meets ? 'border-emerald-500/60 text-emerald-300' : 'border-slate-700 text-slate-400'
-              }`}
-            >
-              {skill.label} Lv {current}/{minLevel}
-            </span>
-          );
-        })}
-      </div>
-    );
-  };
-
-  const renderTeaches = (courseId: string) => {
-    const entries = teachesMap[courseId];
-    if (!entries?.length) {
-      return null;
-    }
-    return (
-      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-300" data-testid={`teaches-${courseId}`}>
-        <span className="font-semibold text-slate-200">{TEXT.teachesLabel}</span>
-        {entries.map(({ skill, deltaLevel }) => (
-          <span key={`${courseId}-teach-${skill.id}`} className="rounded-full border border-slate-700 px-3 py-1">
-            {skill.label} +Lv{deltaLevel}
+        {requirements.map((item) => (
+          <span
+            key={`req-${item.skill_id}`}
+            className={`rounded-full border px-3 py-1 ${
+              item.met
+                ? 'border-emerald-500/60 text-emerald-300'
+                : 'border-slate-700 text-slate-400'
+            }`}
+          >
+            {item.label} Lv {item.current_level}/{item.min_level}
           </span>
         ))}
       </div>
     );
   };
 
-  const renderTaughtBy = (skillId: string) => {
-    const entries = taughtByMap[skillId];
-    if (!entries?.length) {
+  const renderTeachingChips = (teaches: SkillTreeTeaching[]) => {
+    if (!teaches.length) {
       return null;
     }
     return (
-      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-300" data-testid={`taught-by-${skillId}`}>
-        <span className="font-semibold text-slate-200">{TEXT.taughtByLabel}</span>
-        {entries.map(({ course, deltaLevel }) => (
-          <span key={`${skillId}-from-${course.id}`} className="rounded-full border border-slate-700 px-3 py-1">
-            {course.label} +Lv{deltaLevel}
+      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-300">
+        <span className="font-semibold text-slate-200">{TEXT.teachesLabel}</span>
+        {teaches.map((item) => (
+          <span
+            key={`teach-${item.skill_id}`}
+            className="rounded-full border border-slate-700 px-3 py-1"
+          >
+            {item.label} +Lv{item.delta_level}
           </span>
         ))}
       </div>
@@ -411,7 +317,11 @@ export const SkillTreePage: React.FC = () => {
   if (error) {
     return (
       <div className="mx-auto flex h-full max-w-4xl flex-col gap-4 p-6 text-slate-200">
-        <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white" type="button">
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white"
+          type="button"
+        >
           <ArrowLeft size={18} /> 뒤로 가기
         </button>
         <div className="rounded-2xl border border-red-400/40 bg-red-900/30 p-4 text-red-100">
@@ -428,14 +338,16 @@ export const SkillTreePage: React.FC = () => {
       data-experiment-variant={experiment?.variant ?? 'tree'}
     >
       <header className="flex flex-col gap-3 text-white">
-        <button onClick={() => navigate(-1)} className="inline-flex w-max items-center gap-2 text-sm text-slate-300 hover:text-white" type="button">
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex w-max items-center gap-2 text-sm text-slate-300 hover:text-white"
+          type="button"
+        >
           <ArrowLeft size={18} /> 돌아가기
         </button>
         <h1 className="text-3xl font-semibold">스킬 트리</h1>
         <p className="text-sm text-slate-300">
-          {experiment?.variant === 'list'
-            ? '리스트 보기로 렌즈와 티어를 빠르게 확인하고 바로 학습을 시작하세요.'
-            : '노드를 선택하면 해당 스킬에 맞춘 학습 세션으로 이동합니다. 잠금 조건은 ALL 방식으로 모든 선행 스킬을 완료해야 합니다.'}
+          각 카드에서 필요한 원자 스킬과 강화되는 스킬을 확인하고 학습을 시작해보세요.
         </p>
         <div className="flex flex-wrap gap-3 text-xs text-slate-400">
           <span>
@@ -446,314 +358,161 @@ export const SkillTreePage: React.FC = () => {
               {TEXT.lastUpdatedLabel} {new Date(progress.updated_at).toLocaleString()}
             </span>
           ) : null}
+          {version ? <span>버전 {version}</span> : null}
         </div>
       </header>
 
-      {(courseSteps.length > 0 || atomicSkills.length > 0) && (
-        <div className="flex flex-wrap gap-2" role="tablist" aria-label="스킬 뷰 전환">
-          <button
-            type="button"
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 ${
-              viewMode === 'course'
-                ? 'bg-sky-500 text-slate-900 shadow-lg shadow-sky-900/30'
-                : 'bg-slate-800/80 text-slate-200 hover:bg-slate-700/70'
-            }`}
-            onClick={() => setViewMode('course')}
-            aria-pressed={viewMode === 'course'}
-            data-testid="view-toggle-course"
-          >
-            코스·스텝
-          </button>
-          <button
-            type="button"
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 ${
-              viewMode === 'atomic'
-                ? 'bg-sky-500 text-slate-900 shadow-lg shadow-sky-900/30'
-                : 'bg-slate-800/80 text-slate-200 hover:bg-slate-700/70'
-            }`}
-            onClick={() => setViewMode('atomic')}
-            aria-pressed={viewMode === 'atomic'}
-            data-testid="view-toggle-atomic"
-          >
-            원자 스킬
-          </button>
-          <button
-            type="button"
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 ${
-              viewMode === 'skill'
-                ? 'bg-sky-500 text-slate-900 shadow-lg shadow-sky-900/30'
-                : 'bg-slate-800/80 text-slate-200 hover:bg-slate-700/70'
-            }`}
-            onClick={() => setViewMode('skill')}
-            aria-pressed={viewMode === 'skill'}
-            data-testid="view-toggle-legacy"
-          >
-            기존 노드
-          </button>
+      {groupedView.length === 0 ? (
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 text-center text-slate-300">
+          표시할 스킬 트리 데이터가 없습니다.
         </div>
+      ) : (
+        groupedView.map(({ group, tiers }) => (
+          <section key={`group-${group.id}`} className="space-y-5">
+            <header className="flex flex-col gap-1 text-white">
+              <h2 className="text-2xl font-semibold">{group.label}</h2>
+              <p className="text-xs text-slate-400">
+                포함 코스: {group.course_ids.length ? group.course_ids.join(', ') : '미지정'}
+              </p>
+            </header>
+
+            {tiers.length === 0 ? (
+              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-400">
+                해당 그룹에 속하는 스킬이 없습니다.
+              </div>
+            ) : (
+              tiers.map((tier) => (
+                <div key={`group-${group.id}-tier-${tier.tier}`} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-slate-200">Tier {tier.tier}</h3>
+                    <span className="text-xs text-slate-400">{tier.nodes.length} 단계</span>
+                  </div>
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    {tier.nodes.map((node) => {
+                      const statusClasses =
+                        STATUS_BADGE_CLASSES[node.state.value] ?? STATUS_BADGE_CLASSES.locked;
+                      const xpSummary = formatXpSummary(node.progress);
+                      const lrcStatus = node.progress?.lrc_status ?? 'pending';
+                      return (
+                        <article
+                          key={node.id}
+                          className={`rounded-2xl border p-4 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 ${
+                            node.state.value === 'locked'
+                              ? 'border-slate-800 bg-slate-950/60 text-slate-300 opacity-70'
+                              : 'border-sky-500/30 bg-slate-900/80 text-slate-100 shadow-lg shadow-sky-900/20'
+                          }`}
+                          data-node-id={node.id}
+                          data-node-state={node.state.value}
+                        >
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="text-xs uppercase tracking-wide text-slate-400">
+                                  {node.course} · Tier {node.tier}
+                                </p>
+                                <h4 className="text-lg font-semibold text-white">{node.label}</h4>
+                              </div>
+                              <span className={`rounded-full border px-3 py-1 text-xs ${statusClasses}`}>
+                                {TEXT[node.state.value]}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {node.lens.map((lens, index) => lensDisplay(lens, palette, index))}
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              <span className="font-semibold text-slate-200">LRC</span>{' '}
+                              {lrcStatus}
+                            </div>
+                            {xpSummary ? (
+                              <div className="text-xs text-slate-400">{xpSummary}</div>
+                            ) : null}
+                          </div>
+
+                          {renderRequirementChips(node.requires)}
+                          {renderTeachingChips(node.teaches)}
+
+                          {node.misconceptions.length ? (
+                            <details className="mt-3 text-xs text-slate-400">
+                              <summary className="cursor-pointer text-slate-300">자주 틀리는 개념</summary>
+                              <ul className="mt-2 list-disc space-y-1 pl-5 text-[0.7rem] text-slate-400">
+                                {node.misconceptions.map((item) => (
+                                  <li key={`${node.id}-mc-${item}`}>{item}</li>
+                                ))}
+                              </ul>
+                            </details>
+                          ) : null}
+
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleStartCourse(node)}
+                              disabled={!node.state.available}
+                              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 ${
+                                node.state.available
+                                  ? 'bg-sky-500 text-slate-900 shadow-lg shadow-sky-900/30 hover:-translate-y-0.5 hover:bg-sky-400'
+                                  : 'cursor-not-allowed bg-slate-800/80 text-slate-500'
+                              }`}
+                            >
+                              {TEXT.startButton}
+                            </button>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))
+            )}
+          </section>
+        ))
       )}
 
-      {viewMode === 'course' && courseSteps.length > 0 ? (
-        <div className="flex flex-col gap-6" data-testid="course-steps">
-          {courseTierGroups.map((group) => (
-            <section key={`course-tier-${group.tier}`} className="flex flex-col gap-4">
-              <header className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-white">Tier {group.tier}</h2>
-                <span className="text-sm text-slate-400">{group.nodes.length} 단계</span>
-              </header>
-              <div className="grid gap-4 lg:grid-cols-2">
-                {group.nodes.map((node) => {
-                  const nodeProgress = getCourseNodeProgress(node.id);
-                  const isUnlocked = getUnlockedState(node.id);
-                  const isCompleted = getCompletionState(node.id);
-                  const xpSummary = getNodeXpSummary(nodeProgress);
-                  const lrcStatus = nodeProgress?.lrc_status ?? 'pending';
-                  const statusLabel = isCompleted ? TEXT.completed : isUnlocked ? TEXT.available : TEXT.locked;
-                  return (
-                    <article
-                      key={node.id}
-                      className={`${statusClass} bg-slate-900/70 text-left text-slate-200 ${
-                        isUnlocked ? 'hover:bg-slate-800/80' : 'opacity-60'
-                      }`}
-                    >
-                      <div className="flex flex-col gap-2">
-                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                          {node.id}
-                        </span>
-                        <p className="text-lg font-semibold text-white">{node.label}</p>
-                        <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-                          <span
-                            className={`rounded-full border px-3 py-1 ${
-                              isCompleted
-                                ? 'border-emerald-500/70 text-emerald-300'
-                                : isUnlocked
-                                  ? 'border-sky-500/60 text-sky-300'
-                                  : 'border-slate-700 text-slate-400'
-                            }`}
-                          >
-                            {statusLabel}
-                          </span>
-                          {xpSummary ? (
-                            <span className="rounded-full border border-slate-700 px-3 py-1">{xpSummary}</span>
-                          ) : null}
-                          <span className="rounded-full border border-slate-700 px-3 py-1">
-                            LRC {lrcStatus.toUpperCase()}
-                          </span>
-                        </div>
-                        {node.misconceptions.length > 0 ? (
-                          <p className="text-xs text-slate-400">오개념: {node.misconceptions.join(', ')}</p>
-                        ) : null}
-                      </div>
-                      {renderRequirements(node.id)}
-                      {renderTeaches(node.id)}
-                      <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-300">
-                        <span className="rounded-full border border-slate-700 px-3 py-1">
-                          시도당 XP {node.xp.per_try}
-                        </span>
-                        <span className="rounded-full border border-slate-700 px-3 py-1">
-                          정답 XP {node.xp.per_correct}
-                        </span>
-                        {node.lens.map((lens) => lensChip(lens, `${node.id}-${lens}`))}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </section>
-          ))}
-        </div>
-      ) : null}
-
-      {viewMode === 'atomic' && atomicSkills.length > 0 ? (
-        <div className="flex flex-col gap-6" data-testid="atomic-skills">
-          {atomicDomainGroups.map((group) => (
-            <section key={`domain-${group.domain}`} className="flex flex-col gap-4">
-              <header className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-white">{group.domain}</h2>
-                <span className="text-sm text-slate-400">{group.nodes.length} 스킬</span>
-              </header>
-              <div className="grid gap-4 lg:grid-cols-2">
-                {group.nodes.map((skill) => {
-                  const skillProgress = getAtomicSkillProgress(skill.id);
-                  const levelEarned = skillProgress?.level ?? 0;
-                  const xpEarned = skillProgress?.xp ?? 0;
-                  const isUnlocked = getUnlockedState(skill.id);
-                  return (
-                    <article
-                      key={skill.id}
-                      className={`${statusClass} bg-slate-900/70 text-left text-slate-200 ${
-                        isUnlocked ? 'hover:bg-slate-800/80' : 'opacity-60'
-                      }`}
-                    >
-                      <div className="flex flex-col gap-2">
-                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                          목표 레벨 {skill.levels} · {skill.id}
-                        </span>
-                        <p className="text-lg font-semibold text-white">{skill.label}</p>
-                        <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-                          <span className="rounded-full border border-slate-700 px-3 py-1">
-                            현재 레벨 {levelEarned}
-                          </span>
-                          <span className="rounded-full border border-slate-700 px-3 py-1">
-                            누적 XP {xpEarned}
-                          </span>
-                          <span
-                            className={`rounded-full border px-3 py-1 ${
-                              isUnlocked ? 'border-sky-500/60 text-sky-300' : 'border-slate-700 text-slate-400'
-                            }`}
-                          >
-                            {isUnlocked ? TEXT.unlocked : TEXT.locked}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-300">
-                        <span className="rounded-full border border-slate-700 px-3 py-1">
-                          시도당 XP {skill.xp_per_try}
-                        </span>
-                        <span className="rounded-full border border-slate-700 px-3 py-1">
-                          정답 XP {skill.xp_per_correct}
-                        </span>
-                        {skill.lens.map((lens) => lensChip(lens, `${skill.id}-${lens}`))}
-                      </div>
-                      {renderTaughtBy(skill.id)}
-                    </article>
-                  );
-                })}
-              </div>
-            </section>
-          ))}
-        </div>
-      ) : null}
-
-      {viewMode === 'skill' &&
-        (experiment?.variant === 'list' ? (
-          <div className="flex flex-col gap-4" data-testid="skill-tree-list">
-            {nodes
+      {skills.length ? (
+        <section className="space-y-3">
+          <header className="flex items-center justify-between text-white">
+            <h3 className="text-xl font-semibold">원자 스킬 진행 현황</h3>
+            <span className="text-xs text-slate-400">
+              총 {skills.length}개 스킬 · 상위 12개 표시
+            </span>
+          </header>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {skills
               .slice()
-              .sort((a, b) => a.label.localeCompare(b.label, 'ko'))
-              .map((node) => {
-                const nodeProgress = getCourseNodeProgress(node.id);
-                const isUnlocked = getUnlockedState(node.id);
-                const isCompleted = getCompletionState(node.id);
-                const xpSummary = getNodeXpSummary(nodeProgress);
-                const statusLabel = isCompleted ? TEXT.completed : isUnlocked ? TEXT.available : TEXT.locked;
-                return (
-                  <article
-                    key={node.id}
-                    className={`${statusClass} bg-slate-900/70 text-left text-slate-100 ${
-                      isUnlocked ? 'hover:bg-slate-800/80' : 'opacity-60'
-                    }`}
-                  >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-1">
-                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                          Tier {node.tier} · {node.kind.toUpperCase()}
-                        </span>
-                        <p className="text-lg font-semibold text-white">{node.label}</p>
-                        <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-                          <span
-                            className={`rounded-full border px-3 py-1 ${
-                              isCompleted
-                                ? 'border-emerald-500/70 text-emerald-300'
-                                : isUnlocked
-                                  ? 'border-sky-500/60 text-sky-300'
-                                  : 'border-slate-700 text-slate-400'
-                            }`}
-                          >
-                            {statusLabel}
-                          </span>
-                          {xpSummary ? (
-                            <span className="rounded-full border border-slate-700 px-3 py-1">{xpSummary}</span>
-                          ) : null}
-                        </div>
-                        {node.keywords?.length ? (
-                          <p className="text-xs text-slate-400">키워드: {node.keywords.join(', ')}</p>
-                        ) : null}
-                      </div>
-                      <button
-                        onClick={() => handleStartSkill(node.id)}
-                        className={`inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          isUnlocked
-                            ? 'bg-sky-500 text-slate-900 shadow-lg shadow-sky-900/30 hover:-translate-y-0.5 hover:bg-sky-400'
-                            : 'cursor-not-allowed bg-slate-700/60 text-slate-300'
-                        }`}
-                        type="button"
-                        disabled={!isUnlocked}
-                        aria-disabled={!isUnlocked}
-                      >
-                        {isUnlocked ? '학습 시작' : TEXT.locked}
-                      </button>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-300">
-                      <span className="rounded-full border border-slate-700 px-3 py-1">
-                        경험치 +{node.xp_per_correct}
-                      </span>
-                      <span className="rounded-full border border-slate-700 px-3 py-1">
-                        시도당 {node.xp_per_try} XP
-                      </span>
-                      {node.lens.map((lens) => lensChip(lens, `${node.id}-${lens}`))}
-                    </div>
-                  </article>
-                );
-              })}
-          </div>
-        ) : (
-          <div className="grid gap-6 lg:grid-cols-5">
-            {tierGroups.map((group) => (
-              <section key={group.tier} className="flex flex-col gap-4">
-                <h2 className="rounded-full bg-slate-800/80 px-4 py-2 text-center text-sm font-semibold text-slate-200">
-                  Tier {group.tier}
-                </h2>
-                <div className="flex flex-col gap-3">
-                  {group.nodes.map((node) => {
-                    const nodeProgress = getCourseNodeProgress(node.id);
-                    const isUnlocked = getUnlockedState(node.id);
-                    const isCompleted = getCompletionState(node.id);
-                    const statusLabel = isCompleted ? TEXT.completed : isUnlocked ? TEXT.available : TEXT.locked;
-                    return (
-                      <button
-                        key={node.id}
-                        className={`${statusClass} bg-slate-900/70 text-left text-slate-100 ${
-                          isUnlocked ? 'hover:bg-slate-800/80' : 'cursor-not-allowed opacity-60'
-                        }`}
-                        onClick={() => handleStartSkill(node.id)}
-                        type="button"
-                        disabled={!isUnlocked}
-                        aria-disabled={!isUnlocked}
-                      >
-                        <span className="text-sm font-semibold">{node.label}</span>
-                        <span className="mt-1 block text-xs text-slate-300">
-                          {node.kind.toUpperCase()}
-                        </span>
-                        <span
-                          className={`mt-2 inline-block rounded-full border px-3 py-1 text-xs ${
-                            isCompleted
-                              ? 'border-emerald-500/70 text-emerald-300'
-                              : isUnlocked
-                                ? 'border-sky-500/60 text-sky-300'
-                                : 'border-slate-700 text-slate-400'
-                          }`}
-                        >
-                          {statusLabel}
-                        </span>
-                        {nodeProgress ? (
-                          <span className="mt-1 block text-xs text-slate-400">
-                            XP {nodeProgress.xp_earned}
-                          </span>
-                        ) : null}
-                        {node.keywords?.length ? (
-                          <span className="mt-2 block text-xs text-slate-400">
-                            {node.keywords.join(', ')}
-                          </span>
-                        ) : null}
-                      </button>
-                    );
-                  })}
+              .sort((a, b) => b.level - a.level || a.label.localeCompare(b.label, 'ko'))
+              .slice(0, 12)
+              .map((skill) => (
+                <div
+                  key={skill.id}
+                  className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 text-slate-200"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-white">{skill.label}</h4>
+                    <span className="rounded-full border border-slate-700 px-2 py-0.5 text-xs text-slate-300">
+                      Lv {skill.level}/{skill.levels}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-400">{skill.domain}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {skill.lens.map((lens, index) => lensDisplay(lens, palette, index))}
+                  </div>
+                  <p className="mt-2 text-xs text-slate-400">
+                    XP {skill.xp.earned.toLocaleString()} (+{skill.xp.per_correct} / {skill.xp.per_try})
+                  </p>
                 </div>
-              </section>
-            ))}
+              ))}
           </div>
-        ))}
+        </section>
+      ) : null}
+
+      {edges.length ? (
+        <section className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400">
+          <h4 className="text-sm font-semibold text-slate-200">학습 전이 경로</h4>
+          <p className="mt-2">
+            총 {edges.length}개의 전이(edge)가 정의되어 있습니다. 스텝을 완료하면 연결된 다음 스텝이
+            강조됩니다.
+          </p>
+        </section>
+      ) : null}
     </div>
   );
 };

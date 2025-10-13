@@ -25,6 +25,7 @@ from ..progress_store import (
 from ..dependencies.auth import get_optional_user
 from ..repositories import UserRecord
 from ..services import SkillProgressService
+from ..services.skill_tree_projection import build_skill_tree_projection
 
 router = APIRouter(prefix="/api/v1", tags=["skills"])
 
@@ -134,13 +135,11 @@ async def api_get_skill_tree(
         node_progress = _serialise_node_progress(course_steps, snapshot)
         skill_progress = _serialise_skill_progress(atomic_skills, snapshot)
 
-        unlocked: Dict[str, bool] = {
-            **{
-                node_id: data.get("unlocked", False)
-                for node_id, data in node_progress.items()
-            },
-            **{skill_id: data.get("level", 0) > 0 for skill_id, data in skill_progress.items()},
-        }
+        projection = build_skill_tree_projection(
+            graph=bipartite_graph,
+            node_progress=node_progress,
+            skill_progress=skill_progress,
+        )
 
         progress_payload: Dict[str, Any] = {
             "user_id": snapshot.user_id if snapshot else effective_user_id,
@@ -151,10 +150,13 @@ async def api_get_skill_tree(
         }
 
         payload: Dict[str, Any] = {
-            "graph": skill_graph.model_dump(by_alias=True),
-            "bipartite_graph": bipartite_graph.model_dump(by_alias=True),
+            "version": projection["version"],
+            "palette": projection["palette"],
+            "groups": projection["groups"],
+            "nodes": projection["nodes"],
+            "edges": projection["edges"],
+            "skills": projection["skills"],
             "progress": progress_payload,
-            "unlocked": unlocked,
             "experiment": assignment.to_payload(),
         }
         return payload
@@ -168,10 +170,13 @@ async def api_get_skill_tree(
             "skills": {},
         }
         return {
-            "graph": {"nodes": [], "edges": [], "meta": {}},
-            "bipartite_graph": {"nodes": [], "edges": [], "palette": {}},
+            "version": None,
+            "palette": {},
+            "groups": [],
+            "nodes": [],
+            "edges": [],
+            "skills": [],
             "progress": fallback_progress,
-            "unlocked": {},
             "experiment": assignment.to_payload(),
             "error": {
                 "message": "스킬 트리 데이터를 불러오는 중 문제가 발생했습니다.",
@@ -188,10 +193,13 @@ async def api_get_skill_tree(
             "skills": {},
         }
         return {
-            "graph": {"nodes": [], "edges": [], "meta": {}},
-            "bipartite_graph": {"nodes": [], "edges": [], "palette": {}},
+            "version": None,
+            "palette": {},
+            "groups": [],
+            "nodes": [],
+            "edges": [],
+            "skills": [],
             "progress": fallback_progress,
-            "unlocked": {},
             "experiment": assignment.to_payload(),
             "error": {
                 "message": "스킬 트리를 불러오는 중 예기치 못한 오류가 발생했습니다.",

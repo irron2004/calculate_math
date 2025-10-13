@@ -32,14 +32,19 @@ async def test_skill_tree_endpoint_returns_experiment_payload(client):
     response = await client.get("/api/v1/skills/tree")
     assert response.status_code == 200
     data = response.json()
-    assert "graph" in data and "nodes" in data["graph"]
-    assert "bipartite_graph" in data and data["bipartite_graph"]["nodes"]
+    assert data["version"]
+    assert isinstance(data["groups"], list) and data["groups"]
+    assert isinstance(data["nodes"], list) and data["nodes"]
+    assert isinstance(data["edges"], list)
+    assert isinstance(data["skills"], list) and data["skills"]
     progress = data["progress"]
     assert progress["user_id"] is not None
-    assert "nodes" in progress and isinstance(progress["nodes"], dict)
-    assert "skills" in progress and isinstance(progress["skills"], dict)
-    unlocked = data["unlocked"]
-    assert isinstance(unlocked, dict)
+    assert isinstance(progress["nodes"], dict)
+    assert isinstance(progress["skills"], dict)
+    first_node = data["nodes"][0]
+    assert "requires" in first_node and "state" in first_node
+    assert "session" in first_node
+    assert first_node["state"]["value"] in {"locked", "available", "completed"}
     assert "experiment" in data
     experiment = data["experiment"]
     assert experiment["name"] == "skill_tree_layout"

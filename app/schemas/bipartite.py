@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Dict, List, Optional, Sequence, Union, Literal, Annotated
+from typing import Any, Dict, List, Optional, Sequence, Union, Literal, Annotated
 
 from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 
@@ -49,6 +49,36 @@ class AtomicSkillNode(BaseModel):
         return list(value)
 
 
+class CourseSessionConfig(BaseModel):
+    """Standardised session metadata for launching practice from a course step."""
+
+    concept: Optional[str] = Field(default=None, description="Primary curriculum concept id")
+    step: Optional[Literal["S1", "S2", "S3"]] = Field(
+        default=None, description="Recommended curriculum step identifier"
+    )
+    problem_count: Optional[int] = Field(
+        default=None,
+        ge=1,
+        le=60,
+        description="Target number of problems for the generated session",
+    )
+    generator: Optional[str] = Field(
+        default=None,
+        description="Optional generator identifier (e.g. arithmetic, templates)",
+    )
+    parameters: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Generator-specific parameters (operand sizes, contexts, etc.)",
+    )
+
+    @field_validator("concept")
+    def _normalise_concept(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        stripped = value.strip()
+        return stripped or None
+
+
 class CourseStepNode(BaseModel):
     """A course step describing a concrete learning session."""
 
@@ -60,6 +90,7 @@ class CourseStepNode(BaseModel):
     misconceptions: List[str] = Field(default_factory=list)
     xp: XPReward
     lrc_min: Optional[Dict[str, float]] = None
+    session: Optional[CourseSessionConfig] = None
 
     @field_validator("lens", "misconceptions", mode="before")
     def _normalize_sequence(
@@ -156,10 +187,10 @@ __all__ = [
     "AtomicSkillNode",
     "BipartiteGraphSpec",
     "CourseStepNode",
+    "CourseSessionConfig",
     "EdgeType",
     "GraphEdge",
     "NodeSpec",
     "NodeType",
     "XPReward",
 ]
-

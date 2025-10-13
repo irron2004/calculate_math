@@ -796,6 +796,19 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "arithmetic",
+        "parameters": {
+          "op": "add",
+          "min": 10,
+          "max": 99,
+          "allow_carry": false,
+          "count": 12
+        }
       }
     },
     {
@@ -816,6 +829,20 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "arithmetic",
+        "parameters": {
+          "op": "add",
+          "min": 10,
+          "max": 999,
+          "allow_carry": true,
+          "friendly_adjustments": true,
+          "count": 16
+        }
       }
     },
     {
@@ -837,6 +864,23 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "arithmetic",
+        "parameters": {
+          "ops": [
+            "add",
+            "sub"
+          ],
+          "min": 10,
+          "max": 999,
+          "allow_carry": true,
+          "include_adjustments": true,
+          "count": 20
+        }
       }
     },
     {
@@ -857,6 +901,24 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "arithmetic",
+        "parameters": {
+          "ops": [
+            "add",
+            "sub"
+          ],
+          "digits": [
+            2,
+            2
+          ],
+          "allow_carry": false,
+          "count": 12
+        }
       }
     },
     {
@@ -877,6 +939,24 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "arithmetic",
+        "parameters": {
+          "ops": [
+            "add",
+            "sub"
+          ],
+          "digits": [
+            3,
+            3
+          ],
+          "allow_carry": true,
+          "count": 16
+        }
       }
     },
     {
@@ -897,6 +977,25 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "arithmetic",
+        "parameters": {
+          "ops": [
+            "add",
+            "sub"
+          ],
+          "digits": [
+            3,
+            3
+          ],
+          "allow_carry": true,
+          "include_estimation": true,
+          "count": 20
+        }
       }
     },
     {
@@ -916,6 +1015,18 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "arithmetic",
+        "parameters": {
+          "op": "mul",
+          "left_digits": 1,
+          "right_digits": 1,
+          "count": 12
+        }
       }
     },
     {
@@ -935,6 +1046,19 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "arithmetic",
+        "parameters": {
+          "op": "mul",
+          "left_digits": 2,
+          "right_digits": 1,
+          "include_pow10": true,
+          "count": 16
+        }
       }
     },
     {
@@ -954,6 +1078,19 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "arithmetic",
+        "parameters": {
+          "op": "mul",
+          "left_digits": 2,
+          "right_digits": 1,
+          "include_partial_products": true,
+          "count": 20
+        }
       }
     },
     {
@@ -973,6 +1110,19 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "arithmetic",
+        "parameters": {
+          "op": "div",
+          "dividend_digits": 3,
+          "divisor_digits": 1,
+          "allow_remainder": true,
+          "count": 12
+        }
       }
     },
     {
@@ -992,6 +1142,19 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "arithmetic",
+        "parameters": {
+          "op": "div",
+          "dividend_digits": 3,
+          "divisor_digits": 1,
+          "allow_remainder": false,
+          "count": 16
+        }
       }
     },
     {
@@ -1011,6 +1174,19 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "arithmetic",
+        "parameters": {
+          "op": "div",
+          "dividend_digits": 4,
+          "divisor_digits": 2,
+          "allow_remainder": false,
+          "count": 20
+        }
       }
     },
     {
@@ -1030,6 +1206,20 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "RAT-PRO",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "fraction",
+        "parameters": {
+          "op": "fraction_part_whole",
+          "denominator_range": [
+            2,
+            12
+          ],
+          "count": 12
+        }
       }
     },
     {
@@ -1049,6 +1239,21 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "RAT-PRO",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "fraction",
+        "parameters": {
+          "op": "fraction_addition",
+          "denominator_range": [
+            3,
+            12
+          ],
+          "allow_mixed_numbers": true,
+          "count": 16
+        }
       }
     },
     {
@@ -1068,6 +1273,21 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "RAT-PRO",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "fraction",
+        "parameters": {
+          "op": "fraction_multiplication",
+          "denominator_range": [
+            2,
+            12
+          ],
+          "include_ratio": true,
+          "count": 20
+        }
       }
     },
     {
@@ -1087,6 +1307,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "RAT-PRO",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "decimal",
+        "parameters": {
+          "op": "decimal_place_value",
+          "max_places": 3,
+          "count": 12
+        }
       }
     },
     {
@@ -1107,6 +1338,18 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "RAT-PRO",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "decimal",
+        "parameters": {
+          "op": "decimal_addition",
+          "max_places": 3,
+          "align_required": true,
+          "count": 16
+        }
       }
     },
     {
@@ -1126,6 +1369,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "RAT-PRO",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "ratio",
+        "parameters": {
+          "op": "percentage_table",
+          "include_graph": true,
+          "count": 20
+        }
       }
     },
     {
@@ -1145,6 +1399,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "sequence",
+        "parameters": {
+          "op": "arithmetic_difference",
+          "max_terms": 8,
+          "count": 12
+        }
       }
     },
     {
@@ -1164,6 +1429,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "sequence",
+        "parameters": {
+          "op": "general_term",
+          "max_terms": 8,
+          "count": 16
+        }
       }
     },
     {
@@ -1184,6 +1460,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "ALG-AP",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "sequence",
+        "parameters": {
+          "op": "arithmetic_series",
+          "max_terms": 10,
+          "count": 20
+        }
       }
     },
     {
@@ -1203,6 +1490,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "geometry",
+        "parameters": {
+          "op": "coordinate_distance",
+          "include_midpoint": true,
+          "count": 12
+        }
       }
     },
     {
@@ -1223,6 +1521,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "geometry",
+        "parameters": {
+          "op": "slope_intercept",
+          "include_table": true,
+          "count": 16
+        }
       }
     },
     {
@@ -1242,6 +1551,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "algebra",
+        "parameters": {
+          "op": "linear_equation",
+          "unknown_position": "varied",
+          "count": 20
+        }
       }
     },
     {
@@ -1261,6 +1581,21 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "geometry",
+        "parameters": {
+          "op": "transformations",
+          "types": [
+            "reflection",
+            "translation",
+            "rotation"
+          ],
+          "count": 12
+        }
       }
     },
     {
@@ -1281,6 +1616,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "geometry",
+        "parameters": {
+          "op": "similarity_scale",
+          "include_ratio": true,
+          "count": 16
+        }
       }
     },
     {
@@ -1301,6 +1647,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "geometry",
+        "parameters": {
+          "op": "right_triangle_ratio",
+          "include_context": true,
+          "count": 20
+        }
       }
     },
     {
@@ -1320,6 +1677,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "calculus",
+        "parameters": {
+          "op": "area_approximation",
+          "method": "rectangles",
+          "count": 12
+        }
       }
     },
     {
@@ -1339,6 +1707,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "calculus",
+        "parameters": {
+          "op": "trapezoid_sum",
+          "method": "trapezoid",
+          "count": 16
+        }
       }
     },
     {
@@ -1359,6 +1738,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "calculus",
+        "parameters": {
+          "op": "average_rate",
+          "include_graph": true,
+          "count": 20
+        }
       }
     },
     {
@@ -1379,6 +1769,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": null,
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "statistics",
+        "parameters": {
+          "op": "measure_of_center",
+          "include_context": true,
+          "count": 12
+        }
       }
     },
     {
@@ -1398,6 +1799,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": null,
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "statistics",
+        "parameters": {
+          "op": "measure_of_spread",
+          "include_box_plot": true,
+          "count": 16
+        }
       }
     },
     {
@@ -1417,6 +1829,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": null,
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "statistics",
+        "parameters": {
+          "op": "combinatorics_probability",
+          "include_conditionals": true,
+          "count": 20
+        }
       }
     },
     {
@@ -1436,6 +1859,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S1",
+        "problem_count": 12,
+        "generator": "calculus",
+        "parameters": {
+          "op": "average_rate",
+          "include_table": true,
+          "count": 12
+        }
       }
     },
     {
@@ -1455,6 +1889,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S2",
+        "problem_count": 16,
+        "generator": "calculus",
+        "parameters": {
+          "op": "instantaneous_rate",
+          "tangent_focus": true,
+          "count": 16
+        }
       }
     },
     {
@@ -1474,6 +1919,17 @@
       },
       "lrc_min": {
         "acc": 0.9
+      },
+      "session": {
+        "concept": "GEO-LIN",
+        "step": "S3",
+        "problem_count": 20,
+        "generator": "calculus",
+        "parameters": {
+          "op": "riemann_sum",
+          "method": "midpoint",
+          "count": 20
+        }
       }
     }
   ],
