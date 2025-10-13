@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 
 SERVICE_ROOT = Path(__file__).resolve().parent
@@ -82,6 +82,13 @@ def _resolve_path(value: str | None, *, default: Path) -> Path:
     return candidate
 
 
+def _parse_optional_str(value: str | None) -> Optional[str]:
+    if value is None:
+        return None
+    candidate = value.strip()
+    return candidate or None
+
+
 @dataclass(frozen=True)
 class Settings:
     app_name: str
@@ -102,6 +109,7 @@ class Settings:
     dag_data_path: Path
     progress_data_path: Path
     skill_tree_list_rollout_percentage: int
+    external_hub_url: Optional[str]
 
 
 def _build_settings() -> Settings:
@@ -151,6 +159,7 @@ def _build_settings() -> Settings:
         skill_tree_list_rollout_percentage=_clamp_percentage(
             os.getenv("SKILL_TREE_LIST_ROLLOUT"), default=50
         ),
+        external_hub_url=_parse_optional_str(os.getenv("HUB_URL")),
     )
 
 

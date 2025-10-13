@@ -107,8 +107,11 @@
                 <nav aria-label="메인 탐색" class="flex flex-wrap items-center gap-1 text-sm font-medium text-slate-200">
                     <a href="/" class="nav-link">대시보드</a>
                     <a href="/problems" class="nav-link">문제 선택</a>
-                    <a href="/" class="nav-link">메인 허브</a>
-                    <a href="/health" class="nav-link">헬스체크</a>
+                    <a href="/skills" class="nav-link">스킬 트리</a>
+                    {% if hub_url %}
+                    <a href="{{ hub_url }}" class="nav-link" target="_blank" rel="noopener">메인 허브</a>
+                    {% endif %}
+                    <a href="/api/v1/health" class="nav-link">헬스체크</a>
                 </nav>
                 {% set nav_primary = primary_category %}
                 {% if nav_primary is none and categories %}

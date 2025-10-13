@@ -1,25 +1,27 @@
 from collections import defaultdict
-from dataclasses import asdict
 from typing import Callable
 
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from ..config import get_settings
+from ..config import Settings, get_settings
 from ..category_service import (
     build_category_cards,
     resolve_allowed_categories,
     resolve_primary_category,
 )
 from ..bridge_bank import BridgeDataError, list_bridge_units
-from ..problem_bank import get_problems
 from ..curriculum_graph import get_curriculum_graph
 from ..template_engine import list_concepts
 from ..dependencies.auth import resolve_optional_user
 from ..progress_store import ProgressStore, refresh_progress_store
 from ..repositories import AttemptRepository
 from ..services.progress_metrics import ProgressMetricsService
+from ..services.problem_generation import (
+    CATEGORY_OPERATION_DEFAULTS,
+    generate_problem_set,
+)
 
 
 def _templates_resolver(
@@ -53,6 +55,68 @@ def _should_show_compliance(request: Request) -> bool:
     return False
 
 
+def _resolve_settings(request: Request) -> Settings:
+    settings = getattr(request.app.state, "settings", None)
+    if isinstance(settings, Settings):
+        return settings
+    return get_settings()
+
+
+def _build_skill_tree_overview(
+    graph_payload: dict,
+    concept_lookup: dict[str, object],
+) -> tuple[list[dict[str, object]], dict[str, str]]:
+    sequence_order: list[str] = []
+    for node in graph_payload.get("nodes", []):
+        concept_id = node.get("concept")
+        if concept_id and concept_id not in sequence_order:
+            sequence_order.append(concept_id)
+
+    step_priority = {"S1": 0, "S2": 1, "S3": 2}
+    grouped_nodes: dict[str, dict[str, object]] = defaultdict(lambda: {"steps": []})
+    for node in graph_payload.get("nodes", []):
+        step_value = str(node.get("step", "")).upper()
+        if step_value not in step_priority:
+            continue
+        concept_id = node.get("concept")
+        if not concept_id:
+            continue
+        group = grouped_nodes[concept_id]
+        group.setdefault("concept_id", concept_id)
+        concept_meta = concept_lookup.get(concept_id)
+        if concept_meta is not None:
+            group.setdefault("name", concept_meta.name)
+            group.setdefault("lens", list(concept_meta.lens))
+            group.setdefault("summary", concept_meta.summary)
+        steps_list = group.setdefault("steps", [])
+        if isinstance(steps_list, list):
+            steps_list.append(
+                {
+                    "id": node.get("id"),
+                    "label": node.get("label", f"{concept_id} · {step_value}"),
+                    "step": step_value,
+                    "lens": node.get("lens", []),
+                    "grade_band": node.get("grade_band"),
+                }
+            )
+    skill_tree: list[dict[str, object]] = []
+    for concept_id, group in grouped_nodes.items():
+        steps = group.get("steps", [])
+        if isinstance(steps, list):
+            steps.sort(key=lambda item: step_priority.get(item.get("step", ""), 99))
+        group.setdefault("name", concept_id)
+        group.setdefault("lens", [])
+        group.setdefault("summary", "")
+        skill_tree.append(group)
+    skill_tree.sort(
+        key=lambda item: sequence_order.index(item["concept_id"])  # type: ignore[index]
+        if item["concept_id"] in sequence_order  # type: ignore[operator]
+        else len(sequence_order)
+    )
+    palette = graph_payload.get("meta", {}).get("palette", {})
+    return skill_tree, palette
+
+
 def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
     router = APIRouter(tags=["pages"])
     resolve_templates = _templates_resolver(templates)
@@ -60,6 +124,7 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
     @router.get("/", response_class=HTMLResponse)
     async def home(request: Request) -> HTMLResponse:
         active_templates = resolve_templates(request)
+        settings = _resolve_settings(request)
         categories = resolve_allowed_categories()
         cards = build_category_cards(categories)
         primary_category = resolve_primary_category(categories)
@@ -75,13 +140,13 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
         graph_payload = get_curriculum_graph()
         concept_nodes = list_concepts()
         concept_lookup = {node.id: node for node in concept_nodes}
+        skill_tree, palette = _build_skill_tree_overview(graph_payload, concept_lookup)
 
         progress_metrics_data = None
         user = resolve_optional_user(request)
         if user is not None:
             attempt_repository = getattr(request.app.state, "attempt_repository", None)
             if not isinstance(attempt_repository, AttemptRepository):
-                settings = getattr(request.app.state, "settings", None) or get_settings()
                 attempt_repository = AttemptRepository(settings.attempts_database_path)
                 request.app.state.attempt_repository = attempt_repository
             progress_store = getattr(request.app.state, "dag_progress_store", None)
@@ -93,55 +158,6 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 progress_store=progress_store,
             )
             progress_metrics_data = metrics_service.get_metrics_for_user(user.id).dict()
-
-        sequence_order: list[str] = []
-        for node in graph_payload.get("nodes", []):
-            concept_id = node.get("concept")
-            if concept_id and concept_id not in sequence_order:
-                sequence_order.append(concept_id)
-
-        step_priority = {"S1": 0, "S2": 1, "S3": 2}
-        grouped_nodes: dict[str, dict[str, object]] = defaultdict(lambda: {"steps": []})
-        for node in graph_payload.get("nodes", []):
-            step_value = str(node.get("step", "")).upper()
-            if step_value not in step_priority:
-                continue
-            concept_id = node.get("concept")
-            if not concept_id:
-                continue
-            group = grouped_nodes[concept_id]
-            group.setdefault("concept_id", concept_id)
-            concept_meta = concept_lookup.get(concept_id)
-            if concept_meta is not None:
-                group.setdefault("name", concept_meta.name)
-                group.setdefault("lens", list(concept_meta.lens))
-                group.setdefault("summary", concept_meta.summary)
-            steps_list = group.setdefault("steps", [])
-            if isinstance(steps_list, list):
-                steps_list.append(
-                    {
-                        "id": node.get("id"),
-                        "label": node.get("label", f"{concept_id} · {step_value}"),
-                        "step": step_value,
-                        "lens": node.get("lens", []),
-                        "grade_band": node.get("grade_band"),
-                    }
-                )
-        skill_tree = []
-        for concept_id, group in grouped_nodes.items():
-            steps = group.get("steps", [])
-            if isinstance(steps, list):
-                steps.sort(key=lambda item: step_priority.get(item.get("step", ""), 99))
-            group.setdefault("name", concept_id)
-            group.setdefault("lens", [])
-            group.setdefault("summary", "")
-            skill_tree.append(group)
-        skill_tree.sort(
-            key=lambda item: sequence_order.index(item["concept_id"])  # type: ignore[index]
-            if item["concept_id"] in sequence_order  # type: ignore[operator]
-            else len(sequence_order)
-        )
-        palette = graph_payload.get("meta", {}).get("palette", {})
 
         return active_templates.TemplateResponse(
             "index.html",
@@ -158,6 +174,7 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 "skill_palette": palette,
                 "show_compliance_details": _should_show_compliance(request),
                 "progress_metrics": progress_metrics_data,
+                "hub_url": settings.external_hub_url,
             },
         )
 
@@ -165,9 +182,14 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
     async def problems(
         request: Request,
         category: str = Query(default=None, description="문제 유형"),
+        op: str | None = Query(default=None, description="연산 (add|sub|mul|div)"),
+        digits: int | None = Query(default=None, ge=1, le=4, description="자릿수"),
+        count: int | None = Query(default=None, ge=1, le=50, description="문항 수"),
+        seed: int | None = Query(default=None, alias="seed", description="난수 시드"),
     ) -> HTMLResponse:
         active_templates = resolve_templates(request)
         categories = resolve_allowed_categories()
+        settings = _resolve_settings(request)
         selected_category = (
             category if category in categories else resolve_primary_category(categories)
         )
@@ -182,12 +204,39 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
             "뺄셈": "ALG-AP",
         }
 
+        generation_meta: dict[str, object] | None = None
         if not selected_category:
-            problems_payload: list[dict[str, object]] = []
+            problems_payload = []
         else:
-            problems_payload = [
-                asdict(problem) for problem in get_problems(selected_category)
-            ]
+            default_operation, default_digits = CATEGORY_OPERATION_DEFAULTS.get(
+                selected_category, ("add", 2)
+            )
+            requested_operation = (op or default_operation).lower()
+            effective_digits = digits or default_digits
+            effective_count = count or 20
+            try:
+                generated = generate_problem_set(
+                    operation=requested_operation,
+                    digits=effective_digits,
+                    count=effective_count,
+                    seed=seed,
+                    include_answers=True,
+                )
+            except ValueError:
+                generated = generate_problem_set(
+                    operation=default_operation,
+                    digits=default_digits,
+                    count=effective_count,
+                    seed=seed,
+                    include_answers=True,
+                )
+            problems_payload = generated["items"]
+            generation_meta = {
+                "operation": generated["operation"],
+                "digits": generated["digits"],
+                "seed": generated["seed"],
+                "count": generated["count"],
+            }
             target_node = node_by_category.get(selected_category)
             if target_node:
                 for unit in bridge_units:
@@ -205,6 +254,30 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
                 "primary_category": resolve_primary_category(categories),
                 "category_available": bool(selected_category),
                 "bridge_unit": bridge_unit,
+                "show_compliance_details": _should_show_compliance(request),
+                "hub_url": settings.external_hub_url,
+                "problem_generation": generation_meta,
+            },
+        )
+
+    @router.get("/skills", response_class=HTMLResponse)
+    async def skills_page(request: Request) -> HTMLResponse:
+        active_templates = resolve_templates(request)
+        settings = _resolve_settings(request)
+        categories = resolve_allowed_categories()
+        graph_payload = get_curriculum_graph()
+        concept_nodes = list_concepts()
+        concept_lookup = {node.id: node for node in concept_nodes}
+        skill_tree, palette = _build_skill_tree_overview(graph_payload, concept_lookup)
+        return active_templates.TemplateResponse(
+            "skills.html",
+            {
+                "request": request,
+                "categories": categories,
+                "primary_category": resolve_primary_category(categories),
+                "skill_tree": skill_tree,
+                "skill_palette": palette,
+                "hub_url": settings.external_hub_url,
                 "show_compliance_details": _should_show_compliance(request),
             },
         )

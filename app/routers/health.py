@@ -13,6 +13,11 @@ async def health_check(request: Request) -> Dict[str, Any]:
     return collect_liveness_status(request.app)
 
 
+@router.get("/api/v1/health", summary="Service health check (namespaced)")
+async def health_check_v1(request: Request) -> Dict[str, Any]:
+    return collect_liveness_status(request.app)
+
+
 @router.get("/healthz", summary="Liveness probe")
 async def healthz(request: Request) -> Dict[str, Any]:
     return collect_liveness_status(request.app)

@@ -21,9 +21,14 @@
                 <a href="/" class="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/30 transition hover:-translate-y-0.5 hover:bg-white">
                     <span aria-hidden="true">🏠</span> 허브 홈
                 </a>
-                <a href="/" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
+                <a href="/skills" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
+                    <span aria-hidden="true">🌳</span> 스킬 트리 살펴보기
+                </a>
+                {% if hub_url %}
+                <a href="{{ hub_url }}" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10" target="_blank" rel="noopener">
                     <span aria-hidden="true">🌐</span> 360Me Hub로 이동
                 </a>
+                {% endif %}
             </div>
         </div>
     </section>
@@ -75,6 +80,11 @@
         <header>
             <h2 id="section-problems" class="text-2xl font-semibold text-white sm:text-3xl">총 {{ problems|length }}개의 {{ category_display }} 문제</h2>
             <p class="mt-2 text-sm text-slate-300">포커스 이동과 키보드 입력을 지원하며, 즉시 피드백이 제공됩니다.</p>
+            {% if problem_generation %}
+            <p class="mt-1 text-xs text-slate-400">
+                연산: {{ problem_generation.operation }} · 자릿수 {{ problem_generation.digits }} · 문항 수 {{ problem_generation.count }}{% if problem_generation.seed is not none %} · seed {{ problem_generation.seed }}{% endif %}
+            </p>
+            {% endif %}
         </header>
         <div class="space-y-5" data-problem-list>
             {% for problem in problems %}

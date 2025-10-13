@@ -9,10 +9,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, model_validator
 
-from ..category_service import (
-    resolve_allowed_categories,
-    resolve_primary_category,
-)
+from ..category_service import resolve_allowed_categories, resolve_primary_category
+from ..config import get_settings
 from ..invite_service import InviteSession, InviteSummary, invite_store
 
 
@@ -148,6 +146,8 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
             "categories": categories,
             "primary_category": resolve_primary_category(categories),
         }
+        settings = getattr(request.app.state, "settings", None) or get_settings()
+        context["hub_url"] = getattr(settings, "external_hub_url", None)
         status_code = status.HTTP_200_OK if session else status.HTTP_410_GONE
         active_templates = resolve_templates(request)
         response = active_templates.TemplateResponse(

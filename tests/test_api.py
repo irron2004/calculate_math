@@ -190,6 +190,13 @@ async def test_default_problem_category_is_returned(client) -> None:
     body = response.json()
     assert body["category"] == list_categories()[0]
     assert body["total"] == len(body["items"])
+    assert body["operation"] in {"add", "sub", "mul", "div"}
+    assert 1 <= body["digits"] <= 4
+    assert body["seed"] is None
+    for item in body["items"]:
+        assert "id" in item
+        assert "question" in item
+        assert "answer" not in item
 
 
 async def test_invalid_category_returns_problem_detail(client) -> None:
@@ -198,6 +205,44 @@ async def test_invalid_category_returns_problem_detail(client) -> None:
     body = response.json()
     assert body["type"].endswith("invalid-category")
     assert body["status"] == 404
+
+
+async def test_generate_endpoint_is_deterministic_with_seed(client) -> None:
+    params = {"op": "add", "digits": 2, "count": 3, "seed": 42, "reveal_answers": True}
+    first = await client.get("/api/problems/generate", params=params)
+    second = await client.get("/api/problems/generate", params=params)
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert first.json()["items"] == second.json()["items"]
+
+
+async def test_generated_problem_attempt_is_scored(client) -> None:
+    response = await client.get(
+        "/api/problems/generate",
+        params={"op": "sub", "digits": 2, "count": 1, "seed": 11, "reveal_answers": True},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    problem = payload["items"][0]
+    answer = problem["answer"]
+
+    attempt = await client.post(
+        f"/api/problems/{problem['id']}/attempts",
+        json={"answer": answer},
+    )
+    assert attempt.status_code == 201
+    attempt_payload = attempt.json()
+    assert attempt_payload["is_correct"] is True
+    assert attempt_payload["correct_answer"] == answer
+    assert attempt_payload["category"] == "뺄셈"
+
+
+async def test_problem_listing_can_expose_answers_for_staff(client) -> None:
+    response = await client.get("/api/problems", params={"reveal_answers": True})
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["items"]
+    assert "answer" in payload["items"][0]
 
 
 async def test_request_id_is_preserved(client) -> None:
@@ -215,6 +260,13 @@ async def test_html_routes_emit_noindex_header(client) -> None:
     response = await client.get("/problems")
     assert response.status_code == 200
     assert response.headers["X-Robots-Tag"] == "noindex"
+
+
+async def test_skills_page_renders_and_is_hidden_from_indexing(client) -> None:
+    response = await client.get("/skills")
+    assert response.status_code == 200
+    assert response.headers["X-Robots-Tag"] == "noindex"
+    assert "스킬 트리" in response.text
 
 
 def test_submit_correct_attempt_records_success(client, dataset) -> None:

@@ -4,7 +4,9 @@
 
 ## 주요 기능
 - `/` · `/problems` HTML 화면: 카테고리별 연산 문제 제공, 즉시 채점 UI
+- `/skills`: 스킬 트리 개요 페이지(잠금 해제 하이라이트, 학습 동선 제공)
 - `/api/problems`: 카테고리 필터가 가능한 JSON API (RFC 9457 문제 상세 응답)
+- `/api/problems/generate`: 결정적 산술 문제 생성기(동일 `seed` → 동일 세트)
 - `/api/v1/login`: 닉네임 기반 학생/부모용 계정 생성 + 로그인
 - `/api/v1/sessions`: React 학습 게임이 사용하는 20문제 세트 생성
 - `/api/categories`: 사용 가능한 문제 카테고리 나열
@@ -40,6 +42,7 @@ npm run dev   # http://localhost:5173 (Vite)
 | `ENABLE_OPENAPI` | 문서 노출 여부 (`true`/`false`) | true |
 | `ALLOWED_PROBLEM_CATEGORIES` | 쉼표로 구분된 허용 카테고리 | 모든 카테고리 |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | OTLP 수집기 HTTP(S) 엔드포인트 (`https://otel:4318` 등) | OpenTelemetry 기본값 |
+| `HUB_URL` | 상단 내비게이션의 외부 허브 링크 URL(설정 시만 노출) | 설정하지 않음 |
 | `OTEL_EXPORTER_OTLP_HEADERS` | 콤마 구분 헤더 (`Authorization=Bearer ...`) | 설정하지 않음 |
 | `OTEL_SERVICE_NAME` | OTEL 리소스 `service.name` 값 | calculate-service |
 | `OTEL_SERVICE_NAMESPACE` | OTEL 리소스 `service.namespace` 값 | education |

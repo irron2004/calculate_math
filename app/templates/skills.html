@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}스킬 트리 — 360Me Math Lab{% endblock %}
+
+{% block content %}
+<div class="mx-auto w-full max-w-6xl space-y-14 px-4 py-12 sm:px-6 lg:px-8">
+    <section class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-500 via-sky-500 to-indigo-600 px-6 py-14 text-white shadow-2xl sm:px-10">
+        <div class="absolute inset-0 opacity-20" aria-hidden="true"
+             style="background-image: radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35) 0, transparent 55%),
+                    radial-gradient(circle at 75% 25%, rgba(255,255,255,0.22) 0, transparent 50%),
+                    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.18) 0, transparent 60%);"></div>
+        <div class="relative z-10 mx-auto max-w-4xl space-y-6 text-center">
+            <span class="inline-flex items-center justify-center rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/80">
+                Skill Tree Experiment · skill_tree_layout
+            </span>
+            <h1 class="text-4xl font-bold leading-tight sm:text-5xl">스킬 트리 진행 현황</h1>
+            <p class="text-base text-white/85 sm:text-lg">
+                교과 개념과 원자 스킬의 연결 구조를 한눈에 확인하고, 잠금·해제 상태를 추적하세요.
+                트리에 표시되는 색상은 커리큘럼 렌즈를 나타냅니다.
+            </p>
+            <div class="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+                <a href="/problems" class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 shadow-xl shadow-emerald-900/30 transition hover:-translate-y-0.5 hover:bg-slate-100">
+                    <span aria-hidden="true">🧮</span> 문제로 이동
+                </a>
+                <a href="/problems?category={{ primary_category or '' }}" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                    <span aria-hidden="true">🚀</span> 추천 스테이지 연습
+                </a>
+                {% if hub_url %}
+                <a href="{{ hub_url }}" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10" target="_blank" rel="noopener">
+                    <span aria-hidden="true">🌐</span> 메인 허브
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section aria-labelledby="section-overview" class="space-y-6">
+        <header class="space-y-2 text-center">
+            <h2 id="section-overview" class="text-3xl font-semibold text-white sm:text-4xl">개념별 스킬 트리 요약</h2>
+            <p class="text-sm text-slate-300">각 카드에는 단계(S1~S3)와 해당 렌즈가 표시됩니다. 잠금 해제된 노드는 실시간으로 강조됩니다.</p>
+        </header>
+        <p class="text-center text-sm text-slate-400" data-skill-status role="status">스킬 트리를 불러오는 중입니다…</p>
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3" data-skill-grid>
+            {% for concept in skill_tree %}
+            {% set palette = skill_palette.get(concept.concept_id) if skill_palette else None %}
+            <article class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-sky-900/10 transition hover:-translate-y-0.5 hover:shadow-2xl" data-skill-concept data-concept-id="{{ concept.concept_id }}">
+                <header class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-xl font-semibold text-white">{{ concept.name }}</h3>
+                        {% if concept.summary %}
+                        <p class="mt-1 text-sm text-slate-300">{{ concept.summary }}</p>
+                        {% endif %}
+                    </div>
+                    {% if palette %}
+                    <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold text-white" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.24); color: {{ palette }};">
+                        <span aria-hidden="true">🎨</span>{{ palette }}
+                    </span>
+                    {% endif %}
+                </header>
+                <ul class="mt-5 space-y-3">
+                    {% for step in concept.steps %}
+                    <li class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white transition" data-skill-node="{{ step.id }}">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white">{{ loop.index }}</span>
+                            <div>
+                                <p class="font-semibold">{{ step.label }}</p>
+                                {% if step.lens %}
+                                <p class="text-xs text-slate-300">렌즈: {{ step.lens|join(', ') }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <span class="rounded-full bg-slate-950/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">{{ step.step }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    <section aria-labelledby="section-legend" class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-xl shadow-sky-900/10">
+        <h2 id="section-legend" class="text-2xl font-semibold text-white">상태 범례</h2>
+        <dl class="mt-4 grid gap-4 sm:grid-cols-3 text-sm text-slate-200">
+            <div class="rounded-2xl border border-emerald-400/40 bg-emerald-500/15 px-4 py-3">
+                <dt class="font-semibold text-emerald-200">해제됨</dt>
+                <dd class="mt-1 text-slate-200">학습을 시작할 수 있는 상태입니다. 노드가 강조 표시됩니다.</dd>
+            </div>
+            <div class="rounded-2xl border border-sky-400/40 bg-sky-500/10 px-4 py-3">
+                <dt class="font-semibold text-sky-200">진행 중</dt>
+                <dd class="mt-1 text-slate-200">문제를 풀고 있는 중이라면 파란색 테두리로 표시됩니다.</dd>
+            </div>
+            <div class="rounded-2xl border border-white/15 bg-white/5 px-4 py-3">
+                <dt class="font-semibold text-white/75">잠김</dt>
+                <dd class="mt-1 text-slate-300">선행 스킬을 먼저 완료해야 하는 상태입니다.</dd>
+            </div>
+        </dl>
+    </section>
+</div>
+
+<script type="module">
+const statusLabel = document.querySelector('[data-skill-status]');
+const nodeElements = Array.from(document.querySelectorAll('[data-skill-node]'));
+
+function applyState(element, state) {
+    element.classList.remove('border-white/10', 'bg-white/5', 'border-emerald-400', 'bg-emerald-500/10', 'border-amber-400', 'bg-amber-500/10');
+    if (state === 'unlocked') {
+        element.classList.add('border-emerald-400', 'bg-emerald-500/10');
+        element.setAttribute('data-state', 'unlocked');
+    } else if (state === 'in-progress') {
+        element.classList.add('border-amber-400', 'bg-amber-500/10');
+        element.setAttribute('data-state', 'in-progress');
+    } else {
+        element.classList.add('border-white/10', 'bg-white/5');
+        element.setAttribute('data-state', 'locked');
+    }
+}
+
+async function hydrateSkillTree() {
+    try {
+        const response = await fetch('/api/v1/skills/tree', { credentials: 'include' });
+        if (!response.ok) {
+            throw new Error(`스킬 트리를 불러오지 못했습니다. (HTTP ${response.status})`);
+        }
+        const payload = await response.json();
+        const unlocked = payload && payload.unlocked ? payload.unlocked : {};
+        const progress = payload && payload.progress ? payload.progress : {};
+        const nodesProgress = progress.nodes || {};
+
+        nodeElements.forEach((element) => {
+            const nodeId = element.dataset.skillNode;
+            if (!nodeId) {
+                return;
+            }
+            const nodeState = nodesProgress[nodeId];
+            if (nodeState && nodeState.completed) {
+                applyState(element, 'unlocked');
+                return;
+            }
+            if (unlocked[nodeId]) {
+                applyState(element, 'unlocked');
+                return;
+            }
+            if (nodeState && nodeState.in_progress) {
+                applyState(element, 'in-progress');
+                return;
+            }
+            applyState(element, 'locked');
+        });
+
+        if (statusLabel) {
+            statusLabel.textContent = '스킬 트리를 최신 상태로 불러왔습니다.';
+            statusLabel.classList.remove('text-rose-300');
+            statusLabel.classList.add('text-emerald-300');
+        }
+
+        const experiment = payload && payload.experiment ? payload.experiment : null;
+        if (experiment && window.analytics && typeof window.analytics.trackEvent === 'function') {
+            window.analytics.trackEvent('experiment_exposure', {
+                experiment: experiment.name,
+                variant: experiment.variant,
+                source: experiment.source,
+                bucket: experiment.bucket,
+                request_id: experiment.request_id,
+                rollout: experiment.rollout,
+                surface: 'skill_tree_web',
+            });
+        }
+    } catch (error) {
+        if (statusLabel) {
+            const message = error instanceof Error ? error.message : '스킬 트리를 불러오는 중 오류가 발생했습니다.';
+            statusLabel.textContent = message;
+            statusLabel.classList.remove('text-emerald-300');
+            statusLabel.classList.add('text-rose-300');
+        }
+        nodeElements.forEach((element) => applyState(element, 'locked'));
+        console.error(error);
+    }
+}
+
+if (nodeElements.length > 0) {
+    hydrateSkillTree();
+} else if (statusLabel) {
+    statusLabel.textContent = '표시할 스킬 트리 데이터가 없습니다.';
+}
+</script>
+{% endblock %}
