@@ -5,6 +5,7 @@
 - `docs/skills.schema.json` : 스킬 트리 JSON 스키마
 - `scripts/dag_to_skills.py` : `docs/dag.md`를 파싱해 `skills.json` 생성
 - `scripts/validate_skills.py` : 스킬 JSON 검증(스키마/사이클/참조)
+- `graph.bipartite.json` : 코스·스텝 ↔ 원자 스킬 이중 레이어 그래프
 - `app/data/skills.baseline.json` : 대화에서 정리된 베이스라인 DAG (샘플)
 
 ## 사용법

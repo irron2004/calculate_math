@@ -69,7 +69,31 @@ const sampleBipartiteGraph = {
       xp_per_correct: 2,
     },
   ],
-  edges: [],
+  edges: [
+    { from: 'AS.MUL.FACTS', to: 'C01-S1', type: 'requires', min_level: 1 },
+    { from: 'C01-S1', to: 'AS.MUL.FACTS', type: 'teaches', delta_level: 1 },
+  ],
+};
+
+const sampleProgress = {
+  user_id: '1',
+  updated_at: '2025-01-01T09:00:00+00:00',
+  total_xp: 150,
+  nodes: {
+    'C01-S1': {
+      xp_earned: 120,
+      xp_required: 120,
+      level: 1,
+      unlocked: true,
+      completed: true,
+      lrc_status: 'gold',
+      lrc_metrics: { accuracy: 0.94 },
+      attempts: 6,
+    },
+  },
+  skills: {
+    'AS.MUL.FACTS': { level: 1, xp: 40 },
+  },
 };
 
 describe('SkillTreePage', () => {
@@ -82,8 +106,8 @@ describe('SkillTreePage', () => {
     mockedFetchSkillTree.mockResolvedValue({
       graph: sampleGraph,
       bipartite_graph: sampleBipartiteGraph,
-      progress: {},
-      unlocked: {},
+      progress: sampleProgress,
+      unlocked: { 'C01-S1': true, 'AS.MUL.FACTS': true, 'ALG-1': false },
       experiment: {
         name: 'skill_tree_layout',
         variant: 'list',
@@ -105,10 +129,14 @@ describe('SkillTreePage', () => {
     );
     expect(screen.getByTestId('view-toggle-course')).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByText('C01·S1 자리가치·분해')).toBeInTheDocument();
+    expect(screen.getByText(/총 XP 150/)).toBeInTheDocument();
+    expect(screen.getByTestId('requirements-C01-S1')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('view-toggle-atomic'));
     await waitFor(() => expect(screen.getByTestId('atomic-skills')).toBeInTheDocument());
+    expect(screen.getByTestId('taught-by-AS.MUL.FACTS')).toBeInTheDocument();
     expect(screen.getByText('리스트 보기로 렌즈와 티어를 빠르게 확인하고 바로 학습을 시작하세요.')).toBeInTheDocument();
-    expect(screen.getByText('학습 시작')).toBeInTheDocument();
+    const actionButton = screen.getByRole('button', { name: '잠김' });
+    expect(actionButton).toBeDisabled();
 
     expect(mockedTrackExperimentExposure).toHaveBeenCalledTimes(1);
     expect(mockedTrackExperimentExposure).toHaveBeenCalledWith({
@@ -126,8 +154,8 @@ describe('SkillTreePage', () => {
     mockedFetchSkillTree.mockResolvedValue({
       graph: sampleGraph,
       bipartite_graph: sampleBipartiteGraph,
-      progress: {},
-      unlocked: {},
+      progress: sampleProgress,
+      unlocked: { 'C01-S1': true, 'AS.MUL.FACTS': true, 'ALG-1': true },
     });
 
     render(

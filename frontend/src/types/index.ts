@@ -190,10 +190,34 @@ export type SkillTreeExperiment = {
   bucket?: number | string | null;
 };
 
+export type SkillNodeProgress = {
+  xp_earned: number;
+  xp_required?: number | null;
+  level?: number | null;
+  unlocked: boolean;
+  completed: boolean;
+  lrc_status?: string | null;
+  lrc_metrics?: Record<string, number>;
+  attempts?: number | null;
+};
+
+export type AtomicSkillProgress = {
+  level: number;
+  xp: number;
+};
+
+export type SkillTreeProgress = {
+  user_id?: string | null;
+  updated_at?: string | null;
+  total_xp: number;
+  nodes: Record<string, SkillNodeProgress>;
+  skills: Record<string, AtomicSkillProgress>;
+};
+
 export type SkillTreeResponse = {
   graph: SkillGraph;
   bipartite_graph?: BipartiteGraph;
-  progress: Record<string, unknown>;
+  progress?: SkillTreeProgress;
   unlocked: Record<string, boolean>;
   experiment?: SkillTreeExperiment;
 };

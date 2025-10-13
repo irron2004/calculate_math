@@ -59,15 +59,26 @@ Both variants keep identical data sources and navigation flows to prevent confou
 ## Launch Checklist
 1. ✅ Ship backend & frontend plumbing behind configurable rollout.
 2. ✅ Validate logging in staging (headers, cookies, analytics payloads).
-3. ☐ Dry-run analysis script with sample data to confirm schema.
+3. ☑ Dry-run analysis script with sample data to confirm schema.
+   - Command: `python scripts/analyze_skill_tree_layout.py docs/experiments/sample_data/skill_tree_layout_sample.jsonl`
+   - Expected output confirms both `tree`/`list` variants register exposures and session starts; no schema violations detected.
 4. ☐ Enable 10% treatment for smoke test; monitor for 1 hour.
+   - Follow `docs/experiments/skill_tree_layout_smoke_test.md` for rollout, verification, and rollback steps.
 5. ☐ Ramp to 50% if guardrails stable; notify stakeholders.
+   - Follow `docs/experiments/skill_tree_layout_ramp.md` for rollout, monitoring cadence, and comms plan.
 
 ## Analysis Approach
 - Primary analysis uses two-sample t-test (or non-parametric alternative) comparing session start rates between variants over a fixed observation window (minimum N = 3k exposures per arm).
 - Complement with Bayesian credible intervals on lift to communicate uncertainty.
 - Segment by learner tenure (new vs returning) to detect heterogeneous effects.
 - Summarize findings in experiment notebook and archive in `/docs/experiments/results/skill_tree_layout.md` post-analysis.
+
+### Dry-run validation notes
+- Sample dataset lives at `docs/experiments/sample_data/skill_tree_layout_sample.jsonl` and mirrors the analytics payload shape (exposure plus engagement events).
+- Running `python scripts/analyze_skill_tree_layout.py docs/experiments/sample_data/skill_tree_layout_sample.jsonl` should emit variant-level exposure counts and verify required metadata fields (`name`, `variant`, `source`, `bucket`, `rollout`, `request_id`).
+- CI will not execute the script automatically; trigger manually before altering rollout percentages to spot schema drifts early.
+- For smoke testing, see the runbook in `docs/experiments/skill_tree_layout_smoke_test.md` covering environment overrides, monitoring, and rollback guardrails.
+- For the 50% ramp, reference `docs/experiments/skill_tree_layout_ramp.md` to ensure balanced exposure, guardrail tracking, and stakeholder updates.
 
 ## Rollback Criteria
 - Guardrail violations (time to first action or completion rate) beyond thresholds.
