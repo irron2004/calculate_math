@@ -91,6 +91,13 @@ const sampleResponse: SkillTreeResponse = {
         available: true,
         unlocked: true,
       },
+      session: {
+        concept: 'ALG-AP',
+        step: 'S1',
+        problem_count: 12,
+        generator: 'arithmetic',
+        parameters: { op: 'add', count: 12 },
+      },
       progress: sampleProgress.nodes['C01-S1'],
     },
   ],

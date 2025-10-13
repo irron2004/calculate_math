@@ -273,6 +273,13 @@ const MathGame: React.FC = () => {
   const [completedStepsByConcept, setCompletedStepsByConcept] = useState<Record<string, StepID[]>>({});
   const [curriculumSequence, setCurriculumSequence] = useState<SequenceEntry[]>([]);
   const [sequenceIndex, setSequenceIndex] = useState<number | null>(null);
+  const [activeSessionConfig, setActiveSessionConfig] = useState<CourseSessionConfig | null>(
+    requestedSessionConfig
+  );
+
+  useEffect(() => {
+    setActiveSessionConfig(requestedSessionConfig);
+  }, [requestedSessionConfig]);
 
   const resetRoundState = () => {
     setScore(0);
@@ -730,9 +737,10 @@ const MathGame: React.FC = () => {
       typeof sessionConfig.problem_count === 'number' && Number.isFinite(sessionConfig.problem_count)
         ? sessionConfig.problem_count
         : null;
+    const parameters = sessionConfig.parameters ?? {};
     const parameterCount =
-      sessionConfig.parameters && typeof sessionConfig.parameters.count === 'number'
-        ? Number(sessionConfig.parameters.count)
+      typeof (parameters as Record<string, unknown>).count === 'number'
+        ? Number((parameters as Record<string, unknown>).count)
         : null;
     const targetCount = explicitCount ?? parameterCount ?? PROBLEMS_PER_STEP;
     if (sessionConfig.generator === 'arithmetic') {
@@ -854,13 +862,23 @@ const MathGame: React.FC = () => {
     setCurrentProblem(problems[0] ?? null);
     setGameState(problems.length ? 'playing' : 'finished');
 
+    let sequencePosition: number | null = sequenceIndex;
+    if (options.sequenceEntry) {
+      const idx = curriculumSequence.findIndex(
+        (entry) => entry.conceptId === options.sequenceEntry?.conceptId && entry.step === options.sequenceEntry?.step
+      );
+      if (idx >= 0) {
+        sequencePosition = idx;
+      }
+    }
+
     if (options.source === 'skill_node' || options.triggeredByTree) {
       trackSessionStartedFromTree({
         conceptId: concept.id,
         conceptName: concept.name,
         step,
         nodeId: options.sequenceEntry?.nodeId ?? `${concept.id}-${step}`,
-        sequenceIndex: options.sequenceEntry ? curriculumSequence.indexOf(options.sequenceEntry) : null,
+        sequenceIndex: sequencePosition,
         triggeredBy: 'skill_node',
         available: true,
         completed: false,
@@ -874,9 +892,7 @@ const MathGame: React.FC = () => {
       step,
       nodeId: options.sequenceEntry?.nodeId ?? `${concept.id}-${step}`,
       source: options.source ?? 'unknown',
-      sequenceIndex: options.sequenceEntry
-        ? curriculumSequence.indexOf(options.sequenceEntry)
-        : sequenceIndex,
+      sequenceIndex: sequencePosition,
       available: true,
       completed: false,
       lens: concept.lens?.[0] ?? null,
@@ -915,8 +931,11 @@ const MathGame: React.FC = () => {
 
       const requestedConceptId = requestedConceptParam && catalog[requestedConceptParam]
         ? requestedConceptParam
+        : requestedSessionConfig?.concept && catalog[requestedSessionConfig.concept]
+        ? requestedSessionConfig.concept
         : null;
-      const requestedStep = requestedStepParam;
+      const requestedStep =
+        requestedStepParam ?? (requestedSessionConfig?.step ? requestedSessionConfig.step : null);
 
       const orderedConcepts = reorderConceptsBySequence(sequence, catalog);
       setConcepts(orderedConcepts);
@@ -936,6 +955,7 @@ const MathGame: React.FC = () => {
           await loadProblemsForStep(targetConcept, requestedStep, {
             source: 'query_param',
             sequenceEntry: targetEntry,
+            sessionConfig: requestedSessionConfig,
           });
           if (targetIndex !== -1) {
             setSequenceIndex(targetIndex);
@@ -1018,7 +1038,7 @@ const MathGame: React.FC = () => {
   useEffect(() => {
     void initialiseGame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, requestedConceptParam, requestedStepParam]);
+  }, [user?.id, requestedConceptParam, requestedStepParam, requestedSessionParam]);
 
   const handleConceptSelect = async (conceptId: string) => {
     const concept = conceptCatalog[conceptId];

@@ -46,7 +46,7 @@ export interface SkillViewedPayload {
   completed: boolean;
   lens?: string | null;
   problemCount?: number;
-  problemsSource?: 'generated' | 'session_fallback' | 'local_fallback';
+  problemsSource?: 'generated' | 'session_config' | 'session_fallback' | 'local_fallback';
 }
 
 export const trackSkillViewed = (payload: SkillViewedPayload) => {
