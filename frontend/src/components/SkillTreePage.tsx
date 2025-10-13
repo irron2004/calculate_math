@@ -104,21 +104,6 @@ export const SkillTreePage: React.FC = () => {
   const [experiment, setExperiment] = useState<ExperimentAssignment | null>(null);
 
   useEffect(() => {
-    if (!experiment) {
-      return;
-    }
-    trackExperimentExposure({
-      experiment: experiment.name,
-      variant: experiment.variant,
-      source: experiment.source,
-      bucket: experiment.bucket ?? undefined,
-      requestId: experiment.requestId ?? undefined,
-      rollout: experiment.rollout ?? undefined,
-      surface: 'skill_tree_page',
-    });
-  }, [experiment]);
-
-  useEffect(() => {
     let cancelled = false;
     const load = async () => {
       setIsLoading(true);
@@ -216,6 +201,17 @@ export const SkillTreePage: React.FC = () => {
               bucket: payload.experiment.bucket ?? null,
             }
           : null;
+        if (nextExperiment) {
+          trackExperimentExposure({
+            experiment: nextExperiment.name,
+            variant: nextExperiment.variant,
+            source: nextExperiment.source,
+            bucket: nextExperiment.bucket ?? undefined,
+            requestId: nextExperiment.requestId ?? undefined,
+            rollout: nextExperiment.rollout ?? undefined,
+            surface: 'skill_tree_page',
+          });
+        }
         setExperiment(nextExperiment);
         setError(null);
       } catch (err) {
