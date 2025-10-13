@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,6 +7,16 @@ import SkillTreePage from '../SkillTreePage';
 import type { SkillTreeResponse } from '../../types';
 import { fetchSkillTree } from '../../utils/api';
 import { trackExperimentExposure } from '../../utils/analytics';
+
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 vi.mock('../../utils/api', () => ({
   fetchSkillTree: vi.fn(),
@@ -128,6 +138,7 @@ describe('SkillTreePage', () => {
   beforeEach(() => {
     mockedFetchSkillTree.mockReset();
     mockedTrackExperimentExposure.mockReset();
+    mockNavigate.mockReset();
   });
 
   it('renders experiment variant and tracks exposure metadata', async () => {
@@ -175,5 +186,27 @@ describe('SkillTreePage', () => {
       expect(screen.getByTestId('skill-tree-page')).toHaveAttribute('data-experiment-variant', 'tree')
     );
     expect(mockedTrackExperimentExposure).not.toHaveBeenCalled();
+  });
+
+  it('navigates with session parameters when starting an available node', async () => {
+    mockedFetchSkillTree.mockResolvedValue(sampleResponse);
+
+    render(
+      <MemoryRouter>
+        <SkillTreePage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByText('C01·S1 자리가치·분해')).toBeInTheDocument());
+
+    const button = screen.getByRole('button', { name: '학습 시작' });
+    fireEvent.click(button);
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    const destination = mockNavigate.mock.calls[0][0] as string;
+    expect(destination).toContain('skill=C01-S1');
+    expect(destination).toContain('concept=ALG-AP');
+    expect(destination).toContain('step=S1');
+    expect(destination).toContain('session=');
   });
 });
