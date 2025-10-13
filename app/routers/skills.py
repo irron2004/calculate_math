@@ -1,25 +1,35 @@
 from __future__ import annotations
 
+import logging
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from pydantic import BaseModel, Field
 
 from ..feature_flags import assign_skill_tree_variant
-from ..skills_loader import get_skill_graph
-from ..bipartite_loader import get_bipartite_graph, get_course_steps, get_atomic_skills
+from ..skills_loader import SkillSpecError, get_skill_graph
+from ..bipartite_loader import (
+    BipartiteSpecError,
+    get_bipartite_graph,
+    get_course_steps,
+    get_atomic_skills,
+)
 from ..progress_store import (
     ProgressStore,
     ProgressSnapshot,
     NodeProgress,
     SkillProgress,
     get_progress_store,
+    ProgressDataError,
 )
 from ..dependencies.auth import get_optional_user
 from ..repositories import UserRecord
 from ..services import SkillProgressService
 
 router = APIRouter(prefix="/api/v1", tags=["skills"])
+
+
+logger = logging.getLogger("calculate_service.api.skills")
 
 
 class SkillProgressRequest(BaseModel):
@@ -110,40 +120,84 @@ async def api_get_skill_tree(
     user_id: Optional[str] = Query(None, description="Optional user id override"),
     user: UserRecord | None = Depends(get_optional_user),
 ) -> Dict[str, Any]:
-    skill_graph = get_skill_graph()
-    bipartite_graph = get_bipartite_graph()
-    course_steps = get_course_steps()
-    atomic_skills = get_atomic_skills()
-    store = _resolve_progress_store(request)
-
-    effective_user_id = user.id if user is not None else user_id
-    snapshot = _select_snapshot(store, effective_user_id)
-
-    node_progress = _serialise_node_progress(course_steps, snapshot)
-    skill_progress = _serialise_skill_progress(atomic_skills, snapshot)
-
-    unlocked: Dict[str, bool] = {
-        **{node_id: data.get("unlocked", False) for node_id, data in node_progress.items()},
-        **{skill_id: data.get("level", 0) > 0 for skill_id, data in skill_progress.items()},
-    }
-
-    progress_payload: Dict[str, Any] = {
-        "user_id": snapshot.user_id if snapshot else effective_user_id,
-        "updated_at": snapshot.updated_at.isoformat() if snapshot else None,
-        "total_xp": snapshot.total_xp if snapshot else 0,
-        "nodes": node_progress,
-        "skills": skill_progress,
-    }
-
     assignment = assign_skill_tree_variant(request, response)
-    payload: Dict[str, Any] = {
-        "graph": skill_graph.model_dump(by_alias=True),
-        "bipartite_graph": bipartite_graph.model_dump(by_alias=True),
-        "progress": progress_payload,
-        "unlocked": unlocked,
-        "experiment": assignment.to_payload(),
-    }
-    return payload
+    try:
+        skill_graph = get_skill_graph()
+        bipartite_graph = get_bipartite_graph()
+        course_steps = get_course_steps()
+        atomic_skills = get_atomic_skills()
+        store = _resolve_progress_store(request)
+
+        effective_user_id = user.id if user is not None else user_id
+        snapshot = _select_snapshot(store, effective_user_id)
+
+        node_progress = _serialise_node_progress(course_steps, snapshot)
+        skill_progress = _serialise_skill_progress(atomic_skills, snapshot)
+
+        unlocked: Dict[str, bool] = {
+            **{
+                node_id: data.get("unlocked", False)
+                for node_id, data in node_progress.items()
+            },
+            **{skill_id: data.get("level", 0) > 0 for skill_id, data in skill_progress.items()},
+        }
+
+        progress_payload: Dict[str, Any] = {
+            "user_id": snapshot.user_id if snapshot else effective_user_id,
+            "updated_at": snapshot.updated_at.isoformat() if snapshot else None,
+            "total_xp": snapshot.total_xp if snapshot else 0,
+            "nodes": node_progress,
+            "skills": skill_progress,
+        }
+
+        payload: Dict[str, Any] = {
+            "graph": skill_graph.model_dump(by_alias=True),
+            "bipartite_graph": bipartite_graph.model_dump(by_alias=True),
+            "progress": progress_payload,
+            "unlocked": unlocked,
+            "experiment": assignment.to_payload(),
+        }
+        return payload
+    except (SkillSpecError, BipartiteSpecError, ProgressDataError) as exc:
+        logger.exception("Failed to load skill tree payload")
+        fallback_progress: Dict[str, Any] = {
+            "user_id": None,
+            "updated_at": None,
+            "total_xp": 0,
+            "nodes": {},
+            "skills": {},
+        }
+        return {
+            "graph": {"nodes": [], "edges": [], "meta": {}},
+            "bipartite_graph": {"nodes": [], "edges": [], "palette": {}},
+            "progress": fallback_progress,
+            "unlocked": {},
+            "experiment": assignment.to_payload(),
+            "error": {
+                "message": "스킬 트리 데이터를 불러오는 중 문제가 발생했습니다.",
+                "kind": exc.__class__.__name__,
+            },
+        }
+    except Exception as exc:  # pragma: no cover - defensive fallback
+        logger.exception("Unexpected error while building skill tree payload")
+        fallback_progress = {
+            "user_id": None,
+            "updated_at": None,
+            "total_xp": 0,
+            "nodes": {},
+            "skills": {},
+        }
+        return {
+            "graph": {"nodes": [], "edges": [], "meta": {}},
+            "bipartite_graph": {"nodes": [], "edges": [], "palette": {}},
+            "progress": fallback_progress,
+            "unlocked": {},
+            "experiment": assignment.to_payload(),
+            "error": {
+                "message": "스킬 트리를 불러오는 중 예기치 못한 오류가 발생했습니다.",
+                "kind": "UnexpectedError",
+            },
+        }
 
 
 @router.post("/skills/progress")

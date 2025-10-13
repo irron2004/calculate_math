@@ -213,7 +213,12 @@ export const SkillTreePage: React.FC = () => {
           });
         }
         setExperiment(nextExperiment);
-        setError(null);
+        if (payload.error && typeof (payload.error as { message?: unknown }).message === 'string') {
+          const message = (payload.error as { message?: unknown }).message;
+          setError(typeof message === 'string' ? message : null);
+        } else {
+          setError(null);
+        }
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : '스킬 트리를 불러오지 못했습니다.');
