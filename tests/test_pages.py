@@ -48,8 +48,14 @@ async def test_problems_page_without_categories_shows_invite_notice(client, monk
     assert "초대 링크를 생성할 수 없습니다" in body
 
 
-async def test_home_page_hides_compliance_copy_for_learners(client):
-    response = await client.get("/")
+async def test_home_redirects_to_skills(client):
+    response = await client.get("/", follow_redirects=False)
+    assert response.status_code == 302
+    assert response.headers["location"] == "/skills"
+
+
+async def test_home_page_route_hides_compliance_copy_for_learners(client):
+    response = await client.get("/home")
     assert response.status_code == 200
     body = response.text
     assert "Web Vitals" not in body
@@ -65,8 +71,8 @@ async def test_home_page_hides_compliance_copy_for_learners(client):
     assert "학습 공유 링크만 생성" not in body
 
 
-async def test_home_page_shows_compliance_copy_for_staff_toggle(client):
-    response = await client.get("/?staff=1")
+async def test_home_page_route_shows_compliance_copy_for_staff_toggle(client):
+    response = await client.get("/home?staff=1")
     assert response.status_code == 200
     body = response.text
     assert "Web Vitals" in body

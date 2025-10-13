@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Callable
 
 from fastapi import APIRouter, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from ..config import Settings, get_settings
@@ -121,8 +121,12 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
     router = APIRouter(tags=["pages"])
     resolve_templates = _templates_resolver(templates)
 
-    @router.get("/", response_class=HTMLResponse)
-    async def home(request: Request) -> HTMLResponse:
+    @router.get("/", response_class=RedirectResponse)
+    async def home(request: Request) -> RedirectResponse:
+        return RedirectResponse(url="/skills", status_code=302)
+
+    @router.get("/home", response_class=HTMLResponse)
+    async def home_page(request: Request) -> HTMLResponse:
         active_templates = resolve_templates(request)
         settings = _resolve_settings(request)
         categories = resolve_allowed_categories()
