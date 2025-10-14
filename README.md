@@ -80,6 +80,7 @@ frontend/
 
 ## 추가 문서
 - [Skill Tree Content & Visual Standards Guide](docs/skill_tree_content_guide.md): 스킬 트리 카피, 로컬라이제이션 키, 시각 요소 표준과 협업 절차 정리
+- [Diablo-Style Skill Tree Gap Analysis](docs/skill_tree_diablo_gap_analysis.md): 디아블로형 스킬트리 미구현 원인과 개선 과제 정리
 
 ## 라이선스
 MIT
