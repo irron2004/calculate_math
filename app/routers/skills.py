@@ -44,9 +44,38 @@ def _load_skill_ui_graph() -> Dict[str, Any]:
     if not _SKILL_UI_PATH.exists():
         raise SkillSpecError(f"Skill UI graph not found at {_SKILL_UI_PATH}")
     try:
-        return json.loads(_SKILL_UI_PATH.read_text(encoding="utf-8"))
+        payload = json.loads(_SKILL_UI_PATH.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:  # pragma: no cover - defensive guard
         raise SkillSpecError("Invalid skill UI graph specification") from exc
+
+    nodes = payload.get("nodes")
+    if not isinstance(nodes, list) or not nodes:
+        raise SkillSpecError("Skill UI graph must define at least one node")
+
+    node_ids = []
+    for node in nodes:
+        if not isinstance(node, dict) or "id" not in node:
+            raise SkillSpecError("Skill UI graph nodes must include an 'id' field")
+        node_ids.append(node["id"])
+
+    node_id_set = set(node_ids)
+    edges = payload.get("edges", [])
+    if edges and isinstance(edges, list):
+        missing_endpoints = []
+        for edge in edges:
+            if not isinstance(edge, dict):
+                raise SkillSpecError("Skill UI graph edges must be objects with 'from' and 'to'")
+            source = edge.get("from")
+            target = edge.get("to")
+            unknown = [endpoint for endpoint in (source, target) if endpoint not in node_id_set]
+            if unknown:
+                missing_endpoints.extend(endpoint for endpoint in unknown if endpoint)
+        if missing_endpoints:
+            unique_missing = sorted(set(missing_endpoints))
+            preview = ", ".join(unique_missing[:5])
+            raise SkillSpecError(f"Skill UI graph edges reference unknown nodes: {preview}")
+
+    return payload
 
 
 class SkillProgressRequest(BaseModel):

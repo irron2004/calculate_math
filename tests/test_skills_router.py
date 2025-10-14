@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import importlib
 import sys
@@ -80,3 +81,21 @@ async def test_skill_progress_update_mutates_snapshot(client):
     payload = response.json()
     assert payload["nodes"]["C01-S1"]["xp_earned"] >= base_xp + 10
     assert payload["skills"]["AS.PV.DECOMP"]["level"] >= 1
+
+
+async def test_skill_tree_returns_error_when_ui_graph_invalid(monkeypatch, tmp_path, client):
+    from app.routers import skills as skills_module
+
+    invalid_ui_path = tmp_path / "skills.ui.json"
+    invalid_ui_path.write_text(json.dumps({"version": "invalid", "nodes": [], "edges": []}), encoding="utf-8")
+
+    monkeypatch.setattr(skills_module, "_SKILL_UI_PATH", invalid_ui_path)
+    skills_module._load_skill_ui_graph.cache_clear()
+
+    response = await client.get("/api/v1/skills/tree")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["graph"] is None
+    assert payload["error"]["kind"] == "SkillSpecError"
+
+    skills_module._load_skill_ui_graph.cache_clear()

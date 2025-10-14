@@ -314,6 +314,23 @@ useEffect(() => {
     }
   }, [selectedNodeId, selectedNode]);
 
+  useEffect(() => {
+    if (isLoading || error || !uiGraph) {
+      return;
+    }
+    const graphNodeCount = Array.isArray(uiGraph.nodes) ? uiGraph.nodes.length : 0;
+    if (graphNodeCount === 0 || graphNodesView.length === 0) {
+      const apiBaseUrl =
+        (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) || '';
+      console.warn('[SkillTree] 그래프 노드가 비어 있습니다.', {
+        apiBaseUrl,
+        graphNodeCount,
+        graphEdgeCount: Array.isArray(uiGraph.edges) ? uiGraph.edges.length : 0,
+        payloadNodeCount: nodes.length,
+      });
+    }
+  }, [isLoading, error, uiGraph, graphNodesView.length, nodes.length]);
+
 useEffect(() => {
   if (!selectedNode) {
     return undefined;
@@ -471,7 +488,11 @@ useEffect(() => {
 
       {graphNodesView.length === 0 ? (
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 text-center text-slate-300">
-          표시할 스킬 트리 데이터가 없습니다.
+          <p>표시할 스킬 트리 데이터가 없습니다.</p>
+          <p className="mt-2 text-xs text-slate-500">
+            `/api/v1/skills/tree` 응답의 그래프 노드를 불러오지 못했습니다. 프로덕션 환경 변수 `VITE_API_BASE_URL` 및
+            `skills.ui.json` 배포 상태를 확인하고, 자세한 점검 항목은 `docs/skill_tree_feedback.md`를 참고하세요.
+          </p>
         </div>
       ) : (
         <SkillTreeGraph

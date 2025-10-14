@@ -10,14 +10,21 @@ import type {
   SkillProgressResponse,
   SkillTreeResponse,
   TemplateSummary,
-  UserProgressMetrics
+  UserProgressMetrics,
 } from '../types';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/math-api/api';
 
+if (typeof window !== 'undefined' && !import.meta.env.VITE_API_BASE_URL) {
+  console.warn(
+    '[API] VITE_API_BASE_URL가 설정되지 않아 기본 경로 "/math-api/api"를 사용합니다. 배포 환경에서 백엔드 라우팅이 다르면 .env.production을 업데이트하세요.',
+  );
+}
+
 // API 호출 유틸리티 함수
 async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
       ...options?.headers,
@@ -27,7 +34,24 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`API 호출 실패: ${response.status}`);
+    let bodyPreview: string | undefined;
+    try {
+      const text = await response.clone().text();
+      bodyPreview = text.trim().slice(0, 200);
+    } catch (error) {
+      bodyPreview = undefined;
+    }
+    console.error('[API] 호출 실패', {
+      url,
+      status: response.status,
+      statusText: response.statusText,
+      bodyPreview,
+    });
+    throw new Error(
+      `API 호출 실패: ${response.status} ${response.statusText} @ ${url}${
+        bodyPreview ? ` → ${bodyPreview}` : ''
+      }`,
+    );
   }
 
   return response.json();
