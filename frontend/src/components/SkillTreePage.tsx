@@ -13,7 +13,7 @@ import type {
 } from '../types';
 import { fetchSkillTree } from '../utils/api';
 import { trackExperimentExposure } from '../utils/analytics';
-import { resolveConceptStep } from '../utils/skillMappings';
+import { registerCourseConcept, resetCourseConceptOverrides, resolveConceptStep } from '../utils/skillMappings';
 
 type ExperimentAssignment = {
   name: string;
@@ -120,7 +120,14 @@ const SkillTreePage: React.FC = () => {
         setVersion(payload.version ?? null);
         setPalette(payload.palette ?? {});
         setGroups(Array.isArray(payload.groups) ? payload.groups : []);
-        setNodes(Array.isArray(payload.nodes) ? payload.nodes : []);
+        const nodeList = Array.isArray(payload.nodes) ? payload.nodes : [];
+        resetCourseConceptOverrides();
+        nodeList.forEach((node) => {
+          if (node.session?.concept) {
+            registerCourseConcept(node.course, node.session.concept);
+          }
+        });
+        setNodes(nodeList);
         setEdges(Array.isArray(payload.edges) ? payload.edges : []);
         setSkills(Array.isArray(payload.skills) ? payload.skills : []);
         setProgress(normaliseProgress(payload.progress));
@@ -210,23 +217,6 @@ const SkillTreePage: React.FC = () => {
     }).sort((a, b) => a.group.order - b.group.order);
   }, [groups, groupLookup, nodes]);
 
-  const determineFallbackConcept = (node: SkillTreeNode): string => {
-    const courseId = node.course;
-    if (['C01', 'C02', 'C03', 'C04', 'C07'].includes(courseId)) {
-      return 'ALG-AP';
-    }
-    if (['C05', 'C06'].includes(courseId)) {
-      return 'RAT-PRO';
-    }
-    if (['C08', 'C09'].includes(courseId)) {
-      return 'GEO-COORD';
-    }
-    if (['C10', 'C12'].includes(courseId)) {
-      return 'GEO-LIN';
-    }
-    return 'FALLBACK';
-  };
-
   const determineStepFromNode = (node: SkillTreeNode): 'S1' | 'S2' | 'S3' => {
     const fromId = node.id.match(/S([123])/);
     if (fromId) {
@@ -247,7 +237,7 @@ const SkillTreePage: React.FC = () => {
       return;
     }
     const mapping = resolveConceptStep(node.id);
-    const conceptId = node.session?.concept ?? mapping?.concept ?? determineFallbackConcept(node);
+    const conceptId = node.session?.concept ?? mapping?.concept ?? 'ALG-AP';
     const fallbackStep = determineStepFromNode(node);
     const step = (node.session?.step ?? mapping?.step ?? fallbackStep) as 'S1' | 'S2' | 'S3';
     const params = new URLSearchParams();

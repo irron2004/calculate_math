@@ -433,8 +433,35 @@ async def test_create_session_returns_twenty_problems(client) -> None:
     assert payload["session_id"]
     assert len(payload["problems"]) == 20
     first = payload["problems"][0]
-    assert set(first.keys()) == {"id", "left", "right", "answer", "options"}
+    assert set(first.keys()) == {"id", "left", "right", "answer", "options", "operator"}
     assert len(first["options"]) == 4
+
+
+async def test_create_session_honours_arithmetic_config(client) -> None:
+    token, login_response = await _login_and_get_token(client)
+    assert login_response.status_code == 200
+
+    payload = {
+        "config": {
+            "generator": "arithmetic",
+            "op": "mul",
+            "left_digits": 1,
+            "right_digits": 1,
+            "count": 5,
+        }
+    }
+
+    response = await client.post(
+        "/api/v1/sessions",
+        headers={"Authorization": f"Bearer {token}"},
+        json=payload,
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["problems"]) == 5
+    sample = data["problems"][0]
+    assert sample["operator"] == "mul"
+    assert sample["left"] * sample["right"] == sample["answer"]
 
 
 async def test_create_session_requires_authentication(client) -> None:

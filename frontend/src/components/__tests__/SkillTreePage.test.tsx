@@ -7,6 +7,7 @@ import SkillTreePage from '../SkillTreePage';
 import type { SkillTreeResponse } from '../../types';
 import { fetchSkillTree } from '../../utils/api';
 import { trackExperimentExposure } from '../../utils/analytics';
+import { resetCourseConceptOverrides } from '../../utils/skillMappings';
 
 const mockNavigate = vi.fn();
 
@@ -136,6 +137,7 @@ const sampleResponse: SkillTreeResponse = {
 
 describe('SkillTreePage', () => {
   beforeEach(() => {
+    resetCourseConceptOverrides();
     mockedFetchSkillTree.mockReset();
     mockedTrackExperimentExposure.mockReset();
     mockNavigate.mockReset();

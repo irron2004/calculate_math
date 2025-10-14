@@ -5,10 +5,12 @@ import type {
   CurriculumHomeCopy,
   GeneratedItem,
   LRCEvaluation,
+  PracticeSessionConfigPayload,
   ProblemAttemptResponse,
+  SkillProgressResponse,
   SkillTreeResponse,
-  UserProgressMetrics,
-  TemplateSummary
+  TemplateSummary,
+  UserProgressMetrics
 } from '../types';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/math-api/api';
@@ -32,14 +34,40 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
 }
 
 // 세션 생성 (20문제 세트)
-export async function createSession(token?: string): Promise<APISession> {
+export async function createSession(
+  token?: string,
+  config?: PracticeSessionConfigPayload
+): Promise<APISession> {
   const headers: Record<string, string> = {};
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
-  return apiCall<APISession>('/v1/sessions', {
+  const options: RequestInit = {
     method: 'POST',
     headers,
+  };
+  if (config && Object.keys(config).length) {
+    options.body = JSON.stringify({ config });
+  }
+  return apiCall<APISession>('/v1/sessions', options);
+}
+
+export async function updateSkillProgress(
+  courseStepId: string,
+  payload?: {
+    correct?: boolean;
+    attempts?: number;
+    userId?: string | null;
+  }
+): Promise<SkillProgressResponse> {
+  return apiCall<SkillProgressResponse>('/v1/skills/progress', {
+    method: 'POST',
+    body: JSON.stringify({
+      course_step_id: courseStepId,
+      correct: payload?.correct ?? true,
+      attempts: payload?.attempts ?? 1,
+      user_id: payload?.userId ?? undefined,
+    }),
   });
 }
 

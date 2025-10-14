@@ -1771,7 +1771,7 @@
         "acc": 0.9
       },
       "session": {
-        "concept": null,
+        "concept": "RAT-PRO",
         "step": "S1",
         "problem_count": 12,
         "generator": "statistics",
@@ -1801,7 +1801,7 @@
         "acc": 0.9
       },
       "session": {
-        "concept": null,
+        "concept": "RAT-PRO",
         "step": "S2",
         "problem_count": 16,
         "generator": "statistics",
@@ -1831,7 +1831,7 @@
         "acc": 0.9
       },
       "session": {
-        "concept": null,
+        "concept": "RAT-PRO",
         "step": "S3",
         "problem_count": 20,
         "generator": "statistics",

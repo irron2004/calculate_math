@@ -32,23 +32,38 @@ const COURSE_TO_CONCEPT: Record<string, ConceptStep['concept']> = {
   C05: 'RAT-PRO',
   C06: 'RAT-PRO',
   C07: 'ALG-AP',
-  C08: 'GEO-COORD',
-  C09: 'GEO-COORD',
+  C08: 'GEO-LIN',
+  C09: 'GEO-LIN',
   C10: 'GEO-LIN',
-  C11: 'FALLBACK',
+  C11: 'RAT-PRO',
   C12: 'GEO-LIN',
 };
+
+const courseConceptOverrides: Record<string, ConceptStep['concept']> = {};
+
+export function registerCourseConcept(courseId: string, conceptId: string | null | undefined): void {
+  if (!courseId || !conceptId) {
+    return;
+  }
+  courseConceptOverrides[courseId] = conceptId;
+}
+
+export function resetCourseConceptOverrides(): void {
+  for (const key of Object.keys(courseConceptOverrides)) {
+    delete courseConceptOverrides[key];
+  }
+}
 
 export function resolveConceptStep(skillId: string): ConceptStep | null {
   if (skillToConceptStep[skillId]) {
     return skillToConceptStep[skillId];
   }
-  const match = skillId.match(/^(C\\d{2})-S([123])$/);
+  const match = skillId.match(/^(C\d{2})-S([123])$/);
   if (!match) {
     return null;
   }
   const [, courseId, stepDigit] = match;
-  const concept = COURSE_TO_CONCEPT[courseId];
+  const concept = courseConceptOverrides[courseId] ?? COURSE_TO_CONCEPT[courseId];
   if (!concept) {
     return null;
   }

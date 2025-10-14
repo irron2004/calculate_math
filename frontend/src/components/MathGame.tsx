@@ -1,5 +1,5 @@
 import { Clock, Target } from 'lucide-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type {
@@ -10,7 +10,8 @@ import type {
   GeneratedItem,
   LRCEvaluation,
   LRCStatus,
-  LRCRecommendation
+  LRCRecommendation,
+  SkillTreeResponse
 } from '../types';
 import {
   createSession,
@@ -19,7 +20,9 @@ import {
   fetchCurriculumGraph,
   fetchTemplates,
   fetchLatestLRC,
-  generateTemplateInstance
+  fetchSkillTree,
+  generateTemplateInstance,
+  updateSkillProgress
 } from '../utils/api';
 import { resolveFocusConcept } from '../utils/curriculum';
 import { getLensBadges, getLensBadgeTokens } from '../utils/lens';
@@ -34,6 +37,17 @@ import {
   type SkillViewSource,
   type StepID
 } from '../utils/analytics';
+import { registerCourseConcept, resetCourseConceptOverrides, resolveConceptStep } from '../utils/skillMappings';
+
+const normaliseSessionConfig = (config: CourseSessionConfig): CourseSessionConfig => ({
+  concept: config.concept ?? null,
+  step: config.step === 'S1' || config.step === 'S2' || config.step === 'S3' ? config.step : null,
+  problem_count: typeof config.problem_count === 'number' && Number.isFinite(config.problem_count)
+    ? config.problem_count
+    : null,
+  generator: config.generator ?? null,
+  parameters: { ...(config.parameters ?? {}) },
+});
 
 const STEP_LABEL: Record<string, string> = {
   S1: 'S1 · 기초',
@@ -84,6 +98,8 @@ const FALLBACK_TEMPLATE_ID = 'fallback-inline';
 const QUESTION_TIME_LIMIT = 30;
 const STEP_SEQUENCE: ReadonlyArray<StepID> = ['S1', 'S2', 'S3'];
 const PROBLEMS_PER_STEP = 6;
+const SESSION_COMPLETION_THRESHOLD = 0.8;
+const SESSION_COMPLETION_THRESHOLD = 0.8;
 
 const parseSessionConfigParam = (raw: string | null): CourseSessionConfig | null => {
   if (!raw) {
@@ -183,6 +199,67 @@ const buildNumericOptions = (answer: number): number[] => {
   return Array.from(options).sort(() => Math.random() - 0.5);
 };
 
+const formatArithmeticPrompt = (operator: string, left: number, right: number): string => {
+  switch (operator) {
+    case 'sub':
+      return `${left} - ${right} = ?`;
+    case 'mul':
+      return `${left} × ${right} = ?`;
+    case 'div':
+      return `${left} ÷ ${right} = ?`;
+    case 'add':
+    default:
+      return `${left} + ${right} = ?`;
+  }
+};
+
+const describeArithmeticOperator = (operator: string): string => {
+  switch (operator) {
+    case 'sub':
+      return '두 수의 차를 구합니다.';
+    case 'mul':
+      return '곱셈 규칙을 사용해 답을 구합니다.';
+    case 'div':
+      return '나눗셈 규칙을 사용해 몫을 구합니다.';
+    case 'add':
+    default:
+      return '두 수를 더해 답을 구합니다.';
+  }
+};
+
+const buildPracticePayload = (
+  session: CourseSessionConfig | null
+): Record<string, unknown> | undefined => {
+  if (!session) {
+    return undefined;
+  }
+  const generator = session.generator ?? 'arithmetic';
+  if (generator !== 'arithmetic') {
+    return undefined;
+  }
+  const payload: Record<string, unknown> = { generator };
+  const params = session.parameters ?? {};
+  Object.entries(params).forEach(([key, value]) => {
+    payload[key] = value;
+  });
+  const countCandidate =
+    typeof session.problem_count === 'number' && Number.isFinite(session.problem_count)
+      ? session.problem_count
+      : typeof (params as Record<string, unknown>).count === 'number'
+      ? Number((params as Record<string, unknown>).count)
+      : null;
+  if (typeof countCandidate === 'number' && Number.isFinite(countCandidate)) {
+    payload.count = countCandidate;
+  }
+  if (session.step) {
+    payload.step = session.step;
+  }
+  if (session.concept) {
+    payload.concept = session.concept;
+  }
+  return payload;
+};
+
 const parseStepParam = (value: string | null): StepID | null => {
   if (value === 'S1' || value === 'S2' || value === 'S3') {
     return value;
@@ -230,6 +307,7 @@ const MathGame: React.FC = () => {
   const [searchParams] = useSearchParams();
   const requestedConceptParam = searchParams.get('concept');
   const requestedStepParam = parseStepParam(searchParams.get('step'));
+  const requestedSkillParam = searchParams.get('skill');
   const requestedSessionParam = searchParams.get('session');
   const requestedSessionConfig = useMemo(
     () => parseSessionConfigParam(requestedSessionParam),
@@ -264,6 +342,8 @@ const MathGame: React.FC = () => {
   const [lrcError, setLrcError] = useState<string | null>(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  type ProgressAlert = { kind: 'success' | 'warning'; message: string } | null;
+  const [progressAlert, setProgressAlert] = useState<ProgressAlert>(null);
   const [latestLRC, setLatestLRC] = useState<LRCEvaluation | null>(null);
   const [showKeywordHints, setShowKeywordHints] = useState(false);
   const [conceptCatalog, setConceptCatalog] = useState<Record<string, CurriculumConcept>>({});
@@ -274,12 +354,117 @@ const MathGame: React.FC = () => {
   const [curriculumSequence, setCurriculumSequence] = useState<SequenceEntry[]>([]);
   const [sequenceIndex, setSequenceIndex] = useState<number | null>(null);
   const [activeSessionConfig, setActiveSessionConfig] = useState<CourseSessionConfig | null>(
-    requestedSessionConfig
+    requestedSessionConfig ? normaliseSessionConfig(requestedSessionConfig) : null
   );
+  const [activeSkillNodeId, setActiveSkillNodeId] = useState<string | null>(requestedSkillParam);
+  const [sessionConfigCache, setSessionConfigCache] = useState<Record<string, CourseSessionConfig | null>>({});
+  const conceptStepNodeRef = useRef<Record<string, string>>({});
 
   useEffect(() => {
-    setActiveSessionConfig(requestedSessionConfig);
-  }, [requestedSessionConfig]);
+    setActiveSessionConfig(
+      requestedSessionConfig ? normaliseSessionConfig(requestedSessionConfig) : null
+    );
+    if (requestedSkillParam) {
+      setActiveSkillNodeId(requestedSkillParam);
+    }
+  }, [requestedSessionConfig, requestedSkillParam]);
+
+  const cacheSessionConfig = useCallback(
+    (conceptId: string, step: StepID, nodeId: string | null, config: CourseSessionConfig | null) => {
+      if (!config) {
+        return;
+      }
+      const canonical = normaliseSessionConfig(config);
+      const serialized = JSON.stringify(canonical);
+      setSessionConfigCache((previous) => {
+        const conceptKey = `${conceptId}|${step}`;
+        const updates: Record<string, CourseSessionConfig | null> = {};
+        let changed = false;
+
+        const ensure = (key: string) => {
+          const existing = previous[key];
+          if (!existing || JSON.stringify(existing) !== serialized) {
+            updates[key] = canonical;
+            changed = true;
+          }
+        };
+
+        ensure(conceptKey);
+        if (nodeId) {
+          ensure(nodeId);
+        }
+
+        if (!changed) {
+          return previous;
+        }
+        return { ...previous, ...updates };
+      });
+    },
+    []
+  );
+
+  const lookupSessionConfig = useCallback(
+    (conceptId: string, step: StepID, nodeId: string | null): CourseSessionConfig | null => {
+      const conceptKey = `${conceptId}|${step}`;
+      const fromConcept = sessionConfigCache[conceptKey];
+      if (fromConcept) {
+        return fromConcept;
+      }
+      if (nodeId) {
+        const fromNode = sessionConfigCache[nodeId];
+        if (fromNode) {
+          return fromNode;
+        }
+      }
+      return null;
+    },
+    [sessionConfigCache]
+  );
+
+  const seedSessionConfigs = useCallback(
+    (skillTree: SkillTreeResponse | null) => {
+      if (!skillTree || !Array.isArray(skillTree.nodes)) {
+        return;
+      }
+      resetCourseConceptOverrides();
+      conceptStepNodeRef.current = {};
+      setSessionConfigCache((previous) => {
+        const additions: Record<string, CourseSessionConfig | null> = {};
+        let changed = false;
+
+        skillTree.nodes.forEach((node) => {
+          if (!node.session) {
+            return;
+          }
+          const canonical = normaliseSessionConfig(node.session);
+          if (node.course && canonical.concept) {
+            registerCourseConcept(node.course, canonical.concept);
+          }
+          const mapping = resolveConceptStep(node.id);
+          if (mapping) {
+            const conceptKey = `${mapping.concept}|${mapping.step}`;
+            if (!conceptStepNodeRef.current[conceptKey]) {
+              conceptStepNodeRef.current[conceptKey] = node.id;
+            }
+            if (!previous[conceptKey]) {
+              additions[conceptKey] = canonical;
+              changed = true;
+            }
+          }
+          if (!previous[node.id]) {
+            additions[node.id] = canonical;
+            changed = true;
+          }
+        });
+
+        if (!changed) {
+          return previous;
+        }
+        return { ...previous, ...additions };
+      });
+    },
+    []
+  );
 
   const resetRoundState = () => {
     setScore(0);
@@ -449,27 +634,34 @@ const MathGame: React.FC = () => {
     concept: CurriculumConcept,
     step: StepID
   ): CurriculumProblem[] => {
-    return session.problems.map((problem, index) => ({
-      concept,
-      instance: {
-        id: `${FALLBACK_TEMPLATE_ID}-${index}`,
-        template_id: FALLBACK_TEMPLATE_ID,
-        concept: concept.id,
-        step,
-        prompt: `${problem.left} + ${problem.right} = ?`,
-        explanation: '두 수를 더해 답을 구합니다.',
-        answer: problem.answer,
-        options: problem.options,
-        context: 'life',
-        lens: concept.lens,
-        representation: 'C',
-        rubric_keywords: concept.focus_keywords.length ? concept.focus_keywords : ['덧셈'],
-        variables: {
-          left: problem.left,
-          right: problem.right
-        }
-      }
-    }));
+    return session.problems.map((problem, index) => {
+      const operator = problem.operator ?? 'add';
+      const prompt = formatArithmeticPrompt(operator, problem.left, problem.right);
+      const explanation = describeArithmeticOperator(operator);
+      const rubric = concept.focus_keywords.length ? concept.focus_keywords : ['연산'];
+      return {
+        concept,
+        instance: {
+          id: `${FALLBACK_TEMPLATE_ID}-${index}`,
+          template_id: FALLBACK_TEMPLATE_ID,
+          concept: concept.id,
+          step,
+          prompt,
+          explanation,
+          answer: problem.answer,
+          options: problem.options,
+          context: 'life',
+          lens: concept.lens,
+          representation: 'C',
+          rubric_keywords: rubric,
+          variables: {
+            left: problem.left,
+            right: problem.right,
+            operator,
+          },
+        },
+      };
+    });
   };
 
   const generateLocalFallback = (
@@ -813,16 +1005,34 @@ const MathGame: React.FC = () => {
     setSelectedStep(step);
     setGameState('loading');
     setLoadError(null);
-    setActiveSessionConfig(options.sessionConfig ?? null);
+    setProgressAlert(null);
+    const { entry: fallbackEntry } = findSequenceInfo(concept.id, step);
+    const resolvedEntry = options.sequenceEntry ?? fallbackEntry ?? null;
+    const conceptKey = `${concept.id}|${step}`;
+    const skillNodeId =
+      conceptStepNodeRef.current[conceptKey] ??
+      resolvedEntry?.nodeId ??
+      requestedSkillParam ??
+      null;
+    setActiveSkillNodeId(skillNodeId);
+
+    const sessionFromCache = lookupSessionConfig(concept.id, step, skillNodeId);
+    const sessionConfigCandidate = options.sessionConfig ?? sessionFromCache;
+    const canonicalSessionConfig = sessionConfigCandidate
+      ? normaliseSessionConfig(sessionConfigCandidate)
+      : null;
+
+    if (sessionConfigCandidate && skillNodeId) {
+      cacheSessionConfig(concept.id, step, skillNodeId, canonicalSessionConfig);
+    }
+
+    const effectiveSessionConfig = canonicalSessionConfig ?? activeSessionConfig ?? null;
+    setActiveSessionConfig(effectiveSessionConfig);
 
     let problems: CurriculumProblem[] | null = null;
     let problemsSource: 'session_config' | 'generated' | 'session_fallback' | 'local_fallback' = 'generated';
 
-    const configured = generateProblemsFromSessionConfig(
-      concept,
-      step,
-      options.sessionConfig ?? activeSessionConfig
-    );
+    const configured = generateProblemsFromSessionConfig(concept, step, effectiveSessionConfig);
     if (configured && configured.length) {
       problems = configured;
       problemsSource = 'session_config';
@@ -842,7 +1052,8 @@ const MathGame: React.FC = () => {
 
     if (!problems || !problems.length) {
       try {
-        const session = await createSession(token ?? undefined);
+        const practicePayload = buildPracticePayload(effectiveSessionConfig);
+        const session = await createSession(token ?? undefined, practicePayload);
         problems = convertSessionToCurriculum(session, concept, step);
         problemsSource = 'session_fallback';
       } catch (fallbackError) {
@@ -853,6 +1064,7 @@ const MathGame: React.FC = () => {
     }
 
     if (!problems || !problems.length) {
+      setLoadError('문제 세트를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
       setGameState('finished');
       return;
     }
@@ -896,7 +1108,7 @@ const MathGame: React.FC = () => {
       available: true,
       completed: false,
       lens: concept.lens?.[0] ?? null,
-      problemCount: problems.length,
+      problemCount: effectiveSessionConfig?.problem_count ?? problems.length,
       problemsSource,
     });
   };
@@ -911,12 +1123,22 @@ const MathGame: React.FC = () => {
           })
         : Promise.resolve(null);
 
-      const [latest, conceptList, curriculumGraph] = await Promise.all([
+      const skillTreePromise: Promise<SkillTreeResponse | null> = fetchSkillTree()
+        .then((response) => response)
+        .catch((error) => {
+          console.warn('Skill tree fetch failed (session config unavailable):', error);
+          return null;
+        });
+
+      const [latest, conceptList, curriculumGraph, skillTree] = await Promise.all([
         latestPromise,
         fetchConcepts(),
         fetchCurriculumGraph(),
+        skillTreePromise,
       ]);
       setLatestLRC(latest);
+
+      seedSessionConfigs(skillTree);
 
       if (!conceptList.length) {
         throw new Error('등록된 개념이 없습니다.');
@@ -934,8 +1156,12 @@ const MathGame: React.FC = () => {
         : requestedSessionConfig?.concept && catalog[requestedSessionConfig.concept]
         ? requestedSessionConfig.concept
         : null;
-      const requestedStep =
-        requestedStepParam ?? (requestedSessionConfig?.step ? requestedSessionConfig.step : null);
+      const requestedStepCandidate =
+        requestedStepParam ?? (requestedSessionConfig?.step ?? null);
+      const requestedStep: StepID | null =
+        requestedStepCandidate === 'S1' || requestedStepCandidate === 'S2' || requestedStepCandidate === 'S3'
+          ? requestedStepCandidate
+          : null;
 
       const orderedConcepts = reorderConceptsBySequence(sequence, catalog);
       setConcepts(orderedConcepts);
@@ -952,6 +1178,16 @@ const MathGame: React.FC = () => {
             (entry) => entry.conceptId === requestedConceptId && entry.step === requestedStep
           );
           const targetEntry = targetIndex !== -1 ? sequence[targetIndex] : null;
+
+          if (requestedSessionConfig) {
+            cacheSessionConfig(
+              targetConcept.id,
+              requestedStep,
+              targetEntry?.nodeId ?? null,
+              normaliseSessionConfig(requestedSessionConfig)
+            );
+          }
+
           await loadProblemsForStep(targetConcept, requestedStep, {
             source: 'query_param',
             sequenceEntry: targetEntry,
@@ -1330,11 +1566,37 @@ const MathGame: React.FC = () => {
       return;
     }
 
-    if (selectedConcept && selectedStep) {
+    const accuracy = totalQuestions ? correctCount / totalQuestions : 0;
+    const earnedCompletion = accuracy >= SESSION_COMPLETION_THRESHOLD;
+
+    if (activeSkillNodeId) {
+      try {
+        await updateSkillProgress(activeSkillNodeId, {
+          correct: earnedCompletion,
+          attempts: 1,
+          userId: user?.id,
+        });
+        if (earnedCompletion) {
+          setProgressAlert({
+            kind: 'success',
+            message: '진행 상황이 저장되었습니다. 다음 단계로 이동할 수 있어요!',
+          });
+        } else {
+          setProgressAlert(null);
+        }
+      } catch (error) {
+        console.error('Skill progress update failed:', error);
+        setProgressAlert({
+          kind: 'warning',
+          message: '진행 상황을 저장하지 못했습니다. 네트워크를 확인한 뒤 다시 시도해주세요.',
+        });
+      }
+    }
+
+    if (selectedConcept && selectedStep && earnedCompletion) {
       markStepCompleted(selectedConcept.id, selectedStep);
     }
 
-    const accuracy = totalQuestions ? correctCount / totalQuestions : 0;
     const averageTime = timeSpentHistory.length
       ? timeSpentHistory.reduce((acc, value) => acc + value, 0) / timeSpentHistory.length
       : QUESTION_TIME_LIMIT;
@@ -1521,6 +1783,13 @@ const MathGame: React.FC = () => {
       {loadError && (
         <div className="alert alert-warning">
           {loadError}
+        </div>
+      )}
+      {progressAlert && (
+        <div
+          className={`alert ${progressAlert.kind === 'success' ? 'alert-success' : 'alert-warning'}`}
+        >
+          {progressAlert.message}
         </div>
       )}
 

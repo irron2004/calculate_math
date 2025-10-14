@@ -36,6 +36,7 @@ export type APIProblem = {
   right: number;
   answer: number;
   options: number[];
+  operator?: string;
 };
 
 export type CurriculumConcept = {
@@ -233,6 +234,14 @@ export type SkillTreeResponse = {
   };
 };
 
+export type SkillProgressResponse = {
+  user_id: string;
+  updated_at: string;
+  total_xp: number;
+  nodes: Record<string, SkillNodeProgress>;
+  skills: Record<string, AtomicSkillProgress>;
+};
+
 export type CurriculumHomeCopy = {
   version: string;
   nodes: Record<
@@ -284,6 +293,11 @@ export type LRCEvaluation = {
 export type APISession = {
   session_id: number;
   problems: APIProblem[];
+};
+
+export type PracticeSessionConfigPayload = {
+  generator?: string | null;
+  [key: string]: unknown;
 };
 
 export type ProblemAttemptResponse = {
