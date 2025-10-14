@@ -1,5 +1,14 @@
 # 해야 할 일
 
+## Skill Tree: Senior Feedback Follow-up
+
+- [ ] 프로덕션 환경 `.env`의 `VITE_API_BASE_URL`과 리버스 프록시 라우팅이 FastAPI 백엔드 경로와 일치하는지 재확인 (`docs/skill_tree_feedback.md` 참고)
+- [ ] 배포 환경에서 `fetchSkillTree` 응답을 점검하여 `payload.graph.nodes`가 비어 있는지/에러인지 모니터링 (`docs/skill_tree_feedback.md`, `scripts/fetch_skill_tree_payload.py`)
+- [ ] 배포본에 최신 `skills.ui.json`이 포함되었는지 확인하고 필요 시 bipartite 그래프 기반 생성 스크립트 재실행
+- [x] `skills.ui.json` 노드 ID가 `payload.nodes`/unlock 상태와 일치하는지 교차 검증 (`python scripts/check_skill_tree_assets.py`)
+- [x] 그래프 노드가 비어 있을 때 추적용 텔레메트리 또는 추가 안내 UI를 도입
+- [ ] 장기적으로 React Flow/dagre 등 자동 레이아웃 도입 가능성 조사
+
 - [ ] 로그인 기능 도입: 일일 학습 기록과 진행 상황을 사용자 단위로 추적할 수 있도록 인증/세션을 구현
 - [ ] 수학 학습과 무관한 문서(로컬 개발 가이드, 안전/프라이버시 등) 정리 또는 제거
 - [ ] 실시간 학습 지표를 사용자별로 개인화할 수 있도록 데이터 모델/뷰 재구성
