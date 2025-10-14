@@ -16,6 +16,7 @@
 - Backend endpoint proxies `skills.ui.json` directly into `payload["graph"]`. Missing or stale deployments of this file result in `graph: None` or an empty node list.
 - `skills.ui.json` must stay in sync with `graph.bipartite.json` (node IDs like `C01-S1`). Any mismatch prevents node lookups when building `graphNodesView`.
 - FastAPI now validates the UI graph at load time; missing nodes or dangling edges raise a `SkillSpecError`, returning a red error banner instead of an empty-state fallback.
+- When `docs/dag.md` contains an invalid JSON block, the backend now falls back to the packaged `app/data/skills.json` to avoid `UnexpectedError`, but deployment artifacts still need the JSON export kept up to date.
 
 ### Rendering & UX Notes
 - Locked nodes are still rendered; invisibility is due to absent nodes rather than CSS opacity.

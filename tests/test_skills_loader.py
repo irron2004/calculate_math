@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 from pydantic import ValidationError
 
@@ -68,4 +70,29 @@ def test_kind_filtering_accepts_enum_value() -> None:
     concept_nodes = get_nodes_by_kind(SkillKind.CONCEPT)
     assert concept_nodes
     assert all(node.kind == SkillKind.CONCEPT for node in concept_nodes)
+
+
+def test_loader_falls_back_to_packaged_spec_when_docs_json_invalid(tmp_path, monkeypatch) -> None:
+    from app import skills_loader as loader
+
+    # Prepare a valid packaged export based on the existing graph.
+    packaged_payload = loader.get_skill_graph().dict(by_alias=True)
+    packaged_path = tmp_path / "skills.json"
+    packaged_path.write_text(json.dumps(packaged_payload), encoding="utf-8")
+
+    # Create an invalid docs file that would raise JSONDecodeError if parsed.
+    docs_path = tmp_path / "dag.md"
+    docs_path.write_text("```json\n{ invalid json }\n```", encoding="utf-8")
+
+    # Point loader paths to the temporary files and clear caches.
+    monkeypatch.setattr(loader, "_DOCS_PATH", docs_path)
+    monkeypatch.setattr(loader, "_JSON_EXPORT_PATH", packaged_path)
+    loader._load_skill_spec.cache_clear()
+
+    graph = loader.get_skill_graph()
+
+    assert graph.version == packaged_payload["version"]
+
+    # Clean up cache to avoid affecting other tests.
+    loader._load_skill_spec.cache_clear()
 

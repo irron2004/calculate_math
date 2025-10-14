@@ -41,11 +41,18 @@ def _load_raw_spec() -> Dict[str, object]:
 
     if _DOCS_PATH.exists():
         markdown = _DOCS_PATH.read_text(encoding="utf-8")
-        if (json_blob := _extract_json_blob(markdown)):
-            return json.loads(json_blob)
+        if json_blob := _extract_json_blob(markdown):
+            try:
+                return json.loads(json_blob)
+            except json.JSONDecodeError:
+                # Fallback to packaged export below; keep logging minimal to avoid noisy stdout in tests.
+                pass
 
     if _JSON_EXPORT_PATH.exists():
-        return json.loads(_JSON_EXPORT_PATH.read_text(encoding="utf-8"))
+        try:
+            return json.loads(_JSON_EXPORT_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise SkillSpecError("Packaged skill specification is invalid JSON") from exc
 
     raise SkillSpecError("Unable to locate skill specification source")
 
