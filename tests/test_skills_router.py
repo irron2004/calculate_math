@@ -41,6 +41,11 @@ async def test_skill_tree_endpoint_returns_experiment_payload(client):
     assert progress["user_id"] is not None
     assert isinstance(progress["nodes"], dict)
     assert isinstance(progress["skills"], dict)
+    graph = data["graph"]
+    assert graph is not None
+    assert isinstance(graph.get("nodes"), list)
+    unlocked = data["unlocked"]
+    assert isinstance(unlocked, dict)
     first_node = data["nodes"][0]
     assert "requires" in first_node and "state" in first_node
     assert "session" in first_node

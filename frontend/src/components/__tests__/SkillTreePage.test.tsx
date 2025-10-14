@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -123,8 +123,53 @@ const sampleResponse: SkillTreeResponse = {
       level: 1,
       xp: { per_try: 1, per_correct: 2, earned: 40 },
     },
+    {
+      id: 'AS.PV.DECOMP',
+      label: '분해/재구성',
+      domain: '분해/재구성',
+      lens: ['transform'],
+      levels: 3,
+      level: 1,
+      xp: { per_try: 1, per_correct: 2, earned: 30 },
+    },
+    {
+      id: 'AS.MUL.POW10',
+      label: '×10/×100 스케일',
+      domain: '연산·스케일',
+      lens: ['scale'],
+      levels: 3,
+      level: 1,
+      xp: { per_try: 1, per_correct: 2, earned: 25 },
+    },
   ],
   progress: sampleProgress,
+  graph: {
+    version: '2025-10-12.bipartite.v1.ui.v1',
+    trees: [
+      { id: 'arithmetic', label: '수와 연산', order: 1 },
+      { id: 'fraction_ratio', label: '분수·소수·비율', order: 2 },
+      { id: 'algebra_geo_stats', label: '대수·기하·해석·통계', order: 3 },
+    ],
+    nodes: [
+      {
+        id: 'C01-S1',
+        tree: 'arithmetic',
+        tier: 1,
+        label: 'C01·S1 자리가치·분해',
+        lens: ['transform'],
+        requires: [
+          { skill_id: 'AS.PV.READ', min_level: 1 },
+          { skill_id: 'AS.PV.DECOMP', min_level: 1 },
+          { skill_id: 'AS.MUL.POW10', min_level: 1 },
+        ],
+        xp: { per_try: 5, per_correct: 10 },
+        boss: false,
+        grid: { row: 1, col: 1 },
+      },
+    ],
+    edges: [],
+  },
+  unlocked: { 'C01-S1': true },
   experiment: {
     name: 'skill_tree_layout',
     variant: 'list',
@@ -132,6 +177,22 @@ const sampleResponse: SkillTreeResponse = {
     request_id: 'req-1',
     rollout: 50,
     bucket: 12,
+  },
+};
+
+const refreshedResponse: SkillTreeResponse = {
+  ...sampleResponse,
+  progress: {
+    ...sampleResponse.progress,
+    total_xp: 300,
+    nodes: {
+      ...sampleResponse.progress.nodes,
+      'C01-S1': {
+        ...sampleResponse.progress.nodes['C01-S1'],
+        xp_earned: 200,
+        level: 2,
+      },
+    },
   },
 };
 
@@ -155,8 +216,9 @@ describe('SkillTreePage', () => {
     await waitFor(() =>
       expect(screen.getByTestId('skill-tree-page')).toHaveAttribute('data-experiment-variant', 'list')
     );
+    expect(screen.getByTestId('skill-tree-graph')).toBeInTheDocument();
     expect(screen.getByText('C01·S1 자리가치·분해')).toBeInTheDocument();
-    expect(screen.getByText(/필요 스킬/)).toBeInTheDocument();
+    expect(screen.getByText(/필요 조건:/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '학습 시작' })).toBeEnabled();
     expect(screen.getByText(/총 XP 150/)).toBeInTheDocument();
 
@@ -210,5 +272,80 @@ describe('SkillTreePage', () => {
     expect(destination).toContain('concept=ALG-AP');
     expect(destination).toContain('step=S1');
     expect(destination).toContain('session=');
+  });
+
+  it('opens a node detail overlay when graph nodes are selected', async () => {
+    mockedFetchSkillTree.mockResolvedValue(sampleResponse);
+
+    render(
+      <MemoryRouter>
+        <SkillTreePage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByText('C01·S1 자리가치·분해')).toBeInTheDocument());
+
+    const node = screen.getByRole('button', { name: /C01·S1 자리가치·분해/ });
+    fireEvent.click(node);
+
+    await waitFor(() => expect(screen.getByTestId('skill-node-overlay')).toBeInTheDocument());
+    expect(screen.getByText('필요 조건')).toBeInTheDocument();
+    expect(screen.getByText('누적 XP 120')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '닫기' }));
+    await waitFor(() =>
+      expect(screen.queryByTestId('skill-node-overlay')).not.toBeInTheDocument()
+    );
+  });
+
+  it('traps focus inside the overlay and supports closing with Escape', async () => {
+    mockedFetchSkillTree.mockResolvedValue(sampleResponse);
+
+    render(
+      <MemoryRouter>
+        <SkillTreePage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByText('C01·S1 자리가치·분해')).toBeInTheDocument());
+
+    const node = screen.getByRole('button', { name: /C01·S1 자리가치·분해/ });
+    node.focus();
+    fireEvent.keyDown(node, { key: 'Enter', code: 'Enter' });
+
+    await waitFor(() => expect(screen.getByTestId('skill-node-overlay')).toBeInTheDocument());
+    const closeButton = screen.getByRole('button', { name: '닫기' });
+    expect(closeButton).toHaveFocus();
+
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+    await waitFor(() =>
+      expect(screen.queryByTestId('skill-node-overlay')).not.toBeInTheDocument()
+    );
+    expect(node).toHaveFocus();
+  });
+
+  it('refreshes skill data when a progress update event is observed', async () => {
+    mockedFetchSkillTree.mockResolvedValueOnce(sampleResponse);
+    mockedFetchSkillTree.mockResolvedValueOnce(refreshedResponse);
+
+    render(
+      <MemoryRouter>
+        <SkillTreePage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByText(/총 XP 150/)).toBeInTheDocument());
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent('skill-tree:progress-updated', {
+          detail: { courseStepId: 'C01-S1', correct: true },
+        })
+      );
+    });
+
+    await waitFor(() => expect(mockedFetchSkillTree).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.getByText(/총 XP 300/)).toBeInTheDocument());
+    expect(screen.queryByText('진행도 갱신 중…')).not.toBeInTheDocument();
   });
 });

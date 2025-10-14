@@ -165,13 +165,19 @@ const renderGame = async () => {
 };
 
 describe('MathGame navigation-free flow', () => {
+  const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
+
   it('shows a fallback message when generated problems are unavailable', async () => {
     fetchTemplatesMock.mockResolvedValue([]);
     createSessionMock.mockRejectedValueOnce(new Error('network'));
 
     await renderGame();
 
-    await waitFor(() => expect(screen.getByText('문제 세트를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.getByText('문제 세트를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.')
+      ).toBeInTheDocument()
+    );
   });
 
   beforeEach(() => {
@@ -207,6 +213,11 @@ describe('MathGame navigation-free flow', () => {
     });
     mockLogin.mockReset();
     mockLogout.mockReset();
+    dispatchEventSpy.mockClear();
+  });
+
+  afterAll(() => {
+    dispatchEventSpy.mockRestore();
   });
 
   it('requests practice session payload with generator parameters when templates are missing', async () => {
@@ -259,6 +270,9 @@ describe('MathGame navigation-free flow', () => {
         userId: 'student-1',
       })
     );
+    const eventArg = dispatchEventSpy.mock.calls.at(-1)?.[0] as CustomEvent | undefined;
+    expect(eventArg?.type).toBe('skill-tree:progress-updated');
+    expect(eventArg?.detail).toMatchObject({ courseStepId: 'C01-S1', correct: true });
   });
 
   it('shows a warning when skill progress update fails', async () => {
@@ -284,11 +298,47 @@ describe('MathGame navigation-free flow', () => {
 
     await waitFor(() => expect(updateSkillProgressMock).toHaveBeenCalled());
     expect(
-      screen.getByText('진행 상황이 저장되었습니다. 다음 단계로 이동할 수 있어요!')
-    ).toBeInTheDocument();
-    expect(
       screen.getByText('진행 상황을 저장하지 못했습니다. 네트워크를 확인한 뒤 다시 시도해주세요.')
     ).toBeInTheDocument();
+    expect(
+      screen.queryByText('진행 상황이 저장되었습니다. 다음 단계로 이동할 수 있어요!')
+    ).not.toBeInTheDocument();
+    expect(dispatchEventSpy).not.toHaveBeenCalled();
+  });
+
+  it('shows an encouragement banner when the completion threshold is not met', async () => {
+    await renderGame();
+
+    const user = userEvent.setup();
+
+    const answerInput = screen.getByLabelText('정답 입력');
+    const confirmButton = screen.getByRole('button', { name: '확인' });
+
+    await user.clear(answerInput);
+    await user.type(answerInput, '3');
+    await user.click(confirmButton);
+
+    await user.clear(answerInput);
+    await user.type(answerInput, '999');
+    await user.click(confirmButton);
+
+    await screen.findByText('결과를 확인하려면 제출 버튼을 눌러주세요.');
+    await user.click(screen.getByRole('button', { name: '제출' }));
+
+    await waitFor(() => expect(updateSkillProgressMock).toHaveBeenCalled());
+    expect(
+      screen.getByText('조건을 아직 충족하지 못했습니다. 이전 스텝을 더 연습해보세요.')
+    ).toBeInTheDocument();
+    expect(updateSkillProgressMock).toHaveBeenLastCalledWith(
+      'C01-S1',
+      expect.objectContaining({
+        correct: false,
+        attempts: 1,
+        userId: 'student-1',
+      })
+    );
+    const encouragementEvent = dispatchEventSpy.mock.calls.at(-1)?.[0] as CustomEvent | undefined;
+    expect(encouragementEvent?.detail).toMatchObject({ courseStepId: 'C01-S1', correct: false });
   });
 
   afterEach(() => {

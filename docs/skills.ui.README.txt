@@ -1,0 +1,16 @@
+
+skills.ui.json — UI projection spec
+===================================
+
+- trees: UI panels (3)
+- nodes: CourseStep nodes only. Each node has:
+    * tree: which panel to render in
+    * tier: original tier (1..5)
+    * requires: list of {skill_id, min_level} aggregated from AS->CS edges
+    * xp: {per_try, per_correct}
+    * boss: true for S3 by convention
+    * grid: simple (row,col) to seed the layout; refine in FE with dagre/force
+- edges: CS->CS 'enables' only (draw arrows)
+- version: inherits from source + .ui.v1
+
+This file is auto-generated from graph.bipartite.json.

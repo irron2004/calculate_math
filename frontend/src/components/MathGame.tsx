@@ -99,7 +99,6 @@ const QUESTION_TIME_LIMIT = 30;
 const STEP_SEQUENCE: ReadonlyArray<StepID> = ['S1', 'S2', 'S3'];
 const PROBLEMS_PER_STEP = 6;
 const SESSION_COMPLETION_THRESHOLD = 0.8;
-const SESSION_COMPLETION_THRESHOLD = 0.8;
 
 const parseSessionConfigParam = (raw: string | null): CourseSessionConfig | null => {
   if (!raw) {
@@ -1576,13 +1575,27 @@ const MathGame: React.FC = () => {
           attempts: 1,
           userId: user?.id,
         });
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('skill-tree:progress-updated', {
+              detail: {
+                courseStepId: activeSkillNodeId,
+                correct: earnedCompletion,
+                attempts: 1,
+              },
+            })
+          );
+        }
         if (earnedCompletion) {
           setProgressAlert({
             kind: 'success',
             message: '진행 상황이 저장되었습니다. 다음 단계로 이동할 수 있어요!',
           });
         } else {
-          setProgressAlert(null);
+          setProgressAlert({
+            kind: 'warning',
+            message: '조건을 아직 충족하지 못했습니다. 이전 스텝을 더 연습해보세요.',
+          });
         }
       } catch (error) {
         console.error('Skill progress update failed:', error);

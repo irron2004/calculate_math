@@ -172,6 +172,45 @@ export type SkillTreeEdge = {
   to: string;
 };
 
+export type SkillTreeGraphRequirement = {
+  skill_id: string;
+  min_level: number;
+};
+
+export type SkillTreeGraphGrid = {
+  row: number;
+  col: number;
+};
+
+export type SkillTreeGraphNode = {
+  id: string;
+  tree: string;
+  tier: number;
+  label: string;
+  lens: string[];
+  requires: SkillTreeGraphRequirement[];
+  xp: {
+    per_try: number;
+    per_correct: number;
+  };
+  boss?: boolean;
+  grid: SkillTreeGraphGrid;
+};
+
+export type SkillTreeGraphTree = {
+  id: string;
+  label: string;
+  order: number;
+};
+
+export type SkillTreeGraphSpec = {
+  version: string;
+  trees: SkillTreeGraphTree[];
+  nodes: SkillTreeGraphNode[];
+  edges: SkillTreeEdge[];
+  meta?: Record<string, unknown>;
+};
+
 export type SkillSummary = {
   id: string;
   label: string;
@@ -227,6 +266,8 @@ export type SkillTreeResponse = {
   edges: SkillTreeEdge[];
   skills: SkillSummary[];
   progress: SkillTreeProgress;
+  graph?: SkillTreeGraphSpec | null;
+  unlocked?: Record<string, boolean>;
   experiment?: SkillTreeExperiment;
   error?: {
     message: string;

@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
 import logging
+from copy import deepcopy
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
@@ -31,6 +35,18 @@ router = APIRouter(prefix="/api/v1", tags=["skills"])
 
 
 logger = logging.getLogger("calculate_service.api.skills")
+
+_SKILL_UI_PATH = Path(__file__).resolve().parent.parent / "data" / "skills.ui.json"
+
+
+@lru_cache(maxsize=1)
+def _load_skill_ui_graph() -> Dict[str, Any]:
+    if not _SKILL_UI_PATH.exists():
+        raise SkillSpecError(f"Skill UI graph not found at {_SKILL_UI_PATH}")
+    try:
+        return json.loads(_SKILL_UI_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:  # pragma: no cover - defensive guard
+        raise SkillSpecError("Invalid skill UI graph specification") from exc
 
 
 class SkillProgressRequest(BaseModel):
@@ -123,7 +139,7 @@ async def api_get_skill_tree(
 ) -> Dict[str, Any]:
     assignment = assign_skill_tree_variant(request, response)
     try:
-        skill_graph = get_skill_graph()
+        _ = get_skill_graph()
         bipartite_graph = get_bipartite_graph()
         course_steps = get_course_steps()
         atomic_skills = get_atomic_skills()
@@ -140,7 +156,6 @@ async def api_get_skill_tree(
             node_progress=node_progress,
             skill_progress=skill_progress,
         )
-
         progress_payload: Dict[str, Any] = {
             "user_id": snapshot.user_id if snapshot else effective_user_id,
             "updated_at": snapshot.updated_at.isoformat() if snapshot else None,
@@ -148,6 +163,14 @@ async def api_get_skill_tree(
             "nodes": node_progress,
             "skills": skill_progress,
         }
+
+        ui_graph = deepcopy(_load_skill_ui_graph())
+        unlocked_map: Dict[str, bool] = {}
+        for node in projection["nodes"]:
+            state = node.get("state", {})
+            unlocked_map[node["id"]] = bool(state.get("completed") or state.get("available"))
+
+        payload_graph = ui_graph
 
         payload: Dict[str, Any] = {
             "version": projection["version"],
@@ -157,6 +180,8 @@ async def api_get_skill_tree(
             "edges": projection["edges"],
             "skills": projection["skills"],
             "progress": progress_payload,
+            "graph": payload_graph,
+            "unlocked": unlocked_map,
             "experiment": assignment.to_payload(),
         }
         return payload
@@ -177,6 +202,8 @@ async def api_get_skill_tree(
             "edges": [],
             "skills": [],
             "progress": fallback_progress,
+            "graph": None,
+            "unlocked": {},
             "experiment": assignment.to_payload(),
             "error": {
                 "message": "스킬 트리 데이터를 불러오는 중 문제가 발생했습니다.",
@@ -200,6 +227,8 @@ async def api_get_skill_tree(
             "edges": [],
             "skills": [],
             "progress": fallback_progress,
+            "graph": None,
+            "unlocked": {},
             "experiment": assignment.to_payload(),
             "error": {
                 "message": "스킬 트리를 불러오는 중 예기치 못한 오류가 발생했습니다.",
