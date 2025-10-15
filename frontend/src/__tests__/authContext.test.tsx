@@ -62,4 +62,19 @@ describe('AuthContext', () => {
     expect(result.current.token).toBeNull();
     expect(result.current.error).toBe('잘못된 비밀번호입니다.');
   });
+
+  it('allows guest login without contacting backend', () => {
+    const fetchSpy = vi.spyOn(global, 'fetch');
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => <AuthProvider>{children}</AuthProvider>
+    });
+
+    const outcome = result.current.loginAsGuest();
+
+    expect(outcome.success).toBe(true);
+    expect(outcome.user?.role).toBe('guest');
+    expect(result.current.user?.role).toBe('guest');
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
 });
