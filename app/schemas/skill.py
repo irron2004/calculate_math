@@ -99,10 +99,10 @@ class SkillGraphSpec(BaseModel):
         return palette
 
     @model_validator(mode="after")
-    def _cross_field_validation(cls, values: "SkillGraphSpec") -> "SkillGraphSpec":
-        palette = values.palette
-        nodes = values.nodes
-        edges = values.edges
+    def _cross_field_validation(self) -> "SkillGraphSpec":
+        palette = self.palette
+        nodes = self.nodes
+        edges = self.edges
 
         node_ids: Set[str] = {node.id for node in nodes}
         palette_keys: Set[str] = set(palette)
@@ -111,11 +111,11 @@ class SkillGraphSpec(BaseModel):
 
         for node in nodes:
             if node.requires:
-                cls._validate_requirements(node, node_ids)
+                self._validate_requirements(node, node_ids)
             if node.boss is not None and node.boss not in node_ids:
                 raise ValueError(f"Node '{node.id}' references unknown boss '{node.boss}'")
             if node.kind is SkillKind.BOSS:
-                cls._validate_boss_node(node)
+                self._validate_boss_node(node)
 
             missing_lens.update(set(node.lens) - palette_keys)
 
@@ -132,7 +132,7 @@ class SkillGraphSpec(BaseModel):
                 "Palette is missing definitions for lens keys: " + ", ".join(sorted(missing_lens))
             )
 
-        return values
+        return self
 
     @classmethod
     def _validate_requirements(cls, node: SkillNode, node_ids: Set[str]) -> None:
