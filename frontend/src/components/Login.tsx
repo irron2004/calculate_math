@@ -9,7 +9,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, error: authError } = useAuth();
+  const { login, loginAsGuest, error: authError } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,8 +45,13 @@ const Login: React.FC = () => {
   };
 
   const handleGuestLogin = () => {
-    // 게스트 계정 정보
-    navigate('/student');
+    setError('');
+    const result = loginAsGuest();
+    if (result.success) {
+      navigate('/student');
+    } else if (result.error) {
+      setError(result.error);
+    }
   };
 
   return (
