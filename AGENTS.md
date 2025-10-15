@@ -8,18 +8,18 @@
 ## 0) 컨텍스트
 
 - OS: **Windows WSL2 (Ubuntu)**. 모든 경로/셸은 Linux 기준으로 작성합니다.
-- Python 백엔드: **FastAPI** 및/또는 **Django** (Python ≥ 3.10).
-- 프런트엔드: **React**.
+- Python 백엔드: **FastAPI (Python ≥ 3.11)**.
+- 프런트엔드: **React + Vite (Node 18+ 권장)**.
 - 테스트: **pytest**(백엔드), **Vitest** 또는 **Testing Library**(프런트엔드).
-- 품질 도구: **ruff, black, isort, mypy, pre-commit**.
+- 품질 도구: **ruff, black, isort, mypy, pre-commit**(가이드라인; 필요 시 도입).
 - CI: **GitHub Actions**(lint/test/coverage).  
 - 가상환경: 프로젝트 루트의 **`.venv/`** (WSL 내부 디스크; `/mnt/c/...` 금지).
 
 > **Codex는 다음을 가정합니다.**
 > - Python 실행 경로: `.venv/bin/python`  
 > - 테스트 경로: `tests/`(백엔드), `frontend/**/__tests__/` 또는 `frontend/src/**.test.tsx?`(프런트)  
-> - 앱 기본 포트: FastAPI/Django: `:8000`, React dev: `:5173` 혹은 `:3000`  
-> - 필요 시 수정하세요.
+> - 앱 기본 포트: FastAPI `:8000`, React dev `:5173`  
+> - 실제 엔트리: FastAPI `app/main.py` 또는 `make run`
 
 ---
 
@@ -38,14 +38,12 @@
 
 ## 2) 작업 절차(What to change)
 
-### 2.1 백엔드(FastAPI/Django)
+### 2.1 백엔드(FastAPI)
 
-- FastAPI: 엔드포인트/서비스/리포지토리 레이어를 분리하고, **Pydantic 모델**을 명확히 정의합니다.
-- Django: 모델 변경 시 `migrations/` 생성 코드를 포함합니다(마이그레이션 스크립트 추가).
-- 공통:
-  - **테스트 작성**: 신규/변경된 로직은 `tests/`에 단위테스트 추가.  
-    - 예: `tests/api/test_users.py`, `tests/services/test_billing.py`
-  - **문서화**: 변경 사항을 `README.md` 또는 `docs/`에 간단 요약(엔드포인트/스키마/예제).
+- 엔드포인트/서비스/리포지토리 레이어를 분리하고, **Pydantic 모델**을 명확히 정의합니다.
+- **테스트 작성**: 신규/변경된 로직은 `tests/`에 단위/라우터 테스트 추가.  
+  - 예: `tests/test_api.py`, `tests/test_skills_router.py`, `tests/test_pages.py`
+- **문서화**: 변경 사항을 `README.md` 또는 `docs/`에 간단 요약(엔드포인트/스키마/예제).
 
 ### 2.2 프런트엔드(React)
 
@@ -59,8 +57,8 @@
 
 - **절대 직접 수정 금지**: `.env`, `secrets`, GitHub Actions OIDC/시크릿 값.
 - **의존성 관리 규칙**  
-  - Python: 새 의존성은 `requirements.in`에 추가 → `requirements.txt`를 동기화(잠금 반영).  
-    - CLI 실행이 불가한 상황이면, **두 파일 모두 패치**를 제안하고 PR 설명에 “pip-compile 필요”를 명시합니다.
+  - Python: 새 의존성은 `requirements.txt`에 추가하고 PR에서 근거를 명시합니다.  
+    - 이 레포는 `pyproject.toml`로도 의존성을 정의합니다. 둘 간 버전/목록이 어긋나지 않도록 동기화 제안 문구를 포함하세요.
   - Node: 패키지 추가 시 `package.json`과 **lockfile**(예: `package-lock.json`/`pnpm-lock.yaml`)을 함께 갱신합니다.  
     - 불가하면 “lockfile 갱신 필요”를 PR 설명에 명시합니다.
 
@@ -145,12 +143,12 @@ test(users): add edge cases for email normalization
 
 ---
 
-## 7) 디렉터리·명명 규칙(예시, 프로젝트에 맞게 수정)
+## 7) 디렉터리·명명 규칙(레포 적용)
 
 - 백엔드:
-  - `app/` (FastAPI) 또는 `config/` + `apps/<domain>/` (Django)
-  - `app/schemas/`, `app/services/`, `app/api/routes/`
-  - 테스트: `tests/api/`, `tests/services/`, `tests/models/`
+  - `app/` (FastAPI 애플리케이션 루트: `app/__init__.py`, `app/main.py`)
+  - `app/routers/`, `app/services/`, `app/templates/`, `app/static/`
+  - 테스트: `tests/` (예: `tests/test_api.py`, `tests/test_skills_router.py`)
 - 프런트:
   - `frontend/src/components/`, `frontend/src/hooks/`, `frontend/src/pages/`
   - 테스트: `frontend/src/**/__tests__/` 또는 `*.test.tsx`
@@ -166,17 +164,20 @@ test(users): add edge cases for email normalization
 # Python
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+pip install -r requirements-dev.txt  # 테스트/개발 의존성
+
 # FastAPI dev
-uvicorn app.main:app --reload
-# Django dev
-python manage.py runserver
-# 테스트(참고): python -m pytest
+make run                 # 또는: uvicorn app.main:app --reload --port 8000
+
+# 테스트(참고; CI가 실행)
+pytest -q                # 또는: make test
 
 # Frontend
 nvm use 18
-npm ci
-npm run dev
-# 테스트(참고): npm test -- --run
+cd frontend && npm install
+npm run dev              # http://localhost:5173 (Vite)
+# 테스트(참고; CI가 실행)
+npm test -- --run
 ````
 
 ---
@@ -195,16 +196,38 @@ npm run dev
 
 ---
 
-## 11) 예시: 기능 추가 작업 카드(요약)
+## 11) SOP + 검증 커맨드(레포 적용)
 
-* 목표: `POST /users/verify` 추가 (FastAPI)
-* 산출물:
+다음 루프를 엄격히 따릅니다: **Plan → Commands → Diff → Verify**
 
-  * `app/api/routes/users.py` 라우트 + 서비스/스키마
-  * 테스트: `tests/api/test_users.py::test_verify_success`, 에러 케이스 1개
-  * 문서: `README.md` API 섹션 갱신
-* 기대 결과(실행 없이): 200 OK, 응답 `{verified: true, verified_at: "..."}`
-* 마이그레이션: Django 사용 시 `apps/users/migrations/00XX_add_verify_flag.py`
+- Plan: 문제 재현 경로와 수정 범위를 간단히 나열(최대 8줄)
+- Commands: 재현/검증에 필요한 셸 명령을 한 줄씩(순서: 재현 → 수정 → 검증)
+- Diff: 유니파이드 패치만. 최소 변경. 불필요한 재포맷 금지
+- Verify: HTTP 코드/본문, 로그 키워드, 테스트 통과 수를 근거로 성공/실패 명시
+- 파괴적 명령(대량 rm, sudo, 외부 네트워크 접근) 금지. 필요 시 명시적 승인 요청
+
+### Build & Test (Codex가 실행 참조용)
+- Backend: `pytest -q` 또는 `make test`
+- Lint(선택): `python -m compileall app` (기본 제공), ruff/black은 도입 시 활성화
+- Dev server: `make run` (포트 `:8000`)
+- Health check: `curl -s http://localhost:8000/health`
+
+### Endpoints to verify
+- `GET /health`, `GET /healthz`, `GET /readyz`
+- `GET /api/problems`, `GET /api/problems/generate?category=add&seed=1`
+- `POST /api/v1/login {nickname,password}` → Set-Cookie 확인
+- `POST /api/v1/sessions` → 문제 세트 20개 생성 확인
+- `GET /api/v1/metrics/me` → 사용자별 통계
+- `GET /api/v1/skills/tree`, `POST /api/v1/skills/progress` (스냅샷/투영 검증)
+
+### Known Pitfalls
+- Pydantic v2 기준(`model_dump`, `field_validation`). v1 전용 API 사용 금지
+- 테스트는 `httpx.AsyncClient` + ASGITransport 사용. `X-Request-ID` 헤더 전파 필수
+- 스킬 UI 그래프(`app/data/skills.ui.json`) 불일치 시 `SkillSpecError` 발생 → 검증 로직 유지
+
+### Docker (옵션)
+- Build: `docker build -t calculate-service .`
+- Run: `docker run -p 8000:8000 calculate-service`
 
 ---
 
@@ -218,3 +241,21 @@ npm run dev
 - 프로젝트에 맞춰 포트/경로/테스트 폴더/Node 버전 등을 한 번만 수정해두면, 이후에는 **반복 안내 없이** 일관된 방식으로 협업할 수 있습니다.
 
 필요하시면 위 **AGENTS.md의 플레이스홀더**(포트/경로/테스트 폴더/의존성 정책 등)를 당신의 레포 구조에 맞춰 제가 바로 채워드릴게요.
+
+---
+
+## 12) Codex Starter Prompts (붙여넣기용)
+
+다음 프롬프트를 Codex CLI에 그대로 입력하면, 이 레포의 SOP에 맞춘 루틴으로 동작합니다.
+
+### A. 헬스→재현→수정→검증 한방
+
+codex "health 확인 후 /api/problems, /api/v1/sessions, /api/v1/skills/tree 재현 → 원인 분석(Pydantic v2/캐시/파일 경로 포함) → 최소 수정(diff) → curl/pytest로 검증. SOP/AGENTS.md 준수. 컨텍스트: README.md, app/__init__.py, app/routers/problems.py, app/routers/practice.py, app/routers/skills.py, app/routers/health.py, app/status.py, Makefile, tests/test_api.py, tests/test_skills_router.py"
+
+### B. 워커/응답 지연 추적(옵션)
+
+codex "/api/problems 및 /api/v1/sessions의 처리시간을 추적하고 병목을 완화(랜덤/IO/캐시 갱신). 필요한 경우 uvicorn 로그 레벨 조정과 간단한 캐시 힌트를 추가. Verify에 응답 시간/상태코드 수치 포함."
+
+### C. 스킬 그래프 호환성 점검
+
+codex "skills UI 그래프 검증에서 발생 가능한 SkillSpecError를 재현하고, 메시지 개선/에지케이스 방어를 최소 변경으로 적용. 수정 범위는 app/routers/skills.py 한정. pytest 통과 후 Verify에 라우트 응답 예시 포함."

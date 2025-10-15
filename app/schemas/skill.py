@@ -138,7 +138,7 @@ class SkillGraphSpec(BaseModel):
     def _validate_requirements(cls, node: SkillNode, node_ids: Set[str]) -> None:
         requirements = node.requires
         assert requirements is not None  # nosec - guarded by caller
-        invalid_ids = set(requirements.all_of) | set(requirements.any_of) - node_ids
+        invalid_ids = (set(requirements.all_of) | set(requirements.any_of)) - node_ids
         if invalid_ids:
             raise ValueError(
                 f"Node '{node.id}' has requirements referencing unknown nodes: {sorted(invalid_ids)}"

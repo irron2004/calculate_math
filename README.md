@@ -32,6 +32,21 @@ npm run dev   # http://localhost:5173 (Vite)
 
 > `.env.local` 등에 `VITE_API_BASE_URL=/math-api/api`를 지정하면 프록시 경로를 자유롭게 바꿀 수 있습니다. 로컬 개발 시에는 기본값(`/math-api/api`)이 사용되며, docker-compose/nginx 구성과도 호환됩니다.
 
+## Docker 실행 (백엔드 + 프런트)
+```bash
+make build   # 이미지 빌드 후 두 서비스를 백그라운드에서 실행
+make up      # 기존 이미지를 사용해 컨테이너 실행
+make down    # 실행 중인 컨테이너 정리
+
+# docker compose 직접 사용 시
+docker compose up --build -d
+docker compose down
+```
+
+- 백엔드: `http://localhost:8000`
+- 프런트엔드: `http://localhost:5173/math/`
+- 프론트에서 API 호출은 `http://localhost:5173/api/...` 경로를 통해 자동 프록시돼 백엔드(`math-backend`)로 전달됩니다.
+
 ## 설정
 환경 변수는 `.env` 파일로 오버라이드할 수 있습니다.
 
@@ -57,6 +72,10 @@ make test
 ```
 테스트는 FastAPI `TestClient`를 사용해 `X-Request-ID` 전파, RFC 9457 오류 응답, noindex 헤더를 검증합니다. OpenTelemetry 익스포터는 통합/스테이징 환경에서 검증합니다.
 
+## CI
+- CI는 백엔드 테스트(`pytest -q`)와 필요 시 프런트엔드 테스트를 실행해 기본 커버리지를 확인합니다.
+- 재현 가능한 버그 리포트를 위해 템플릿을 사용하세요: `docs/issue_template.md`.
+
 ## 배포 메모
 - Docker 빌드는 `Dockerfile`을 그대로 사용할 수 있습니다.
 - Cloud Run/Cloudflare 배포 시 `X-Request-ID` 헤더를 그대로 전달하도록 프록시를 구성하세요.
@@ -81,6 +100,7 @@ frontend/
 ## 추가 문서
 - [Skill Tree Content & Visual Standards Guide](docs/skill_tree_content_guide.md): 스킬 트리 카피, 로컬라이제이션 키, 시각 요소 표준과 협업 절차 정리
 - [Diablo-Style Skill Tree Gap Analysis](docs/skill_tree_diablo_gap_analysis.md): 디아블로형 스킬트리 미구현 원인과 개선 과제 정리
+- [Codex CLI Workflow (GPT Pro 로그인)](docs/codex_workflow.md): Codex CLI 설치/로그인, SOP(Plan→Commands→Diff→Verify), 검증 커맨드/프롬프트
 
 ## 라이선스
 MIT
