@@ -21,6 +21,7 @@ dev = [
     "pytest==7.4.3",
     "httpx==0.25.2",
     "anyio==3.7.1",
+    "requests>=2.31.0",
 ]
 
 [tool.pytest.ini_options]

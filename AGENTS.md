@@ -259,3 +259,46 @@ codex "/api/problems 및 /api/v1/sessions의 처리시간을 추적하고 병목
 ### C. 스킬 그래프 호환성 점검
 
 codex "skills UI 그래프 검증에서 발생 가능한 SkillSpecError를 재현하고, 메시지 개선/에지케이스 방어를 최소 변경으로 적용. 수정 범위는 app/routers/skills.py 한정. pytest 통과 후 Verify에 라우트 응답 예시 포함."
+
+---
+
+## 13) Codex 자동화 루프 + 문서 주도 개발(추가)
+
+- 로컬/CI 공통 자동화:
+  - `tools/codex_loop.py`: pytest 실패 요약 → LLM 패치(diff) → 적용 → 재테스트(최대 N회)
+  - `tools/codex_docs.py`: `docs/idea.md` → `docs/PRD.md`, `docs/architecture.md` 기본 골격 생성
+
+### 로컬 사용
+
+```bash
+# 0) 의존성
+pip install -r requirements.txt -r requirements-dev.txt
+
+# 1) DAG → skills.json 생성/검증 (자동 루프가 내부에서 수행하지만 수동 실행 가능)
+python scripts/dag_to_skills.py --in docs/dag.md --out app/data/skills.json
+python scripts/validate_skills.py --in app/data/skills.json --schema docs/skills.schema.json
+
+# 2) 1차 테스트 (선택)
+pytest -q
+
+# 3) 자동 수정 루프 (LLM 사용)
+export LLM_API_KEY=sk-...   # 선택: LLM_BASE_URL, LLM_MODEL, CODEX_MAX_ITERS
+python tools/codex_loop.py
+```
+
+### GitHub Actions
+
+- `.github/workflows/docs-to-pr.yml`:
+  - `docs/idea.md`, `docs/PRD.md`, `docs/api/**`, `docs/dag.md` 변경 시 동작
+  - `tools/codex_docs.py` 실행 → `docs/dag.md` 변경 시 skills.json 생성/검증 → PR 생성
+
+- `.github/workflows/ci-autofix.yml`:
+  - PR/수동 트리거 시 `tools/codex_loop.py` 실행
+  - 변경이 있으면 `peter-evans/create-pull-request`로 `autofix/*` PR 자동 생성
+  - 시크릿: `LLM_API_KEY`(필수), 선택 `LLM_BASE_URL`; `vars.LLM_MODEL`로 모델명 지정 가능
+
+### 제약/안전장치
+
+- LLM 프롬프트에 변경 범위를 `app/`, `tests/`, `docs/`, `scripts/`, `frontend/`로 유도
+- 오류 응답은 RFC 9457 Problem Details 유지, `/api/v1/skills/tree` 누락 시 503 방어 권장
+- `requests`는 dev 의존성으로 추가됨. CI/로컬에서 `requirements-dev.txt` 설치 필요

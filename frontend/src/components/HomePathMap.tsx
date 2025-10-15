@@ -138,7 +138,7 @@ const HomePathMap: React.FC<HomePathMapProps> = ({ className }) => {
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const nodeRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggeredRef = useRef(false);
   const suppressClickRef = useRef(false);
 

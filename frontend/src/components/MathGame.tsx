@@ -723,7 +723,7 @@ const MathGame: React.FC = () => {
     const allowCarry = Boolean((params as Record<string, unknown>).allow_carry ?? true);
     const allowRemainder = Boolean((params as Record<string, unknown>).allow_remainder ?? false);
     const digitsParam = Array.isArray((params as Record<string, unknown>).digits)
-      ? (params as Record<string, unknown>).digits
+      ? ((params as Record<string, unknown>).digits as number[])
       : null;
     const leftDigits =
       typeof (params as Record<string, unknown>).left_digits === 'number'
@@ -1463,7 +1463,7 @@ const MathGame: React.FC = () => {
         step: question.step,
         lens: question.lens?.[0],
         time_limit_ms: timeLimitMs,
-        timed_out,
+        timed_out: timedOut,
         correct: isCorrect,
         hint_used: hintRevealedRef.current || undefined
       };

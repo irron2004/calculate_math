@@ -9,12 +9,11 @@ import type {
   SkillTreeGraphTree,
   SkillTreeNode,
   SkillTreeProgress,
-  SkillTreeResponse,
 } from '../types';
 import { fetchSkillTree } from '../utils/api';
 import { trackExperimentExposure } from '../utils/analytics';
 import { registerCourseConcept, resetCourseConceptOverrides, resolveConceptStep } from '../utils/skillMappings';
-import SkillTreeGraph, { SkillTreeGraphNodeView } from './SkillTreeGraph';
+import SkillTreeGraph, { type SkillTreeGraphNodeView } from './SkillTreeGraph';
 
 type ExperimentAssignment = {
   name: string;
@@ -90,7 +89,11 @@ const SkillTreePage: React.FC = () => {
   const isMountedRef = useRef(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-const loadSkillTree = useCallback(
+  const closeOverlay = useCallback(() => {
+    setSelectedNodeId(null);
+  }, []);
+
+  const loadSkillTree = useCallback(
   async (options?: { silent?: boolean }) => {
     const silent = Boolean(options?.silent);
     if (silent) {
@@ -331,10 +334,11 @@ useEffect(() => {
     }
   }, [isLoading, error, uiGraph, graphNodesView.length, nodes.length]);
 
-useEffect(() => {
-  if (!selectedNode) {
-    return undefined;
-  }
+  useEffect(() => {
+    if (!selectedNode) {
+      return undefined;
+    }
+
     const overlayEl = overlayRef.current;
     lastFocusedElementRef.current = document.activeElement as HTMLElement | null;
 
@@ -427,7 +431,6 @@ useEffect(() => {
   const selectedProjection = selectedNode ? projectionLookup.get(selectedNode.id) ?? null : null;
   const overlayTitleId = selectedNode ? `skill-node-${selectedNode.id}-title` : undefined;
   const overlayDescriptionId = selectedNode ? `skill-node-${selectedNode.id}-details` : undefined;
-  const closeOverlay = useCallback(() => setSelectedNodeId(null), []);
 
   if (isLoading) {
     return (

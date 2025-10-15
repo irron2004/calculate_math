@@ -1,0 +1,37 @@
+name: docs-to-pr
+on:
+  push:
+    paths:
+      - 'docs/idea.md'
+      - 'docs/PRD.md'
+      - 'docs/api/**'
+      - 'docs/dag.md'
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate docs (if needed)
+        run: |
+          python -V
+          python tools/codex_docs.py
+      - name: Build skills.json when dag.md changed
+        if: contains(join(github.event.head_commit.message), 'docs/dag.md') || contains(toJson(github.event.commits.*.modified), 'docs/dag.md') || contains(toJson(github.event.commits.*.added), 'docs/dag.md')
+        run: |
+          python scripts/dag_to_skills.py --in docs/dag.md --out app/data/skills.json
+          python scripts/validate_skills.py --in app/data/skills.json --schema docs/skills.schema.json || python scripts/validate_skills.py --in app/data/skills.json
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "docs: sync PRD/skills.json"
+          commit-message: "docs: update PRD/skills.json"
+          body: |
+            Auto-generated from docs changes.
+            - docs/idea.md or docs/PRD.md updated
+            - docs/dag.md converted to app/data/skills.json and validated
+          branch: "docs/sync"
+

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { CurriculumGraph } from '../types';
+import type { StepID } from '../utils/analytics';
 import { fetchCurriculumGraph } from '../utils/api';
 import {
   buildSkillTree,
@@ -15,7 +16,7 @@ type SkillTreeProps = {
   conceptNames?: Record<string, string>;
   activeConceptId?: string | null;
   selectedNodeId?: string | null;
-  onSelectStep?: (conceptId: string, step: string) => void;
+  onSelectStep?: (conceptId: string, step: StepID) => void;
 };
 
 const buildOptions = (conceptNames?: Record<string, string>): BuildSkillTreeOptions => {
@@ -156,7 +157,7 @@ type NodeItemProps = {
   branch: SkillTreeBranch;
   node: SkillTreeBranch['nodes'][number];
   selectedNodeId?: string | null;
-  onSelectStep?: (conceptId: string, step: string) => void;
+  onSelectStep?: (conceptId: string, step: StepID) => void;
 };
 
 const SkillTreeNodeItem: React.FC<NodeItemProps> = ({
@@ -173,7 +174,9 @@ const SkillTreeNodeItem: React.FC<NodeItemProps> = ({
     if (!isInteractive) {
       return;
     }
-    onSelectStep?.(branch.conceptId, node.step);
+    if (node.step === 'S1' || node.step === 'S2' || node.step === 'S3') {
+      onSelectStep?.(branch.conceptId, node.step);
+    }
   };
 
   return (

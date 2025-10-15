@@ -175,7 +175,6 @@ function buildEdgePath(
   const y1 = from.y + from.height;
   const x2 = to.x + to.width / 2;
   const y2 = to.y;
-  const deltaX = (x2 - x1) / 2;
   const control1Y = y1 + 48;
   const control2Y = y2 - 48;
   return `M ${x1} ${y1} C ${x1} ${control1Y}, ${x2} ${control2Y}, ${x2} ${y2}`;
