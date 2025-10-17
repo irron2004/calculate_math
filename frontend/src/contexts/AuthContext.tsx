@@ -8,6 +8,7 @@ interface AuthContextType {
   token: string | null;
   error: string | null;
   login: (nickname: string, password: string) => Promise<LoginResult>;
+  loginAsGuest: () => LoginResult;
   logout: () => void;
   loading: boolean;
 }
@@ -96,11 +97,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
   };
 
+  const loginAsGuest = (): LoginResult => {
+    const guestUser: User = {
+      id: 'guest',
+      username: 'guest',
+      role: 'guest',
+      name: '게스트 사용자',
+    };
+
+    setUser(guestUser);
+    setToken(null);
+    setError(null);
+    return { success: true, user: guestUser };
+  };
+
   const value = {
     user,
     token,
     error,
     login,
+    loginAsGuest,
     logout,
     loading
   };
