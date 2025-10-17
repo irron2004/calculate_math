@@ -30,8 +30,8 @@ COURSE_GROUP_DEFINITIONS: Sequence[dict[str, Any]] = (
         "course_ids": {"C05", "C06"},
     },
     {
-        "id": "patterns_geometry_stats",
-        "label": "규칙·좌표·기하·통계",
+        "id": "algebra_geo_stats",
+        "label": "대수·기하·해석·통계(응용)",
         "order": 3,
         "course_ids": {"C07", "C08", "C09", "C10", "C11", "C12"},
     },
@@ -57,7 +57,7 @@ def _normalise_domain(domain: str) -> str:
 
 
 def _build_course_group_map(course_ids: Iterable[str]) -> tuple[List[dict[str, Any]], Dict[str, str]]:
-    """Return ordered group definitions and lookup mapping for course ids."""
+    """Return ordered group definitions and lookup mapping for base course ids."""
 
     course_to_group: Dict[str, str] = {}
     groups: List[dict[str, Any]] = []
@@ -165,7 +165,8 @@ def build_skill_tree_projection(
         and edge.to in course_lookup
     ]
 
-    groups, course_to_group = _build_course_group_map(course_lookup.keys())
+    base_course_ids = {course.id.split("-")[0] for course in course_steps}
+    groups, course_to_group = _build_course_group_map(base_course_ids)
 
     nodes_payload: List[dict[str, Any]] = []
     for course in sorted(course_steps, key=lambda item: (item.tier, item.id)):

@@ -60,6 +60,18 @@ async def test_skill_tree_endpoint_returns_experiment_payload(client):
     assert cookie_value in {"tree", "list"}
 
 
+async def test_skill_tree_groups_cover_curriculum_domains(client):
+    response = await client.get("/api/v1/skills/tree")
+    assert response.status_code == 200
+    groups = {group["id"]: group for group in response.json()["groups"]}
+    expected_ids = {"arithmetic", "fraction_ratio", "algebra_geo_stats"}
+    assert expected_ids.issubset(groups.keys())
+    assert groups["arithmetic"]["course_ids"] == ["C01", "C02", "C03", "C04"]
+    assert groups["fraction_ratio"]["course_ids"] == ["C05", "C06"]
+    assert groups["algebra_geo_stats"]["course_ids"] == ["C07", "C08", "C09", "C10", "C11", "C12"]
+    assert "general" not in groups
+
+
 async def test_skill_tree_respects_existing_cookie(client):
     first = await client.get("/api/v1/skills/tree")
     first_variant = first.json()["experiment"]["variant"]
