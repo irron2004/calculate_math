@@ -269,12 +269,10 @@ async def test_skills_page_renders_and_is_hidden_from_indexing(client) -> None:
     assert "스킬 트리" in response.text
 
 
-def test_submit_correct_attempt_records_success(client, dataset) -> None:
+async def test_submit_correct_attempt_records_success(app, client, dataset) -> None:
     target = dataset["problems"][0]
-    assert str(client._app.state.problem_repository.source_path) == str(
-        dataset["problems_path"]
-    )
-    response = client.post(
+    assert str(app.state.problem_repository.source_path) == str(dataset["problems_path"])
+    response = await client.post(
         f"/api/problems/{target['id']}/attempts",
         json={"answer": target["answer"]},
     )
@@ -327,13 +325,11 @@ async def test_metrics_endpoint_returns_personalised_stats(client, dataset) -> N
     assert payload["progress"]["unlocked_nodes"] == 2
 
 
-def test_submit_incorrect_attempt_is_logged(client, dataset) -> None:
+async def test_submit_incorrect_attempt_is_logged(app, client, dataset) -> None:
     target = dataset["problems"][1]
-    assert str(client._app.state.problem_repository.source_path) == str(
-        dataset["problems_path"]
-    )
+    assert str(app.state.problem_repository.source_path) == str(dataset["problems_path"])
     wrong_answer = target["answer"] + 5
-    response = client.post(
+    response = await client.post(
         f"/api/problems/{target['id']}/attempts",
         json={"answer": wrong_answer},
     )
@@ -351,9 +347,11 @@ def test_submit_incorrect_attempt_is_logged(client, dataset) -> None:
     assert attempts[0].submitted_answer == wrong_answer
 
 
-def test_submit_attempt_without_answer_returns_validation_error(client, dataset) -> None:
+async def test_submit_attempt_without_answer_returns_validation_error(
+    client, dataset
+) -> None:
     target = dataset["problems"][2]
-    response = client.post(
+    response = await client.post(
         f"/api/problems/{target['id']}/attempts",
         json={},
     )
@@ -490,8 +488,8 @@ async def test_create_session_rejects_unknown_token(client) -> None:
     assert response.status_code == 401
 
 
-def test_daily_stats_endpoint_returns_summary(client) -> None:
-    response = client.get("/api/v1/stats/daily", params={"days": 30})
+async def test_daily_stats_endpoint_returns_summary(client) -> None:
+    response = await client.get("/api/v1/stats/daily", params={"days": 30})
     assert response.status_code == 200
     payload = response.json()
     assert "total_sessions" in payload

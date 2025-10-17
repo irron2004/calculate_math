@@ -172,20 +172,29 @@ async def api_get_skill_tree(
         bipartite_graph = get_bipartite_graph()
         course_steps = get_course_steps()
         atomic_skills = get_atomic_skills()
-        store = _resolve_progress_store(request)
 
+        progress_error: ProgressDataError | None = None
+        snapshot: ProgressSnapshot | None = None
         effective_user_id = user.id if user is not None else user_id
-        snapshot = _select_snapshot(store, effective_user_id)
+        node_progress = _serialise_node_progress(course_steps, None)
+        skill_progress = _serialise_skill_progress(atomic_skills, None)
 
-        node_progress = _serialise_node_progress(course_steps, snapshot)
-        skill_progress = _serialise_skill_progress(atomic_skills, snapshot)
+        try:
+            store = _resolve_progress_store(request)
+            snapshot = _select_snapshot(store, effective_user_id)
+            if snapshot is not None:
+                effective_user_id = snapshot.user_id
+            node_progress = _serialise_node_progress(course_steps, snapshot)
+            skill_progress = _serialise_skill_progress(atomic_skills, snapshot)
+        except ProgressDataError as exc:
+            progress_error = exc
 
         projection = build_skill_tree_projection(
             graph=bipartite_graph,
             node_progress=node_progress,
             skill_progress=skill_progress,
         )
-        progress_payload: Dict[str, Any] = {
+        progress_payload = {
             "user_id": snapshot.user_id if snapshot else effective_user_id,
             "updated_at": snapshot.updated_at.isoformat() if snapshot else None,
             "total_xp": snapshot.total_xp if snapshot else 0,
@@ -199,8 +208,6 @@ async def api_get_skill_tree(
             state = node.get("state", {})
             unlocked_map[node["id"]] = bool(state.get("completed") or state.get("available"))
 
-        payload_graph = ui_graph
-
         payload: Dict[str, Any] = {
             "version": projection["version"],
             "palette": projection["palette"],
@@ -209,12 +216,17 @@ async def api_get_skill_tree(
             "edges": projection["edges"],
             "skills": projection["skills"],
             "progress": progress_payload,
-            "graph": payload_graph,
+            "graph": deepcopy(ui_graph),
             "unlocked": unlocked_map,
             "experiment": assignment.to_payload(),
         }
+        if progress_error is not None:
+            payload["error"] = {
+                "message": "진행도 데이터를 불러오는 중 문제가 발생하여 기본 값을 표시합니다.",
+                "kind": progress_error.__class__.__name__,
+            }
         return payload
-    except (SkillSpecError, BipartiteSpecError, ProgressDataError) as exc:
+    except (SkillSpecError, BipartiteSpecError) as exc:
         logger.exception("Failed to load skill tree payload")
         fallback_progress: Dict[str, Any] = {
             "user_id": None,

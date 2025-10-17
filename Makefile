@@ -1,4 +1,4 @@
-.PHONY: install dev run test lint validate-dag be fe clean build up down
+.PHONY: install dev run test lint quality validate-dag be fe clean build up down smoke
 
 UVICORN_CMD := .venv/bin/python -m uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 VITE_DEV_CMD := npm --prefix frontend run dev
@@ -25,6 +25,14 @@ test:
 
 lint: validate-dag
 	python -m compileall app
+
+quality:
+	ruff check .
+	mypy --strict
+
+smoke:
+	@echo "Run a local dev server (make run) in another terminal first."
+	curl -sfS http://localhost:8000/health
 
 validate-dag:
 	python scripts/validate_skill_graph.py

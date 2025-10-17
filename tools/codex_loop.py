@@ -5,16 +5,18 @@ codex_loop.py — Local/CI autofix loop for this repository
 
 Functions:
   1) Build & validate skills.json from docs/dag.md
-  2) Run pytest (with JUnit + coverage XML)
-  3) Summarize first failure(s)
-  4) Ask an LLM for a minimal unified diff to fix tests
-  5) Apply patch, commit, and re-run tests (up to N iterations)
+  2) Run quality gates: ruff, mypy, pytest (JUnit+coverage)
+  3) Summarize failures and extract code context from traces
+  4) Ask LLM for a short Plan first, then a minimal unified diff
+  5) Apply patch, commit, and re-run (up to N iterations). Optional smoke.
 
 Environment:
   - LLM_API_KEY: required to contact the LLM provider
   - LLM_BASE_URL: base URL for chat completions API (default: https://api.openai.com/v1)
   - LLM_MODEL: model name (default: gpt-4o-mini)
   - CODEX_MAX_ITERS: max patch iterations (default: 2)
+  - LLM_PLAN_MODEL: optional model for planning step
+  - CODEX_SMOKE_CMD: optional shell command to run a smoke test; must return 0 on success
 
 Notes:
   - Uses scripts/dag_to_skills.py and scripts/validate_skills.py already present in this repo
@@ -38,6 +40,7 @@ REPORTS.mkdir(exist_ok=True, parents=True)
 LLM_BASE = os.getenv("LLM_BASE_URL", "https://api.openai.com/v1")
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 LLM_KEY = os.getenv("LLM_API_KEY")  # required for LLM calls
+LLM_PLAN_MODEL = os.getenv("LLM_PLAN_MODEL", LLM_MODEL)
 
 MAX_ITERS = int(os.getenv("CODEX_MAX_ITERS", "2"))
 
@@ -91,6 +94,8 @@ def pytest_once():
         f"--cov-report=xml:{cov}",
     ]
     cp = run(cmd, check=False)
+    # also persist stdout/stderr to a plain text for quick reading
+    (REPORTS / "pytest.txt").write_text((cp.stdout or "") + (cp.stderr or ""), encoding="utf-8")
     junit_text = ""
     if junit.exists():
         try:
@@ -98,6 +103,27 @@ def pytest_once():
         except Exception:
             junit_text = ""
     return cp.returncode, junit_text
+
+
+def ruff_once() -> int:
+    cp = run(["ruff", "check", "."], check=False)
+    (REPORTS / "ruff.txt").write_text((cp.stdout or "") + (cp.stderr or ""), encoding="utf-8")
+    return cp.returncode
+
+
+def mypy_once() -> int:
+    cp = run(["mypy", "--strict"], check=False)
+    (REPORTS / "mypy.txt").write_text((cp.stdout or "") + (cp.stderr or ""), encoding="utf-8")
+    return cp.returncode
+
+
+def smoke_once() -> int:
+    cmd = os.getenv("CODEX_SMOKE_CMD")
+    if not cmd:
+        return 0
+    cp = run(["bash", "-lc", cmd], check=False)
+    (REPORTS / "smoke.txt").write_text((cp.stdout or "") + (cp.stderr or ""), encoding="utf-8")
+    return cp.returncode
 
 
 def summarize_failures(junit_xml: str) -> str:
@@ -117,14 +143,14 @@ def git_add_commit(msg: str):
     run(["git", "commit", "-m", msg], check=False)
 
 
-def call_llm(system_prompt: str, user_prompt: str) -> str:
+def call_llm(system_prompt: str, user_prompt: str, *, model: str | None = None) -> str:
     if not LLM_KEY:
         raise SystemExit("LLM_API_KEY not set")
     import requests  # local import to avoid hard dependency when unused
 
     headers = {"Authorization": f"Bearer {LLM_KEY}", "Content-Type": "application/json"}
     payload = {
-        "model": LLM_MODEL,
+        "model": model or LLM_MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
@@ -135,10 +161,19 @@ def call_llm(system_prompt: str, user_prompt: str) -> str:
     return r.json()["choices"][0]["message"]["content"]
 
 
+PLAN_INSTR = textwrap.dedent(
+    """
+    You are a careful senior engineer.
+    Provide a short plan (≤8 lines) to fix the failures below.
+    Include: likely root cause, minimal change scope, risks.
+    Output ONLY the plan lines, no code or diff.
+    """
+)
+
 PATCH_INSTR = textwrap.dedent(
     """
     You are an expert Python FastAPI/pytest engineer.
-    Given the repository structure and the failing pytest summary below,
+    Given the repository structure and quality failures below,
     return ONLY a unified diff patch to fix the failures. Use minimal, safe changes.
     Do not include explanations. Patch root is repository root.
     Limit changes to app/, tests/, docs/, scripts/, frontend/ unless absolutely necessary.
@@ -158,32 +193,111 @@ def apply_patch(diff_text: str):
         run(["patch", "-p1", "-i", p])
 
 
+def extract_context_snippets(max_files: int = 5, max_lines: int = 250) -> str:
+    """Pull file paths from pytest logs and junit, include code slices for LLM context."""
+    paths: set[str] = set()
+    # from pytest text
+    try:
+        txt = (REPORTS / "pytest.txt").read_text(encoding="utf-8", errors="ignore")
+    except FileNotFoundError:
+        txt = ""
+    for m in re.findall(r"([A-Za-z0-9_./\\-]+\.py)(?::(\d+))?", txt):
+        paths.add(m[0])
+    # from junit.xml
+    try:
+        junit = (REPORTS / "junit.xml").read_text(encoding="utf-8", errors="ignore")
+    except FileNotFoundError:
+        junit = ""
+    for m in re.findall(r"file=\"([^\"]+\.py)\"", junit):
+        paths.add(m)
+    # trim & build snippets
+    out = []
+    for p in list(paths)[:max_files]:
+        fp = (REPO / p) if not p.startswith(str(REPO)) else pathlib.Path(p)
+        if not fp.exists() or fp.is_dir():
+            continue
+        try:
+            code = fp.read_text(encoding="utf-8", errors="ignore").splitlines()
+        except Exception:
+            continue
+        snippet = "\n".join(code[:max_lines])
+        out.append(f"--- FILE: {p} ---\n{snippet}")
+    return "\n\n".join(out)
+
+
 def main():
     build_skills()
-    rc, junit = pytest_once()
-    if rc == 0:
-        print("✅ All tests passed.")
+    # run quality gates first
+    ruff_rc = ruff_once()
+    mypy_rc = mypy_once()
+    test_rc, junit = pytest_once()
+    smoke_rc = smoke_once()
+    if ruff_rc == 0 and mypy_rc == 0 and test_rc == 0 and smoke_rc == 0:
+        print("✅ All quality gates passed (ruff/mypy/pytest/smoke).")
         return
 
     summary = summarize_failures(junit)
-    print("❌ Test failed:\n", summary)
+    print("❌ Quality failing. pytest summary:\n", summary)
     ts = datetime.utcnow().strftime("%Y%m%d%H%M%S")
     branch = f"autofix/{ts}"
     git_branch(branch)
 
     for i in range(MAX_ITERS):
+        # assemble dynamic context
+        ctx = extract_context_snippets()
+        # build combined failure text (truncated)
+        ruff_txt = (REPORTS / "ruff.txt").read_text(encoding="utf-8", errors="ignore") if (REPORTS/"ruff.txt").exists() else ""
+        mypy_txt = (REPORTS / "mypy.txt").read_text(encoding="utf-8", errors="ignore") if (REPORTS/"mypy.txt").exists() else ""
+        pytest_txt = (REPORTS / "pytest.txt").read_text(encoding="utf-8", errors="ignore") if (REPORTS/"pytest.txt").exists() else ""
+
+        # (A) request plan
+        plan_user = f"""Repository context: FastAPI + pytest.
+Failing headlines (pytest junit):
+{summary}
+
+Ruff (head):
+{ruff_txt[:1200]}
+
+Mypy (head):
+{mypy_txt[:1200]}
+
+Pytest (head):
+{pytest_txt[:1200]}
+
+Relevant code:
+{ctx[:4000]}
+"""
+        plan = call_llm(PLAN_INSTR, plan_user, model=LLM_PLAN_MODEL).strip()
+
+        # (B) ask for patch
         user_prompt = f"""Repo overview:
 - Language: Python 3.11+, FastAPI, pytest
 - Pre-step: scripts/dag_to_skills.py generated app/data/skills.json from docs/dag.md
-- Request: produce a patch to fix tests.
+- Request: produce a minimal patch to fix all failing gates.
 
 Failing summary:
 {summary}
+
+Ruff (head):
+{ruff_txt[:1600]}
+
+Mypy (head):
+{mypy_txt[:1600]}
+
+Pytest (head):
+{pytest_txt[:1600]}
+
+Relevant code:
+{ctx[:6000]}
+
+Plan:
+{plan}
 
 Constraints:
 - Keep API success = plain JSON, errors = RFC 9457 Problem Details
 - If /api/v1/skills/tree fails due to missing files, add defensive checks and return 503 Problem Details, not 500.
 - Prefer httpx.AsyncClient+ASGITransport for tests over sync TestClient.
+ - Prefer minimal changes; avoid reformatting unrelated files.
 
 Output: unified diff starting with `diff --git a/... b/...`
 """
@@ -194,17 +308,20 @@ Output: unified diff starting with `diff --git a/... b/...`
         apply_patch(diff)
         git_add_commit(f"autofix(iter={i+1}): patch by codex_loop")
         build_skills()
-        rc, junit = pytest_once()
-        if rc == 0:
-            print("✅ Tests passed after autofix.")
+        # re-run gates
+        ruff_rc = ruff_once()
+        mypy_rc = mypy_once()
+        test_rc, junit = pytest_once()
+        smoke_rc = smoke_once()
+        if ruff_rc == 0 and mypy_rc == 0 and test_rc == 0 and smoke_rc == 0:
+            print("✅ Green after autofix (ruff/mypy/pytest/smoke).")
             print(f"Branch ready: {branch}")
             return
         summary = summarize_failures(junit)
-        print(f"❌ Still failing (iter {i+1}):\n{summary}")
+        print(f"❌ Still failing (iter {i+1}). pytest summary:\n{summary}")
 
     print(f"❗️Autofix failed after {MAX_ITERS} iterations. See reports/ and branch {branch}")
 
 
 if __name__ == "__main__":
     main()
-

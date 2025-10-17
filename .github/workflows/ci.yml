@@ -1,0 +1,46 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests-and-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: |
+          python -V
+          pip install -U pip
+          pip install -r requirements.txt
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+      - name: Build skills.json and validate
+        run: |
+          python scripts/dag_to_skills.py --in docs/dag.md --out app/data/skills.json
+          python scripts/validate_skills.py --in app/data/skills.json --schema docs/skills.schema.json || python scripts/validate_skills.py --in app/data/skills.json
+      - name: Collect quality outputs (non-fatal)
+        run: |
+          mkdir -p reports
+          { ruff check . || true; }  > reports/ruff.txt 2>&1
+          { mypy --strict || true; } > reports/mypy.txt 2>&1
+          { pytest -q --maxfail=1 --disable-warnings --junitxml=reports/junit.xml --cov=app --cov-report=xml:reports/coverage.xml || true; } 2>&1 | tee reports/pytest.txt
+          { python -m compileall app || true; } > reports/compile.txt 2>&1
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-artifacts
+          path: |
+            reports/*
+            app/data/skills.json
+      - name: Lint gate (ruff)
+        run: ruff check .
+      - name: Type gate (mypy)
+        run: mypy --strict
+      - name: Test gate (pytest)
+        run: pytest -q --maxfail=1 --disable-warnings
+      - name: Build gate (compile)
+        run: python -m compileall app

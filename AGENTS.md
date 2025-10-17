@@ -262,6 +262,33 @@ codex "skills UI 그래프 검증에서 발생 가능한 SkillSpecError를 재�
 
 ---
 
+## 14) Output Contract & Definition of Done (보완)
+
+### Output Contract (항상 4섹션)
+- Plan: 해야 할 일 요약(≤8줄), 변경 범위/리스크 명시
+- Commands: 재현/수정/검증 명령(복붙 가능, 멱등)
+- Diff: 유니파이드 패치만(불필요 재포맷 금지, 최소 변경)
+- Verify: HTTP 코드/본문 요약, 로그 키워드+줄번호, pytest/ruff/mypy 결과 수치
+
+### Definition of Done (모두 Green)
+- 테스트: `pytest -q` 통과 (junit.xml 기록)
+- 린트: `ruff check .` 경고/오류 없음
+- 타입: `mypy --strict` 오류 없음
+- (선택) 스모크: `make smoke` 또는 `CODEX_SMOKE_CMD` 성공(0)
+
+### Project Rules (반복 실수 방지)
+- 테스트: 동기 `TestClient` 금지 → `httpx.AsyncClient + ASGITransport` 선호
+- 오류 정책: RFC 9457 Problem Details (성공은 평문 JSON)
+- `/api/v1/skills/tree`: 데이터 누락 시 503 Problem Details
+- Pydantic v1/v2: v2 우선, 필요 시 `getattr` 분기로 호환 처리
+- 외부 네트워크/파괴적 명령 금지(명시적 승인 전까지 제안만)
+ - async/await 누락 금지, 전역 가변 상태 공유 금지, 파일 IO는 비동기/캐시 무효화 규칙 준수
+
+### 동적 컨텍스트 주입(RAG-like)
+- 실패 트레이스에서 파일/라인을 추출하여 해당 코드 스니펫(≤5파일, ≤250줄/파일)을 프롬프트에 포함
+- 이전 패치 요약을 다음 턴 입력 상단에 포함(멀티턴 상태 유지)
+
+
 ## 13) Codex 자동화 루프 + 문서 주도 개발(추가)
 
 - 로컬/CI 공통 자동화:

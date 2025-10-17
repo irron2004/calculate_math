@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# Codex CLI-based autofix loop with Plan→Diff→Verify, state, and dynamic context
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+ITER="${1:-2}"
+mkdir -p .codex reports
+
+# 0) Collect fresh quality signals
+python scripts/dag_to_skills.py --in docs/dag.md --out app/data/skills.json || true
+python scripts/validate_skills.py --in app/data/skills.json || true
+{ ruff check . || true; }  > reports/ruff.txt 2>&1 || true
+{ mypy --strict || true; } > reports/mypy.txt 2>&1 || true
+{ pytest -q --junitxml=reports/junit.xml --maxfail=1 --disable-warnings || true; } 2>&1 | tee reports/pytest.txt
+
+# 1) Nothing to fix → exit
+if grep -q "\bpassed\b" reports/pytest.txt \
+   && ! grep -qE "error|^E:" reports/mypy.txt \
+   && ! grep -qE "^\s*[A-Z]\d{3}" reports/ruff.txt; then
+  echo "✅ All clean"; exit 0; fi
+
+# 2) Extract failing file paths → contextual code
+CTX=".codex/ctx.txt"; : > "$CTX"
+python - "$CTX" <<'PY'
+import re,sys,os
+out = sys.argv[1]
+paths=set()
+for p in ("reports/junit.xml","reports/pytest.txt"):
+    if not os.path.exists(p):
+        continue
+    s=open(p,errors="ignore").read()
+    for m in re.findall(r'([A-Za-z0-9_./\\-]+\.py)[:", ]+(\d+)', s):
+        paths.add(m[0])
+paths=list(paths)[:5]
+with open(out,"w",encoding="utf-8") as f:
+    for p in paths:
+        try:
+            f.write(f"\n--- FILE: {p} ---\n")
+            with open(p,errors="ignore") as r:
+                f.write("".join(r.readlines()[:400]))
+        except Exception:
+            pass
+PY
+
+BR="autofix/$(date +%Y%m%d%H%M%S)"; git checkout -B "$BR"
+PREV_NOTE=""
+
+for i in $(seq 1 "$ITER"); do
+  PLAN=$(codex exec "
+[SYSTEM] AGENTS.md의 규칙을 준수하세요. 아래 실패를 고치기 위한 계획만 8줄 이내로 작성하세요.
+실패 요약:
+>>> PYTEST
+$(sed -n '1,120p' reports/pytest.txt)
+>>> RUFF
+$(sed -n '1,120p' reports/ruff.txt)
+>>> MYPY
+$(sed -n '1,120p' reports/mypy.txt)
+>>> CONTEXT
+$(sed -n '1,400p' $CTX)
+이전 패치 요약: $PREV_NOTE
+")
+
+  DIFF=$(codex exec "
+[SYSTEM] 다음 제약을 지키며 유니파이드 패치만 출력하세요. 설명/코드블록 금지.
+- 테스트는 httpx.AsyncClient+ASGITransport 선호
+- /api/v1/skills/tree: 데이터 누락 시 503 Problem Details
+- Pydantic v1/v2 호환(getattr 분기)
+- 최소 변경, 스타일 재포맷 금지
+입력 실패/컨텍스트 동일. 계획은 다음과 같음:
+$PLAN
+")
+
+  echo "$DIFF" | awk '/^diff --git /,0' > .codex/patch.diff || true
+  if [ ! -s .codex/patch.diff ]; then echo "No diff produced"; exit 1; fi
+  git apply --whitespace=fix .codex/patch.diff || patch -p1 -i .codex/patch.diff
+  git add -A && git commit -m "autofix(iter=$i): patch by codex"
+
+  # Re-run signals
+  { ruff check . || true; }  > reports/ruff.txt 2>&1 || true
+  { mypy --strict || true; } > reports/mypy.txt 2>&1 || true
+  { pytest -q --junitxml=reports/junit.xml --maxfail=1 --disable-warnings || true; } 2>&1 | tee reports/pytest.txt
+
+  if grep -q "\bpassed\b" reports/pytest.txt \
+     && ! grep -qE "error|^E:" reports/mypy.txt \
+     && ! grep -qE "^\s*[A-Z]\d{3}" reports/ruff.txt; then
+    echo "✅ Green after autofix. Branch: $BR"; exit 0; fi
+
+  PREV_NOTE="패치 후 일부 실패 지속. 주요 헤드라인: $(head -n 1 reports/pytest.txt | tr -d '\n')"
+done
+
+echo "❗️Still failing after $ITER iterations. See reports/ and branch $BR"; exit 1
+

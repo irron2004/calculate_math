@@ -4,8 +4,16 @@
 - Plan: short steps to reproduce and fix (≤8 lines)
 - Commands: shell lines to reproduce → fix → verify
 - Diff: unified patches only, minimal changes
-- Verify: HTTP status/body, logs, pytest pass/fail counts
+- Verify: HTTP status/body, logs, pytest/ruff/mypy pass/fail counts
 - Avoid destructive ops (sudo, mass rm, external network). Request approval first if needed.
+
+## Definition of Done
+
+- pytest: all tests pass
+- ruff: `ruff check .` no errors
+- mypy: `mypy --strict` type-check clean
+- (optional) smoke: `make smoke` or `CODEX_SMOKE_CMD` returns 0
+- (optional) compile: `python -m compileall app` succeeds
 
 ## Build & Test (reference)
 
@@ -16,6 +24,10 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 make run      # uvicorn app.main:app on :8000
 pytest -q     # executed by CI, local optional
+
+# Quality (linters/types)
+ruff check . || true
+mypy --strict || true
 
 # Frontend (Vite)
 cd frontend && npm install
@@ -45,10 +57,10 @@ npm run dev   # :5173
 ```
 SOP를 따르세요. 출력은 반드시 섹션 4개만:
 
-1) Plan
+1) Plan (최대 8줄; 범위/리스크 포함)
 2) Commands (재현→수정→검증)
 3) Diff (유니파이드 패치만)
-4) Verify (HTTP 코드/본문, pytest 통과/실패 수)
+4) Verify (HTTP/본문, pytest/ruff/mypy 수치)
 
 컨텍스트 파일: README.md, app/__init__.py, app/main.py,
 app/routers/problems.py, app/routers/practice.py, app/routers/skills.py,
@@ -57,6 +69,19 @@ tests/test_api.py, tests/test_skills_router.py, tests/test_pages.py
 
 재현 우선: GET /health → /api/problems → /api/v1/sessions POST.
 수정은 최소 변경. 성공 기준은 Verify에 수치로 명확히.
+
+### Model Strategy (optional)
+- Use lighter model for planning (LLM_PLAN_MODEL), stronger for diff
+- Prefer local vLLM for plan/exploration; hosted LLM for final patch
+
+### Context Injection
+- Provide failing file:line and short code snippets from logs
+- Keep snippets ≤ 5 files, ≤ 250 lines each to avoid token blowup
+
+### Aider + vLLM
+- Use Aider for fast iterative edits and local reasoning
+- Back Aider with a local vLLM server (OpenAI-compatible) for planning
+- Set `LLM_BASE_URL` to local server for codex tools when desired
 ```
 
 ### B) Latency/Bottleneck Trace (optional)
@@ -76,4 +101,3 @@ codex "skills UI 그래프 검증에서 SkillSpecError를 재현하고, 메시�
 ---
 
 For constraints and expectations, see AGENTS.md.
-

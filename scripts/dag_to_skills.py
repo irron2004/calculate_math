@@ -34,6 +34,25 @@ Usage:
 """
 import re, json, argparse, sys, csv, io, os, math
 from collections import defaultdict, deque
+from pathlib import Path
+
+MIN_NODE_THRESHOLD = 10
+
+
+def strip_json_comments(payload: str) -> str:
+    """Remove // and /* */ style comments from JSON-like content."""
+
+    without_block = re.sub(r"/\*.*?\*/", "", payload, flags=re.S)
+    return re.sub(r"//.*?$", "", without_block, flags=re.M)
+
+
+def load_existing_payload(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
 
 TIER_DEFAULTS = {
     1: {"xp_per_try":4, "xp_per_correct":8, "xp_to_level":[0,40,120,240]},
@@ -208,6 +227,9 @@ def main():
     ap.add_argument("--schema", dest="schema", default=None)
     args = ap.parse_args()
 
+    out_path = Path(args.out)
+    existing_payload = load_existing_payload(out_path)
+
     with open(args.inp, "r", encoding="utf-8") as f:
         md = f.read()
 
@@ -220,7 +242,7 @@ def main():
         graph_data = None
         if lang == "json":
             try:
-                graph_data = json.loads(content)
+                graph_data = json.loads(strip_json_comments(content))
             except json.JSONDecodeError:
                 continue
         elif lang in ("yaml", "yml"):
@@ -231,6 +253,9 @@ def main():
             else:
                 graph_data = yaml.safe_load(content)
         if isinstance(graph_data, dict) and "nodes" in graph_data:
+            node_count = len(graph_data.get("nodes") or [])
+            if node_count < MIN_NODE_THRESHOLD:
+                continue
             if "edges" not in graph_data:
                 graph_data["edges"] = []
             if "palette" not in graph_data:
@@ -286,6 +311,17 @@ def main():
         print("ERROR: Cycle detected in 'requires' edges.", file=sys.stderr)
         # still write output for debugging
     palette = PALETTE
+
+    if len(node_acc) < MIN_NODE_THRESHOLD:
+        if existing_payload is not None:
+            print(
+                f"Skipped rewrite: parsed {len(node_acc)} nodes (<{MIN_NODE_THRESHOLD}); keeping existing {args.out}.",
+                file=sys.stdout,
+            )
+            return
+        raise SystemExit(
+            f"Parsed {len(node_acc)} nodes (<{MIN_NODE_THRESHOLD}) and no existing payload to fall back to."
+        )
 
     out = {
         "version": "auto-from-md",

@@ -68,6 +68,23 @@ async def test_skill_tree_respects_existing_cookie(client):
     assert second_variant == first_variant
 
 
+async def test_skill_tree_keeps_graph_when_progress_missing(monkeypatch, client):
+    from app.routers import skills as skills_module
+
+    def broken_progress_store(request):
+        raise skills_module.ProgressDataError("missing dataset")
+
+    monkeypatch.setattr(skills_module, "_resolve_progress_store", broken_progress_store)
+
+    response = await client.get("/api/v1/skills/tree")
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["graph"] is not None
+    assert isinstance(payload["progress"]["nodes"], dict) and payload["progress"]["nodes"]
+    assert payload.get("error", {}).get("kind") == "ProgressDataError"
+
+
 async def test_skill_progress_update_mutates_snapshot(client):
     initial = await client.get("/api/v1/skills/tree")
     initial_data = initial.json()

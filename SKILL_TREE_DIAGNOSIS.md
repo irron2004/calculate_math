@@ -18,7 +18,7 @@ curl http://localhost:8000/api/v1/skills/tree | jq
 **확인 사항:**
 - [ ] `graph` 필드가 존재하는가?
 - [ ] `graph.nodes` 배열에 36개 노드가 있는가?
-- [ ] `graph.edges` 배열에 46개 엣지가 있는가?
+- [ ] `graph.edges` 배열에 40개 엣지가 있는가?
 - [ ] `error` 필드가 null인가?
 
 **예상 응답 구조:**
@@ -35,7 +35,7 @@ curl http://localhost:8000/api/v1/skills/tree | jq
     "version": "2025-10-12.bipartite.v1.ui.v1",
     "trees": [...],  // 3개
     "nodes": [...],  // 36개
-    "edges": [...]   // 46개
+    "edges": [...]   // 40개
   },
   "unlocked": {...},
   "experiment": {...}
@@ -47,7 +47,7 @@ curl http://localhost:8000/api/v1/skills/tree | jq
 ```bash
 ls -la app/data/skills.ui.json
 cat app/data/skills.ui.json | jq '.nodes | length'  # 36이어야 함
-cat app/data/skills.ui.json | jq '.edges | length'  # 46이어야 함
+cat app/data/skills.ui.json | jq '.edges | length'  # 40이어야 함
 ```
 
 **확인 사항:**

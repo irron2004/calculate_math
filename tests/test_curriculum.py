@@ -205,8 +205,8 @@ async def test_lrc_evaluate_pending(client) -> None:
     assert payload["recommendation"] == "reinforce"
 
 
-def test_lrc_evaluate_retry(client) -> None:
-    response = client.post(
+async def test_lrc_evaluate_retry(client) -> None:
+    response = await client.post(
         "/api/v1/lrc/evaluate",
         json={
             "accuracy": 0.7,
@@ -223,9 +223,9 @@ def test_lrc_evaluate_retry(client) -> None:
     assert payload["recommendation"] == "remediate"
 
 
-def test_lrc_last_endpoint_returns_latest(client) -> None:
+async def test_lrc_last_endpoint_returns_latest(client) -> None:
     # Ensure evaluating with user id stores the record
-    response = client.post(
+    response = await client.post(
         "/api/v1/lrc/evaluate",
         json={
             "accuracy": 0.88,
@@ -237,7 +237,7 @@ def test_lrc_last_endpoint_returns_latest(client) -> None:
     )
     assert response.status_code == 200
 
-    response = client.get("/api/v1/lrc/last", params={"user_id": "student-latest"})
+    response = await client.get("/api/v1/lrc/last", params={"user_id": "student-latest"})
     assert response.status_code == 200
     payload = response.json()
     assert payload["recommendation"] == "promote"
@@ -245,6 +245,6 @@ def test_lrc_last_endpoint_returns_latest(client) -> None:
     assert "metrics" in payload
 
 
-def test_lrc_last_endpoint_handles_missing(client) -> None:
-    response = client.get("/api/v1/lrc/last", params={"user_id": "missing-user"})
+async def test_lrc_last_endpoint_handles_missing(client) -> None:
+    response = await client.get("/api/v1/lrc/last", params={"user_id": "missing-user"})
     assert response.status_code == 404
