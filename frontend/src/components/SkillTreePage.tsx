@@ -5,8 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import type {
   SkillNodeProgress,
   SkillSummary,
+  SkillTreeEdge,
   SkillTreeGraphSpec,
   SkillTreeGraphTree,
+  SkillTreeGroup,
   SkillTreeNode,
   SkillTreeProgress,
 } from '../types';
@@ -77,6 +79,8 @@ const SkillTreePage: React.FC = () => {
   const [version, setVersion] = useState<string | null>(null);
   const [palette, setPalette] = useState<Record<string, string>>({});
   const [nodes, setNodes] = useState<SkillTreeNode[]>([]);
+  const [edges, setEdges] = useState<SkillTreeEdge[]>([]);
+  const [courseGroups, setCourseGroups] = useState<SkillTreeGroup[]>([]);
   const [skills, setSkills] = useState<SkillSummary[]>([]);
   const [uiGraph, setUiGraph] = useState<SkillTreeGraphSpec | null>(null);
   const [unlockedMap, setUnlockedMap] = useState<Record<string, boolean>>({});
@@ -117,6 +121,8 @@ const SkillTreePage: React.FC = () => {
         }
       });
       setNodes(nodeList);
+      setEdges(Array.isArray(payload.edges) ? payload.edges : []);
+      setCourseGroups(Array.isArray(payload.groups) ? payload.groups : []);
       setSkills(Array.isArray(payload.skills) ? payload.skills : []);
       setUiGraph(payload.graph ?? null);
       setUnlockedMap(payload.unlocked ?? {});
@@ -237,11 +243,94 @@ useEffect(() => {
   const nodeProgressMap: Record<string, SkillNodeProgress> = progress.nodes ?? {};
   const skillProgressMap = progress.skills ?? {};
 
+  const resolvedGraph = useMemo<SkillTreeGraphSpec | null>(() => {
+    if (uiGraph && Array.isArray(uiGraph.nodes) && uiGraph.nodes.length) {
+      return uiGraph;
+    }
+    if (!nodes.length) {
+      return null;
+    }
+
+    const sortedGroups = (courseGroups.length
+      ? courseGroups
+      : [
+          {
+            id: 'general',
+            label: '전체',
+            order: 1,
+            course_ids: [],
+          },
+        ]
+    )
+      .slice()
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    const groupedNodes = new Map<string, SkillTreeNode[]>();
+    nodes.forEach((node) => {
+      const groupId = typeof node.group === 'string' && node.group ? node.group : 'general';
+      if (!groupedNodes.has(groupId)) {
+        groupedNodes.set(groupId, []);
+      }
+      groupedNodes.get(groupId)!.push(node);
+    });
+
+    const fallbackNodes: SkillTreeGraphSpec['nodes'] = [];
+    sortedGroups.forEach((group) => {
+      const bucket = groupedNodes.get(group.id) ?? [];
+      const tierCounters = new Map<number, number>();
+      bucket
+        .slice()
+        .sort((a, b) => {
+          if (a.tier !== b.tier) {
+            return a.tier - b.tier;
+          }
+          return a.label.localeCompare(b.label, 'ko');
+        })
+        .forEach((node) => {
+          const row = Math.max(1, node.tier ?? 1);
+          const nextCol = (tierCounters.get(row) ?? 0) + 1;
+          tierCounters.set(row, nextCol);
+          fallbackNodes.push({
+            id: node.id,
+            tree: group.id,
+            tier: row,
+            label: node.label,
+            lens: node.lens ?? [],
+            requires: (node.requires ?? []).map((req) => ({
+              skill_id: req.skill_id,
+              min_level: req.min_level ?? 0,
+            })),
+            xp: node.xp ?? { per_try: 0, per_correct: 0 },
+            grid: {
+              row,
+              col: nextCol,
+            },
+          });
+        });
+    });
+
+    if (!fallbackNodes.length) {
+      return null;
+    }
+
+    return {
+      version: version ?? 'fallback',
+      trees: sortedGroups.map((group, index) => ({
+        id: group.id,
+        label: group.label,
+        order: group.order ?? index + 1,
+      })),
+      nodes: fallbackNodes,
+      edges: edges.map((edge) => ({ from: edge.from, to: edge.to })),
+      meta: { derived_from_projection: true },
+    };
+  }, [courseGroups, edges, nodes, uiGraph, version]);
+
   const graphNodesView = useMemo<SkillTreeGraphNodeView[]>(() => {
-    if (!uiGraph) {
+    if (!resolvedGraph) {
       return [];
     }
-    return uiGraph.nodes.map((uiNode) => {
+    return resolvedGraph.nodes.map((uiNode) => {
       const projectionNode = projectionLookup.get(uiNode.id);
 
       const requirementSource =
@@ -274,7 +363,7 @@ useEffect(() => {
       });
 
       const teaches = projectionNode?.teaches ?? [];
-      const unlocked = unlockedMap[uiNode.id] ?? false;
+      const unlocked = unlockedMap[uiNode.id] ?? Boolean(projectionNode?.state?.unlocked);
       const state = projectionNode?.state ?? {
         value: unlocked ? 'available' : 'locked',
         completed: false,
@@ -299,10 +388,10 @@ useEffect(() => {
         progress: progressEntry ?? null,
       };
     });
-  }, [uiGraph, projectionLookup, skillMeta, skillProgressMap, nodeProgressMap, unlockedMap]);
+  }, [resolvedGraph, projectionLookup, skillMeta, skillProgressMap, nodeProgressMap, unlockedMap]);
 
-  const graphEdges = useMemo(() => uiGraph?.edges ?? [], [uiGraph]);
-  const graphTrees = useMemo<SkillTreeGraphTree[]>(() => uiGraph?.trees ?? [], [uiGraph]);
+  const graphEdges = useMemo(() => resolvedGraph?.edges ?? [], [resolvedGraph]);
+  const graphTrees = useMemo<SkillTreeGraphTree[]>(() => resolvedGraph?.trees ?? [], [resolvedGraph]);
 
   const selectedNode = useMemo(() => {
     if (!selectedNodeId) {
@@ -318,21 +407,22 @@ useEffect(() => {
   }, [selectedNodeId, selectedNode]);
 
   useEffect(() => {
-    if (isLoading || error || !uiGraph) {
+    if (isLoading || error || !resolvedGraph) {
       return;
     }
-    const graphNodeCount = Array.isArray(uiGraph.nodes) ? uiGraph.nodes.length : 0;
+    const graphNodeCount = Array.isArray(resolvedGraph.nodes) ? resolvedGraph.nodes.length : 0;
     if (graphNodeCount === 0 || graphNodesView.length === 0) {
       const apiBaseUrl =
         (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) || '';
       console.warn('[SkillTree] 그래프 노드가 비어 있습니다.', {
         apiBaseUrl,
         graphNodeCount,
-        graphEdgeCount: Array.isArray(uiGraph.edges) ? uiGraph.edges.length : 0,
+        graphEdgeCount: Array.isArray(resolvedGraph.edges) ? resolvedGraph.edges.length : 0,
         payloadNodeCount: nodes.length,
+        derivedFallback: Boolean(resolvedGraph.meta?.derived_from_projection),
       });
     }
-  }, [isLoading, error, uiGraph, graphNodesView.length, nodes.length]);
+  }, [isLoading, error, resolvedGraph, graphNodesView.length, nodes.length]);
 
   useEffect(() => {
     if (!selectedNode) {

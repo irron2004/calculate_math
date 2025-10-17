@@ -213,14 +213,15 @@ describe('SkillTreePage', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() =>
-      expect(screen.getByTestId('skill-tree-page')).toHaveAttribute('data-experiment-variant', 'list')
-    );
-    expect(screen.getByTestId('skill-tree-graph')).toBeInTheDocument();
-    expect(screen.getByText('C01·S1 자리가치·분해')).toBeInTheDocument();
-    expect(screen.getByText(/필요 조건:/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '학습 시작' })).toBeEnabled();
-    expect(screen.getByText(/총 XP 150/)).toBeInTheDocument();
+    await waitFor(() => {
+      const page = screen.getByTestId('skill-tree-page');
+      expect(page.getAttribute('data-experiment-variant')).toBe('list');
+    });
+    expect(screen.queryByTestId('skill-tree-graph')).not.toBeNull();
+    expect(screen.queryByText('C01·S1 자리가치·분해')).not.toBeNull();
+    expect(screen.queryByText(/필요 조건:/)).not.toBeNull();
+    expect(screen.getByRole('button', { name: '학습 시작' }).hasAttribute('disabled')).toBe(false);
+    expect(screen.queryByText(/총 XP 150/)).not.toBeNull();
 
     expect(mockedTrackExperimentExposure).toHaveBeenCalledTimes(1);
     expect(mockedTrackExperimentExposure).toHaveBeenLastCalledWith({
@@ -232,6 +233,25 @@ describe('SkillTreePage', () => {
       rollout: 50,
       surface: 'skill_tree_page',
     });
+  });
+
+  it('derives a fallback layout when the UI graph specification is missing', async () => {
+    mockedFetchSkillTree.mockResolvedValue({
+      ...sampleResponse,
+      graph: null,
+    });
+
+    render(
+      <MemoryRouter>
+        <SkillTreePage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      screen.getByTestId('skill-tree-graph');
+    });
+    expect(screen.queryByText('표시할 스킬 트리 데이터가 없습니다.')).toBeNull();
+    expect(screen.queryByText('C01·S1 자리가치·분해')).not.toBeNull();
   });
 
   it('falls back to tree variant and skips analytics when experiment data is absent', async () => {
@@ -246,9 +266,10 @@ describe('SkillTreePage', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() =>
-      expect(screen.getByTestId('skill-tree-page')).toHaveAttribute('data-experiment-variant', 'tree')
-    );
+    await waitFor(() => {
+      const page = screen.getByTestId('skill-tree-page');
+      expect(page.getAttribute('data-experiment-variant')).toBe('tree');
+    });
     expect(mockedTrackExperimentExposure).not.toHaveBeenCalled();
   });
 
@@ -261,7 +282,9 @@ describe('SkillTreePage', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(screen.getByText('C01·S1 자리가치·분해')).toBeInTheDocument());
+    await waitFor(() => {
+      screen.getByText('C01·S1 자리가치·분해');
+    });
 
     const button = screen.getByRole('button', { name: '학습 시작' });
     fireEvent.click(button);
@@ -283,19 +306,23 @@ describe('SkillTreePage', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(screen.getByText('C01·S1 자리가치·분해')).toBeInTheDocument());
+    await waitFor(() => {
+      screen.getByText('C01·S1 자리가치·분해');
+    });
 
     const node = screen.getByRole('button', { name: /C01·S1 자리가치·분해/ });
     fireEvent.click(node);
 
-    await waitFor(() => expect(screen.getByTestId('skill-node-overlay')).toBeInTheDocument());
-    expect(screen.getByText('필요 조건')).toBeInTheDocument();
-    expect(screen.getByText('누적 XP 120')).toBeInTheDocument();
+    await waitFor(() => {
+      screen.getByTestId('skill-node-overlay');
+    });
+    expect(screen.queryByText('필요 조건')).not.toBeNull();
+    expect(screen.queryByText('누적 XP 120')).not.toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: '닫기' }));
-    await waitFor(() =>
-      expect(screen.queryByTestId('skill-node-overlay')).not.toBeInTheDocument()
-    );
+    await waitFor(() => {
+      expect(screen.queryByTestId('skill-node-overlay')).toBeNull();
+    });
   });
 
   it('traps focus inside the overlay and supports closing with Escape', async () => {
@@ -307,21 +334,29 @@ describe('SkillTreePage', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(screen.getByText('C01·S1 자리가치·분해')).toBeInTheDocument());
+    await waitFor(() => {
+      screen.getByText('C01·S1 자리가치·분해');
+    });
 
     const node = screen.getByRole('button', { name: /C01·S1 자리가치·분해/ });
     node.focus();
     fireEvent.keyDown(node, { key: 'Enter', code: 'Enter' });
 
-    await waitFor(() => expect(screen.getByTestId('skill-node-overlay')).toBeInTheDocument());
+    await waitFor(() => {
+      screen.getByTestId('skill-node-overlay');
+    });
     const closeButton = screen.getByRole('button', { name: '닫기' });
-    expect(closeButton).toHaveFocus();
+    await waitFor(() => {
+      expect(document.activeElement).toBe(closeButton);
+    });
 
     fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
-    await waitFor(() =>
-      expect(screen.queryByTestId('skill-node-overlay')).not.toBeInTheDocument()
-    );
-    expect(node).toHaveFocus();
+    await waitFor(() => {
+      expect(screen.queryByTestId('skill-node-overlay')).toBeNull();
+    });
+    await waitFor(() => {
+      expect(document.activeElement).toBe(node);
+    });
   });
 
   it('refreshes skill data when a progress update event is observed', async () => {
@@ -334,7 +369,9 @@ describe('SkillTreePage', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(screen.getByText(/총 XP 150/)).toBeInTheDocument());
+    await waitFor(() => {
+      screen.getByText(/총 XP 150/);
+    });
 
     act(() => {
       window.dispatchEvent(
@@ -345,7 +382,9 @@ describe('SkillTreePage', () => {
     });
 
     await waitFor(() => expect(mockedFetchSkillTree).toHaveBeenCalledTimes(2));
-    await waitFor(() => expect(screen.getByText(/총 XP 300/)).toBeInTheDocument());
-    expect(screen.queryByText('진행도 갱신 중…')).not.toBeInTheDocument();
+    await waitFor(() => {
+      screen.getByText(/총 XP 300/);
+    });
+    expect(screen.queryByText('진행도 갱신 중…')).toBeNull();
   });
 });
