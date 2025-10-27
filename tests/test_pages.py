@@ -54,6 +54,16 @@ async def test_home_redirects_to_skills(client):
     assert response.headers["location"] == "/skills"
 
 
+async def test_home_redirects_to_frontend_when_bundle_present(client):
+    transport = client._transport  # httpx.ASGITransport
+    assert transport is not None
+    transport.app.state.frontend_available = True
+
+    response = await client.get("/", follow_redirects=False)
+    assert response.status_code == 302
+    assert response.headers["location"] == "/math/"
+
+
 async def test_home_page_route_hides_compliance_copy_for_learners(client):
     response = await client.get("/home")
     assert response.status_code == 200

@@ -43,6 +43,7 @@ docker compose up --build -d
 docker compose down
 ```
 
+- 루트 `Dockerfile`은 멀티 스테이지 빌드로 React 프런트엔드를 컴파일해 `/math/` 경로에 서빙합니다. 필요하면 `docker build --build-arg VITE_API_BASE_URL=/api` 형태로 API 기본 경로를 재정의하세요.
 - 백엔드: `http://localhost:8000`
 - 프런트엔드: `http://localhost:5173/math/`
 - 프론트에서 API 호출은 `http://localhost:5173/api/...` 경로를 통해 자동 프록시돼 백엔드(`math-backend`)로 전달됩니다.

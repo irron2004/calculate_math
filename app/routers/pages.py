@@ -123,7 +123,9 @@ def _build_router(templates: Jinja2Templates | None = None) -> APIRouter:
 
     @router.get("/", response_class=RedirectResponse)
     async def home(request: Request) -> RedirectResponse:
-        return RedirectResponse(url="/skills", status_code=302)
+        frontend_available = getattr(request.app.state, "frontend_available", False)
+        target = "/math/" if frontend_available else "/skills"
+        return RedirectResponse(url=target, status_code=302)
 
     @router.get("/home", response_class=HTMLResponse)
     async def home_page(request: Request) -> HTMLResponse:

@@ -1,3 +1,17 @@
+FROM node:18-alpine AS frontend-build
+
+WORKDIR /workspace/frontend
+
+COPY frontend/package*.json ./
+RUN npm ci
+
+COPY frontend .
+
+ARG VITE_API_BASE_URL=/api
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+RUN npm run build
+
+
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -13,9 +27,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 애플리케이션 코드 복사
 COPY . .
+COPY --from=frontend-build /workspace/frontend/dist ./frontend/dist
 
 # 포트 노출
 EXPOSE 8000
 
 # 애플리케이션 실행
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

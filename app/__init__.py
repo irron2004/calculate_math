@@ -152,10 +152,23 @@ def create_app() -> FastAPI:
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
     templates = Jinja2Templates(directory=template_dir)
 
+    frontend_dir = base_dir.parent / "frontend" / "dist"
+    frontend_available = frontend_dir.exists()
+    if frontend_available:
+        startup_logger.debug("mounting built frontend from %s", frontend_dir)
+        app.mount(
+            "/math",
+            StaticFiles(directory=frontend_dir, html=True),
+            name="frontend",
+        )
+    else:
+        startup_logger.debug("frontend bundle not found at %s; skipping mount", frontend_dir)
+
     # Store shared resources on the application state so routers can resolve them
     # without needing to be constructed dynamically during startup.
     app.state.settings = settings
     app.state.templates = templates
+    app.state.frontend_available = frontend_available
 
     app.add_middleware(RequestContextMiddleware)
 
