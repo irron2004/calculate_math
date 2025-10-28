@@ -171,3 +171,15 @@ export const trackExperimentExposure = (payload: ExperimentExposurePayload) => {
   });
 };
 
+export const trackSkillTreeZoomChanged = (zoom: number) => {
+  emitEvent('skill_tree_zoom_changed', { zoom });
+};
+
+export const trackSkillTreeContrastToggled = (highContrast: boolean) => {
+  emitEvent('skill_tree_contrast_toggled', { high_contrast: highContrast });
+};
+
+export const trackSkillTreeFocusMode = (nodeId: string | null) => {
+  emitEvent('skill_tree_focus_mode', { node_id: nodeId });
+};
+

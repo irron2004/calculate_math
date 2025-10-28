@@ -10,12 +10,21 @@ import type {
   SkillTreeGraphTree,
   SkillTreeGroup,
   SkillTreeNode,
+  SkillTreeNodeState,
   SkillTreeProgress,
 } from '../types';
 import { fetchSkillTree } from '../utils/api';
-import { trackExperimentExposure } from '../utils/analytics';
+import {
+  trackExperimentExposure,
+  trackSkillTreeContrastToggled,
+  trackSkillTreeFocusMode,
+  trackSkillTreeZoomChanged,
+} from '../utils/analytics';
 import { registerCourseConcept, resetCourseConceptOverrides, resolveConceptStep } from '../utils/skillMappings';
 import SkillTreeGraph, { type SkillTreeGraphNodeView } from './SkillTreeGraph';
+import { useUnlockFx } from '../hooks/useUnlockFx';
+import { formatList, t } from '../utils/i18n';
+import { SKILL_STATE_META, type SkillState } from '../constants/skillStates';
 
 type ExperimentAssignment = {
   name: string;
@@ -29,11 +38,6 @@ type ExperimentAssignment = {
 const TEXT = {
   totalXpLabel: '총 XP',
   lastUpdatedLabel: '업데이트',
-  lockedTooltip: '해당 스텝은 아직 잠금 상태입니다.',
-  startButton: '학습 시작',
-  locked: '잠김',
-  available: '진행 가능',
-  completed: '완료',
 };
 
 const createEmptyProgress = (): SkillTreeProgress => ({
@@ -43,6 +47,28 @@ const createEmptyProgress = (): SkillTreeProgress => ({
   nodes: {},
   skills: {},
 });
+
+const deriveSkillState = (
+  state: SkillTreeNodeState,
+  progressEntry: SkillNodeProgress | null | undefined,
+  unlocked: boolean,
+): SkillState => {
+  if (state.value === 'mastered' || state.mastered) {
+    return 'mastered';
+  }
+  if (progressEntry?.completed || state.completed) {
+    return 'completed';
+  }
+  if (unlocked || state.unlocked || state.available || state.value === 'unlocked' || state.value === 'unlockable' || state.value === 'available') {
+    const attempts = progressEntry?.attempts ?? 0;
+    const xpEarned = progressEntry?.xp_earned ?? 0;
+    if (attempts > 0 || xpEarned > 0) {
+      return 'unlocked';
+    }
+    return 'unlockable';
+  }
+  return 'locked';
+};
 
 const normaliseProgress = (raw?: SkillTreeProgress | null): SkillTreeProgress => ({
   user_id: raw?.user_id ?? null,
@@ -92,9 +118,57 @@ const SkillTreePage: React.FC = () => {
   const lastFocusedElementRef = useRef<HTMLElement | null>(null);
   const isMountedRef = useRef(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [highContrast, setHighContrast] = useState(false);
+  const [focusNodeId, setFocusNodeId] = useState<string | null>(null);
+  const [recentlyUnlocked, setRecentlyUnlocked] = useState<string[]>([]);
+  const prevUnlockedRef = useRef<Record<string, boolean>>({});
+  const focusTrackedRef = useRef<string | null>(null);
+
+useUnlockFx(recentlyUnlocked);
+
+  const handleZoomChange = useCallback(
+    (value: number) => {
+      setZoom(value);
+      trackSkillTreeZoomChanged(value);
+    },
+    [],
+  );
+
+  const handleContrastToggle = useCallback(
+    (next: boolean) => {
+      setHighContrast(next);
+      trackSkillTreeContrastToggled(next);
+    },
+    [],
+  );
+
+  const handleZoomInput = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = Number(event.target.value);
+      handleZoomChange(Number.isFinite(value) ? value : 1);
+    },
+    [handleZoomChange],
+  );
+
+  const resetZoom = useCallback(() => {
+    handleZoomChange(1);
+  }, [handleZoomChange]);
+
+  const handleContrastCheckbox = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      handleContrastToggle(event.target.checked);
+    },
+    [handleContrastToggle],
+  );
+
+  const handleResetFocus = useCallback(() => {
+    setFocusNodeId(null);
+  }, []);
 
   const closeOverlay = useCallback(() => {
     setSelectedNodeId(null);
+    setFocusNodeId(null);
   }, []);
 
   const loadSkillTree = useCallback(
@@ -125,10 +199,22 @@ const SkillTreePage: React.FC = () => {
       setCourseGroups(Array.isArray(payload.groups) ? payload.groups : []);
       setSkills(Array.isArray(payload.skills) ? payload.skills : []);
       setUiGraph(payload.graph ?? null);
-      setUnlockedMap(payload.unlocked ?? {});
+      const nextUnlocked = payload.unlocked ?? {};
+      const previousUnlocked = prevUnlockedRef.current;
+      const newlyUnlockedIds = Object.keys(nextUnlocked).filter(
+        (id) => nextUnlocked[id] && !previousUnlocked[id],
+      );
+      if (newlyUnlockedIds.length) {
+        setRecentlyUnlocked(newlyUnlockedIds);
+      } else if (!silent) {
+        setRecentlyUnlocked([]);
+      }
+      prevUnlockedRef.current = nextUnlocked;
+      setUnlockedMap(nextUnlocked);
       setProgress(normaliseProgress(payload.progress));
       if (!silent) {
         setSelectedNodeId(null);
+        setFocusNodeId(null);
       }
 
       if (payload.experiment) {
@@ -215,6 +301,14 @@ useEffect(() => {
     window.removeEventListener('skill-tree:progress-updated', handleProgressUpdate);
   };
 }, [loadSkillTree]);
+
+useEffect(() => {
+  if (focusTrackedRef.current === focusNodeId) {
+    return;
+  }
+  focusTrackedRef.current = focusNodeId;
+  trackSkillTreeFocusMode(focusNodeId ?? null);
+}, [focusNodeId]);
 
   const determineStepFromIdentifier = (id: string, label: string): 'S1' | 'S2' | 'S3' => {
     const fromId = id.match(/S([123])/);
@@ -364,14 +458,24 @@ useEffect(() => {
 
       const teaches = projectionNode?.teaches ?? [];
       const unlocked = unlockedMap[uiNode.id] ?? Boolean(projectionNode?.state?.unlocked);
-      const state = projectionNode?.state ?? {
-        value: unlocked ? 'available' : 'locked',
-        completed: false,
-        available: unlocked,
-        unlocked,
-      };
+      const baseState: SkillTreeNodeState =
+        projectionNode?.state ?? {
+          value: unlocked ? 'unlockable' : 'locked',
+          completed: false,
+          available: unlocked,
+          unlocked,
+        };
       const progressEntry =
         projectionNode?.progress ?? (nodeProgressMap[uiNode.id] as SkillNodeProgress | undefined);
+      const resolvedState = deriveSkillState(baseState, progressEntry, unlocked);
+      const normalisedState: SkillTreeNodeState = {
+        ...baseState,
+        value: resolvedState,
+        unlocked: baseState.unlocked || unlocked || resolvedState !== 'locked',
+        available: baseState.available || resolvedState !== 'locked',
+        completed: baseState.completed || resolvedState === 'completed' || resolvedState === 'mastered',
+        mastered: baseState.mastered || resolvedState === 'mastered',
+      };
 
       return {
         id: uiNode.id,
@@ -384,7 +488,8 @@ useEffect(() => {
         xp: uiNode.xp,
         requires,
         teaches,
-        state,
+        state: normalisedState,
+        resolvedState,
         progress: progressEntry ?? null,
       };
     });
@@ -488,8 +593,16 @@ useEffect(() => {
   }, [selectedNode, closeOverlay]);
 
   const handleStartCourse = (graphNode: SkillTreeGraphNodeView) => {
-    if (!graphNode.state.available) {
-      window.alert(TEXT.lockedTooltip);
+    if (graphNode.resolvedState === 'locked') {
+      const unmet = graphNode.requires
+        .filter((req) => !req.met)
+        .map((req) => req.label)
+        .filter(Boolean);
+      window.alert(
+        t(SKILL_STATE_META.locked.tooltipKey, {
+          requires: unmet.length ? formatList(unmet) : '없음',
+        }),
+      );
       return;
     }
     const projectionNode = projectionLookup.get(graphNode.id);
@@ -521,6 +634,7 @@ useEffect(() => {
   const selectedProjection = selectedNode ? projectionLookup.get(selectedNode.id) ?? null : null;
   const overlayTitleId = selectedNode ? `skill-node-${selectedNode.id}-title` : undefined;
   const overlayDescriptionId = selectedNode ? `skill-node-${selectedNode.id}-details` : undefined;
+  const overlayStateMeta = selectedNode ? SKILL_STATE_META[selectedNode.resolvedState] : null;
 
   if (isLoading) {
     return (
@@ -579,6 +693,47 @@ useEffect(() => {
         </div>
       </header>
 
+      <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-800/60 bg-slate-950/40 p-3 text-xs text-slate-300">
+        <label className="flex items-center gap-2">
+          <span>확대</span>
+          <input
+            type="range"
+            min="0.6"
+            max="1.6"
+            step="0.1"
+            value={zoom}
+            onChange={handleZoomInput}
+            aria-label="스킬 트리 확대 배율"
+          />
+          <span>{zoom.toFixed(1)}x</span>
+        </label>
+        <button
+          type="button"
+          className="rounded-full border border-slate-700 px-3 py-1 text-slate-200 transition hover:border-slate-500 hover:text-white"
+          onClick={resetZoom}
+        >
+          100%로
+        </button>
+        <label className="inline-flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={highContrast}
+            onChange={handleContrastCheckbox}
+            aria-label="고대비 모드"
+          />
+          <span>고대비</span>
+        </label>
+        <button
+          type="button"
+          className="rounded-full border border-slate-700 px-3 py-1 text-slate-200 transition hover:border-slate-500 hover:text-white"
+          onClick={handleResetFocus}
+        >
+          포커스 해제
+        </button>
+      </div>
+
+      <div id="live-region" aria-live="polite" className="sr-only" />
+
       {graphNodesView.length === 0 ? (
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 text-center text-slate-300">
           <p>표시할 스킬 트리 데이터가 없습니다.</p>
@@ -596,7 +751,12 @@ useEffect(() => {
           onStart={handleStartCourse}
           onSelect={(node) => {
             setSelectedNodeId(node.id);
+            setFocusNodeId(node.id);
           }}
+          zoom={zoom}
+          highContrast={highContrast}
+          focusNodeId={focusNodeId}
+          dimUnrelated={Boolean(focusNodeId)}
         />
       )}
 
@@ -692,7 +852,7 @@ useEffect(() => {
               </span>
               {selectedNode.lens.map((lens, index) => lensDisplay(lens, palette, `${selectedNode.id}-lens-${index}`))}
               <span className="rounded-full border border-slate-700 px-3 py-1">
-                상태: {TEXT[selectedNode.state.value]}
+                상태: {overlayStateMeta ? t(overlayStateMeta.badgeKey) : ''}
               </span>
               {selectedNode.progress?.xp_earned ? (
                 <span className="rounded-full border border-slate-700 px-3 py-1">

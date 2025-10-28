@@ -133,10 +133,11 @@ export type SkillTreeTeaching = {
 };
 
 export type SkillTreeNodeState = {
-  value: 'locked' | 'available' | 'completed';
+  value: 'locked' | 'unlockable' | 'unlocked' | 'completed' | 'mastered' | 'available';
   completed: boolean;
   available: boolean;
   unlocked: boolean;
+  mastered?: boolean;
 };
 
 export type SkillTreeNode = {
