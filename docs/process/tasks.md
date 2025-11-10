@@ -1,0 +1,43 @@
+# 해야 할 일
+
+## Skill Tree: Senior Feedback Follow-up
+
+- [ ] 프로덕션 환경 `.env`의 `VITE_API_BASE_URL`과 리버스 프록시 라우팅이 FastAPI 백엔드 경로와 일치하는지 재확인 (`docs/skill_tree_feedback.md` 참고)
+- [ ] 배포 환경에서 `fetchSkillTree` 응답을 점검하여 `payload.graph.nodes`가 비어 있는지/에러인지 모니터링 (`docs/skill_tree_feedback.md`, `scripts/fetch_skill_tree_payload.py`)
+- [ ] 배포본에 최신 `skills.ui.json`이 포함되었는지 확인하고 필요 시 bipartite 그래프 기반 생성 스크립트 재실행
+- [x] `skills.ui.json` 노드 ID가 `payload.nodes`/unlock 상태와 일치하는지 교차 검증 (`python scripts/check_skill_tree_assets.py`)
+- [x] 그래프 노드가 비어 있을 때 추적용 텔레메트리 또는 추가 안내 UI를 도입
+- [ ] 장기적으로 React Flow/dagre 등 자동 레이아웃 도입 가능성 조사
+
+- [ ] 로그인 기능 도입: 일일 학습 기록과 진행 상황을 사용자 단위로 추적할 수 있도록 인증/세션을 구현
+- [ ] 수학 학습과 무관한 문서(로컬 개발 가이드, 안전/프라이버시 등) 정리 또는 제거
+- [ ] 실시간 학습 지표를 사용자별로 개인화할 수 있도록 데이터 모델/뷰 재구성
+- [ ] Web Vitals·WCAG 관련 안내는 내부 품질 체크리스트로만 유지하고, 학습 화면에는 노출하지 않도록 정리
+- [ ] 학습 화면에서 ‘허브로 돌아가기’ 등 공유/탐색용 버튼을 제거하여 개인 학습 흐름에 집중
+- [ ] 메인 화면에서 헬스체크/허브 공유 안내를 제거하고 학습 전용 메시지로 단순화 (`app/templates/index.html`)
+- [ ] `docs/dag.md`에 정의된 DAG 스펙을 JSON/모델로 로딩하는 백엔드 모듈 구축 (노드/엣지, XP 테이블, tier/boss 메타 반영)
+- [ ] `graph.bipartite.json`을 로드해 코스·스텝 ↔ 원자 스킬 이중 레이어 트리를 구성하고 데이터 파이프라인에 통합
+- [ ] DAG 노드/엣지, XP 진행 상황, LRC 임계치 등을 조회하는 API 추가 (`GET /api/v1/dag/nodes`, `/api/v1/dag/edges`, `/api/v1/dag/progress`) – 세부 요구사항은 `docs/dag.md` 참고
+- [ ] MathGame/대시보드에서 DAG 기반 단계·XP UI를 노출하고 보스전/티어 진행을 시각화 (`docs/dag.md` 참고)
+- [ ] 세션 완료 시 DAG 노드 경험치/레벨 업데이트 로직 구현 및 LRC 조건 반영 (`docs/dag.md` 참고)
+- [ ] 스킬 그래프 스키마 검증 스크립트와 순환 감지 작성 (`기획안.md` Epic A-1, `docs/dag.md`)
+- [ ] 잠금/해제 규칙 엔진(`ALL/ANY`, `min_level`, 보스전 통과) 단위 테스트 15케이스 작성 (`기획안.md` Epic A-2)
+- [ ] `GET /api/v1/skills/tree` 엔드포인트 구현 (캐시 키 `version:user_id`, 진행도 포함) (`기획안.md` Epic B-3)
+- [ ] `POST /api/v1/skills/progress` 엔드포인트 구현 및 경쟁 상태 방지 (`기획안.md` Epic B-4)
+- [ ] React 스킬 트리 컴포넌트 (팬/줌/키보드 내비/스크린리더 지원) 구현 (`기획안.md` Epic C-5)
+- [ ] 노드 상태(locked/unlockable/unlocked/mastered) 색상·툴팁·아이콘·i18n 구현 (`기획안.md` Epic C-6)
+- [ ] 티어 평가(보스전) 라우트 및 다음 티어 일괄 해제 규칙 구현 (`기획안.md` Epic D-7)
+- [ ] Matomo/GA4 이벤트 훅(`skill_viewed`, `skill_unlocked`, `boss_passed`, `session_started_from_tree`) 추가 (`기획안.md` Epic E-8)
+- [ ] 스킬 트리 콘텐츠 가이드(i18n/난이도 문구/아이콘) 문서화 (`기획안.md` Epic F-9)
+- [ ] 스킬 트리 vs 리스트 A/B 실험 설계 및 계측 플래그 준비 (`기획안.md` Epic F-10)
+- [ ] 해제 규칙 엔진을 ALL 조건만 허용하도록 반영 (`기획안.md` 의사결정: ANY 불가)
+- [ ] 스킬 트리 노드 클릭 시 대응 학습 세션(문제 세트)로 진입하는 화면/라우트 구현 (`기획안.md` First Sprint + UI) – MathGame 연동
+- [x] `docs/problem_generation_plan.md` 지침에 따라 템플릿·문제 데이터 구조와 파라미터를 업데이트해 생성 문제를 개선 (`app/data/templates.json`, `app/template_engine.py`, `app/routers/curriculum.py`)
+- [x] 덧셈 등 개념 선택 시 S1→S2→S3를 스킬 트리 단계별로 노출하고 단계 완료 시 다음 단계가 활성화되도록 UX 재구성 (`frontend/src/components/MathGame.tsx`, `frontend/src/components/SkillTree.tsx`, `frontend/src/components/MathGame.css`, `frontend/src/components/SkillTree.css`)
+- [ ] MathGame에서 정답 입력 후 `확인` 버튼/엔터를 눌러도 제출되지 않는 사례를 재현하고 입력 검증 로직을 개선
+- [x] MathGame에서 `확인` 버튼 클릭 시 정답 피드백이 표시되지 않는 이슈 수정 및 모든 문제 풀이 후 `답변 제출` 아래 정답률 표시 추가 (`frontend/src/components/MathGame.tsx`, `frontend/src/components/MathGame.css`)
+- [x] 커리큘럼을 Skill Tree 형태로 시각화하는 UI 구현 (`frontend/src/components/SkillTree.tsx`, `frontend/src/components/SkillTree.css`, `frontend/src/components/skillTreeHelpers.ts`)
+- [x] 콘텐츠 스튜디오에서 바로 임포트할 수 있도록 100개 템플릿을 JSON/NDJSON으로 패키징하고 샘플 파일 생성 (`docs/content_templates.ndjson`)
+- [x] 온보딩 진단 v0.9 스펙 정리 (스레드별 S1 3문항 구성, 점수 산식, 추천 로직) (`docs/onboarding_diagnostic_v0.9.md`)
+- [x] 교사 콘솔 "수업 악보" 자동 생성 규칙 설계 및 출력 포맷 정의 (`docs/teacher_lesson_score_rules.md`)
+- [x] `pytest` 실행 시 타임아웃 발생 원인 분석 및 수정 - async 테스트로 전환하여 해결됨 (`tests/test_api.py`, `tests/test_curriculum.py`, `tests/test_invites.py`, `tests/test_pages.py`, `tests/test_curriculum_graph.py`)

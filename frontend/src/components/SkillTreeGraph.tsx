@@ -1,5 +1,6 @@
 import { ArrowRight, CheckCircle, Lock, Sparkles, Star } from 'lucide-react';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import ELK from 'elkjs/lib/elk.bundled.js';
 
 import type {
   SkillNodeProgress,
@@ -105,6 +106,26 @@ type GraphIndex = {
   children: Map<string, string[]>;
   depth: Map<string, number>;
 };
+
+type LayoutResult = {
+  positioned: PositionedNode[];
+  height: number;
+};
+
+type EdgeBundle = {
+  parent: PositionedNode;
+  children: PositionedNode[];
+  busX: number;
+  busY: number;
+  state: SkillState;
+};
+
+type RegularEdgeSegment = {
+  parent: PositionedNode;
+  child: PositionedNode;
+};
+
+const BUS_OFFSET = 48;
 
 function buildGraphIndex({ nodes, edges }: LayoutGraph): GraphIndex {
   const parents = new Map<string, string[]>();
@@ -394,19 +415,183 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
   dimUnrelated = false,
 }) => {
   const effectiveZoom = Math.min(Math.max(zoom, 0.5), 2);
-  const { positioned, height } = useMemo(
+  const layoutCacheRef = useRef<Map<string, LayoutResult>>(new Map());
+  const [isLayoutLoading, setIsLayoutLoading] = useState(false);
+
+  const layoutKey = useMemo(
+    () =>
+      JSON.stringify({
+        nodes: nodes.map((node) => ({
+          id: node.id,
+          tree: node.tree,
+          tier: node.tier,
+          col: node.grid?.col ?? 0,
+          row: node.grid?.row ?? 0,
+        })),
+        edges: edges.map((edge) => [edge.from, edge.to]),
+        groups: trees.map((tree) => ({ id: tree.id, order: tree.order })),
+      }),
+    [nodes, edges, trees],
+  );
+
+  const fallbackLayout = useMemo(
     () => buildPositionedNodes(nodes, trees, edges),
     [nodes, trees, edges],
   );
+  const [layoutResult, setLayoutResult] = useState<LayoutResult>(fallbackLayout);
 
-  const canvasWidth = Math.max(trees.length * PANEL_WIDTH, PANEL_WIDTH);
+  useEffect(() => {
+    setLayoutResult(fallbackLayout);
+    setIsLayoutLoading(false);
+  }, [fallbackLayout]);
+
+  const elk = useMemo(() => new ELK(), []);
+
+  useEffect(() => {
+    const cached = layoutCacheRef.current.get(layoutKey);
+    if (cached) {
+      setLayoutResult(cached);
+      setIsLayoutLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const run = async () => {
+      if (!nodes.length) {
+        if (!cancelled) {
+          setLayoutResult({ positioned: [], height: 560 });
+          setIsLayoutLoading(false);
+        }
+        return;
+      }
+
+      setIsLayoutLoading(true);
+
+      const orderLookup = groupOrder(trees);
+      const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+      const sortedGroups = trees.slice().sort((a, b) => a.order - b.order);
+      const positioned: PositionedNode[] = [];
+      let maxHeight = 0;
+
+      try {
+        for (const group of sortedGroups) {
+          const groupNodes = nodes.filter((node) => node.tree === group.id);
+          if (!groupNodes.length) {
+            continue;
+          }
+          const groupEdges = edges.filter((edge) => {
+            const source = nodeMap.get(edge.from);
+            const target = nodeMap.get(edge.to);
+            return source?.tree === group.id && target?.tree === group.id;
+          });
+
+          const elkGraph = {
+            id: `group-${group.id}`,
+            layoutOptions: {
+              'elk.algorithm': 'layered',
+              'elk.direction': 'DOWN',
+              'elk.layered.spacing.nodeNodeBetweenLayers': ROW_GAP.toString(),
+              'elk.spacing.nodeNode': Math.floor(NODE_COLUMN_SPACING * 0.8).toString(),
+              'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
+            },
+            children: groupNodes.map((node) => ({
+              id: node.id,
+              width: NODE_WIDTH,
+              height: NODE_HEIGHT,
+            })),
+            edges: groupEdges.map((edge) => ({
+              id: `${edge.from}->${edge.to}`,
+              sources: [edge.from],
+              targets: [edge.to],
+            })),
+          };
+
+          const layout = await elk.layout(elkGraph);
+          const offsetIndex = orderLookup[group.id] ?? sortedGroups.length;
+          const panelOffsetX = offsetIndex * PANEL_WIDTH;
+          let groupMaxBottom = 0;
+
+          layout.children?.forEach(
+            (child: { id: string; x?: number; y?: number; width?: number; height?: number }) => {
+              const node = nodeMap.get(child.id);
+              if (!node) {
+                return;
+              }
+              const childX = child.x ?? 0;
+              const childY = child.y ?? 0;
+              const x = panelOffsetX + PANEL_PADDING_X + childX;
+              const y = childY;
+              positioned.push({
+                node,
+                x,
+              y,
+              width: NODE_WIDTH,
+              height: NODE_HEIGHT,
+              groupIndex: offsetIndex,
+              });
+              const bottom = childY + (child.height ?? NODE_HEIGHT);
+              if (bottom > groupMaxBottom) {
+                groupMaxBottom = bottom;
+              }
+            },
+          );
+
+          const groupHeight = groupMaxBottom + NODE_HEIGHT;
+          if (groupHeight > maxHeight) {
+            maxHeight = groupHeight;
+          }
+        }
+
+        if (!cancelled) {
+          const height = Math.max(Math.ceil(maxHeight + 160), 560);
+          const result = {
+            positioned: positioned.length ? positioned : fallbackLayout.positioned,
+            height,
+          };
+          layoutCacheRef.current.set(layoutKey, result);
+          setLayoutResult(result);
+          setIsLayoutLoading(false);
+        }
+      } catch (error) {
+        console.warn('[SkillTree] ELK layout failed, using fallback layout', error);
+        if (!cancelled) {
+          setLayoutResult(fallbackLayout);
+          setIsLayoutLoading(false);
+        }
+      }
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [elk, nodes, trees, edges, fallbackLayout, layoutKey]);
+
+  const positioned = layoutResult.positioned;
+  const height = layoutResult.height;
+
+  const canvasWidth = useMemo(() => {
+    if (!positioned.length) {
+      return Math.max(trees.length * PANEL_WIDTH, PANEL_WIDTH);
+    }
+    const maxX = Math.max(
+      ...positioned.map((item) => item.x + item.width + PANEL_PADDING_X),
+    );
+    return Math.max(Math.ceil(maxX), PANEL_WIDTH);
+  }, [positioned, trees.length]);
+
   const treeOrderLookup = useMemo(() => groupOrder(trees), [trees]);
 
   const positionedMap = useMemo(() => {
-    return positioned.reduce<Record<string, PositionedNode>>((accumulator, item) => {
-      accumulator[item.node.id] = item;
-      return accumulator;
-    }, {});
+    return positioned.reduce<Record<string, PositionedNode>>(
+      (accumulator, item: PositionedNode) => {
+        accumulator[item.node.id] = item;
+        return accumulator;
+      },
+      {},
+    );
   }, [positioned]);
 
   const orderedGroups = useMemo(
@@ -422,7 +607,7 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
 
   const adjacency = useMemo(() => {
     const map = new Map<string, Set<string>>();
-    nodes.forEach((node) => map.set(node.id, new Set()));
+    positioned.forEach((item: PositionedNode) => map.set(item.node.id, new Set()));
     edges.forEach((edge) => {
       if (!map.has(edge.from)) {
         map.set(edge.from, new Set());
@@ -434,7 +619,69 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
       map.get(edge.to)!.add(edge.from);
     });
     return map;
-  }, [edges, nodes]);
+  }, [edges, positioned]);
+
+  const edgeGrouping = useMemo(() => {
+    const parentChildren = new Map<string, PositionedNode[]>();
+    edges.forEach((edge) => {
+      const parent = positionedMap[edge.from];
+      const child = positionedMap[edge.to];
+      if (!parent || !child) {
+        return;
+      }
+      if (!parentChildren.has(edge.from)) {
+        parentChildren.set(edge.from, []);
+      }
+      parentChildren.get(edge.from)!.push(child);
+    });
+
+    const regular: RegularEdgeSegment[] = [];
+    const bundles: EdgeBundle[] = [];
+
+    parentChildren.forEach((children, parentId) => {
+      const parent = positionedMap[parentId];
+      if (!parent || !children.length) {
+        return;
+      }
+      if (children.length <= 1) {
+        const child = children[0];
+        if (child) {
+          regular.push({ parent, child });
+        }
+        return;
+      }
+      const centers = children.map((child) => child.x + child.width / 2);
+      const busX = average(centers) ?? parent.x + parent.width / 2;
+      const busY = parent.y + parent.height + BUS_OFFSET;
+      bundles.push({
+        parent,
+        children,
+        busX,
+        busY,
+        state: parent.node.resolvedState,
+      });
+    });
+
+    return { regular, bundles };
+  }, [edges, positionedMap]);
+
+  const regularEdges = edgeGrouping.regular;
+  const bundledEdges = edgeGrouping.bundles;
+
+  const layoutStats = useMemo(
+    () => ({
+      nodes: positioned.length,
+      edges: edges.length,
+      bundles: bundledEdges.length,
+    }),
+    [positioned.length, edges.length, bundledEdges.length],
+  );
+
+  useEffect(() => {
+    if (import.meta.env?.DEV) {
+      console.info('[SkillTree] layout stats', layoutStats);
+    }
+  }, [layoutStats]);
 
   const focusSet = useMemo(() => {
     if (!dimUnrelated || !focusNodeId) {
@@ -474,7 +721,13 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
       data-testid="skill-tree-graph"
       data-high-contrast={highContrast ? 'true' : 'false'}
     >
-      <div className="skill-tree-graph__canvas-wrapper" style={canvasWrapperStyle}>
+      <div className="skill-tree-graph__canvas-wrapper" style={canvasWrapperStyle} data-loading={isLayoutLoading ? 'true' : 'false'}>
+        {isLayoutLoading ? (
+          <div className="skill-tree-graph__loading" role="status">
+            <span className="skill-tree-graph__loading-spinner" aria-hidden="true" />
+            <span>레이아웃 계산 중…</span>
+          </div>
+        ) : null}
         <div className="skill-tree-graph__canvas" style={canvasStyle}>
           {orderedGroups.map((group) => {
             const index = treeOrderLookup[group.id] ?? 0;
@@ -533,17 +786,75 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
                 <feDropShadow dx="0" dy="0" stdDeviation="1.4" floodOpacity="0.45" />
               </filter>
             </defs>
-            {edges.map((edge) => {
-              const from = positionedMap[edge.from];
-              const to = positionedMap[edge.to];
-              if (!from || !to) {
-                return null;
-              }
-              const edgeState = from.node.resolvedState;
-              const tone = SKILL_STATE_META[edgeState].tone;
+
+            {bundledEdges.map((bundle) => {
+              const tone = SKILL_STATE_META[bundle.state as SkillState].tone;
+              const color = SKILL_STATE_COLORS[tone];
+              const parentCenterX = bundle.parent.x + bundle.parent.width / 2;
+              const parentBottomY = bundle.parent.y + bundle.parent.height;
+              const bundleDimmed =
+                focusSet && !focusSet.has(bundle.parent.node.id) && !bundle.children.some((child) => focusSet.has(child.node.id));
+              const className = [
+                'skill-tree-edge',
+                `skill-tree-edge--${bundle.state}`,
+                'skill-tree-edge--bundle',
+                bundleDimmed ? 'skill-tree-edge--dimmed' : '',
+              ]
+                .filter(Boolean)
+                .join(' ');
+              const busPath = `M ${parentCenterX} ${parentBottomY} C ${parentCenterX} ${
+                parentBottomY + 24
+              }, ${bundle.busX} ${bundle.busY - 24}, ${bundle.busX} ${bundle.busY}`;
+
+              return (
+                <React.Fragment key={`bundle-${bundle.parent.node.id}`}>
+                  <path
+                    className={className}
+                    d={busPath}
+                    stroke={color}
+                    strokeWidth={strokeWidth + 0.3}
+                    markerEnd="url(#skill-tree-edge-arrow)"
+                    strokeLinecap="round"
+                  />
+                  {bundle.children.map((child) => {
+                    const targetX = child.x + child.width / 2;
+                    const targetY = child.y;
+                    const childDimmed =
+                      focusSet && !(focusSet.has(bundle.parent.node.id) && focusSet.has(child.node.id));
+                    const childClassName = [
+                      'skill-tree-edge',
+                      `skill-tree-edge--${bundle.state}`,
+                      'skill-tree-edge--bundle-segment',
+                      childDimmed ? 'skill-tree-edge--dimmed' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ');
+                    const childPath = `M ${bundle.busX} ${bundle.busY} C ${bundle.busX} ${
+                      bundle.busY + 24
+                    }, ${targetX} ${targetY - 24}, ${targetX} ${targetY}`;
+                    return (
+                      <path
+                        key={`${bundle.parent.node.id}->${child.node.id}`}
+                        className={childClassName}
+                        d={childPath}
+                        stroke={color}
+                        strokeWidth={strokeWidth}
+                        markerEnd="url(#skill-tree-edge-arrow)"
+                        strokeLinecap="round"
+                      />
+                    );
+                  })}
+                </React.Fragment>
+              );
+            })}
+
+            {regularEdges.map(({ parent, child }) => {
+              const edgeState = parent.node.resolvedState;
+              const tone = SKILL_STATE_META[edgeState as SkillState].tone;
               const color = SKILL_STATE_COLORS[tone];
               const dimmed =
-                focusSet && (!focusSet.has(edge.from) || !focusSet.has(edge.to));
+                focusSet &&
+                !(focusSet.has(parent.node.id) && focusSet.has(child.node.id));
               const className = [
                 'skill-tree-edge',
                 `skill-tree-edge--${edgeState}`,
@@ -554,9 +865,9 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
 
               return (
                 <path
-                  key={`${edge.from}-${edge.to}`}
+                  key={`${parent.node.id}-${child.node.id}`}
                   className={className}
-                  d={buildEdgePath(from, to)}
+                  d={buildEdgePath(parent, child)}
                   stroke={color}
                   strokeWidth={edgeState === 'completed' ? strokeWidth + 0.5 : strokeWidth}
                   markerEnd="url(#skill-tree-edge-arrow)"
@@ -567,10 +878,10 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
             })}
           </svg>
 
-          {positioned.map((item) => {
+          {positioned.map((item: PositionedNode) => {
             const { node, x, y } = item;
             const resolvedState = node.resolvedState;
-            const stateMeta = SKILL_STATE_META[resolvedState];
+            const stateMeta = SKILL_STATE_META[resolvedState as SkillState];
             const Icon = ICON_COMPONENTS[stateMeta.icon];
             const badgeClass = ['badge', SKILL_STATE_BADGE_CLASS[stateMeta.tone]]
               .filter(Boolean)
@@ -581,8 +892,8 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
             const xpSummary = formatXpSummary(node.progress);
             const tooltipId = `skill-${node.id}-tooltip`;
             const unmetRequires = node.requires
-              .filter((req) => !req.met)
-              .map((req) => req.label)
+              .filter((req: SkillTreeRequirement) => !req.met)
+              .map((req: SkillTreeRequirement) => req.label)
               .filter(Boolean);
             const tooltipText = t(stateMeta.tooltipKey, {
               requires: unmetRequires.length ? formatList(unmetRequires) : '없음',
@@ -655,7 +966,7 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
                 </div>
                 {xpSummary ? <div className="skill-tree-node__stats">{xpSummary}</div> : null}
                 <div className="skill-tree-node__badges">
-                  {node.lens.map((lens) => (
+                  {node.lens.map((lens: string) => (
                     <span
                       key={`${node.id}-lens-${lens}`}
                       className="skill-tree-node__badge"

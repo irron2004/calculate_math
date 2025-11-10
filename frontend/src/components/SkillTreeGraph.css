@@ -90,6 +90,14 @@
   opacity: 0.18;
 }
 
+.skill-tree-edge--bundle {
+  opacity: 0.9;
+}
+
+.skill-tree-edge--bundle-segment {
+  opacity: 0.78;
+}
+
 @keyframes dash {
   to {
     stroke-dashoffset: -48;
@@ -126,6 +134,13 @@
 
 .skill-card[data-dimmed='true'] {
   opacity: 0.18;
+}
+
+.skill-tree-graph__canvas-wrapper[data-loading='true'] .skill-tree-graph__canvas {
+  opacity: 0.35;
+  filter: blur(1px);
+  transition: opacity 160ms ease, filter 160ms ease;
+  pointer-events: none;
 }
 
 .skill-card--locked {
@@ -258,6 +273,37 @@
   cursor: not-allowed;
   filter: grayscale(0.5);
   opacity: 0.6;
+}
+
+.skill-tree-graph__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: rgba(15, 23, 42, 0.68);
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  z-index: 10;
+  text-transform: uppercase;
+}
+
+.skill-tree-graph__loading-spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  border: 3px solid rgba(148, 163, 184, 0.35);
+  border-top-color: #38bdf8;
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .badge {
