@@ -40,7 +40,14 @@ type: catalog
 - DAG 편집 워크플로우: `docs/process/dag_edit_workflow.md`
 - 스펙 루프 러너/역할: `scripts/spec/spec_loop.py`, `roles/`
 
+## BE(Backend)
+- BE Handbook index: `docs/BE/README.md`
+- 12‑Week Execution Plan: `docs/BE/execution_plan_12w.md`
+- Refactor Checklist: `docs/BE/refactor_checklist.md`
+- API Contracts Overview: `docs/BE/api_contracts_overview.md`
+- DAG Pipeline & CI: `docs/BE/dag_pipeline_ci.md`
+- MQG‑P1 Quality Gates: `docs/BE/mqg_p1_quality_gates.md`
+
 ---
 
 카테고리 외 문서는 `docs/README.md` 또는 각 디렉터리의 안내 문서를 참고하세요.
-
