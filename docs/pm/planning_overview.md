@@ -2,7 +2,7 @@
 
 본 문서는 본 프로젝트의 핵심 기획을 간결하게 정리한 개요입니다. 목표는 “문서→코드→테스트→자동수정→배포”로 이어지는 자동화 파이프라인 위에서, 초등 연산 학습을 디아블로식 스킬트리로 제공하는 웹서비스를 구현·운영하는 것입니다.
 
-자세한 최대 상세 기획서는 `docs/pm/spec_skill_tree_v1.0.md`와 PRD는 `docs/pm/prd_skill_tree_v1.0.md`(Single Source of Truth)를 참고하세요. 제품 결정 로그는 `docs/pm/DECISIONS.md`에 기록합니다.
+자세한 최대 상세 기획서는 `docs/pm/spec_skill_tree_v1.0.md`와 PRD는 `docs/pm/prd_skill_tree_v1.0.md`(Single Source of Truth)를 참고하세요. 제품 결정 로그는 `docs/pm/DECISIONS.md`에 기록합니다. 전체 문서 묶음 카탈로그는 `docs/CATALOG.md`를 참고하세요.
 
 ## Archives
 - 초기 기획(교재 제작 절차, v0): `docs/pm/archive/initial_plan_2025-11-10.md`
