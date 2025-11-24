@@ -26,6 +26,7 @@ import SkillTreeGraph, { type SkillTreeGraphNodeView } from './SkillTreeGraph';
 import { useUnlockFx } from '../hooks/useUnlockFx';
 import { formatList, t } from '../utils/i18n';
 import { SKILL_STATE_META, type SkillState } from '../constants/skillStates';
+import './SkillTreePage.css';
 
 type ExperimentAssignment = {
   name: string;
@@ -99,6 +100,117 @@ const lensDisplay = (
   );
 };
 
+type SelectedSkillPanelProps = {
+  node: SkillTreeGraphNodeView | null;
+  projection: SkillTreeNode | null;
+  onStart: (node: SkillTreeGraphNodeView) => void;
+  onClear: () => void;
+};
+
+const SelectedSkillPanel: React.FC<SelectedSkillPanelProps> = ({ node, projection, onStart, onClear }) => {
+  if (!node) {
+    return (
+      <aside className="skill-panel">
+        <div className="skill-panel-header">
+          <div>
+            <p className="panel-kicker">선택한 스킬</p>
+            <h3 className="panel-title">트리에서 스킬을 선택하세요</h3>
+          </div>
+        </div>
+        <ul className="panel-list">
+          <li>왼쪽 트리에서 관심 있는 노드를 클릭합니다.</li>
+          <li>필요한 선행 스킬과 연결된 상위 개념을 확인합니다.</li>
+          <li>바로 연습을 시작하거나 다른 경로를 탐색합니다.</li>
+        </ul>
+      </aside>
+    );
+  }
+
+  const requires = node.requires ?? [];
+  const teaches = node.teaches ?? [];
+  const conceptLabel =
+    projection?.session?.concept && projection.session.step
+      ? `${projection.session.concept} · 단계 ${projection.session.step}`
+      : '연결 개념을 준비 중입니다.';
+
+  return (
+    <aside className="skill-panel">
+      <div className="skill-panel-header">
+        <div>
+          <p className="panel-kicker">선택한 스킬</p>
+          <h3 className="panel-title">{node.label}</h3>
+          <p className="panel-sub">트리 {node.tree} · Tier {node.tier}</p>
+        </div>
+        <button className="text-button small" type="button" onClick={onClear}>
+          선택 해제
+        </button>
+      </div>
+
+      <div className="panel-tags">
+        {node.boss ? <span className="badge badge-warning">BOSS</span> : null}
+        {node.lens.map((lens, index) => (
+          <span key={`${node.id}-lens-${index}`} className="badge">
+            {lens}
+          </span>
+        ))}
+        <span className="badge">상태: {SKILL_STATE_META[node.resolvedState]?.badgeKey ? t(SKILL_STATE_META[node.resolvedState].badgeKey) : node.resolvedState}</span>
+      </div>
+
+      <div className="panel-summary">
+        <p className="summary-title">이 스킬은 무엇인가요?</p>
+        <p className="summary-body">
+          {conceptLabel}
+        </p>
+        <p className="summary-body subtle">
+          XP {node.xp.per_try}/{node.xp.per_correct} · 현재 상태 {node.resolvedState}
+        </p>
+      </div>
+
+      <div className="panel-section">
+        <div className="panel-section-head">
+          <h4>필요한 선행 스킬</h4>
+        </div>
+        <ul className="panel-list">
+          {requires.length === 0 ? <li>필요 조건 없음</li> : null}
+          {requires.map((req) => (
+            <li key={`${node.id}-req-${req.skill_id}`}>
+              <span>{req.label}</span>
+              <span className="pill">Lv {req.current_level ?? 0}/{req.min_level}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="panel-section">
+        <div className="panel-section-head">
+          <h4>이후에 이어지는 스킬</h4>
+        </div>
+        <ul className="panel-list">
+          {teaches.length === 0 ? <li>진행도와 XP가 상승합니다.</li> : null}
+          {teaches.map((teach) => (
+            <li key={`${node.id}-teach-${teach.skill_id}`}>
+              <span>{teach.label}</span>
+              <span className="pill">+{teach.delta_level} Lv</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="panel-section">
+        <div className="panel-section-head">
+          <h4>예시 문제</h4>
+        </div>
+        <p className="summary-body subtle">
+          예시 문제를 통해 난이도를 가볍게 확인한 뒤 바로 연습을 시작하세요.
+        </p>
+        <button className="primary-button full" type="button" onClick={() => onStart(node)}>
+          이 스킬 연습 시작하기
+        </button>
+      </div>
+    </aside>
+  );
+};
+
 const SkillTreePage: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -115,9 +227,6 @@ const SkillTreePage: React.FC = () => {
   const [experiment, setExperiment] = useState<ExperimentAssignment | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [isSimpleSkillTree, setIsSimpleSkillTree] = useState(false);
-  const overlayRef = useRef<HTMLDivElement | null>(null);
-  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
-  const lastFocusedElementRef = useRef<HTMLElement | null>(null);
   const isMountedRef = useRef(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -168,7 +277,7 @@ useUnlockFx(recentlyUnlocked);
     setFocusNodeId(null);
   }, []);
 
-  const closeOverlay = useCallback(() => {
+  const clearSelection = useCallback(() => {
     setSelectedNodeId(null);
     setFocusNodeId(null);
   }, []);
@@ -555,69 +664,6 @@ useEffect(() => {
     }
   }, [isLoading, error, resolvedGraph, graphNodesView.length, nodes.length]);
 
-  useEffect(() => {
-    if (!selectedNode) {
-      return undefined;
-    }
-
-    const overlayEl = overlayRef.current;
-    lastFocusedElementRef.current = document.activeElement as HTMLElement | null;
-
-    const focusableSelectors =
-      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
-    const getFocusable = (): HTMLElement[] => {
-      if (!overlayEl) {
-        return [];
-      }
-      return Array.from(overlayEl.querySelectorAll<HTMLElement>(focusableSelectors)).filter(
-        (element) => !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true',
-      );
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        closeOverlay();
-        return;
-      }
-      if (event.key !== 'Tab') {
-        return;
-      }
-      const focusable = getFocusable();
-      if (focusable.length === 0) {
-        event.preventDefault();
-        return;
-      }
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const active = document.activeElement as HTMLElement | null;
-      if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first.focus();
-      } else if (event.shiftKey && active === first) {
-        event.preventDefault();
-        last.focus();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
-      window.requestAnimationFrame(() => {
-        closeButtonRef.current?.focus();
-      });
-    } else {
-      closeButtonRef.current?.focus();
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      const previous = lastFocusedElementRef.current;
-      if (previous && typeof previous.focus === 'function') {
-        previous.focus();
-      }
-    };
-  }, [selectedNode, closeOverlay]);
-
   const handleStartCourse = (graphNode: SkillTreeGraphNodeView) => {
     if (graphNode.resolvedState === 'locked') {
       const unmet = graphNode.requires
@@ -635,9 +681,6 @@ useEffect(() => {
   };
 
   const selectedProjection = selectedNode ? projectionLookup.get(selectedNode.id) ?? null : null;
-  const overlayTitleId = selectedNode ? `skill-node-${selectedNode.id}-title` : undefined;
-  const overlayDescriptionId = selectedNode ? `skill-node-${selectedNode.id}-details` : undefined;
-  const overlayStateMeta = selectedNode ? SKILL_STATE_META[selectedNode.resolvedState] : null;
 
   if (isLoading) {
     return (
@@ -741,33 +784,42 @@ useEffect(() => {
         </button>
       </div>
 
-      <div id="live-region" aria-live="polite" className="sr-only" />
-
-      {graphNodesView.length === 0 ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 text-center text-slate-300">
-          <p>표시할 스킬 트리 데이터가 없습니다.</p>
-          <p className="mt-2 text-xs text-slate-500">
-            `/api/v1/skills/tree` 응답의 그래프 노드를 불러오지 못했습니다. 프로덕션 환경 변수 `VITE_API_BASE_URL` 및
-            `skills.ui.json` 배포 상태를 확인하고, 자세한 점검 항목은 `docs/skill_tree_feedback.md`를 참고하세요.
-          </p>
+      <div className="skill-tree-layout">
+        <div className="skill-tree-left">
+          <div id="live-region" aria-live="polite" className="sr-only" />
+          {graphNodesView.length === 0 ? (
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 text-center text-slate-300">
+              <p>표시할 스킬 트리 데이터가 없습니다.</p>
+              <p className="mt-2 text-xs text-slate-500">
+                `/api/v1/skills/tree` 응답의 그래프 노드를 불러오지 못했습니다. 프로덕션 환경 변수 `VITE_API_BASE_URL` 및
+                `skills.ui.json` 배포 상태를 확인하고, 자세한 점검 항목은 `docs/skill_tree_feedback.md`를 참고하세요.
+              </p>
+            </div>
+          ) : (
+            <SkillTreeGraph
+              nodes={graphNodesView}
+              edges={graphEdges}
+              trees={graphTrees}
+              palette={palette}
+              onStart={handleStartCourse}
+              onSelect={(node) => {
+                setSelectedNodeId(node.id);
+                setFocusNodeId(node.id);
+              }}
+              zoom={zoom}
+              highContrast={highContrast}
+              focusNodeId={focusNodeId}
+              dimUnrelated={Boolean(focusNodeId)}
+            />
+          )}
         </div>
-      ) : (
-        <SkillTreeGraph
-          nodes={graphNodesView}
-          edges={graphEdges}
-          trees={graphTrees}
-          palette={palette}
+        <SelectedSkillPanel
+          node={selectedNode}
+          projection={selectedProjection}
           onStart={handleStartCourse}
-          onSelect={(node) => {
-            setSelectedNodeId(node.id);
-            setFocusNodeId(node.id);
-          }}
-          zoom={zoom}
-          highContrast={highContrast}
-          focusNodeId={focusNodeId}
-          dimUnrelated={Boolean(focusNodeId)}
+          onClear={clearSelection}
         />
-      )}
+      </div>
 
       {skills.length ? (
         <section className="space-y-3">
@@ -814,136 +866,6 @@ useEffect(() => {
             강조됩니다.
           </p>
         </section>
-      ) : null}
-
-      {selectedNode ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={overlayTitleId}
-          aria-describedby={overlayDescriptionId}
-          className="fixed inset-0 z-40 flex items-end justify-center bg-slate-950/70 p-4 sm:items-center"
-          data-testid="skill-node-overlay"
-          onClick={closeOverlay}
-        >
-          <div
-            ref={overlayRef}
-            className="w-full max-w-3xl rounded-3xl border border-slate-800 bg-slate-900/95 p-6 text-slate-100 shadow-2xl shadow-slate-900/50"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <header className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">
-                  {selectedNode.tree} · Tier {selectedNode.tier}
-                </p>
-                <h2 id={overlayTitleId} className="text-2xl font-semibold text-white">
-                  {selectedNode.label}
-                  {selectedNode.boss ? (
-                    <span className="ml-2 inline-flex items-center rounded-full border border-amber-400/60 bg-amber-400/15 px-2 py-0.5 text-xs uppercase tracking-wide text-amber-300">
-                      BOSS
-                    </span>
-                  ) : null}
-                </h2>
-              </div>
-              <button
-                type="button"
-                className="rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-wide text-slate-300 transition hover:border-slate-500 hover:text-white"
-                ref={closeButtonRef}
-                onClick={closeOverlay}
-              >
-                닫기
-              </button>
-            </header>
-
-            <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
-              <span className="rounded-full border border-slate-700 px-3 py-1">
-                XP {selectedNode.xp.per_try}/{selectedNode.xp.per_correct}
-              </span>
-              {selectedNode.lens.map((lens, index) => lensDisplay(lens, palette, `${selectedNode.id}-lens-${index}`))}
-              <span className="rounded-full border border-slate-700 px-3 py-1">
-                상태: {overlayStateMeta ? t(overlayStateMeta.badgeKey) : ''}
-              </span>
-              {selectedNode.progress?.xp_earned ? (
-                <span className="rounded-full border border-slate-700 px-3 py-1">
-                  누적 XP {selectedNode.progress.xp_earned.toLocaleString()}
-                </span>
-              ) : null}
-            </div>
-
-            <section id={overlayDescriptionId ?? undefined} className="mt-6 space-y-3">
-              <div>
-                <h3 className="text-sm font-semibold text-slate-200">필요 조건</h3>
-                <ul className="mt-2 space-y-2 text-sm">
-                  {selectedNode.requires.length === 0 ? (
-                    <li className="text-slate-400">필요 조건 없음</li>
-                  ) : (
-                    selectedNode.requires.map((req) => (
-                      <li
-                        key={`${selectedNode.id}-req-${req.skill_id}`}
-                        className={`flex items-center justify-between rounded-xl border px-3 py-2 ${
-                          req.met ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200' : 'border-slate-700 bg-slate-800/40 text-slate-300'
-                        }`}
-                      >
-                        <span className="font-medium">{req.label}</span>
-                        <span>
-                          Lv {req.current_level ?? 0}/{req.min_level}
-                        </span>
-                      </li>
-                    ))
-                  )}
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-slate-200">보상</h3>
-                <ul className="mt-2 space-y-2 text-sm text-slate-300">
-                  {selectedNode.teaches.length === 0 ? (
-                    <li>진행도 및 XP 상승</li>
-                  ) : (
-                    selectedNode.teaches.map((teach) => (
-                      <li
-                        key={`${selectedNode.id}-teach-${teach.skill_id}`}
-                        className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800/40 px-3 py-2"
-                      >
-                        <span>{teach.label}</span>
-                        <span className="text-sky-300">+{teach.delta_level} Lv</span>
-                      </li>
-                    ))
-                  )}
-                </ul>
-              </div>
-
-              {selectedProjection?.misconceptions?.length ? (
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-200">자주 틀리는 개념</h3>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-400">
-                    {selectedProjection.misconceptions.map((item) => (
-                      <li key={`${selectedNode.id}-mis-${item}`}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </section>
-
-            <footer className="mt-6 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs text-slate-400">
-                {selectedProjection?.session?.concept
-                  ? `연결 개념: ${selectedProjection.session.concept} · 단계 ${selectedProjection.session.step}`
-                  : '연결 개념 정보가 없습니다.'}
-              </p>
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 rounded-full bg-sky-500 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-900/40 transition hover:-translate-y-0.5 hover:bg-sky-400"
-                onClick={() => {
-                  handleStartCourse(selectedNode);
-                  closeOverlay();
-                }}
-              >
-                바로 학습 시작하기
-              </button>
-            </footer>
-          </div>
-        </div>
       ) : null}
     </div>
   );

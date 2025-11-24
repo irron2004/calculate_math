@@ -39,6 +39,39 @@ describe('AuthContext', () => {
     expect(result.current.error).toBeNull();
   });
 
+  it('register creates a new account through the auth endpoint', async () => {
+    const mockResponse = {
+      ok: true,
+      json: async () => ({
+        user_id: 2,
+        nickname: 'newbie',
+        role: 'student',
+        message: '새 계정이 생성되었습니다',
+        session_token: 'token-999',
+        expires_at: Date.now() / 1000 + 3600
+      })
+    } as Response;
+    const fetchSpy = vi
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(mockResponse);
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => <AuthProvider>{children}</AuthProvider>
+    });
+
+    await act(async () => {
+      const outcome = await result.current.register('newbie', 'passcode');
+      expect(outcome.success).toBe(true);
+      expect(outcome.user?.username).toBe('newbie');
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining('/v1/login'),
+      expect.objectContaining({ method: 'POST' })
+    );
+    expect(result.current.token).toBe('token-999');
+  });
+
   it('exposes error message when login fails', async () => {
     const mockResponse = {
       ok: false,

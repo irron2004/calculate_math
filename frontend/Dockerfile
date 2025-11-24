@@ -17,7 +17,7 @@ RUN npm install
 COPY . .
 
 # 애플리케이션 빌드
-ARG VITE_API_BASE_URL=/math-api/api
+ARG VITE_API_BASE_URL=/api
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN npm run build
 

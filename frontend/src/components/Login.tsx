@@ -105,16 +105,27 @@ const Login: React.FC = () => {
           </button>
         </form>
 
-        <button 
-          className="login-button" 
+        <button
+          className="login-button"
           style={{ marginTop: 8, background: '#eee', color: '#333' }}
           onClick={handleGuestLogin}
         >
           게스트로 시작
         </button>
 
+        <div className="auth-switch">
+          <span>계정이 없으신가요?</span>
+          <button
+            type="button"
+            className="link-button"
+            onClick={() => navigate('/signup')}
+          >
+            회원가입
+          </button>
+        </div>
+
         <div className="login-info">
-          <p>처음 사용하시는 경우 닉네임과 비밀번호를 입력하면 자동으로 계정이 생성됩니다.</p>
+          <p>처음 사용하시는 경우 회원가입을 통해 계정을 만들고, 이후에는 로그인으로 이어서 학습을 진행하세요.</p>
         </div>
       </div>
     </div>

@@ -144,6 +144,52 @@
   margin-bottom: 0;
 }
 
+.auth-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.link-button:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: #4c51bf;
+}
+
+.helper-text {
+  background: #f4f7fb;
+  color: #374151;
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-top: 18px;
+  text-align: left;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.success-message {
+  background: #e6f7ee;
+  color: #18794e;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
 /* 태블릿 반응형 */
 @media (max-width: 768px) {
   .login-card {

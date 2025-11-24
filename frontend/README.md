@@ -154,6 +154,9 @@ npm run preview
 
 ## 배포
 
+### 환경 변수
+- `VITE_API_BASE_URL`: 프런트에서 호출할 백엔드 기본 경로입니다. 동일 도메인(`/api`)에 백엔드가 노출되는 Railway 배포에서는 빈 문자열(`""`) 또는 `/api`로 설정하세요. 별도 프록시/서브패스가 있다면 그 경로를 설정한 뒤 빌드해야 합니다.
+
 ### Vercel 배포
 ```bash
 npm run build

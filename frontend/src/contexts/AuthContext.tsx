@@ -8,6 +8,7 @@ interface AuthContextType {
   token: string | null;
   error: string | null;
   login: (nickname: string, password: string) => Promise<LoginResult>;
+  register: (nickname: string, password: string) => Promise<LoginResult>;
   loginAsGuest: () => LoginResult;
   logout: () => void;
   loading: boolean;
@@ -40,13 +41,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const login = async (
+  const authenticate = async (
     nickname: string,
-    password: string
+    password: string,
+    intent: 'login' | 'register',
   ): Promise<LoginResult> => {
     try {
       setLoading(true);
       setError(null);
+      // NOTE: Backend creates the account on first login, so signup reuses the same endpoint.
       const response = await fetch(`${API_BASE_URL}/v1/login`, {
         method: 'POST',
         headers: {
@@ -74,22 +77,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return { success: true, user: userData };
       } else {
         const errorData = await response.json();
+        const fallback =
+          intent === 'register'
+            ? '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.'
+            : '로그인에 실패했습니다. 닉네임과 비밀번호를 확인해주세요.';
         const message =
           (errorData?.detail && errorData.detail.message) ||
           errorData?.message ||
-          '로그인에 실패했습니다. 닉네임과 비밀번호를 확인해주세요.';
+          fallback;
         setError(message);
         return { success: false, error: message };
       }
     } catch (error) {
-      console.error('Login error:', error);
-      const message = '로그인 중 오류가 발생했습니다.';
+      console.error('Auth error:', error);
+      const message =
+        intent === 'register'
+          ? '회원가입 중 오류가 발생했습니다.'
+          : '로그인 중 오류가 발생했습니다.';
       setError(message);
       return { success: false, error: message };
     } finally {
       setLoading(false);
     }
   };
+
+  const login = async (nickname: string, password: string) =>
+    authenticate(nickname, password, 'login');
+
+  const register = async (nickname: string, password: string) =>
+    authenticate(nickname, password, 'register');
 
   const logout = () => {
     setUser(null);
@@ -116,6 +132,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     token,
     error,
     login,
+    register,
     loginAsGuest,
     logout,
     loading

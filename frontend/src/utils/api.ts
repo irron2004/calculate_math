@@ -17,11 +17,11 @@ import type {
 import { STARTER_SKILL_TREE, SKILL_TREE_SEED_VERSION } from '../constants/skillTreeSeed';
 import { buildSimpleSkillTree } from './simpleSkillTree';
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/math-api/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
 if (typeof window !== 'undefined' && !import.meta.env.VITE_API_BASE_URL) {
   console.warn(
-    '[API] VITE_API_BASE_URL가 설정되지 않아 기본 경로 "/math-api/api"를 사용합니다. 배포 환경에서 백엔드 라우팅이 다르면 .env.production을 업데이트하세요.',
+    '[API] VITE_API_BASE_URL가 설정되지 않아 기본 경로 "/api"를 사용합니다. 배포 환경에서 백엔드 라우팅이 다르면 .env.production을 업데이트하세요.',
   );
 }
 
