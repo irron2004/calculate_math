@@ -39,6 +39,25 @@ export type APIProblem = {
   operator?: string;
 };
 
+export type SkillProblemSummary = {
+  id: string;
+  skill_id: string;
+  category: string;
+  question: string;
+  hint?: string | null;
+};
+
+export type SkillProblemListResponse = {
+  skill_id: string;
+  category: string;
+  total: number;
+  items: SkillProblemSummary[];
+};
+
+export type ProblemDetailResponse = SkillProblemSummary & {
+  answer?: number | null;
+};
+
 export type CurriculumConcept = {
   id: string;
   name: string;

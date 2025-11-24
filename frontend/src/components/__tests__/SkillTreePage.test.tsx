@@ -25,6 +25,9 @@ vi.mock('../../utils/api', () => ({
 
 vi.mock('../../utils/analytics', () => ({
   trackExperimentExposure: vi.fn(),
+  trackSkillTreeContrastToggled: vi.fn(),
+  trackSkillTreeFocusMode: vi.fn(),
+  trackSkillTreeZoomChanged: vi.fn(),
 }));
 
 const mockedFetchSkillTree = vi.mocked(fetchSkillTree);
@@ -386,5 +389,34 @@ describe('SkillTreePage', () => {
       screen.getByText(/총 XP 300/);
     });
     expect(screen.queryByText('진행도 갱신 중…')).toBeNull();
+  });
+
+  it('renders a simple skill list payload as a tree and disables session start', async () => {
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => undefined);
+    mockedFetchSkillTree.mockResolvedValue({
+      skills: [
+        { id: 'COUNT_100', name: '0~100 수 세기·비교', prereq: [] },
+        { id: 'ADD_SUB_BASIC', name: '한 자리 덧셈·뺄셈', prereq: ['COUNT_100'] },
+      ],
+    } as unknown as SkillTreeResponse);
+
+    render(
+      <MemoryRouter>
+        <SkillTreePage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      screen.getByText('0~100 수 세기·비교');
+      screen.getByTestId('skill-tree-graph');
+    });
+    expect(screen.getByTestId('skill-tree-page').getAttribute('data-experiment-variant')).toBe('tree');
+    expect(screen.queryByText(/시작용 스킬 트리/)).not.toBeNull();
+
+    const startButtons = screen.getAllByRole('button', { name: '학습 시작' });
+    fireEvent.click(startButtons[0]);
+    expect(alertSpy).toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    alertSpy.mockRestore();
   });
 });

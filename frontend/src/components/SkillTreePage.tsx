@@ -20,7 +20,8 @@ import {
   trackSkillTreeFocusMode,
   trackSkillTreeZoomChanged,
 } from '../utils/analytics';
-import { registerCourseConcept, resetCourseConceptOverrides, resolveConceptStep } from '../utils/skillMappings';
+import { registerCourseConcept, resetCourseConceptOverrides } from '../utils/skillMappings';
+import { buildSimpleSkillTree, extractSimpleSkillList } from '../utils/simpleSkillTree';
 import SkillTreeGraph, { type SkillTreeGraphNodeView } from './SkillTreeGraph';
 import { useUnlockFx } from '../hooks/useUnlockFx';
 import { formatList, t } from '../utils/i18n';
@@ -113,6 +114,7 @@ const SkillTreePage: React.FC = () => {
   const [progress, setProgress] = useState<SkillTreeProgress>(createEmptyProgress());
   const [experiment, setExperiment] = useState<ExperimentAssignment | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [isSimpleSkillTree, setIsSimpleSkillTree] = useState(false);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const lastFocusedElementRef = useRef<HTMLElement | null>(null);
@@ -172,7 +174,7 @@ useUnlockFx(recentlyUnlocked);
   }, []);
 
   const loadSkillTree = useCallback(
-  async (options?: { silent?: boolean }) => {
+    async (options?: { silent?: boolean }) => {
     const silent = Boolean(options?.silent);
     if (silent) {
       setIsRefreshing(true);
@@ -185,6 +187,31 @@ useUnlockFx(recentlyUnlocked);
         return;
       }
 
+      const simpleSkills = extractSimpleSkillList(payload);
+      if (simpleSkills) {
+        const simple = buildSimpleSkillTree(simpleSkills);
+        setVersion(simple.graph.version ?? null);
+        setPalette(simple.palette);
+        setNodes(simple.nodes);
+        setEdges(simple.edges);
+        setCourseGroups(simple.groups);
+        setSkills([]);
+        setUiGraph(simple.graph);
+        setUnlockedMap(simple.unlockedMap);
+        prevUnlockedRef.current = simple.unlockedMap;
+        setRecentlyUnlocked([]);
+        setProgress(createEmptyProgress());
+        setExperiment(null);
+        setIsSimpleSkillTree(true);
+        setError(null);
+        if (!silent) {
+          setSelectedNodeId(null);
+          setFocusNodeId(null);
+        }
+        return;
+      }
+
+      setIsSimpleSkillTree(false);
       setVersion(payload.version ?? null);
       setPalette(payload.palette ?? {});
       const nodeList = Array.isArray(payload.nodes) ? payload.nodes : [];
@@ -267,13 +294,24 @@ useUnlockFx(recentlyUnlocked);
     setVersion,
     setPalette,
     setNodes,
+    setEdges,
+    setCourseGroups,
     setSkills,
     setUiGraph,
     setUnlockedMap,
     setProgress,
     setSelectedNodeId,
+    setFocusNodeId,
+    setIsSimpleSkillTree,
+    setRecentlyUnlocked,
+    setIsLoading,
+    setIsRefreshing,
     setExperiment,
     setError,
+    buildSimpleSkillTree,
+    extractSimpleSkillList,
+    resetCourseConceptOverrides,
+    registerCourseConcept,
     trackExperimentExposure,
     fetchSkillTree,
   ],
@@ -309,18 +347,6 @@ useEffect(() => {
   focusTrackedRef.current = focusNodeId;
   trackSkillTreeFocusMode(focusNodeId ?? null);
 }, [focusNodeId]);
-
-  const determineStepFromIdentifier = (id: string, label: string): 'S1' | 'S2' | 'S3' => {
-    const fromId = id.match(/S([123])/);
-    if (fromId) {
-      return `S${fromId[1]}` as 'S1' | 'S2' | 'S3';
-    }
-    const fromLabel = label.match(/S([123])/);
-    if (fromLabel) {
-      return `S${fromLabel[1]}` as 'S1' | 'S2' | 'S3';
-    }
-    return 'S1';
-  };
 
   const skillMeta = useMemo(() => {
     const map = new Map<string, SkillSummary>();
@@ -605,30 +631,7 @@ useEffect(() => {
       );
       return;
     }
-    const projectionNode = projectionLookup.get(graphNode.id);
-    if (!projectionNode) {
-      console.warn('Skill node metadata missing for', graphNode.id);
-      return;
-    }
-    const mapping = resolveConceptStep(graphNode.id);
-    const conceptId = projectionNode.session?.concept ?? mapping?.concept ?? 'ALG-AP';
-    const fallbackStep = determineStepFromIdentifier(graphNode.id, graphNode.label);
-    const step = (projectionNode.session?.step ?? mapping?.step ?? fallbackStep) as
-      | 'S1'
-      | 'S2'
-      | 'S3';
-    const params = new URLSearchParams();
-    params.set('skill', graphNode.id);
-    if (conceptId) {
-      params.set('concept', conceptId);
-    }
-    if (step) {
-      params.set('step', step);
-    }
-    if (projectionNode?.session) {
-      params.set('session', JSON.stringify(projectionNode.session));
-    }
-    navigate(`/game?${params.toString()}`);
+    navigate(`/skills/${graphNode.id}/problems`);
   };
 
   const selectedProjection = selectedNode ? projectionLookup.get(selectedNode.id) ?? null : null;
@@ -692,6 +695,12 @@ useEffect(() => {
           {isRefreshing ? <span className="text-sky-300">진행도 갱신 중…</span> : null}
         </div>
       </header>
+
+      {isSimpleSkillTree ? (
+        <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-100">
+          시작용 스킬 트리를 표시합니다. 선행 관계를 빠르게 확인할 수 있고, 학습 시작은 추후 단계별 업데이트와 함께 활성화됩니다.
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-800/60 bg-slate-950/40 p-3 text-xs text-slate-300">
         <label className="flex items-center gap-2">

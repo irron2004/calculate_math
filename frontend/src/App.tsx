@@ -3,6 +3,8 @@ import './App.css'
 import Login from './components/Login'
 import MathGame from './components/MathGame'
 import ParentDashboard from './components/ParentDashboard'
+import ProblemDetailPage from './components/ProblemDetailPage'
+import SkillProblemListPage from './components/SkillProblemListPage'
 import SkillTreePage from './components/SkillTreePage'
 import StudentDashboard from './components/StudentDashboard'
 import TeacherDashboard from './components/TeacherDashboard'
@@ -20,6 +22,8 @@ function App() {
             <Route path="/teacher" element={<TeacherDashboard />} />
             <Route path="/game" element={<MathGame />} />
             <Route path="/skills" element={<SkillTreePage />} />
+            <Route path="/skills/:skillId/problems" element={<SkillProblemListPage />} />
+            <Route path="/problems/:problemId" element={<ProblemDetailPage />} />
           </Routes>
         </div>
       </Router>

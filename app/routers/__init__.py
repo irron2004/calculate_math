@@ -1,4 +1,15 @@
-from . import bridge, curriculum, dag, health, invites, pages, practice, problems, skills
+from . import (
+    bridge,
+    curriculum,
+    dag,
+    health,
+    invites,
+    pages,
+    practice,
+    problems,
+    skill_problems,
+    skills,
+)
 
 __all__ = [
     "bridge",
@@ -10,5 +21,6 @@ __all__ = [
     "pages",
     "practice",
     "problems",
+    "skill_problems",
     "skills",
 ]

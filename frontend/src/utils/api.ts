@@ -7,11 +7,15 @@ import type {
   LRCEvaluation,
   PracticeSessionConfigPayload,
   ProblemAttemptResponse,
+  ProblemDetailResponse,
   SkillProgressResponse,
   SkillTreeResponse,
+  SkillProblemListResponse,
   TemplateSummary,
   UserProgressMetrics,
 } from '../types';
+import { STARTER_SKILL_TREE, SKILL_TREE_SEED_VERSION } from '../constants/skillTreeSeed';
+import { buildSimpleSkillTree } from './simpleSkillTree';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/math-api/api';
 
@@ -56,6 +60,39 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
   return response.json();
 }
+
+const skillTreeMode = (import.meta.env.VITE_SKILL_TREE_MODE ?? 'seed').toLowerCase();
+const useSeedSkillTree = skillTreeMode === 'seed';
+const allowSeedFallback = useSeedSkillTree || skillTreeMode === 'auto-seed';
+
+const seedSkillTree = buildSimpleSkillTree(STARTER_SKILL_TREE, {
+  version: SKILL_TREE_SEED_VERSION,
+});
+const seedSkillTreePayload: SkillTreeResponse = {
+  version: SKILL_TREE_SEED_VERSION,
+  palette: seedSkillTree.palette,
+  groups: seedSkillTree.groups,
+  nodes: seedSkillTree.nodes,
+  edges: seedSkillTree.edges,
+  skills: STARTER_SKILL_TREE as unknown as SkillTreeResponse['skills'],
+  progress: {
+    user_id: null,
+    updated_at: null,
+    total_xp: 0,
+    nodes: {},
+    skills: {},
+  },
+  graph: seedSkillTree.graph,
+  unlocked: seedSkillTree.unlockedMap,
+  experiment: {
+    name: 'seed_only',
+    variant: 'tree',
+    source: 'seed',
+    request_id: null,
+    rollout: null,
+    bucket: null,
+  },
+};
 
 // 세션 생성 (20문제 세트)
 export async function createSession(
@@ -205,5 +242,45 @@ export async function fetchLatestLRC(userId: string): Promise<LRCEvaluation | nu
 }
 
 export async function fetchSkillTree(): Promise<SkillTreeResponse> {
-  return apiCall<SkillTreeResponse>('/v1/skills/tree');
+  if (useSeedSkillTree) {
+    console.info('[API] 스킬 트리를 시드 데이터로 로드합니다.');
+    return seedSkillTreePayload;
+  }
+  try {
+    return await apiCall<SkillTreeResponse>('/v1/skills/tree');
+  } catch (error) {
+    if (allowSeedFallback) {
+      console.warn('[API] 스킬 트리 API 호출 실패 → 시드 데이터로 대체합니다.', error);
+      return seedSkillTreePayload;
+    }
+    throw error;
+  }
+}
+
+export async function fetchSkillProblems(
+  skillId: string,
+  options?: { limit?: number }
+): Promise<SkillProblemListResponse> {
+  const params = new URLSearchParams();
+  if (options?.limit) {
+    params.set('limit', String(options.limit));
+  }
+  const query = params.toString();
+  return apiCall<SkillProblemListResponse>(
+    `/v1/skills/${encodeURIComponent(skillId)}/problems${query ? `?${query}` : ''}`
+  );
+}
+
+export async function fetchProblemDetail(
+  problemId: string,
+  options?: { revealAnswer?: boolean }
+): Promise<ProblemDetailResponse> {
+  const params = new URLSearchParams();
+  if (options?.revealAnswer) {
+    params.set('reveal_answer', 'true');
+  }
+  const query = params.toString();
+  return apiCall<ProblemDetailResponse>(
+    `/v1/problems/${encodeURIComponent(problemId)}${query ? `?${query}` : ''}`
+  );
 }
