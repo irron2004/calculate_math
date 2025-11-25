@@ -61,7 +61,8 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
   return response.json();
 }
 
-const skillTreeMode = (import.meta.env.VITE_SKILL_TREE_MODE ?? 'seed').toLowerCase();
+// 기본값을 live로 올려서 백엔드 트리를 우선 사용하고, seed는 명시적으로만 활성화한다.
+const skillTreeMode = (import.meta.env.VITE_SKILL_TREE_MODE ?? 'live').toLowerCase();
 const useSeedSkillTree = skillTreeMode === 'seed';
 const allowSeedFallback = useSeedSkillTree || skillTreeMode === 'auto-seed';
 
