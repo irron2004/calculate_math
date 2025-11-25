@@ -1,5 +1,5 @@
 import { ArrowRight, CheckCircle, Lock, Sparkles, Star } from 'lucide-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ELK from 'elkjs/lib/elk.bundled.js';
 
 import type {
@@ -64,11 +64,11 @@ type PositionedNode = {
 };
 
 const PANEL_WIDTH = 720;
-const PANEL_PADDING_X = 80;
-const NODE_WIDTH = 220;
-const NODE_HEIGHT = 132;
-const NODE_COLUMN_SPACING = 240;
-const ROW_GAP = 200;
+const PANEL_PADDING_X = 64;
+const NODE_WIDTH = 180;
+const NODE_HEIGHT = 96;
+const NODE_COLUMN_SPACING = 200;
+const ROW_GAP = 140;
 
 const ICON_COMPONENTS = {
   lock: Lock,
@@ -112,6 +112,15 @@ type LayoutResult = {
   height: number;
 };
 
+type Bounds = {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+  width: number;
+  height: number;
+};
+
 type EdgeBundle = {
   parent: PositionedNode;
   children: PositionedNode[];
@@ -126,6 +135,17 @@ type RegularEdgeSegment = {
 };
 
 const BUS_OFFSET = 48;
+
+function getBounds(positioned: PositionedNode[]): Bounds {
+  if (!positioned.length) {
+    return { minX: 0, minY: 0, maxX: 0, maxY: 0, width: 0, height: 0 };
+  }
+  const minX = Math.min(...positioned.map((item) => item.x));
+  const minY = Math.min(...positioned.map((item) => item.y));
+  const maxX = Math.max(...positioned.map((item) => item.x + item.width));
+  const maxY = Math.max(...positioned.map((item) => item.y + item.height));
+  return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
+}
 
 function buildGraphIndex({ nodes, edges }: LayoutGraph): GraphIndex {
   const parents = new Map<string, string[]>();
@@ -414,7 +434,13 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
   focusNodeId = null,
   dimUnrelated = false,
 }) => {
-  const effectiveZoom = Math.min(Math.max(zoom, 0.5), 2);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [fitScale, setFitScale] = useState(1);
+  const [hasFit, setHasFit] = useState(false);
+  const dragStateRef = useRef<{ startX: number; startY: number; panX: number; panY: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const effectiveZoom = Math.min(Math.max(zoom, 0.5), 2) * fitScale;
   const layoutCacheRef = useRef<Map<string, LayoutResult>>(new Map());
   const [isLayoutLoading, setIsLayoutLoading] = useState(false);
 
@@ -683,6 +709,61 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
     }
   }, [layoutStats]);
 
+  const graphBounds = useMemo(() => getBounds(positioned), [positioned]);
+
+  const handleFitToView = useCallback(() => {
+    const container = containerRef.current;
+    if (!container || !positioned.length) {
+      return;
+    }
+    const padding = 60;
+    const { clientWidth, clientHeight } = container;
+    const usableWidth = Math.max(200, clientWidth - padding * 2);
+    const usableHeight = Math.max(200, clientHeight - padding * 2);
+    const { width, height, minX, minY } = graphBounds;
+    const scale = Math.min(usableWidth / Math.max(width, 1), usableHeight / Math.max(height, 1), 1.2);
+    const offsetX = (usableWidth - width * scale) / 2 + padding - minX * scale;
+    const offsetY = (usableHeight - height * scale) / 2 + padding - minY * scale;
+    setFitScale(scale);
+    setPan({ x: offsetX, y: offsetY });
+    setHasFit(true);
+  }, [graphBounds, positioned.length]);
+
+  useEffect(() => {
+    if (!hasFit && positioned.length) {
+      handleFitToView();
+    }
+  }, [handleFitToView, hasFit, positioned.length]);
+
+  const startDrag = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (event.button !== 0) return;
+      dragStateRef.current = {
+        startX: event.clientX,
+        startY: event.clientY,
+        panX: pan.x,
+        panY: pan.y,
+      };
+      setIsDragging(true);
+      const handleMouseMove = (e: MouseEvent) => {
+        const state = dragStateRef.current;
+        if (!state) return;
+        const dx = e.clientX - state.startX;
+        const dy = e.clientY - state.startY;
+        setPan({ x: state.panX + dx, y: state.panY + dy });
+      };
+      const handleMouseUp = () => {
+        setIsDragging(false);
+        dragStateRef.current = null;
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    },
+    [pan.x, pan.y],
+  );
+
   const focusSet = useMemo(() => {
     if (!dimUnrelated || !focusNodeId) {
       return null;
@@ -697,20 +778,31 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
 
   const canvasWrapperStyle = useMemo(
     () => ({
-      height: height * effectiveZoom,
-      width: canvasWidth * effectiveZoom,
+      height: Math.max(height * effectiveZoom + 120, 560),
+      width: Math.max(canvasWidth * effectiveZoom + 120, PANEL_WIDTH),
+      cursor: isDragging ? 'grabbing' : 'grab',
     }),
-    [height, canvasWidth, effectiveZoom],
+    [height, canvasWidth, effectiveZoom, isDragging],
   );
 
   const canvasStyle = useMemo(
     () => ({
       height,
       width: canvasWidth,
-      transform: `scale(${effectiveZoom})`,
+      transform: `translate(${pan.x}px, ${pan.y}px) scale(${effectiveZoom})`,
       transformOrigin: 'top left',
     }),
-    [height, canvasWidth, effectiveZoom],
+    [height, canvasWidth, pan.x, pan.y, effectiveZoom],
+  );
+
+  const edgeCanvasStyle = useMemo(
+    () => ({
+      height,
+      width: canvasWidth,
+      transform: `translate(${pan.x}px, ${pan.y}px) scale(${effectiveZoom})`,
+      transformOrigin: 'top left',
+    }),
+    [height, canvasWidth, pan.x, pan.y, effectiveZoom],
   );
 
   const strokeWidth = Math.max(1.5, Math.min(4, 3 / effectiveZoom));
@@ -721,7 +813,20 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
       data-testid="skill-tree-graph"
       data-high-contrast={highContrast ? 'true' : 'false'}
     >
-      <div className="skill-tree-graph__canvas-wrapper" style={canvasWrapperStyle} data-loading={isLayoutLoading ? 'true' : 'false'}>
+      <div className="skill-tree-graph__controls">
+        <button type="button" className="ghost-button small" onClick={handleFitToView}>
+          전체 보기
+        </button>
+        <span className="skill-tree-graph__controls-hint">드래그로 이동 · 상단 슬라이더로 확대/100%</span>
+      </div>
+      <div
+        className="skill-tree-graph__canvas-wrapper"
+        ref={containerRef}
+        style={canvasWrapperStyle}
+        data-loading={isLayoutLoading ? 'true' : 'false'}
+        data-panning={isDragging ? 'true' : 'false'}
+        onMouseDown={startDrag}
+      >
         {isLayoutLoading ? (
           <div className="skill-tree-graph__loading" role="status">
             <span className="skill-tree-graph__loading-spinner" aria-hidden="true" />
@@ -769,6 +874,7 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
             className="skill-tree-graph__edge-canvas"
             width={canvasWidth}
             height={height}
+            style={edgeCanvasStyle}
             aria-hidden="true"
           >
             <defs>
@@ -889,7 +995,6 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
             const accentColor =
               palette[node.lens[0] ?? ''] ?? SKILL_STATE_COLORS[stateMeta.tone];
             const disabled = resolvedState === 'locked';
-            const xpSummary = formatXpSummary(node.progress);
             const tooltipId = `skill-${node.id}-tooltip`;
             const unmetRequires = node.requires
               .filter((req: SkillTreeRequirement) => !req.met)
@@ -948,11 +1053,7 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
                     <Icon className="skill-tree-node__status-icon" aria-hidden="true" />
                     {t(stateMeta.badgeKey)}
                   </span>
-                  {resolvedState === 'mastered' ? (
-                    <span className="badge badge--amber" aria-hidden="true">
-                      ★
-                    </span>
-                  ) : null}
+                  {resolvedState === 'mastered' ? <span className="badge badge--amber">★</span> : null}
                 </header>
                 <p id={tooltipId} className="sr-only">
                   {tooltipText}
@@ -961,12 +1062,8 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
                   {node.label}
                   {node.boss ? <span className="skill-tree-node__boss">BOSS</span> : null}
                 </h3>
-                <div className="skill-tree-node__stats">
-                  Tier {node.tier} · XP {node.xp.per_try}/{node.xp.per_correct}
-                </div>
-                {xpSummary ? <div className="skill-tree-node__stats">{xpSummary}</div> : null}
-                <div className="skill-tree-node__badges">
-                  {node.lens.map((lens: string) => (
+                <div className="skill-tree-node__compact">
+                  {node.lens.slice(0, 3).map((lens: string) => (
                     <span
                       key={`${node.id}-lens-${lens}`}
                       className="skill-tree-node__badge"
@@ -974,25 +1071,35 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
                         borderColor: palette[lens] ? `${palette[lens]}55` : undefined,
                         color: palette[lens] ?? undefined,
                       }}
+                      aria-hidden="true"
                     >
                       {lens}
                     </span>
                   ))}
                 </div>
-                <div className="skill-tree-node__stats">{formatRequirements(node.requires)}</div>
-                <div className="skill-tree-node__stats">{formatTeaches(node.teaches)}</div>
-                <button
-                  type="button"
-                  className="skill-tree-node__action"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onStart(node);
-                  }}
-                  disabled={disabled}
-                  aria-disabled={disabled}
-                >
-                  학습 시작
-                </button>
+                <div className="skill-card__tooltip" role="tooltip" aria-label={`${node.label} 상세`}>
+                  <div className="tooltip-row">
+                    <span>Tier {node.tier}</span>
+                    <span>
+                      XP {node.xp.per_try}/{node.xp.per_correct}
+                    </span>
+                  </div>
+                  <div className="tooltip-row">{formatRequirements(node.requires)}</div>
+                  <div className="tooltip-row">{formatTeaches(node.teaches)}</div>
+                  <div className="tooltip-row">{formatXpSummary(node.progress) ?? '시도 기록 없음'}</div>
+                  <button
+                    type="button"
+                    className="skill-tree-node__action"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onStart(node);
+                    }}
+                    disabled={disabled}
+                    aria-disabled={disabled}
+                  >
+                    학습 시작
+                  </button>
+                </div>
               </article>
             );
           })}
