@@ -53,7 +53,7 @@ describe('SkillTreeGraph node 상태 표현', () => {
     expect(card.getAttribute('data-state')).toBe('unlockable');
     // 새로운 시각 효과가 적용됐는지 데이터 속성으로 표시해야 한다.
     expect(card.getAttribute('data-shimmer')).toBe('true');
-    expect(button).not.toBeDisabled();
+    expect(button.hasAttribute('disabled')).toBe(false);
   });
 
   it('locked 노드는 muted 표시가 있고 버튼은 비활성화된다', async () => {
@@ -78,7 +78,7 @@ describe('SkillTreeGraph node 상태 표현', () => {
 
     expect(card.getAttribute('data-state')).toBe('locked');
     expect(card.getAttribute('data-muted')).toBe('true');
-    expect(button).toBeDisabled();
+    expect(button.hasAttribute('disabled')).toBe(true);
   });
 
   it('completed/mastered 노드는 활성화(active) 플래그를 갖는다', async () => {

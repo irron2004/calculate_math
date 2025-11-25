@@ -63,12 +63,12 @@ type PositionedNode = {
   groupIndex: number;
 };
 
-const PANEL_WIDTH = 780;
-const PANEL_PADDING_X = 40;
-const NODE_WIDTH = 180;
-const NODE_HEIGHT = 96;
-const NODE_COLUMN_SPACING = 180;
-const ROW_GAP = 120;
+const PANEL_WIDTH = 760;
+const PANEL_PADDING_X = 36;
+const NODE_WIDTH = 160;
+const NODE_HEIGHT = 88;
+const NODE_COLUMN_SPACING = 150;
+const ROW_GAP = 110;
 
 const ICON_COMPONENTS = {
   lock: Lock,
@@ -822,7 +822,10 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
               .join(' ');
             const accentColor =
               palette[node.lens[0] ?? ''] ?? SKILL_STATE_COLORS[stateMeta.tone];
-            const disabled = resolvedState === 'locked';
+            const isLocked = resolvedState === 'locked';
+            const isAvailable = resolvedState === 'unlockable';
+            const isActive = resolvedState === 'completed' || resolvedState === 'mastered';
+            const disabled = isLocked;
             const tooltipId = `skill-${node.id}-tooltip`;
             const unmetRequires = node.requires
               .filter((req: SkillTreeRequirement) => !req.met)
@@ -863,6 +866,9 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
                   .join(' ')}
                 data-node-id={node.id}
                 data-state={resolvedState}
+                data-active={isActive ? 'true' : undefined}
+                data-shimmer={isAvailable ? 'true' : undefined}
+                data-muted={isLocked ? 'true' : undefined}
                 data-dimmed={dimmed ? 'true' : undefined}
                 style={{ left: x, top: y }}
                 aria-label={`${node.label} ${t(stateMeta.badgeKey)}`}

@@ -80,12 +80,12 @@ describe('SkillTreeGraph layout', () => {
 
     // 같은 티어(1)는 같은 x 좌표(열)에 배치된다.
     expect(tier1FirstCard.style.left).toBe(tier1SecondCard.style.left);
-    expect(tier1FirstCard.style.left).toBe('40px');
+    expect(tier1FirstCard.style.left).toBe('36px');
 
-    // 같은 열에서 행이 내려가며 ROW_GAP(120px) 만큼 간격이 난다.
-    expect(tier1SecondCard.style.top).toBe('120px');
+    // 같은 열에서 행이 내려가며 ROW_GAP(110px) 만큼 간격이 난다.
+    expect(tier1SecondCard.style.top).toBe('110px');
 
     // 티어 2는 다음 열로 이동한다.
-    expect(tier2FirstCard.style.left).toBe('220px');
+    expect(tier2FirstCard.style.left).toBe('186px');
   });
 });
