@@ -1,9 +1,8 @@
-import type { FormEvent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
-import type { ProblemDetailResponse } from '../types';
-import { fetchProblemDetail, submitAnswer } from '../utils/api';
+import type { ProblemDetailResponse, SkillProblemListResponse } from '../types';
+import { fetchProblemDetail, fetchSkillProblems, submitAnswer } from '../utils/api';
 
 const ProblemDetailPage = () => {
   const { problemId } = useParams();
@@ -15,8 +14,25 @@ const ProblemDetailPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
+  const [problemList, setProblemList] = useState<SkillProblemListResponse | null>(null);
 
   const skillId = useMemo(() => searchParams.get('skill'), [searchParams]);
+  const currentIndex = useMemo(() => {
+    if (!problemId || !problemList) return null;
+    return problemList.items.findIndex((item) => item.id === problemId);
+  }, [problemId, problemList]);
+  const totalProblems = problemList?.items.length ?? null;
+  const progressPercent =
+    totalProblems && currentIndex !== null && currentIndex >= 0
+      ? Math.round(((currentIndex + 1) / totalProblems) * 100)
+      : null;
+  const nextProblemId =
+    currentIndex !== null &&
+    currentIndex !== -1 &&
+    problemList &&
+    currentIndex + 1 < problemList.items.length
+      ? problemList.items[currentIndex + 1].id
+      : null;
 
   useEffect(() => {
     let mounted = true;
@@ -49,6 +65,27 @@ const ProblemDetailPage = () => {
       mounted = false;
     };
   }, [problemId]);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadList = async () => {
+      if (!skillId) {
+        return;
+      }
+      try {
+        const res = await fetchSkillProblems(skillId);
+        if (mounted) {
+          setProblemList(res);
+        }
+      } catch {
+        // 목록이 없어도 상세 페이지는 동작 가능하므로 무시
+      }
+    };
+    void loadList();
+    return () => {
+      mounted = false;
+    };
+  }, [skillId]);
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -108,6 +145,11 @@ const ProblemDetailPage = () => {
             카테고리: {data.category}
             {skillId ? ` · 스킬 ${skillId}` : null}
           </p>
+          {totalProblems !== null && currentIndex !== null && currentIndex >= 0 ? (
+            <p className="text-xs text-slate-500">
+              이 스킬 내 진행도: {currentIndex + 1} / {totalProblems}
+            </p>
+          ) : null}
         </div>
         <div className="flex gap-2">
           {skillId ? (
@@ -119,6 +161,15 @@ const ProblemDetailPage = () => {
               문제 목록
             </button>
           ) : null}
+          {nextProblemId ? (
+            <button
+              type="button"
+              className="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:border-slate-500 hover:text-white"
+              onClick={() => navigate(`/problems/${nextProblemId}?skill=${encodeURIComponent(skillId ?? '')}`)}
+            >
+              다음 문제
+            </button>
+          ) : null}
           <button
             type="button"
             className="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:border-slate-500 hover:text-white"
@@ -128,6 +179,21 @@ const ProblemDetailPage = () => {
           </button>
         </div>
       </header>
+
+      {progressPercent !== null ? (
+        <div className="space-y-1">
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span>진행도</span>
+            <span>{progressPercent}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
+            <div
+              className="h-full bg-sky-500 transition-all"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </div>
+      ) : null}
 
       {data.hint ? (
         <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-sm text-slate-300">

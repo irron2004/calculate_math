@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import type { SkillProblemListResponse } from '../types';
@@ -10,6 +10,8 @@ const SkillProblemListPage = () => {
   const [data, setData] = useState<SkillProblemListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const firstProblemId = useMemo(() => data?.items[0]?.id ?? null, [data]);
 
   useEffect(() => {
     let mounted = true;
@@ -75,8 +77,19 @@ const SkillProblemListPage = () => {
           <p className="text-xs uppercase tracking-wide text-slate-400">Skill</p>
           <h1 className="text-2xl font-semibold text-white">{data.skill_id}</h1>
           <p className="text-sm text-slate-400">카테고리: {data.category}</p>
+          <p className="text-sm text-slate-400">
+            총 {data.total}문제 · 첫 문제부터 순서대로 풀어보세요
+          </p>
         </div>
         <div className="flex gap-2">
+          {firstProblemId ? (
+            <Link
+              to={`/problems/${firstProblemId}?skill=${encodeURIComponent(data.skill_id)}`}
+              className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:bg-sky-400"
+            >
+              연속 연습 시작
+            </Link>
+          ) : null}
           <button
             type="button"
             className="rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:border-slate-500 hover:text-white"
@@ -86,6 +99,18 @@ const SkillProblemListPage = () => {
           </button>
         </div>
       </header>
+
+      <div className="mb-3 flex items-center justify-between text-sm text-slate-400">
+        <span>문제 {data.total}개</span>
+        {skillId ? (
+          <Link
+            className="text-sky-400 hover:text-sky-300"
+            to={`/skills/${skillId}/problems?mode=list`}
+          >
+            목록 새로고침
+          </Link>
+        ) : null}
+      </div>
 
       <div className="space-y-3">
         {data.items.map((item) => (
@@ -107,6 +132,10 @@ const SkillProblemListPage = () => {
               >
                 풀기
               </Link>
+            </div>
+            <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+              <span>ID: {item.id}</span>
+              <span>스킬: {item.skill_id}</span>
             </div>
           </div>
         ))}

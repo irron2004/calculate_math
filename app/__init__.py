@@ -3,9 +3,11 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from time import time
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import get_settings
 from .dag_loader import reset_graph_cache
@@ -154,6 +156,7 @@ def create_app() -> FastAPI:
     templates = Jinja2Templates(directory=template_dir)
 
     frontend_dir = base_dir.parent / "frontend" / "dist"
+    frontend_index = frontend_dir / "index.html"
     frontend_available = frontend_dir.exists()
     if frontend_available:
         startup_logger.debug("mounting built frontend from %s", frontend_dir)
@@ -196,6 +199,21 @@ def create_app() -> FastAPI:
     app.include_router(dag.router)
     app.include_router(skill_problems.router)
     app.include_router(skills.router)
+
+    @app.exception_handler(404)
+    async def spa_fallback(
+        request: Request, exc: StarletteHTTPException
+    ):  # pragma: no cover - integration exercised in e2e
+        accepts_html = "text/html" in (request.headers.get("accept") or "")
+        if (
+            frontend_available
+            and frontend_index.exists()
+            and request.method == "GET"
+            and accepts_html
+            and not request.url.path.startswith(("/api", "/static", "/docs", "/openapi"))
+        ):
+            return FileResponse(frontend_index)
+        raise exc
 
     return app
 

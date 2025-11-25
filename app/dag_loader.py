@@ -9,7 +9,12 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
-from pydantic import BaseModel, Field, validator
+try:  # pragma: no cover - optional import for pydantic v2+
+    from pydantic import BaseModel, Field, ConfigDict, validator
+except ImportError:  # pragma: no cover - pydantic v1 fallback
+    from pydantic import BaseModel, Field, validator
+
+    ConfigDict = None  # type: ignore[assignment]
 
 from .config import Settings, get_settings
 
@@ -57,8 +62,11 @@ class DagNode(BaseModel):
     lrc_focus: Optional[str] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
-    class Config:
-        extra = "allow"
+    if ConfigDict is not None:  # pragma: no branch - prefer v2 config when available
+        model_config = ConfigDict(extra="allow")
+    else:  # pragma: no cover - v1 compatibility
+        class Config:
+            extra = "allow"
 
     @validator("lens", pre=True, always=True)
     def _normalise_lens(cls, value: Iterable[str] | None) -> List[str]:
@@ -77,9 +85,12 @@ class DagEdge(BaseModel):
     delta_level: Optional[int] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
-    class Config:
-        allow_population_by_field_name = True
-        extra = "allow"
+    if ConfigDict is not None:  # pragma: no branch - prefer v2 config when available
+        model_config = ConfigDict(populate_by_name=True, extra="allow")
+    else:  # pragma: no cover - v1 compatibility
+        class Config:
+            allow_population_by_field_name = True
+            extra = "allow"
 
 
 class DagGraph(BaseModel):
@@ -123,6 +134,9 @@ def _load_raw_graph(path: Path) -> Dict[str, Any]:
 def _parse_graph(raw: Dict[str, Any]) -> DagGraph:
     if "nodes" not in raw or "edges" not in raw:
         raise DagDataError("DAG dataset must include 'nodes' and 'edges' sections")
+    validator = getattr(DagGraph, "model_validate", None)
+    if validator is not None:
+        return validator(raw)
     return DagGraph.parse_obj(raw)
 
 

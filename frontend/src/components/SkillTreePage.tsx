@@ -647,6 +647,12 @@ useEffect(() => {
   }, [selectedNodeId, selectedNode]);
 
   useEffect(() => {
+    if (!selectedNodeId && graphNodesView.length > 0) {
+      setSelectedNodeId(graphNodesView[0].id);
+    }
+  }, [graphNodesView, selectedNodeId]);
+
+  useEffect(() => {
     if (isLoading || error || !resolvedGraph) {
       return;
     }

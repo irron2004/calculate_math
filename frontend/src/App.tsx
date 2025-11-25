@@ -1,16 +1,16 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import './App.css'
-import Home from './components/Home'
-import Login from './components/Login'
 import MathGame from './components/MathGame'
 import ParentDashboard from './components/ParentDashboard'
-import ProblemDetailPage from './components/ProblemDetailPage'
-import Signup from './components/Signup'
-import SkillProblemListPage from './components/SkillProblemListPage'
-import SkillTreePage from './components/SkillTreePage'
 import StudentDashboard from './components/StudentDashboard'
 import TeacherDashboard from './components/TeacherDashboard'
 import { AuthProvider } from './contexts/AuthContext'
+import LandingPage from './pages/LandingPage'
+import LoginPage from './pages/LoginPage'
+import ProblemDetailPage from './pages/ProblemDetailPage'
+import SignupPage from './pages/SignupPage'
+import SkillProblemListPage from './pages/SkillProblemListPage'
+import SkillTreePage from './pages/SkillTreePage'
 
 function App() {
   return (
@@ -18,9 +18,9 @@ function App() {
       <Router basename="/math">
         <div className="App">
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/student" element={<StudentDashboard />} />
             <Route path="/parent" element={<ParentDashboard />} />
             <Route path="/teacher" element={<TeacherDashboard />} />
