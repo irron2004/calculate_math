@@ -63,11 +63,11 @@ type PositionedNode = {
   groupIndex: number;
 };
 
-const PANEL_WIDTH = 720;
-const PANEL_PADDING_X = 64;
+const PANEL_WIDTH = 860;
+const PANEL_PADDING_X = 48;
 const NODE_WIDTH = 180;
 const NODE_HEIGHT = 96;
-const NODE_COLUMN_SPACING = 200;
+const NODE_COLUMN_SPACING = 220;
 const ROW_GAP = 140;
 
 const ICON_COMPONENTS = {
@@ -95,17 +95,6 @@ function average(values: number[]): number | null {
   const sum = values.reduce((acc, value) => acc + value, 0);
   return sum / values.length;
 }
-
-type LayoutGraph = {
-  nodes: SkillTreeGraphNodeView[];
-  edges: SkillTreeEdge[];
-};
-
-type GraphIndex = {
-  parents: Map<string, string[]>;
-  children: Map<string, string[]>;
-  depth: Map<string, number>;
-};
 
 type LayoutResult = {
   positioned: PositionedNode[];
@@ -147,165 +136,15 @@ function getBounds(positioned: PositionedNode[]): Bounds {
   return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
 }
 
-function buildGraphIndex({ nodes, edges }: LayoutGraph): GraphIndex {
-  const parents = new Map<string, string[]>();
-  const children = new Map<string, string[]>();
-
-  nodes.forEach((node) => {
-    parents.set(node.id, []);
-    children.set(node.id, []);
-  });
-
-  edges.forEach((edge) => {
-    if (!parents.has(edge.to)) {
-      parents.set(edge.to, []);
-    }
-    if (!children.has(edge.from)) {
-      children.set(edge.from, []);
-    }
-    parents.get(edge.to)!.push(edge.from);
-    children.get(edge.from)!.push(edge.to);
-  });
-
-  const depth = new Map<string, number>();
-
-  const queue: string[] = [];
-  nodes.forEach((node) => {
-    const hasParent = (parents.get(node.id) ?? []).length > 0;
-    if (!hasParent) {
-      depth.set(node.id, 0);
-      queue.push(node.id);
-    }
-  });
-
-  const visitCount = new Map<string, number>();
-
-  while (queue.length) {
-    const nodeId = queue.shift()!;
-    const nodeDepth = depth.get(nodeId) ?? 0;
-    const childIds = children.get(nodeId) ?? [];
-    childIds.forEach((childId) => {
-      const visited = (visitCount.get(childId) ?? 0) + 1;
-      visitCount.set(childId, visited);
-      const parentIds = parents.get(childId) ?? [];
-      const maxParentDepth = Math.max(
-        ...parentIds.map((id) => depth.get(id) ?? 0),
-      );
-      const candidateDepth = Math.max(nodeDepth + 1, maxParentDepth + 1);
-      const currentDepth = depth.get(childId);
-      if (currentDepth === undefined || candidateDepth > currentDepth) {
-        depth.set(childId, candidateDepth);
-      }
-      if (visited >= parentIds.length) {
-        queue.push(childId);
-      }
-    });
-  }
-
-  nodes.forEach((node) => {
-    if (!depth.has(node.id)) {
-      depth.set(node.id, 0);
-    }
-  });
-
-  return { parents, children, depth };
-}
-
-function buildColumnAssignments(
-  groupNodes: SkillTreeGraphNodeView[],
-  groupEdges: SkillTreeEdge[],
-  graphIndex: GraphIndex,
-): Map<string, number> {
-  const tierBuckets = new Map<number, SkillTreeGraphNodeView[]>();
-  groupNodes.forEach((node) => {
-    const tier = Math.max(
-      1,
-      node.grid?.row ?? node.tier ?? (graphIndex.depth.get(node.id) ?? 0) + 1,
-    );
-    if (!tierBuckets.has(tier)) {
-      tierBuckets.set(tier, []);
-    }
-    tierBuckets.get(tier)!.push(node);
-  });
-
-  const parentLookup = new Map<string, string[]>();
-  groupEdges.forEach((edge) => {
-    if (!parentLookup.has(edge.to)) {
-      parentLookup.set(edge.to, []);
-    }
-    parentLookup.get(edge.to)!.push(edge.from);
-  });
-
-  const columnAssignments = new Map<string, number>();
-  const placementTracker = new Map<number, number>();
-
-  Array.from(tierBuckets.keys())
-    .sort((a, b) => a - b)
-    .forEach((tier) => {
-      const tierNodes = tierBuckets.get(tier)!;
-      tierNodes.sort((a, b) => {
-        const parentColsA =
-          parentLookup
-            .get(a.id)
-            ?.map((parentId) => columnAssignments.get(parentId))
-            .filter((value): value is number => typeof value === 'number') ?? [];
-        const parentColsB =
-          parentLookup
-            .get(b.id)
-            ?.map((parentId) => columnAssignments.get(parentId))
-            .filter((value): value is number => typeof value === 'number') ?? [];
-        const avgA = average(parentColsA);
-        const avgB = average(parentColsB);
-        if (avgA !== null && avgB !== null && avgA !== avgB) {
-          return avgA - avgB;
-        }
-        if (avgA !== null && avgB === null) {
-          return -1;
-        }
-        if (avgA === null && avgB !== null) {
-          return 1;
-        }
-        const graphDepthA = graphIndex.depth.get(a.id) ?? 0;
-        const graphDepthB = graphIndex.depth.get(b.id) ?? 0;
-        if (graphDepthA !== graphDepthB) {
-          return graphDepthA - graphDepthB;
-        }
-        return a.label.localeCompare(b.label, 'ko');
-      });
-      tierNodes.forEach((node) => {
-        const parentCols =
-          parentLookup
-            .get(node.id)
-            ?.map((parentId) => columnAssignments.get(parentId))
-            .filter((value): value is number => typeof value === 'number') ?? [];
-        const averageParentColumn = average(parentCols);
-        if (averageParentColumn !== null) {
-          const proposed = Math.round(averageParentColumn);
-          const used = placementTracker.get(tier) ?? 0;
-          const assignedColumn = Math.max(used, proposed);
-          columnAssignments.set(node.id, assignedColumn);
-          placementTracker.set(tier, assignedColumn + 1);
-        } else {
-          const nextColumn = placementTracker.get(tier) ?? 0;
-          columnAssignments.set(node.id, nextColumn);
-          placementTracker.set(tier, nextColumn + 1);
-        }
-      });
-    });
-
-  return columnAssignments;
-}
-
 function buildPositionedNodes(
   nodes: SkillTreeGraphNodeView[],
   trees: SkillTreeGraphTree[],
-  edges: SkillTreeEdge[],
+  _edges: SkillTreeEdge[],
 ): { positioned: PositionedNode[]; height: number } {
   const orderLookup = groupOrder(trees);
   const positioned: PositionedNode[] = [];
   let maxRowIndex = 0;
 
-  const graphIndex = buildGraphIndex({ nodes, edges });
   const nodesByGroup = new Map<string, SkillTreeGraphNodeView[]>();
   nodes.forEach((node) => {
     const groupId = node.tree;
@@ -318,58 +157,41 @@ function buildPositionedNodes(
   nodesByGroup.forEach((groupNodes, groupId) => {
     const groupIndex = orderLookup[groupId] ?? trees.length;
     const panelOffsetX = groupIndex * PANEL_WIDTH;
-    const groupEdges = edges.filter((edge) => {
-      const source = nodes.find((candidate) => candidate.id === edge.from);
-      const target = nodes.find((candidate) => candidate.id === edge.to);
-      return source?.tree === groupId && target?.tree === groupId;
+    // 티어(단계)별로 같은 열에 배치하고, 같은 티어 안에서는 세로로만 정렬
+    const tierBuckets = new Map<number, SkillTreeGraphNodeView[]>();
+    groupNodes.forEach((node) => {
+      const tier = Math.max(1, node.tier ?? 1);
+      if (!tierBuckets.has(tier)) {
+        tierBuckets.set(tier, []);
+      }
+      tierBuckets.get(tier)!.push(node);
     });
-    const columnAssignments = buildColumnAssignments(
-      groupNodes,
-      groupEdges,
-      graphIndex,
-    );
 
-    groupNodes
-      .slice()
-      .sort((a, b) => {
-        const rowA = a.grid?.row ?? a.tier ?? (graphIndex.depth.get(a.id) ?? 0) + 1;
-        const rowB = b.grid?.row ?? b.tier ?? (graphIndex.depth.get(b.id) ?? 0) + 1;
-        if (rowA !== rowB) {
-          return rowA - rowB;
-        }
-        const colA = columnAssignments.get(a.id) ?? 0;
-        const colB = columnAssignments.get(b.id) ?? 0;
-        if (colA !== colB) {
-          return colA - colB;
-        }
-        const depthA = graphIndex.depth.get(a.id) ?? 0;
-        const depthB = graphIndex.depth.get(b.id) ?? 0;
-        if (depthA !== depthB) {
-          return depthA - depthB;
-        }
-        return a.label.localeCompare(b.label, 'ko');
-      })
-      .forEach((node) => {
-        const colIndex = columnAssignments.get(node.id) ?? 0;
-        const rowIndex = Math.max(
-          0,
-          (node.grid?.row ?? node.tier ?? (graphIndex.depth.get(node.id) ?? 0) + 1) - 1,
-        );
-        const x = panelOffsetX + PANEL_PADDING_X + colIndex * NODE_COLUMN_SPACING;
-        const y = rowIndex * ROW_GAP;
+    Array.from(tierBuckets.keys())
+      .sort((a, b) => a - b)
+      .forEach((tier) => {
+        const list = tierBuckets.get(tier)!;
+        list
+          .slice()
+          .sort((a, b) => a.label.localeCompare(b.label, 'ko'))
+          .forEach((node, rowIndex) => {
+            const colIndex = tier - 1; // 같은 티어는 같은 열
+            const x = panelOffsetX + PANEL_PADDING_X + colIndex * NODE_COLUMN_SPACING;
+            const y = rowIndex * ROW_GAP;
 
-        positioned.push({
-          node,
-          x,
-          y,
-          width: NODE_WIDTH,
-          height: NODE_HEIGHT,
-          groupIndex,
-        });
+            positioned.push({
+              node,
+              x,
+              y,
+              width: NODE_WIDTH,
+              height: NODE_HEIGHT,
+              groupIndex,
+            });
 
-        if (rowIndex > maxRowIndex) {
-          maxRowIndex = rowIndex;
-        }
+            if (rowIndex > maxRowIndex) {
+              maxRowIndex = rowIndex;
+            }
+          });
       });
   });
 
@@ -789,10 +611,18 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
     () => ({
       height,
       width: canvasWidth,
+    }),
+    [height, canvasWidth],
+  );
+
+  const transformStyle = useMemo(
+    () => ({
       transform: `translate(${pan.x}px, ${pan.y}px) scale(${effectiveZoom})`,
       transformOrigin: 'top left',
+      width: canvasWidth,
+      height,
     }),
-    [height, canvasWidth, pan.x, pan.y, effectiveZoom],
+    [pan.x, pan.y, effectiveZoom, canvasWidth, height],
   );
 
   const strokeWidth = Math.max(1.5, Math.min(4, 3 / effectiveZoom));
@@ -824,6 +654,7 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
           </div>
         ) : null}
         <div className="skill-tree-graph__canvas" style={canvasStyle}>
+          <div className="skill-tree-graph__inner" style={transformStyle}>
           {orderedGroups.map((group) => {
             const index = treeOrderLookup[group.id] ?? 0;
             const x = index * PANEL_WIDTH;
@@ -943,11 +774,11 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
               );
             })}
 
-            {regularEdges.map(({ parent, child }) => {
-              const edgeState = parent.node.resolvedState;
-              const tone = SKILL_STATE_META[edgeState as SkillState].tone;
-              const color = SKILL_STATE_COLORS[tone];
-              const dimmed =
+          {regularEdges.map(({ parent, child }) => {
+            const edgeState = parent.node.resolvedState;
+            const tone = SKILL_STATE_META[edgeState as SkillState].tone;
+            const color = SKILL_STATE_COLORS[tone];
+            const dimmed =
                 focusSet &&
                 !(focusSet.has(parent.node.id) && focusSet.has(child.node.id));
               const className = [
@@ -1092,6 +923,7 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
               </article>
             );
           })}
+          </div>
         </div>
       </div>
     </div>

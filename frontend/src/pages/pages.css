@@ -2,6 +2,8 @@
 .page-shell {
   min-height: 100vh;
   padding: 24px;
+  width: 100%;
+  max-width: 100%;
   background: radial-gradient(circle at 10% 20%, #0f172a 0, #0b1224 35%, #0a0f1e 70%);
   color: #e2e8f0;
   display: flex;
