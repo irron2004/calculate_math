@@ -795,16 +795,6 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
     [height, canvasWidth, pan.x, pan.y, effectiveZoom],
   );
 
-  const edgeCanvasStyle = useMemo(
-    () => ({
-      height,
-      width: canvasWidth,
-      transform: `translate(${pan.x}px, ${pan.y}px) scale(${effectiveZoom})`,
-      transformOrigin: 'top left',
-    }),
-    [height, canvasWidth, pan.x, pan.y, effectiveZoom],
-  );
-
   const strokeWidth = Math.max(1.5, Math.min(4, 3 / effectiveZoom));
 
   return (
@@ -874,7 +864,6 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
             className="skill-tree-graph__edge-canvas"
             width={canvasWidth}
             height={height}
-            style={edgeCanvasStyle}
             aria-hidden="true"
           >
             <defs>
