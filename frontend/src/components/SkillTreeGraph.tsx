@@ -63,12 +63,12 @@ type PositionedNode = {
   groupIndex: number;
 };
 
-const PANEL_WIDTH = 860;
-const PANEL_PADDING_X = 48;
+const PANEL_WIDTH = 780;
+const PANEL_PADDING_X = 40;
 const NODE_WIDTH = 180;
 const NODE_HEIGHT = 96;
-const NODE_COLUMN_SPACING = 220;
-const ROW_GAP = 140;
+const NODE_COLUMN_SPACING = 180;
+const ROW_GAP = 120;
 
 const ICON_COMPONENTS = {
   lock: Lock,
@@ -242,6 +242,14 @@ function buildEdgePath(from: PositionedNode, to: PositionedNode): string {
   const control1Y = y1 + 48;
   const control2Y = y2 - 48;
   return `M ${x1} ${y1} C ${x1} ${control1Y}, ${x2} ${control2Y}, ${x2} ${y2}`;
+}
+
+function shortenLabel(label: string): string {
+  const parts = label.trim().split(/\s+/);
+  if (parts.length > 1) {
+    return parts.slice(1).join(' ');
+  }
+  return label;
 }
 
 const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
@@ -824,6 +832,7 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
               requires: unmetRequires.length ? formatList(unmetRequires) : '없음',
             });
             const dimmed = Boolean(focusSet && !focusSet.has(node.id));
+            const displayLabel = shortenLabel(node.label);
 
             const handleSelect = () => {
               if (onSelect) {
@@ -879,7 +888,7 @@ const SkillTreeGraph: React.FC<SkillTreeGraphProps> = ({
                   {tooltipText}
                 </p>
                 <h3 className="skill-tree-node__title">
-                  {node.label}
+                  {displayLabel}
                   {node.boss ? <span className="skill-tree-node__boss">BOSS</span> : null}
                 </h3>
                 <div className="skill-tree-node__compact">

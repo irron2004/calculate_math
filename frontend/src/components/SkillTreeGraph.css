@@ -316,10 +316,11 @@
 
 .skill-card__tooltip {
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translate(-50%, 10px);
-  min-width: 220px;
+  top: 50%;
+  left: 100%;
+  transform: translate(10px, -50%);
+  min-width: 200px;
+  max-width: 240px;
   padding: 0.75rem;
   border-radius: 0.75rem;
   background: rgba(15, 23, 42, 0.95);
@@ -334,7 +335,7 @@
 .skill-card:hover .skill-card__tooltip,
 .skill-card:focus-within .skill-card__tooltip {
   opacity: 1;
-  transform: translate(-50%, 6px);
+  transform: translate(10px, -50%);
   pointer-events: auto;
 }
 
