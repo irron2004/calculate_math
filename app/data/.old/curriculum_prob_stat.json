@@ -1,0 +1,105 @@
+{
+  "boss_id": "TS_PROB_STAT",
+  "name": "확률분포·통계적 추정",
+  "description": "확률변수와 확률분포, 기댓값·분산, 이항분포와 정규분포, 표본·모수·신뢰구간을 연결해 ‘데이터로 세상을 추정하는’ 전체 구조를 다루는 보스 스킬.",
+  "skills": [
+    { "id": "NUM_PLACEVALUE", "name": "자리값·수의 분해/합성", "prereq": [] },
+    { "id": "ADD_SUB_MULTI", "name": "여러 자리 수 덧셈·뺄셈", "prereq": ["NUM_PLACEVALUE"] },
+    { "id": "MULT_DIV_BASIC", "name": "곱셈·나눗셈 기초(구구단)", "prereq": ["ADD_SUB_MULTI"] },
+    { "id": "FRAC_BASIC", "name": "분수의 뜻과 등분할", "prereq": ["MULT_DIV_BASIC"] },
+    { "id": "FRAC_DEC_REL", "name": "분수와 소수의 관계", "prereq": ["FRAC_BASIC"] },
+    { "id": "FRAC_DEC_OP", "name": "분수·소수의 사칙연산", "prereq": ["FRAC_DEC_REL"] },
+    { "id": "INT_RATIONAL_OP", "name": "정수·유리수의 사칙연산", "prereq": ["FRAC_DEC_OP"] },
+    {
+      "id": "PROB_BASIC_EQUALLYLIKELY",
+      "name": "기초 확률 p = 경우의 수 비",
+      "prereq": ["INT_RATIONAL_OP"]
+    },
+    {
+      "id": "PROB_EVENT_OPERATIONS",
+      "name": "사건의 합·곱·여사건(복습)",
+      "prereq": ["PROB_BASIC_EQUALLYLIKELY"]
+    },
+    {
+      "id": "RANDVAR_DISCRETE_DEF",
+      "name": "이산확률변수와 값/확률 쌍",
+      "prereq": ["PROB_BASIC_EQUALLYLIKELY"]
+    },
+    {
+      "id": "PMF_TABLE",
+      "name": "확률분포표(값과 확률)",
+      "prereq": ["RANDVAR_DISCRETE_DEF"]
+    },
+    {
+      "id": "EXPECTATION_BASIC",
+      "name": "기댓값 E[X] = Σ x·p(x)",
+      "prereq": ["PMF_TABLE", "INT_RATIONAL_OP"]
+    },
+    {
+      "id": "VARIANCE_BASIC",
+      "name": "분산·표준편차 Var[X]",
+      "prereq": ["EXPECTATION_BASIC"]
+    },
+    {
+      "id": "FACTORIAL_NOTATION",
+      "name": "계승 n! 복습",
+      "prereq": ["MULT_DIV_BASIC"]
+    },
+    {
+      "id": "COMB_BASIC",
+      "name": "조합 C(n, r) 복습",
+      "prereq": ["FACTORIAL_NOTATION", "INT_RATIONAL_OP"]
+    },
+    {
+      "id": "BINOM_TRIALS",
+      "name": "베르누이 시행과 이항실험",
+      "prereq": ["PROB_BASIC_EQUALLYLIKELY"]
+    },
+    {
+      "id": "BINOM_DIST_DEF",
+      "name": "이항분포 X~B(n,p)의 정의",
+      "prereq": ["BINOM_TRIALS", "COMB_BASIC"]
+    },
+    {
+      "id": "BINOM_MEAN_VAR",
+      "name": "이항분포의 평균 np·분산 np(1-p)",
+      "prereq": ["BINOM_DIST_DEF", "EXPECTATION_BASIC"]
+    },
+    {
+      "id": "NORMAL_DIST_INTRO",
+      "name": "정규분포 모양과 매개변수(μ, σ)",
+      "prereq": ["VARIANCE_BASIC"]
+    },
+    {
+      "id": "STANDARDIZATION_Z",
+      "name": "표준정규분포와 z-표",
+      "prereq": ["NORMAL_DIST_INTRO", "INT_RATIONAL_OP"]
+    },
+    {
+      "id": "SAMPLE_MEAN_PROP",
+      "name": "표본평균·표본비율과 분포 직관",
+      "prereq": ["RANDVAR_DISCRETE_DEF", "EXPECTATION_BASIC", "VARIANCE_BASIC"]
+    },
+    {
+      "id": "CI_MEAN_PROP",
+      "name": "모평균·모비율의 신뢰구간",
+      "prereq": ["SAMPLE_MEAN_PROP", "STANDARDIZATION_Z"]
+    },
+    {
+      "id": "STAT_ESTIMATION_REASON",
+      "name": "추정 결과 해석과 의사결정",
+      "prereq": ["CI_MEAN_PROP"]
+    },
+    {
+      "id": "TS_PROB_STAT",
+      "name": "보스 스킬: 확률분포·통계적 추정 마스터",
+      "prereq": [
+        "PMF_TABLE",
+        "EXPECTATION_BASIC",
+        "VARIANCE_BASIC",
+        "BINOM_MEAN_VAR",
+        "STAT_ESTIMATION_REASON"
+      ]
+    }
+  ]
+}

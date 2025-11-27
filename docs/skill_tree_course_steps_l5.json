@@ -1,0 +1,56 @@
+{
+  "version": "2025-03-17.course_steps",
+  "nodes": [
+    {"id": "ALG_EXPR_BASIC", "type": "course_step", "label": "문자와 식(기초)", "domain": "대수", "tier": 5, "outcomes": ["간단한 상황을 문자식으로 나타낼 수 있다.", "주어진 문자식에 수를 대입해 값을 구할 수 있다.", "동일한 구조의 수식을 여러 맥락(넓이, 길이, 가격)에 적용할 수 있다."]},
+    {"id": "COORD_PLANE_BASIC", "type": "course_step", "label": "좌표평면과 점의 위치", "domain": "도형과 측정", "tier": 5, "outcomes": ["좌표평면의 사분면과 (x, y)의 의미를 설명할 수 있다.", "표에 주어진 (x, y)쌍을 좌표평면에 옮겨 찍을 수 있다.", "간단한 생활 데이터를 점그래프/꺾은선그래프로 나타낼 수 있다."]},
+    {"id": "FRAC_ARITH_BASIC", "type": "course_step", "label": "분수의 사칙연산 기초", "domain": "수와 연산", "tier": 5, "outcomes": ["분수의 크기를 비교하고 동치분수를 자유롭게 만들 수 있다.", "분모가 같은 분수와 다른 분수의 덧셈·뺄셈을 계산할 수 있다.", "분수 상황(거리, 넓이, 비율)을 식으로 나타내고 해석할 수 있다."]},
+
+    {"id": "NUM_3_EXTEND_1000", "type": "skill", "label": "NUM_3_EXTEND_1000"},
+    {"id": "OPS_4_ORDER_OF_OPERATIONS", "type": "skill", "label": "OPS_4_ORDER_OF_OPERATIONS"},
+    {"id": "FRAC_4_ADD_SUB_DIFF_DEN", "type": "skill", "label": "FRAC_4_ADD_SUB_DIFF_DEN"},
+    {"id": "DEC_4_ADD_SUB", "type": "skill", "label": "DEC_4_ADD_SUB"},
+    {"id": "PATTERN_3_INOUT_TABLE", "type": "skill", "label": "PATTERN_3_INOUT_TABLE"},
+    {"id": "DATA_4_MEAN", "type": "skill", "label": "DATA_4_MEAN"},
+
+    {"id": "NUM_3_NUMBERLINE_0_1000", "type": "skill", "label": "NUM_3_NUMBERLINE_0_1000"},
+    {"id": "NUM_INT_NEGATIVE_ON_LINE", "type": "skill", "label": "NUM_INT_NEGATIVE_ON_LINE"},
+    {"id": "GEO_2_POINT_SEG_LINE", "type": "skill", "label": "GEO_2_POINT_SEG_LINE"},
+    {"id": "GEO_3_PARALLEL_PERP", "type": "skill", "label": "GEO_3_PARALLEL_PERP"},
+    {"id": "DATA_3_LINE_GRAPH", "type": "skill", "label": "DATA_3_LINE_GRAPH"},
+
+    {"id": "FRAC_3_TYPES_BASIC", "type": "skill", "label": "FRAC_3_TYPES_BASIC"},
+    {"id": "FRAC_3_COMPARE_SAME_DEN", "type": "skill", "label": "FRAC_3_COMPARE_SAME_DEN"},
+    {"id": "FRAC_4_EQUIV", "type": "skill", "label": "FRAC_4_EQUIV"},
+    {"id": "FRAC_4_SIMPLIFY", "type": "skill", "label": "FRAC_4_SIMPLIFY"},
+    {"id": "FRAC_4_COMMON_DENOM", "type": "skill", "label": "FRAC_4_COMMON_DENOM"},
+    {"id": "FRAC_4_ADD_SUB_SAME_DEN", "type": "skill", "label": "FRAC_4_ADD_SUB_SAME_DEN"},
+    {"id": "OPS_2_MULT_TABLE_1_9", "type": "skill", "label": "OPS_2_MULT_TABLE_1_9"},
+    {"id": "OPS_3_MULT_2DIG_X_1DIG", "type": "skill", "label": "OPS_3_MULT_2DIG_X_1DIG"},
+    {"id": "OPS_3_DIV_2DIG_BY_1DIG", "type": "skill", "label": "OPS_3_DIV_2DIG_BY_1DIG"}
+  ],
+  "edges": [
+    {"from": "NUM_3_EXTEND_1000", "to": "ALG_EXPR_BASIC", "type": "requires"},
+    {"from": "OPS_4_ORDER_OF_OPERATIONS", "to": "ALG_EXPR_BASIC", "type": "requires"},
+    {"from": "FRAC_4_ADD_SUB_DIFF_DEN", "to": "ALG_EXPR_BASIC", "type": "requires"},
+    {"from": "DEC_4_ADD_SUB", "to": "ALG_EXPR_BASIC", "type": "requires"},
+    {"from": "PATTERN_3_INOUT_TABLE", "to": "ALG_EXPR_BASIC", "type": "requires"},
+    {"from": "DATA_4_MEAN", "to": "ALG_EXPR_BASIC", "type": "requires"},
+
+    {"from": "NUM_3_NUMBERLINE_0_1000", "to": "COORD_PLANE_BASIC", "type": "requires"},
+    {"from": "NUM_INT_NEGATIVE_ON_LINE", "to": "COORD_PLANE_BASIC", "type": "requires"},
+    {"from": "GEO_2_POINT_SEG_LINE", "to": "COORD_PLANE_BASIC", "type": "requires"},
+    {"from": "GEO_3_PARALLEL_PERP", "to": "COORD_PLANE_BASIC", "type": "requires"},
+    {"from": "DATA_3_LINE_GRAPH", "to": "COORD_PLANE_BASIC", "type": "requires"},
+    {"from": "PATTERN_3_INOUT_TABLE", "to": "COORD_PLANE_BASIC", "type": "requires"},
+
+    {"from": "FRAC_3_TYPES_BASIC", "to": "FRAC_ARITH_BASIC", "type": "requires"},
+    {"from": "FRAC_3_COMPARE_SAME_DEN", "to": "FRAC_ARITH_BASIC", "type": "requires"},
+    {"from": "FRAC_4_EQUIV", "to": "FRAC_ARITH_BASIC", "type": "requires"},
+    {"from": "FRAC_4_SIMPLIFY", "to": "FRAC_ARITH_BASIC", "type": "requires"},
+    {"from": "FRAC_4_COMMON_DENOM", "to": "FRAC_ARITH_BASIC", "type": "requires"},
+    {"from": "FRAC_4_ADD_SUB_SAME_DEN", "to": "FRAC_ARITH_BASIC", "type": "requires"},
+    {"from": "OPS_2_MULT_TABLE_1_9", "to": "FRAC_ARITH_BASIC", "type": "requires"},
+    {"from": "OPS_3_MULT_2DIG_X_1DIG", "to": "FRAC_ARITH_BASIC", "type": "requires"},
+    {"from": "OPS_3_DIV_2DIG_BY_1DIG", "to": "FRAC_ARITH_BASIC", "type": "requires"}
+  ]
+}

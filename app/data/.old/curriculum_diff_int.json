@@ -1,0 +1,79 @@
+{
+  "bosses": [
+    {
+      "boss_id": "TS_DIFF",
+      "name_ko": "미분",
+      "description_ko": "함수의 극한과 연속을 바탕으로 다항함수(및 기본 함수)의 도함수를 계산하고, 증가·감소, 극값, 접선, 최적화, 속도·가속도 문제를 해결하는 최종 단원.",
+      "skills": [
+        { "id": "NUM_INT_FRAC", "name_ko": "정수·유리수의 사칙연산", "domain": "수와 연산", "level": 1, "description_ko": "정수와 분수, 소수의 사칙연산을 정확히 수행하고, 계산 순서를 이해한다.", "prereq": [] },
+        { "id": "ALG_EXPR_BASIC", "name_ko": "문자와 식 기초", "domain": "대수", "level": 2, "description_ko": "상황을 문자와 식으로 나타내고, 간단한 일차식의 값을 구할 수 있다.", "prereq": ["NUM_INT_FRAC"] },
+        { "id": "GEO_COORD_PLANE", "name_ko": "좌표평면과 점", "domain": "기하", "level": 2, "description_ko": "좌표평면에서 점을 (x, y)로 나타내고 좌표축과 사분면 개념을 이해한다.", "prereq": ["NUM_INT_FRAC"] },
+        { "id": "GEO_SLOPE_LINE", "name_ko": "직선의 기울기", "domain": "기하", "level": 3, "description_ko": "두 점을 지나는 직선의 기울기를 (y2 - y1) / (x2 - x1)로 계산하고 의미를 해석한다.", "prereq": ["GEO_COORD_PLANE", "ALG_EXPR_BASIC"] },
+        { "id": "ALG_POLY_BASIC", "name_ko": "다항식의 뜻과 사칙연산", "domain": "대수", "level": 3, "description_ko": "다항식의 개념을 알고, 다항식의 덧셈·뺄셈·곱셈을 할 수 있다.", "prereq": ["ALG_EXPR_BASIC"] },
+        { "id": "ALG_EQ_LINEAR", "name_ko": "일차방정식 풀이", "domain": "대수", "level": 3, "description_ko": "등식의 성질을 이용해 일차방정식을 풀고, 실생활 문제에 적용한다.", "prereq": ["ALG_EXPR_BASIC"] },
+        { "id": "ALG_EQ_QUAD", "name_ko": "이차방정식 풀이", "domain": "대수", "level": 4, "description_ko": "인수분해·완전제곱 등을 이용해 이차방정식을 풀고 해의 의미를 해석한다.", "prereq": ["ALG_POLY_BASIC", "ALG_EQ_LINEAR"] },
+        { "id": "FUNC_BASIC", "name_ko": "함수 개념 기초", "domain": "함수", "level": 4, "description_ko": "‘입력 하나에 출력 하나’라는 함수 개념과 정의역·치역, 대응 관계를 이해한다.", "prereq": ["ALG_EXPR_BASIC", "GEO_COORD_PLANE"] },
+        { "id": "FUNC_LINEAR", "name_ko": "일차함수와 그래프", "domain": "함수", "level": 4, "description_ko": "일차함수 y = mx + b의 그래프를 그리고, 기울기와 절편의 의미를 해석한다.", "prereq": ["FUNC_BASIC", "GEO_SLOPE_LINE"] },
+        { "id": "FUNC_QUADRATIC", "name_ko": "이차함수와 그래프", "domain": "함수", "level": 5, "description_ko": "이차함수 y = ax^2 + bx + c의 그래프 모양, 꼭짓점, 축, 대칭성을 이해한다.", "prereq": ["FUNC_BASIC", "ALG_POLY_BASIC", "ALG_EQ_QUAD"] },
+        { "id": "CALC_LIMIT_NUM", "name_ko": "수열·표를 통한 극한 직관", "domain": "해석", "level": 5, "description_ko": "함수값이나 수열값이 일정한 수에 점점 가까워지는 상황을 표·그래프를 보고 설명할 수 있다.", "prereq": ["FUNC_LINEAR", "FUNC_QUADRATIC"] },
+        { "id": "CALC_LIMIT_FUNC", "name_ko": "함수의 극한과 연속", "domain": "해석", "level": 6, "description_ko": "함수 y=f(x)의 x→a에서의 극한값과 연속의 뜻을 이해하고, 기본적인 극한을 계산할 수 있다.", "prereq": ["CALC_LIMIT_NUM", "FUNC_BASIC"] },
+        { "id": "CALC_AVG_RATE", "name_ko": "평균변화율과 할선 기울기", "domain": "해석", "level": 6, "description_ko": "구간 [a, b]에서 함수의 평균변화율을 (f(b) - f(a)) / (b - a)로 계산하고, 그래프에서 할선의 기울기로 해석한다.", "prereq": ["FUNC_LINEAR", "FUNC_QUADRATIC", "GEO_SLOPE_LINE"] },
+        { "id": "CALC_DERIV_DEF", "name_ko": "미분계수와 도함수의 정의", "domain": "해석", "level": 7, "description_ko": "x=a에서의 미분계수를 변화율의 극한으로 정의하고, 도함수 f'(x)의 뜻을 이해한다.", "prereq": ["CALC_LIMIT_FUNC", "CALC_AVG_RATE"] },
+        { "id": "CALC_DERIV_RULES_POLY", "name_ko": "다항함수 미분 공식", "domain": "해석", "level": 7, "description_ko": "x^n, ax^n + ... 형태의 다항함수 미분 공식을 유도·이해하고 계산에 적용한다.", "prereq": ["CALC_DERIV_DEF", "ALG_POLY_BASIC"] },
+        { "id": "CALC_DERIV_GRAPH", "name_ko": "도함수와 그래프 형태(증가·감소·극값)", "domain": "해석", "level": 8, "description_ko": "도함수의 부호를 이용해 함수의 증가·감소 구간과 극대·극소를 판별하고, 그래프의 전체 형태를 해석한다.", "prereq": ["CALC_DERIV_RULES_POLY", "FUNC_QUADRATIC"] },
+        { "id": "CALC_DERIV_TANGENT", "name_ko": "접선의 기울기와 방정식", "domain": "해석", "level": 8, "description_ko": "점 (a, f(a))에서의 미분계수를 이용해 곡선의 접선의 기울기와 방정식을 구할 수 있다.", "prereq": ["CALC_DERIV_DEF", "GEO_SLOPE_LINE"] },
+        { "id": "CALC_DERIV_OPTIM", "name_ko": "미분을 이용한 최적화 문제", "domain": "해석", "level": 9, "description_ko": "도함수를 이용해 최대·최소값을 구하고, 도형·경제·물리 등 다양한 상황의 최적화 문제를 해결한다.", "prereq": ["CALC_DERIV_GRAPH", "CALC_DERIV_TANGENT"] },
+        { "id": "CALC_DERIV_KINEM", "name_ko": "위치·속도·가속도와 미분", "domain": "해석", "level": 9, "description_ko": "위치함수, 속도함수, 가속도함수 사이의 관계를 미분을 통해 설명하고, 시간에 따른 운동 문제를 해결한다.", "prereq": ["CALC_DERIV_DEF", "CALC_AVG_RATE"] },
+        {
+          "id": "TS_DIFF",
+          "name_ko": "보스: 미분",
+          "domain": "보스",
+          "level": 10,
+          "description_ko": "다항함수 중심의 미분법을 완전히 이해하고, 그래프 분석·최적화·운동 문제까지 스스로 설정하고 해결할 수 있는 상태.",
+          "prereq": ["CALC_DERIV_RULES_POLY", "CALC_DERIV_GRAPH", "CALC_DERIV_TANGENT", "CALC_DERIV_OPTIM", "CALC_DERIV_KINEM"]
+        }
+      ]
+    },
+    {
+      "boss_id": "TS_INT",
+      "name_ko": "적분",
+      "description_ko": "넓이·누적량을 근사하는 합에서 시작해 정적분의 정의와 성질을 이해하고, 부정적분·정적분의 연결과 넓이·부피·평균값 응용까지 다루는 최종 단원.",
+      "skills": [
+        { "id": "NUM_INT_FRAC", "name_ko": "정수·유리수의 사칙연산", "domain": "수와 연산", "level": 1, "description_ko": "정수와 분수, 소수의 사칙연산을 정확히 수행하고, 계산 순서를 이해한다.", "prereq": [] },
+        { "id": "ALG_EXPR_BASIC", "name_ko": "문자와 식 기초", "domain": "대수", "level": 2, "description_ko": "상황을 문자와 식으로 나타내고, 간단한 일차식의 값을 구할 수 있다.", "prereq": ["NUM_INT_FRAC"] },
+        { "id": "ALG_POLY_BASIC", "name_ko": "다항식의 뜻과 사칙연산", "domain": "대수", "level": 3, "description_ko": "다항식의 개념을 알고, 다항식의 덧셈·뺄셈·곱셈을 할 수 있다.", "prereq": ["ALG_EXPR_BASIC"] },
+        { "id": "FUNC_LINEAR", "name_ko": "일차함수와 그래프", "domain": "함수", "level": 3, "description_ko": "일차함수 y = mx + b의 그래프를 그리고, 기울기와 절편의 의미를 해석한다.", "prereq": ["ALG_EXPR_BASIC"] },
+        { "id": "FUNC_QUADRATIC", "name_ko": "이차함수와 그래프", "domain": "함수", "level": 4, "description_ko": "이차함수 y = ax^2 + bx + c의 그래프 모양과 꼭짓점, 축, 대칭성을 이해한다.", "prereq": ["ALG_POLY_BASIC"] },
+        { "id": "GEO_AREA_BASIC", "name_ko": "기본 도형의 넓이", "domain": "기하", "level": 3, "description_ko": "직사각형, 삼각형, 사다리꼴, 원의 넓이 공식을 이해하고 계산할 수 있다.", "prereq": ["NUM_INT_FRAC"] },
+        { "id": "SEQ_ARITH_BASIC", "name_ko": "등차수열 기초", "domain": "수열", "level": 3, "description_ko": "항 사이의 차이가 일정한 등차수열의 의미를 이해하고, 몇 개 항을 구할 수 있다.", "prereq": ["NUM_INT_FRAC"] },
+        { "id": "SEQ_SUM_ARITH", "name_ko": "등차수열의 합", "domain": "수열", "level": 4, "description_ko": "등차수열 앞에서 n개 항의 합 공식을 이해하고, 합을 계산할 수 있다.", "prereq": ["SEQ_ARITH_BASIC"] },
+        { "id": "CALC_SIGMA", "name_ko": "시그마(Σ) 기호와 유한합", "domain": "해석", "level": 4, "description_ko": "Σ 기호를 사용해 규칙적인 합을 간단히 나타내고, 기본적인 Σ 계산을 할 수 있다.", "prereq": ["SEQ_SUM_ARITH", "ALG_EXPR_BASIC"] },
+        { "id": "CALC_LIMIT_FUNC", "name_ko": "함수의 극한과 연속", "domain": "해석", "level": 5, "description_ko": "함수의 x→a에서의 극한과 연속성을 이해하고, 기본적인 극한값을 계산한다.", "prereq": ["FUNC_LINEAR", "FUNC_QUADRATIC"] },
+        { "id": "CALC_DERIV_DEF", "name_ko": "미분계수와 도함수의 정의", "domain": "해석", "level": 5, "description_ko": "미분계수를 변화율의 극한으로 정의하고, 도함수의 의미를 이해한다.", "prereq": ["CALC_LIMIT_FUNC"] },
+        { "id": "CALC_DERIV_RULES_POLY", "name_ko": "다항함수 미분 공식", "domain": "해석", "level": 6, "description_ko": "다항함수의 미분 공식을 알고, 여러 다항함수의 도함수를 계산할 수 있다.", "prereq": ["CALC_DERIV_DEF", "ALG_POLY_BASIC"] },
+        { "id": "CALC_RIEMANN_SUM", "name_ko": "막대넓이 합과 리만합 직관", "domain": "해석", "level": 6, "description_ko": "구간을 잘게 나누어 직사각형·사다리꼴 넓이를 더해 곡선 아래 넓이를 근사하는 활동(리만합)을 이해한다.", "prereq": ["GEO_AREA_BASIC", "CALC_SIGMA", "FUNC_LINEAR", "FUNC_QUADRATIC"] },
+        { "id": "CALC_DEF_INT_DEF", "name_ko": "정적분의 정의", "domain": "해석", "level": 7, "description_ko": "리만합의 극한으로서 정적분 ∫_a^b f(x) dx 의 정의를 이해하고, 단순한 함수에서 의미를 설명할 수 있다.", "prereq": ["CALC_RIEMANN_SUM", "CALC_LIMIT_FUNC"] },
+        { "id": "CALC_INDEF_INT_BASIC", "name_ko": "부정적분과 기본 적분 공식", "domain": "해석", "level": 7, "description_ko": "부정적분을 미분의 역과정으로 이해하고, 다항함수의 기본 적분 공식을 사용할 수 있다.", "prereq": ["CALC_DERIV_RULES_POLY"] },
+        { "id": "CALC_FT_CALC", "name_ko": "미적분의 기본정리", "domain": "해석", "level": 8, "description_ko": "정적분과 부정적분(원시함수)이 연결된다는 ‘미적분의 기본정리’를 이해하고, 정적분 계산에 활용한다.", "prereq": ["CALC_DEF_INT_DEF", "CALC_INDEF_INT_BASIC"] },
+        { "id": "CALC_INT_AREA_CURVE", "name_ko": "정적분을 이용한 넓이", "domain": "해석", "level": 8, "description_ko": "정적분을 이용해 x축과 그래프 사이의 넓이, 두 그래프 사이의 넓이를 구할 수 있다.", "prereq": ["CALC_DEF_INT_DEF", "FUNC_LINEAR", "FUNC_QUADRATIC"] },
+        { "id": "CALC_INT_VOLUME_SOLID", "name_ko": "회전체의 부피", "domain": "해석", "level": 9, "description_ko": "회전체의 부피를 적분으로 나타내고, 단순한 형태의 회전체 부피를 계산할 수 있다.", "prereq": ["CALC_INT_AREA_CURVE"] },
+        { "id": "CALC_INT_AVG_VALUE", "name_ko": "함수의 평균값(구간 평균)", "domain": "해석", "level": 9, "description_ko": "구간 [a,b]에서 함수의 평균값을 (1/(b-a))∫_a^b f(x)dx 로 정의하고, 상황에 맞게 해석한다.", "prereq": ["CALC_DEF_INT_DEF"] },
+        {
+          "id": "TS_INT",
+          "name_ko": "보스: 적분",
+          "domain": "보스",
+          "level": 10,
+          "description_ko": "정적분의 정의와 성질, 부정적분과의 연결, 넓이·부피·평균값 응용까지 스스로 설명하고 문제를 설계·해결할 수 있는 상태.",
+          "prereq": [
+            "CALC_DEF_INT_DEF",
+            "CALC_INDEF_INT_BASIC",
+            "CALC_FT_CALC",
+            "CALC_INT_AREA_CURVE",
+            "CALC_INT_VOLUME_SOLID",
+            "CALC_INT_AVG_VALUE"
+          ]
+        }
+      ]
+    }
+  ]
+}

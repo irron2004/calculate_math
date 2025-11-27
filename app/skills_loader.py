@@ -37,7 +37,18 @@ def _extract_json_blob(markdown: str) -> Optional[str]:
 
 
 def _load_raw_spec() -> Dict[str, object]:
-    """Load the raw JSON skill specification from docs or packaged export."""
+    """Load the raw JSON skill specification.
+
+    Priority:
+    1) Packaged export (app/data/skills.json) — keeps runtime aligned with shipped data.
+    2) Embedded JSON in docs/dag.md (for local editing and regeneration).
+    """
+
+    if _JSON_EXPORT_PATH.exists():
+        try:
+            return json.loads(_JSON_EXPORT_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise SkillSpecError("Packaged skill specification is invalid JSON") from exc
 
     if _DOCS_PATH.exists():
         markdown = _DOCS_PATH.read_text(encoding="utf-8")
@@ -45,14 +56,7 @@ def _load_raw_spec() -> Dict[str, object]:
             try:
                 return json.loads(json_blob)
             except json.JSONDecodeError:
-                # Fallback to packaged export below; keep logging minimal to avoid noisy stdout in tests.
                 pass
-
-    if _JSON_EXPORT_PATH.exists():
-        try:
-            return json.loads(_JSON_EXPORT_PATH.read_text(encoding="utf-8"))
-        except json.JSONDecodeError as exc:
-            raise SkillSpecError("Packaged skill specification is invalid JSON") from exc
 
     raise SkillSpecError("Unable to locate skill specification source")
 

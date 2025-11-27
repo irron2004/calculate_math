@@ -1,0 +1,66 @@
+{
+  "bosses": [
+    {
+      "boss_id": "TS_TRIG",
+      "name_ko": "삼각함수·삼각법",
+      "description_ko": "각·삼각형·닮음을 바탕으로 삼각비, 단위원 삼각함수, 그래프와 기본 성질, 사인·코사인 법칙을 이용해 임의의 삼각형을 해결하는 보스 스킬.",
+      "skills": [
+        { "id": "ANGLE_DEG_BASIC", "name_ko": "각도와 도 단위(°) 기초", "domain": "도형과 측정", "level": 1, "description_ko": "각의 크기를 도(°)로 나타내고, 각도기를 사용해 각을 재고 그릴 수 있다.", "prereq": [] },
+        { "id": "TRI_RIGHT_SIMILAR", "name_ko": "직각삼각형 닮음과 비", "domain": "도형과 측정", "level": 2, "description_ko": "직각삼각형의 닮음 조건을 이해하고, 대응변의 비를 이용해 길이를 구할 수 있다.", "prereq": ["ANGLE_DEG_BASIC"] },
+        { "id": "GEO_PYTHAGORAS", "name_ko": "피타고라스 정리", "domain": "도형과 측정", "level": 2, "description_ko": "직각삼각형에서 빗변과 다른 두 변 사이의 관계 a² + b² = c² 를 이해하고 활용할 수 있다.", "prereq": ["TRI_RIGHT_SIMILAR"] },
+        { "id": "TRIG_RATIO_RIGHT", "name_ko": "직각삼각형에서의 삼각비(sin, cos, tan)", "domain": "삼각함수", "level": 3, "description_ko": "직각삼각형에서 예각의 사인, 코사인, 탄젠트를 변의 길이의 비로 정의하고 계산할 수 있다.", "prereq": ["TRI_RIGHT_SIMILAR", "GEO_PYTHAGORAS"] },
+        { "id": "TRIG_TABLE_SPECIAL", "name_ko": "특수각(30°, 45°, 60°)의 삼각비", "domain": "삼각함수", "level": 3, "description_ko": "정삼각형, 정사각형을 이용해 30°, 45°, 60°의 삼각비 값을 유도하고 기억·활용할 수 있다.", "prereq": ["TRIG_RATIO_RIGHT"] },
+        { "id": "TRIG_APP_HEIGHT_DISTANCE", "name_ko": "삼각비를 이용한 높이·거리 구하기", "domain": "삼각법 응용", "level": 4, "description_ko": "실제 상황에서 시각·거리·각도 정보를 사용하여 높이나 거리를 삼각비로 모델링하고 계산할 수 있다.", "prereq": ["TRIG_RATIO_RIGHT", "TRIG_TABLE_SPECIAL"] },
+        { "id": "COORD_PLANE", "name_ko": "좌표평면과 점의 좌표", "domain": "도형과 측정", "level": 3, "description_ko": "좌표평면에서 점을 (x, y)로 나타내고, 사분면과 좌표의 의미를 이해한다.", "prereq": [] },
+        { "id": "ANGLE_RAD", "name_ko": "라디안(radian)과 호의 길이", "domain": "도형과 측정", "level": 4, "description_ko": "각의 크기를 라디안으로 나타내는 방법을 이해하고, 원의 호의 길이·부채꼴 넓이와 연결할 수 있다.", "prereq": ["ANGLE_DEG_BASIC"] },
+        { "id": "TRIG_UNIT_CIRCLE", "name_ko": "단위원에서의 삼각함수 정의", "domain": "삼각함수", "level": 5, "description_ko": "반지름 1인 원 위의 점 좌표를 이용해 임의의 실수 각도의 sin, cos, tan을 정의하고, 사분면에 따른 부호를 이해한다.", "prereq": ["COORD_PLANE", "ANGLE_RAD", "TRIG_RATIO_RIGHT"] },
+        { "id": "TRIG_SIGN_QUADRANT", "name_ko": "각도 범위와 사분면별 삼각함수 부호", "domain": "삼각함수", "level": 5, "description_ko": "0~360°(또는 0~2π) 범위에서 각에 따른 삼각함수의 부호와 기준각(참조각)을 이용한 값 계산을 할 수 있다.", "prereq": ["TRIG_UNIT_CIRCLE"] },
+        { "id": "TRIG_GRAPH_BASIC", "name_ko": "y = sin x, cos x, tan x 그래프", "domain": "함수", "level": 6, "description_ko": "삼각함수를 함수로 보고, y = sin x, cos x, tan x의 그래프와 주기·진폭·평균값의 의미를 이해한다.", "prereq": ["TRIG_UNIT_CIRCLE", "COORD_PLANE"] },
+        { "id": "TRIG_IDENT_BASIC", "name_ko": "기본 삼각함수 관계(sin²x + cos²x = 1 등)", "domain": "삼각함수", "level": 6, "description_ko": "tan x = sin x / cos x, sin²x + cos²x = 1 같은 기본 삼각함수 관계를 이해하고, 간단한 식을 변형할 수 있다.", "prereq": ["TRIG_UNIT_CIRCLE"] },
+        { "id": "TRIG_ADD_FORMULAE", "name_ko": "삼각함수 덧셈정리( sin(a±b), cos(a±b) )", "domain": "삼각함수", "level": 7, "description_ko": "삼각함수 덧셈정리를 이해하고, 간단한 값 계산과 삼각함수 식의 변형에 활용할 수 있다.", "prereq": ["TRIG_IDENT_BASIC"] },
+        { "id": "TRI_SINE_LAW", "name_ko": "사인 법칙", "domain": "삼각법", "level": 6, "description_ko": "sin 법칙을 이용해 삼각형의 변과 각 사이의 관계를 이해하고, 일부 변·각이 주어졌을 때 나머지를 구할 수 있다.", "prereq": ["TRIG_RATIO_RIGHT", "ANGLE_DEG_BASIC"] },
+        { "id": "TRI_COSINE_LAW", "name_ko": "코사인 법칙", "domain": "삼각법", "level": 7, "description_ko": "코사인 법칙을 통해 삼각형 세 변 또는 두 변과 끼인각이 주어졌을 때 나머지 요소를 구하고, 삼각형의 유형(예각/직각/둔각)을 판별할 수 있다.", "prereq": ["GEO_PYTHAGORAS", "TRI_SINE_LAW"] },
+        { "id": "TRI_SOLVE_GENERAL", "name_ko": "임의 삼각형 풀이와 넓이", "domain": "삼각법 응용", "level": 8, "description_ko": "사인·코사인 법칙과 삼각함수 넓이 공식(S = 1/2 ab sin C 등)을 이용하여 임의 삼각형의 변·각·넓이를 구하는 문제를 해결한다.", "prereq": ["TRI_SINE_LAW", "TRI_COSINE_LAW", "TRIG_TABLE_SPECIAL"] },
+        {
+          "id": "TS_TRIG",
+          "name_ko": "보스: 삼각함수·삼각법 마스터",
+          "domain": "보스",
+          "level": 9,
+          "description_ko": "직각삼각형 삼각비부터 단위원 삼각함수·그래프·기본 항등식, 사인·코사인 법칙까지 연결하여 임의 삼각형 문제와 함수 문제를 자유롭게 모델링·해결할 수 있는 상태.",
+          "prereq": ["TRIG_GRAPH_BASIC", "TRIG_IDENT_BASIC", "TRIG_ADD_FORMULAE", "TRI_SOLVE_GENERAL"]
+        }
+      ]
+    },
+    {
+      "boss_id": "TS_SEQ_PROOF",
+      "name_ko": "수열·수학적 귀납법",
+      "description_ko": "수열의 규칙과 합 공식을 바탕으로, 자연수에 대한 명제를 수학적 귀납법으로 증명하는 보스 스킬. 등차·등비수열, 합 공식, 나눗셈·부등식 명제를 단계적으로 다룬다.",
+      "skills": [
+        { "id": "NAT_NUM_BASIC", "name_ko": "자연수와 수의 계열", "domain": "수와 연산", "level": 1, "description_ko": "자연수의 나열(1,2,3,…)과 크기 비교, ‘n번째’라는 표현의 의미를 이해한다.", "prereq": [] },
+        { "id": "PATTERN_SIMPLE", "name_ko": "수 배열에서 규칙 찾기", "domain": "변화와 관계", "level": 2, "description_ko": "간단한 수의 나열에서 규칙을 찾아 다음 수를 예측하고, 말이나 식으로 표현할 수 있다.", "prereq": ["NAT_NUM_BASIC"] },
+        { "id": "SEQ_NOTATION_BASIC", "name_ko": "수열 표기와 a_n", "domain": "수열", "level": 3, "description_ko": "수열 {a_n} 표기와 n번째 항 a_n의 의미를 이해하고, 간단한 규칙에서 a_1, a_2, a_3,…를 구할 수 있다.", "prereq": ["PATTERN_SIMPLE"] },
+        { "id": "SEQ_ARITH_BASIC", "name_ko": "등차수열 기초(차 일정)", "domain": "수열", "level": 3, "description_ko": "항 사이의 차이가 일정한 등차수열의 의미를 이해하고, 몇 개 항을 구할 수 있다.", "prereq": ["SEQ_NOTATION_BASIC"] },
+        { "id": "SEQ_GEOM_BASIC", "name_ko": "등비수열 기초(비율 일정)", "domain": "수열", "level": 3, "description_ko": "항 사이의 비율이 일정한 등비수열의 의미를 이해하고, 몇 개 항을 구할 수 있다.", "prereq": ["SEQ_NOTATION_BASIC"] },
+        { "id": "SEQ_GENERAL_FORM", "name_ko": "등차·등비수열의 일반항", "domain": "수열", "level": 4, "description_ko": "등차수열 a_n = a_1 + (n-1)d, 등비수열 a_n = a_1 r^{n-1} 의 일반항 공식을 이해하고, 주어진 조건에서 a_n을 구할 수 있다.", "prereq": ["SEQ_ARITH_BASIC", "SEQ_GEOM_BASIC"] },
+        { "id": "CALC_SIGMA", "name_ko": "시그마(Σ) 기호를 이용한 합 표현", "domain": "수열/해석", "level": 4, "description_ko": "1+2+…+n, 등차·등비수열의 합 등을 Σ 기호로 간단히 표현하고, 기본적인 Σ 계산을 할 수 있다.", "prereq": ["SEQ_GENERAL_FORM"] },
+        { "id": "PROP_STATEMENT_BASIC", "name_ko": "명제와 참·거짓", "domain": "논리", "level": 4, "description_ko": "문장이 명제인지 아닌지 구분하고, 자연수 n에 대한 명제 P(n)의 개념을 이해한다.", "prereq": ["NAT_NUM_BASIC"] },
+        { "id": "LOGIC_IMPLICATION", "name_ko": "논리적 함의와 ‘이면’ 구조", "domain": "논리", "level": 4, "description_ko": "조건문 ‘P이면 Q이다’의 의미를 이해하고, P(n)→P(n+1) 형태의 조건을 말로 설명할 수 있다.", "prereq": ["PROP_STATEMENT_BASIC"] },
+        { "id": "INDUCTION_IDEA", "name_ko": "수학적 귀납법 아이디어(계단 비유)", "domain": "귀납법", "level": 5, "description_ko": "P(1)이 참이고, 임의의 자연수 k에 대해 P(k)가 참이면 P(k+1)도 참임을 보이면 모든 자연수에 대해 P(n)이 참이라는 아이디어를 직관적으로 이해한다.", "prereq": ["LOGIC_IMPLICATION"] },
+        { "id": "INDUCTION_BASE_STEP", "name_ko": "기초 단계와 귀납 단계 쓰기", "domain": "귀납법", "level": 5, "description_ko": "P(1)이 참임을 확인하는 ‘기초 단계’와 P(k)→P(k+1)를 보이는 ‘귀납 단계’를 명확히 구분하여 서술할 수 있다.", "prereq": ["INDUCTION_IDEA"] },
+        { "id": "INDUCTION_SUM_N", "name_ko": "1+2+…+n = n(n+1)/2 증명", "domain": "귀납법/수열", "level": 6, "description_ko": "수학적 귀납법을 사용하여 1부터 n까지의 합 공식 n(n+1)/2 를 증명할 수 있다.", "prereq": ["INDUCTION_BASE_STEP", "CALC_SIGMA"] },
+        { "id": "INDUCTION_SUM_SQUARES", "name_ko": "1²+2²+…+n² 공식 증명(심화)", "domain": "귀납법/수열", "level": 6, "description_ko": "수학적 귀납법으로 1²+2²+…+n² 에 대한 공식을 유도·증명하는 과정을 따라갈 수 있다.", "prereq": ["INDUCTION_BASE_STEP", "CALC_SIGMA"] },
+        { "id": "INDUCTION_SEQ_FORMULAE", "name_ko": "등차·등비수열 공식의 귀납적 증명", "domain": "귀납법/수열", "level": 7, "description_ko": "등차·등비수열의 일반항과 합 공식을 수학적 귀납법으로 증명할 수 있다.", "prereq": ["SEQ_GENERAL_FORM", "INDUCTION_BASE_STEP"] },
+        { "id": "INDUCTION_DIVISIBILITY", "name_ko": "나눗셈·배수 관련 명제의 귀납법 증명", "domain": "귀납법/수론 기초", "level": 7, "description_ko": "n³-n 이 항상 3의 배수임과 같은 나눗셈·배수 명제를 귀납법으로 증명할 수 있다.", "prereq": ["INDUCTION_BASE_STEP"] },
+        { "id": "INDUCTION_INEQUALITY", "name_ko": "부등식 명제의 귀납법 증명(심화)", "domain": "귀납법", "level": 7, "description_ko": "간단한 부등식 명제(예: 2^n ≥ n+1 등)를 수학적 귀납법으로 증명하는 구조를 이해한다.", "prereq": ["INDUCTION_BASE_STEP", "EXP_LAWS"] },
+        {
+          "id": "TS_SEQ_PROOF",
+          "name_ko": "보스: 수열·수학적 귀납법 마스터",
+          "domain": "보스",
+          "level": 8,
+          "description_ko": "수열의 일반항·합 공식, 시그마 표현, 명제·함의·귀납법 구조를 모두 연결하여 다양한 유형의 수열·나눗셈·부등식 명제를 스스로 설정하고 수학적 귀납법으로 증명할 수 있는 상태.",
+          "prereq": ["INDUCTION_SUM_N", "INDUCTION_SEQ_FORMULAE", "INDUCTION_DIVISIBILITY", "INDUCTION_INEQUALITY"]
+        }
+      ]
+    }
+  ]
+}

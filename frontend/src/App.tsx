@@ -10,6 +10,7 @@ import LoginPage from './pages/LoginPage'
 import ProblemDetailPage from './pages/ProblemDetailPage'
 import SignupPage from './pages/SignupPage'
 import SkillProblemListPage from './pages/SkillProblemListPage'
+import CourseSkillTreePage from './pages/CourseSkillTreePage'
 import SkillTreePage from './pages/SkillTreePage'
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route path="/demo-session" element={<MathGame />} />
             <Route path="/skills" element={<SkillTreePage />} />
             <Route path="/skill-tree" element={<SkillTreePage />} />
+            <Route path="/course-skill-tree" element={<CourseSkillTreePage />} />
             <Route path="/skills/:skillId/problems" element={<SkillProblemListPage />} />
             <Route path="/problems/:problemId" element={<ProblemDetailPage />} />
           </Routes>

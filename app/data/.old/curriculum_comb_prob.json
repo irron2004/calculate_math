@@ -1,0 +1,84 @@
+{
+  "boss_id": "TS_COMB_PROB",
+  "name": "경우의 수·확률",
+  "description": "작은 표본공간 나열부터 합·곱의 법칙, 순열·조합, 그리고 기본 확률·조건부확률까지를 한 줄로 묶는 보스 스킬.",
+  "skills": [
+    { "id": "NUM_PLACEVALUE", "name": "자리값·수의 분해/합성", "prereq": [] },
+    { "id": "ADD_SUB_MULTI", "name": "여러 자리 수 덧셈·뺄셈", "prereq": ["NUM_PLACEVALUE"] },
+    { "id": "MULT_DIV_BASIC", "name": "곱셈·나눗셈 기초(구구단)", "prereq": ["ADD_SUB_MULTI"] },
+    { "id": "FRAC_BASIC", "name": "분수의 뜻과 등분할", "prereq": ["MULT_DIV_BASIC"] },
+    { "id": "FRAC_DEC_REL", "name": "분수와 소수의 관계", "prereq": ["FRAC_BASIC"] },
+    { "id": "FRAC_DEC_OP", "name": "분수·소수의 사칙연산", "prereq": ["FRAC_DEC_REL"] },
+    { "id": "INT_RATIONAL_OP", "name": "정수·유리수의 사칙연산", "prereq": ["FRAC_DEC_OP"] },
+    {
+      "id": "SET_BASIC_EVENTS",
+      "name": "사건과 표본공간(집합 언어)",
+      "prereq": ["NUM_PLACEVALUE"]
+    },
+    {
+      "id": "LIST_OUTCOMES_SMALL",
+      "name": "작은 표본공간 나열하기",
+      "prereq": ["SET_BASIC_EVENTS", "NUM_PLACEVALUE"]
+    },
+    {
+      "id": "TREE_TABLE_OUTCOMES",
+      "name": "나무·표를 이용한 경우 나열",
+      "prereq": ["LIST_OUTCOMES_SMALL"]
+    },
+    {
+      "id": "COUNT_RULE_ADD",
+      "name": "합의 법칙(겹치지 않는 사건)",
+      "prereq": ["TREE_TABLE_OUTCOMES", "INT_RATIONAL_OP"]
+    },
+    {
+      "id": "COUNT_RULE_MULT",
+      "name": "곱의 법칙(순차 선택)",
+      "prereq": ["TREE_TABLE_OUTCOMES", "INT_RATIONAL_OP"]
+    },
+    {
+      "id": "FACTORIAL_NOTATION",
+      "name": "계승 n!의 의미",
+      "prereq": ["MULT_DIV_BASIC"]
+    },
+    {
+      "id": "PERM_BASIC",
+      "name": "순열 P(n, r)의 뜻과 계산",
+      "prereq": ["FACTORIAL_NOTATION", "COUNT_RULE_MULT"]
+    },
+    {
+      "id": "COMB_BASIC",
+      "name": "조합 C(n, r)의 뜻과 계산",
+      "prereq": ["PERM_BASIC", "INT_RATIONAL_OP"]
+    },
+    {
+      "id": "COUNT_MIXED_APPLIED",
+      "name": "합·곱·순열·조합을 섞은 경우의 수",
+      "prereq": ["COUNT_RULE_ADD", "COUNT_RULE_MULT", "PERM_BASIC", "COMB_BASIC"]
+    },
+    {
+      "id": "PROB_BASIC_EQUALLYLIKELY",
+      "name": "동일한 가능성에서의 확률 p = 유리수/전체",
+      "prereq": ["LIST_OUTCOMES_SMALL", "INT_RATIONAL_OP"]
+    },
+    {
+      "id": "PROB_EVENT_OPERATIONS",
+      "name": "여러 사건의 합·곱·여사건",
+      "prereq": ["PROB_BASIC_EQUALLYLIKELY"]
+    },
+    {
+      "id": "PROB_COND_BASIC",
+      "name": "조건부확률 P(A|B) 기초",
+      "prereq": ["PROB_EVENT_OPERATIONS", "COUNT_MIXED_APPLIED"]
+    },
+    {
+      "id": "PROB_BAYES_INTRO",
+      "name": "간단한 베이즈 정리 예시",
+      "prereq": ["PROB_COND_BASIC"]
+    },
+    {
+      "id": "TS_COMB_PROB",
+      "name": "보스 스킬: 경우의 수·확률 마스터",
+      "prereq": ["COUNT_MIXED_APPLIED", "PROB_EVENT_OPERATIONS", "PROB_COND_BASIC"]
+    }
+  ]
+}

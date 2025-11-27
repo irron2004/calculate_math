@@ -1,0 +1,1553 @@
+{
+  "version": "2025-03-17.k12-l0-l2",
+  "palette": {
+    "NUM": "#2563eb",
+    "PAT": "#a855f7",
+    "GEO": "#22c55e",
+    "MEAS": "#0ea5e9",
+    "DATA": "#eab308"
+  },
+  "nodes": [
+    {
+      "id": "NUM_L0_COUNT_1_5",
+      "label": "1~5까지 세기",
+      "tier": 1,
+      "kind": "core",
+      "requires": null,
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_0",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "사물과 수를 1:1로 대응시키며 1부터 5까지 센다."
+    },
+    {
+      "id": "NUM_L0_COUNT_1_10",
+      "label": "1~10까지 세기",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L0_COUNT_1_5"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_0",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "1부터 10까지 순서대로 세고, 빠뜨리거나 거꾸로 세지 않는다."
+    },
+    {
+      "id": "NUM_L0_ZERO",
+      "label": "0과 '없음'의 개념",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L0_COUNT_1_10"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_0",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "사물이 하나도 없을 때 0으로 나타낼 수 있음을 이해한다."
+    },
+    {
+      "id": "NUM_L0_COMPARE_1_10",
+      "label": "1~10 수의 크기 비교",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L0_COUNT_1_10"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_0",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "1~10 범위에서 '더 많다/적다, 크다/작다'를 비교할 수 있다."
+    },
+    {
+      "id": "PAT_L0_AB_PATTERN",
+      "label": "간단한 반복 무늬(AB 패턴)",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L0_COUNT_1_10"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "PAT"
+      ],
+      "keywords": [
+        "level_0",
+        "pat"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "빨강-파랑-빨강-파랑처럼 두 가지가 번갈아 나오는 규칙을 찾고 이어갈 수 있다."
+    },
+    {
+      "id": "GEO_L0_BASIC_SHAPES",
+      "label": "기본 평면도형 구별",
+      "tier": 1,
+      "kind": "core",
+      "requires": null,
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "GEO"
+      ],
+      "keywords": [
+        "level_0",
+        "geo"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "삼각형, 네모(사각형), 동그라미(원)의 모양을 보고 구별할 수 있다."
+    },
+    {
+      "id": "GEO_L0_POSITION_WORDS",
+      "label": "위치 말로 표현하기",
+      "tier": 1,
+      "kind": "core",
+      "requires": null,
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "GEO"
+      ],
+      "keywords": [
+        "level_0",
+        "geo"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "위/아래, 왼쪽/오른쪽, 앞/뒤 같은 위치 어휘를 사용할 수 있다."
+    },
+    {
+      "id": "MEAS_L0_LENGTH_MASS_FEEL",
+      "label": "길이·무게 직관",
+      "tier": 1,
+      "kind": "core",
+      "requires": null,
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "MEAS"
+      ],
+      "keywords": [
+        "level_0",
+        "meas"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "두 물건의 길이·무게를 보고 '길다/짧다', '무겁다/가볍다'를 말할 수 있다."
+    },
+    {
+      "id": "DATA_L0_SORT_ONE_ATTR",
+      "label": "한 가지 기준으로 분류하기",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L0_COUNT_1_10"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "DATA"
+      ],
+      "keywords": [
+        "level_0",
+        "data"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "색깔이나 모양 등 한 가지 기준으로 모으고 나누어 볼 수 있다."
+    },
+    {
+      "id": "DATA_L0_TALLY_SIMPLE",
+      "label": "표시하며 개수 세기",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "DATA_L0_SORT_ONE_ATTR"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "DATA"
+      ],
+      "keywords": [
+        "level_0",
+        "data"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "물건을 보며 | ||| 같은 표시를 사용해 개수를 세고 기록할 수 있다."
+    },
+    {
+      "id": "NUM_L1_COUNT_1_100",
+      "label": "1~100까지 세기",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L0_COUNT_1_10"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_1",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "10씩 묶어 세기 등으로 1부터 100까지 수를 셀 수 있다."
+    },
+    {
+      "id": "NUM_L1_PLACE_2DIG",
+      "label": "두 자리 수 자리값",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_COUNT_1_100"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_1",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "일과 십의 자리값을 이해하고 두 자리 수를 분해·합성할 수 있다."
+    },
+    {
+      "id": "NUM_L1_ADD_1D_NO_CARRY",
+      "label": "한 자리 덧셈(받아올림 없음)",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L0_COUNT_1_10"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_1",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "한 자리 수끼리의 덧셈을 이해하고 계산할 수 있다."
+    },
+    {
+      "id": "NUM_L1_SUB_1D_NO_BORROW",
+      "label": "한 자리 뺄셈(받아내림 없음)",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_ADD_1D_NO_CARRY"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_1",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "한 자리 수끼리의 뺄셈을 이해하고 계산할 수 있다."
+    },
+    {
+      "id": "NUM_L1_ADD_2D_NO_CARRY",
+      "label": "두 자리 덧셈(받아올림 없음)",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_PLACE_2DIG",
+          "NUM_L1_ADD_1D_NO_CARRY"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_1",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "십의 자리와 일의 자리로 나누어 두 자리 덧셈을 계산할 수 있다."
+    },
+    {
+      "id": "NUM_L1_SKIPCOUNT_2_5_10",
+      "label": "2, 5, 10씩 뛰어 세기",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_COUNT_1_100"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_1",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "2, 5, 10 단위로 수를 차례대로 셀 수 있다."
+    },
+    {
+      "id": "NUM_L1_WORDPROB_ADD_SUB_1D",
+      "label": "한 자리 덧셈·뺄셈 상황 이해",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_ADD_1D_NO_CARRY",
+          "NUM_L1_SUB_1D_NO_BORROW"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_1",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "실생활 이야기 속에서 '합쳐진다/없어진다' 상황을 덧셈·뺄셈으로 연결할 수 있다."
+    },
+    {
+      "id": "NUM_L1_NUMBERLINE_0_20",
+      "label": "0~20 수직선",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L0_COMPARE_1_10",
+          "NUM_L1_COUNT_1_100"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_1",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "0부터 20까지의 수를 수직선 위에 표시하고 위치를 읽을 수 있다."
+    },
+    {
+      "id": "GEO_L1_TRI_RECT_CIRCLE",
+      "label": "삼각형·사각형·원의 구별",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "GEO_L0_BASIC_SHAPES"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "GEO"
+      ],
+      "keywords": [
+        "level_1",
+        "geo"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "삼각형, 사각형, 원의 모양을 보고 이름을 말할 수 있다."
+    },
+    {
+      "id": "GEO_L1_COMPOSE_SHAPES",
+      "label": "도형 조각으로 모양 만들기",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "GEO_L1_TRI_RECT_CIRCLE"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "GEO"
+      ],
+      "keywords": [
+        "level_1",
+        "geo"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "삼각형·사각형 등을 이용해 새로운 모양을 만들어 볼 수 있다."
+    },
+    {
+      "id": "MEAS_L1_TIME_READ_HOUR",
+      "label": "시계에서 '몇 시' 읽기",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L0_COUNT_1_10"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "MEAS"
+      ],
+      "keywords": [
+        "level_1",
+        "meas"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "아날로그 시계의 시침을 보고 '몇 시'인지 읽을 수 있다."
+    },
+    {
+      "id": "MEAS_L1_LENGTH_COMPARE_ORDER",
+      "label": "길이 비교하고 순서대로 나열하기",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "MEAS_L0_LENGTH_MASS_FEEL"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "MEAS"
+      ],
+      "keywords": [
+        "level_1",
+        "meas"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "여러 물건의 길이를 비교하여 가장 길다/짧다 순으로 나열할 수 있다."
+    },
+    {
+      "id": "DATA_L1_PICTURE_GRAPH",
+      "label": "그림그래프로 나타내기",
+      "tier": 2,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "DATA_L0_TALLY_SIMPLE",
+          "NUM_L1_COUNT_1_100"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "DATA"
+      ],
+      "keywords": [
+        "level_1",
+        "data"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "분류한 자료를 그림이나 기호로 나타낸 그림그래프를 만들고 읽을 수 있다."
+    },
+    {
+      "id": "NUM_L2_PLACE_3DIG",
+      "label": "세 자리 수 자리값",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_PLACE_2DIG",
+          "NUM_L1_COUNT_1_100"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_2",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "백의 자리까지 자리값을 이해하고 세 자리 수를 분해·합성할 수 있다."
+    },
+    {
+      "id": "NUM_L2_PLACE_4DIG",
+      "label": "네 자리 수 자리값",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L2_PLACE_3DIG"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_2",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "천의 자리까지 자리값을 이해하고 네 자리 수를 분해·합성할 수 있다."
+    },
+    {
+      "id": "NUM_L2_ADD_2D_WITH_CARRY",
+      "label": "두 자리 덧셈(받아올림)",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_ADD_2D_NO_CARRY",
+          "NUM_L1_PLACE_2DIG"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_2",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "받아올림이 있는 두 자리 수 덧셈을 계산할 수 있다."
+    },
+    {
+      "id": "NUM_L2_SUB_2D_WITH_BORROW",
+      "label": "두 자리 뺄셈(받아내림)",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_SUB_1D_NO_BORROW",
+          "NUM_L1_PLACE_2DIG"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_2",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "받아내림이 있는 두 자리 수 뺄셈을 계산할 수 있다."
+    },
+    {
+      "id": "NUM_L2_MULT_AS_REPEAT_ADD",
+      "label": "반복 덧셈으로 곱셈 이해",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_SKIPCOUNT_2_5_10",
+          "NUM_L1_ADD_1D_NO_CARRY"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_2",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "같은 수를 여러 번 더하는 상황을 곱셈으로 나타낼 수 있다."
+    },
+    {
+      "id": "NUM_L2_MULT_TABLE_1_9",
+      "label": "구구단 1~9",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L2_MULT_AS_REPEAT_ADD"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_2",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "1×1부터 9×9까지의 곱셈구구를 알고 계산할 수 있다."
+    },
+    {
+      "id": "NUM_L2_DIV_AS_SHARE",
+      "label": "나눗셈의 뜻(똑같이 나누기)",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L2_MULT_AS_REPEAT_ADD",
+          "NUM_L1_WORDPROB_ADD_SUB_1D"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_2",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "물을 똑같이 나누어 주는 상황을 나눗셈으로 나타낼 수 있다."
+    },
+    {
+      "id": "NUM_L2_BOX_EQUATION",
+      "label": "□가 들어간 등식의 값 구하기",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L2_ADD_2D_WITH_CARRY",
+          "NUM_L2_SUB_2D_WITH_BORROW"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_2",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "8+□=15, □-4=7과 같은 식에서 □의 값을 구할 수 있다."
+    },
+    {
+      "id": "NUM_L2_NUMBERLINE_EXT",
+      "label": "수직선 확장(0~100)",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_L1_NUMBERLINE_0_20",
+          "NUM_L1_COUNT_1_100"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "NUM"
+      ],
+      "keywords": [
+        "level_2",
+        "num"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "0~100 범위에서 수직선 위에 수를 표시하고 간격을 이해한다."
+    },
+    {
+      "id": "GEO_L2_POINT_SEG_LINE",
+      "label": "점·선분·직선 구별",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "GEO_L1_TRI_RECT_CIRCLE"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "GEO"
+      ],
+      "keywords": [
+        "level_2",
+        "geo"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "점, 선분, 직선의 뜻을 알고 그림으로 구별할 수 있다."
+    },
+    {
+      "id": "GEO_L2_RECT_SQUARE_PROP",
+      "label": "직사각형·정사각형의 성질 맛보기",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "GEO_L1_TRI_RECT_CIRCLE"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "GEO"
+      ],
+      "keywords": [
+        "level_2",
+        "geo"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "직사각형과 정사각형의 변, 꼭짓점 개수 등을 말할 수 있다."
+    },
+    {
+      "id": "GEO_L2_GRID_POSITION",
+      "label": "격자 위 위치 말로 표현",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "GEO_L0_POSITION_WORDS",
+          "NUM_L1_NUMBERLINE_0_20"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "GEO"
+      ],
+      "keywords": [
+        "level_2",
+        "geo"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "간단한 격자에서 위/아래/왼쪽/오른쪽 몇 칸 이동을 말로 설명할 수 있다."
+    },
+    {
+      "id": "MEAS_L2_LENGTH_CM_M",
+      "label": "1cm와 1m로 길이 재기",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "MEAS_L1_LENGTH_COMPARE_ORDER",
+          "NUM_L1_COUNT_1_100"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "MEAS"
+      ],
+      "keywords": [
+        "level_2",
+        "meas"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "자를 이용해 물건의 길이를 cm, m로 재고 기록할 수 있다."
+    },
+    {
+      "id": "MEAS_L2_TIME_HOUR_MIN",
+      "label": "시계에서 '몇 시 몇 분' 읽기",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "MEAS_L1_TIME_READ_HOUR",
+          "NUM_L1_COUNT_1_100"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "MEAS"
+      ],
+      "keywords": [
+        "level_2",
+        "meas"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "시침·분침을 보고 시각을 '몇 시 몇 분'으로 표현할 수 있다."
+    },
+    {
+      "id": "DATA_L2_TABLE_FROM_SORT",
+      "label": "분류 결과를 표로 나타내기",
+      "tier": 3,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "DATA_L1_PICTURE_GRAPH",
+          "NUM_L1_COUNT_1_100"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "DATA"
+      ],
+      "keywords": [
+        "level_2",
+        "data"
+      ],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": "분류한 자료를 행·열이 있는 간단한 표로 정리할 수 있다."
+    }
+  ],
+  "edges": [
+    {
+      "from": "NUM_L0_COUNT_1_5",
+      "to": "NUM_L0_COUNT_1_10",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L0_COUNT_1_10",
+      "to": "NUM_L0_ZERO",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L0_COUNT_1_10",
+      "to": "NUM_L0_COMPARE_1_10",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L0_COUNT_1_10",
+      "to": "PAT_L0_AB_PATTERN",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L0_COUNT_1_10",
+      "to": "DATA_L0_SORT_ONE_ATTR",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "DATA_L0_SORT_ONE_ATTR",
+      "to": "DATA_L0_TALLY_SIMPLE",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L0_COUNT_1_10",
+      "to": "NUM_L1_COUNT_1_100",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_COUNT_1_100",
+      "to": "NUM_L1_PLACE_2DIG",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L0_COUNT_1_10",
+      "to": "NUM_L1_ADD_1D_NO_CARRY",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_ADD_1D_NO_CARRY",
+      "to": "NUM_L1_SUB_1D_NO_BORROW",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_PLACE_2DIG",
+      "to": "NUM_L1_ADD_2D_NO_CARRY",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_ADD_1D_NO_CARRY",
+      "to": "NUM_L1_ADD_2D_NO_CARRY",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_COUNT_1_100",
+      "to": "NUM_L1_SKIPCOUNT_2_5_10",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_ADD_1D_NO_CARRY",
+      "to": "NUM_L1_WORDPROB_ADD_SUB_1D",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_SUB_1D_NO_BORROW",
+      "to": "NUM_L1_WORDPROB_ADD_SUB_1D",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L0_COMPARE_1_10",
+      "to": "NUM_L1_NUMBERLINE_0_20",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_COUNT_1_100",
+      "to": "NUM_L1_NUMBERLINE_0_20",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "GEO_L0_BASIC_SHAPES",
+      "to": "GEO_L1_TRI_RECT_CIRCLE",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "GEO_L1_TRI_RECT_CIRCLE",
+      "to": "GEO_L1_COMPOSE_SHAPES",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L0_COUNT_1_10",
+      "to": "MEAS_L1_TIME_READ_HOUR",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "MEAS_L0_LENGTH_MASS_FEEL",
+      "to": "MEAS_L1_LENGTH_COMPARE_ORDER",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "DATA_L0_TALLY_SIMPLE",
+      "to": "DATA_L1_PICTURE_GRAPH",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_COUNT_1_100",
+      "to": "DATA_L1_PICTURE_GRAPH",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_PLACE_2DIG",
+      "to": "NUM_L2_PLACE_3DIG",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_COUNT_1_100",
+      "to": "NUM_L2_PLACE_3DIG",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L2_PLACE_3DIG",
+      "to": "NUM_L2_PLACE_4DIG",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_ADD_2D_NO_CARRY",
+      "to": "NUM_L2_ADD_2D_WITH_CARRY",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_PLACE_2DIG",
+      "to": "NUM_L2_ADD_2D_WITH_CARRY",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_SUB_1D_NO_BORROW",
+      "to": "NUM_L2_SUB_2D_WITH_BORROW",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_PLACE_2DIG",
+      "to": "NUM_L2_SUB_2D_WITH_BORROW",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_SKIPCOUNT_2_5_10",
+      "to": "NUM_L2_MULT_AS_REPEAT_ADD",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_ADD_1D_NO_CARRY",
+      "to": "NUM_L2_MULT_AS_REPEAT_ADD",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L2_MULT_AS_REPEAT_ADD",
+      "to": "NUM_L2_MULT_TABLE_1_9",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L2_MULT_AS_REPEAT_ADD",
+      "to": "NUM_L2_DIV_AS_SHARE",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_WORDPROB_ADD_SUB_1D",
+      "to": "NUM_L2_DIV_AS_SHARE",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L2_ADD_2D_WITH_CARRY",
+      "to": "NUM_L2_BOX_EQUATION",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L2_SUB_2D_WITH_BORROW",
+      "to": "NUM_L2_BOX_EQUATION",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_NUMBERLINE_0_20",
+      "to": "NUM_L2_NUMBERLINE_EXT",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_COUNT_1_100",
+      "to": "NUM_L2_NUMBERLINE_EXT",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "GEO_L1_TRI_RECT_CIRCLE",
+      "to": "GEO_L2_POINT_SEG_LINE",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "GEO_L1_TRI_RECT_CIRCLE",
+      "to": "GEO_L2_RECT_SQUARE_PROP",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "GEO_L0_POSITION_WORDS",
+      "to": "GEO_L2_GRID_POSITION",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_NUMBERLINE_0_20",
+      "to": "GEO_L2_GRID_POSITION",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "MEAS_L1_LENGTH_COMPARE_ORDER",
+      "to": "MEAS_L2_LENGTH_CM_M",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_COUNT_1_100",
+      "to": "MEAS_L2_LENGTH_CM_M",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "MEAS_L1_TIME_READ_HOUR",
+      "to": "MEAS_L2_TIME_HOUR_MIN",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_COUNT_1_100",
+      "to": "MEAS_L2_TIME_HOUR_MIN",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "DATA_L1_PICTURE_GRAPH",
+      "to": "DATA_L2_TABLE_FROM_SORT",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_L1_COUNT_1_100",
+      "to": "DATA_L2_TABLE_FROM_SORT",
+      "type": "requires",
+      "lens": null
+    }
+  ]
+}
