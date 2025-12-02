@@ -38,12 +38,14 @@ class SessionTokenService:
         ttl_minutes: int,
         cookie_name: str,
         cookie_secure: bool,
+        cookie_samesite: str,
     ) -> None:
         self.repository = repository
         self.secret = secret
         self.ttl_minutes = max(1, ttl_minutes)
         self.cookie_name = cookie_name
         self.cookie_secure = cookie_secure
+        self.cookie_samesite = cookie_samesite
 
     @property
     def ttl_seconds(self) -> int:
@@ -129,6 +131,7 @@ def get_session_token_service(
         ttl_minutes=settings.session_token_ttl_minutes,
         cookie_name=settings.session_cookie_name,
         cookie_secure=settings.session_cookie_secure,
+        cookie_samesite=settings.session_cookie_samesite,
     )
 
 

@@ -235,6 +235,14 @@ class UserRepository:
             locale=locale,
         )
 
+    def update_password_hash(self, user_id: int, password_hash: str) -> None:
+        with self._lock, self._connect() as connection:
+            connection.execute(
+                "UPDATE users SET password_hash = ? WHERE id = ?",
+                (password_hash, int(user_id)),
+            )
+            connection.commit()
+
     def _row_to_record(self, row: Iterable[object]) -> UserRecord:
         user_id, nickname, password_hash, role, locale = row
         return UserRecord(

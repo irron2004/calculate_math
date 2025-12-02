@@ -9,7 +9,7 @@ last_updated: 2025-11-04
 - Session cookie; SQLite DB; problem datasets; progress snapshots.
 
 # STRIDE Highlights
-- Spoofing: cookie theft → use httponly, sameSite=lax, secure in prod.
+- Spoofing: session hijack → HttpOnly + SameSite=strict cookies, HTTPS-only issuance, Argon2id password hashing w/ pepper and rate limits on login.
 - Tampering: rate limits on POSTs; input validation via Pydantic.
 - Repudiation: structured logs with request-id; audit where applicable.
 - Information Disclosure: no PII in logs; X-Robots-Tag noindex.
@@ -18,4 +18,6 @@ last_updated: 2025-11-04
 
 # Controls & Actions
 - Secret management via env; no hardcoded secrets.
+- Enforced Argon2id password hashing, pepper rotation guidance, and credential-stuffing detection via sliding-window rate limiting.
+- Strict session cookie defaults (secure + SameSite=strict) with HTTP rejection to prevent downgrade attacks.
 - Add dependency scans (pip-audit, npm audit) in CI.
