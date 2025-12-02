@@ -1,16 +1,21 @@
-
-skills.ui.json — UI projection spec
-===================================
-
-- trees: UI panels (3)
-- nodes: CourseStep nodes only. Each node has:
-    * tree: which panel to render in
-    * tier: original tier (1..5)
-    * requires: list of {skill_id, min_level} aggregated from AS->CS edges
-    * xp: {per_try, per_correct}
-    * boss: true for S3 by convention
-    * grid: simple (row,col) to seed the layout; refine in FE with dagre/force
-- edges: CS->CS 'enables' only (draw arrows)
-- version: inherits from source + .ui.v1
-
-This file is auto-generated from graph.bipartite.json.
+diff --git a/docs/skills.ui.README.txt b/docs/skills.ui.README.txt
+index 7ec14f1..f6741f3 100644
+--- a/docs/skills.ui.README.txt
++++ b/docs/skills.ui.README.txt
+@@ -14,3 +14,16 @@ skills.ui.json — UI projection spec
+ - version: inherits from source + .ui.v1
+ 
+ This file is auto-generated from graph.bipartite.json.
++
++Generating / refreshing
++-----------------------
++
++- Run `python scripts/generate_skill_ui_layout.py --force` after updating `graph.bipartite.json` to rebuild `app/data/skills.ui.json`.
++- The script reads the validated bipartite graph, projects it via `build_skill_tree_projection`, and emits a coarse UI layout (trees/nodes/edges/grid) with metadata describing the source graph and timestamp.
++- CI/deploys can call the script with the default arguments to keep the packaged asset in sync; the generator refuses to overwrite unless `--force` is provided.
++
++Runtime fallback
++----------------
++
++- If `skills.ui.json` is missing or invalid in a deployed environment, the backend now derives a temporary layout directly from the bipartite projection so `/api/v1/skills/tree` continues to respond with `graph.meta.fallback_reason` set to `missing_ui_spec` or `invalid_ui_spec`.
++- Logs (`calculate_service.api.skills`) contain a warning whenever the fallback is activated to surface packaging oversights.
