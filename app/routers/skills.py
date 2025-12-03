@@ -1,1 +1,1 @@
-Recovered the full router implementation and added helper routines plus `/skills/nodes/{node_id}/practice-plan` for downstream practice metadata.
+Restored the entire router with UI-layout fallback helpers, new session/prerequisite normalisers, and the `/skills/nodes/{node_id}/practice-plan` endpoint that surfaces tier/group/practice metadata and progress diagnostics.

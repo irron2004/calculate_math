@@ -1,1 +1,1 @@
-Restore JSON loading utilities with legacy `.old` fallback so the projection service can import cleanly.
+Reinstated the skill loader module with `.old` asset fallback and validation so skill graph consumers can import it again.

@@ -1,1 +1,1 @@
-Reinstated the arithmetic practice router to the working baseline so FastAPI startup succeeds.
+Recovered the FastAPI router implementing Argon2 + pepper hashing, sliding-window rate limiting, HTTPS-only cookie enforcement, and legacy-hash upgrade logic for `/api/v1/login`, keeping the existing practice session generation endpoints unchanged.
