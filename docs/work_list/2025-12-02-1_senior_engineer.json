@@ -1,0 +1,63 @@
+{
+  "task_id": "2025-12-02-1",
+  "owner_role": "senior_engineer",
+  "status": "needs-revision",
+  "summary": "Backend/frontend submissions currently check in raw diff output instead of runnable modules, and the required authentication hardening plus regression tests never landed; release must wait until the real source and security updates are restored.",
+  "review_notes": {
+    "backend": [
+      "app/config.py:1 – file contains literal diff output, so the service settings module cannot even import; revert to actual Python code before evaluating the fallback logic.",
+      "app/routers/skills.py:1 and app/services/skill_ui_layout.py:1 – both committed as diff text, so the new graph fallback is never executed and the API crashes during startup.",
+      "app/routers/practice.py:87 – login still relies on SHA-256 and insecure cookie defaults, leaving the requested argon2/bcrypt + secure flag changes unimplemented."
+    ],
+    "frontend": [
+      "frontend/src/utils/api.ts:1 – file holds diff output, meaning the seed/auto-seed fallback and telemetry helpers were never actually compiled.",
+      "frontend/src/utils/analytics.ts:1 – new trackers referenced by api.ts do not exist because the module is just diff text, so the build fails.",
+      "frontend/src/components/SkillTreePage.tsx:1 – page component also contains diff text; no working UI fallback or diagnostics banner ships."
+    ],
+    "risks": [
+      "Whole skill-tree experience is broken because multiple modules are non-executable patches.",
+      "Authentication remains weak without the planned hashing/cookie/rate-limit changes.",
+      "No automated tests cover the fallback paths, so even after restoring code regressions could slip."
+    ]
+  },
+  "artifacts_out": [
+    {
+      "type": "report",
+      "uri": "reports/review/2025-12-02-1/summary.md",
+      "note": "Consolidated review findings"
+    }
+  ],
+  "edits": [
+    {
+      "path": "reports/review/2025-12-02-1/summary.md",
+      "content": "# Review – Task 2025-12-02-1\n\n## Key Findings\n- Several Python and TypeScript modules (e.g., app/config.py, app/routers/skills.py, frontend/src/utils/api.ts) contain literal `diff --git` patches instead of runnable code, so the service cannot even import these modules. Revert the files to real source before validating functionality.\n- Security hardening requested in the chain (bcrypt/argon2 login hashing, secure cookies, rate limiting) is still missing; `app/routers/practice.py` keeps the old SHA-256 logic and insecure session defaults.\n- No backend or frontend tests were added to exercise the new seed/layout fallback paths, so regressions would ship silently.\n\n## Recommendations\n1. Restore each affected module from the intended patch output and add regression tests that cover missing data scenarios.\n2. Complete the authentication hardening requirements and add smoke tests to ensure secure defaults.\n3. When re-landing the frontend fallback, ensure analytics helpers actually exist in `frontend/src/utils/analytics.ts` and that the seed diagnostics surface is covered by Vitest.\n"
+    }
+  ],
+  "changed_files": [
+    "reports/review/2025-12-02-1/summary.md"
+  ],
+  "action_items": [
+    {
+      "assignee": "backend",
+      "action": "Restore the corrupted skill-tree/config modules with real code, add regression tests for missing-data fallbacks, and re-run make test/smoke.",
+      "priority": "high"
+    },
+    {
+      "assignee": "security",
+      "action": "Replace SHA-256 login hashing with Argon2/Bcrypt, enforce secure SameSite cookies, and add login rate limiting per the epic.",
+      "priority": "high"
+    },
+    {
+      "assignee": "frontend",
+      "action": "Reapply the auto-seed fallback implementation with working analytics helpers and Vitest coverage.",
+      "priority": "medium"
+    }
+  ],
+  "handoff_to": [
+    "qa_release"
+  ],
+  "confidence": 0.9,
+  "applied_edits": [
+    "reports/review/2025-12-02-1/summary.md"
+  ]
+}

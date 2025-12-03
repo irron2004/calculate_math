@@ -1,0 +1,769 @@
+# Senior Engineer Report — Task 2025-12-02-1
+
+## 1. Context & Planning Alignment
+- 기획서는 첫 화면을 “디아블로식 스킬 트리”로 전환하고 모바일 기준 TTI ≤ 3초·초기 렌더 50ms를 OKR로 명시합니다.*(docs/pm/기획안.md:1, docs/pm/기획안.md:10, docs/pm/기획안.md:12)*
+- 백엔드 Epic B는 `/api/v1/skills/tree`와 `/api/v1/skills/progress`를 진행도 포함 JSON으로 제공하고 캐시·테스트를 갖추라고 요구합니다.*(docs/pm/기획안.md:45-53)*
+- 프런트 Epic C는 팬/줌/키보드 내비, 명확한 상태 배지, 접근성 보장을 필수로 합니다.*(docs/pm/기획안.md:55-62)*
+
+## 2. Backend Snapshot
+### 2.1 현재 동작 개요
+- FastAPI 앱은 `app/__init__.py`에서 문제/템플릿/그래프/진행도 리포지토리를 수명주기 동안 준비하고 OpenTelemetry 미들웨어·SPA fallback까지 구성되어 있습니다.
+- `/api/v1/skills/tree`는 bipartite 그래프와 진행도 스냅샷을 `build_skill_tree_projection`으로 변환해 UI/실험 정보를 내려줍니다.*(app/routers/skills.py:162-223)*
+
+### 2.2 식별된 리스크 & 개선 과제
+1. **기본 데이터 패키징 부재**  
+   - 설정은 문제·DAG·진행도 파일을 `app/data/*.json` 기본 경로로 기대하지만 저장소에는 `.old` 하위에만 실제 JSON이 있어 런타임 FileNotFound가 발생합니다.*(app/config.py:10-18, app/config.py:133-150)*  
+   - ✅ `app/data`로 최신 JSON을 이동하거나 기본 경로를 `.old` 위치로 조정하고, 파일 미존재 시 최소한 seed/fixture로 대체하도록 로더/health 체크를 보강해야 합니다.
+
+2. **Skill UI 그래프 필수 의존성**  
+   - `/api/v1/skills/tree`는 `_SKILL_UI_PATH`를 강제하고, 파일이 없으면 즉시 `SkillSpecError`를 던집니다.*(app/routers/skills.py:39-78)*  
+   - 현재 저장본에는 `app/data/skills.ui.json`이 없어 API가 graph 없이 빈 payload를 반환합니다. bipartite projection을 그대로 `graph` 필드에 fallback 하거나, UI 그래프를 리포 build 단계에 포함시키는 배포 스크립트가 필요합니다.
+
+3. **진행도 스토어/캐시 옵저버빌리티 부족**  
+   - 진행도 로딩 실패 시 단순히 `progress_error` 메시지에 머물고, store가 완전히 비어있으면 첫 번째 user_id를 임의 사용합니다.*(app/routers/skills.py:100-210)*  
+   - 기본 데이터가 없을 때의 단계별 fallback과 메트릭(exporter) 을 추가해 root cause 파악을 쉽게 해야 합니다.
+
+4. **인증/세션 보안 미흡**  
+   - 로그인은 단순 SHA-256 해시를 사용하고, `SESSION_COOKIE_SECURE` 기본값이 False라 HTTPS가 아닌 환경에서 세션이 노출됩니다.*(app/routers/practice.py:87-101, app/config.py:155-158)*  
+   - Argon2/Bcrypt, pepper/iteration 관리, 최소 rate limit을 추가하고 기본 secure/samesite=strict 정책을 강제해야 합니다.
+
+## 3. Frontend Snapshot
+### 3.1 현재 구현
+- `SkillTreePage`는 API 응답을 기반으로 팬·줌·고대비·포커스 기능을 제공하며, payload에 `skills` 배열만 있을 경우 간이 트리를 그립니다.*(frontend/src/components/SkillTreePage.tsx:285-401)*  
+- 에러 발생 시에는 단순 메시지를 표시하고 뒤로가기 링크만 제공됩니다.*(frontend/src/components/SkillTreePage.tsx:381-399)*
+- API 클라이언트는 `VITE_SKILL_TREE_MODE`의 기본값을 `live`로 설정해 백엔드 실패 시에는 seed fallback 없이 바로 오류를 노출합니다.*(frontend/src/utils/api.ts:64-96)*
+
+### 3.2 개선 포인트
+1. **Seed/Auto Fallback 상시 활성화**  
+   - 브라우저가 첫 방문에서 빈 payload를 받으면 기획서의 “첫 화면 스킬 트리” 경험을 제공하지 못합니다. 기본 모드를 `auto-seed`로 바꾸고, API 실패 시 seed 데이터를 즉시 연결해야 합니다.
+2. **레이아웃/성능 최적화**  
+   - 현재는 백엔드가 내려주는 `graph`가 없으면 매 렌더마다 fallback grid를 재조립합니다.*(frontend/src/components/SkillTreePage.tsx:475-520)*  
+   - 백엔드가 precomputed UI 레이아웃을 보장하도록 하거나, 프런트가 React Flow/ELK를 지연 로드하여 TTI ≤ 3초 목표를 지킬 수 있게 해야 합니다.
+3. **오류/빈 상태 UX 강화**  
+   - 기획서에서 강조한 학습 흐름을 살리려면 에러 카드 대신 seed 그래프/가이드 링크를 노출하고 텔레메트리를 남겨야 합니다.
+
+## 4. Recommended Next Steps
+1. **데이터 자산 번들링** – CI/배포 파이프라인에서 `app/data/.old` 내용을 최신 스냅샷으로 승격하고 health-check에서 존재 여부를 검증합니다.
+2. **Skill Tree API 탄력성** – `_load_skill_ui_graph` 대신 projection 기반 fallback을 도입하고, graph 버전을 상태에 포함시켜 프런트 캐시를 명확히 합니다.
+3. **보안 강화를 위한 인증 리팩터링** – 패스워드 해시 교체, secure 쿠키 기본 적용, `/api/v1/login` rate limiting 및 감사 로그 추가.
+4. **프런트 fallback/성능 개선** – `auto-seed` 기본화, 에러/빈 상태 UX 개선, precomputed layout 사용 혹은 React Flow lazy load로 초기 비용 절감.
+5. **관측성 및 QA** – 스킬 트리 로딩 실패/seed fallback 사용 여부를 OTEL 메트릭과 GA 이벤트(`skill_tree_fallback`)로 측정하고, QA가 기본 데이터/seed 시나리오를 포함한 회귀를 수행하게 합니다.
+
+이 보고서를 `tasks/2025-12-02-1_handoff.json`과 함께 후속 체인(backend→security→frontend→QA→senior engineer)에 공유해 조치합니다.
+
+
+## 🎯 당신에게 할당된 작업 (Action Items)
+
+### 1. 테스트 실패 원인 분석 및 수정
+- **우선순위**: high
+- **마감일**: TBD
+- **출처**: frontend
+
+### 2. Reapply the auto-seed fallback implementation with working analytics helpers and Vitest coverage.
+- **우선순위**: medium
+- **마감일**: TBD
+- **출처**: senior_engineer
+- **산출물**: [{'type': 'report', 'uri': 'reports/review/2025-12-02-1/summary.md', 'note': 'Consolidated review findings'}]
+
+
+
+### 📄 현재 파일 스냅샷 (읽기 전용)
+
+#### app/__init__.py\n```\nimport logging
+from contextlib import asynccontextmanager
+from pathlib import Path
+from time import time
+
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from .config import get_settings
+from .dag_loader import reset_graph_cache
+from .bipartite_loader import reset_bipartite_graph_cache
+from .instrumentation import RequestContextMiddleware, configure_telemetry
+from .problem_bank import refresh_cache, reset_cache
+from .template_engine import refresh_engine, reset_engine
+from .repositories import (
+    AttemptRepository,
+    LRCRepository,
+    SessionRepository,
+    UserRepository,
+)
+from .routers import (
+    bridge,
+    curriculum,
+    dag,
+    health,
+    invites,
+    metrics,
+    pages,
+    practice,
+    problems,
+    skill_problems,
+    skills,
+)
+from .progress_store import (
+    refresh_progress_store,
+    reset_progress_store,
+)
+
+
+startup_logger = logging.getLogger("calculate_service.startup")
+
+
+def create_app() -> FastAPI:
+    """Create and configure the FastAPI application instance."""
+    settings = get_settings()
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        startup_logger.debug("lifespan setup start for app id=%s", id(app))
+        app.state.start_time = time()
+        startup_logger.debug(
+            "refreshing problem cache from %s", settings.problem_data_path
+        )
+        problem_repository = refresh_cache(force=True)
+        startup_logger.debug("problem cache ready with %d items", len(problem_repository))
+        app.state.problem_repository = problem_repository
+        app.state.problem_cache_strategy = {
+            "strategy": "file-mtime",
+            "source": str(problem_repository.source_path),
+        }
+
+        startup_logger.debug(
+            "refreshing template engine with concept=%s template=%s",
+            sett\n... [truncated] ...\ntml=True),
+            name="frontend",
+        )
+    else:
+        startup_logger.debug("frontend bundle not found at %s; skipping mount", frontend_dir)
+
+    # Store shared resources on the application state so routers can resolve them
+    # without needing to be constructed dynamically during startup.
+    app.state.settings = settings
+    app.state.templates = templates
+    app.state.frontend_available = frontend_available
+
+    app.add_middleware(RequestContextMiddleware)
+
+    # Older router modules exposed a factory (``get_router``) so we gracefully
+    # support both patterns to avoid merge conflicts when downstream branches
+    # still rely on the function based API.
+    page_router = (
+        pages.get_router(templates) if hasattr(pages, "get_router") else pages.router
+    )
+    invite_router = (
+        invites.get_router(templates)
+        if hasattr(invites, "get_router")
+        else invites.router
+    )
+
+    app.include_router(health.router)
+    app.include_router(bridge.router)
+    app.include_router(page_router)
+    app.include_router(invite_router)
+    app.include_router(problems.router)
+    app.include_router(practice.router)
+    app.include_router(metrics.router)
+    app.include_router(curriculum.router)
+    app.include_router(dag.router)
+    app.include_router(skill_problems.router)
+    app.include_router(skills.router)
+
+    @app.exception_handler(404)
+    async def spa_fallback(
+        request: Request, exc: StarletteHTTPException
+    ):  # pragma: no cover - integration exercised in e2e
+        accepts_html = "text/html" in (request.headers.get("accept") or "")
+        if (
+            frontend_available
+            and frontend_index.exists()
+            and request.method == "GET"
+            and accepts_html
+            and not request.url.path.startswith(("/api", "/static", "/docs", "/openapi"))
+        ):
+            return FileResponse(frontend_index)
+        raise exc
+
+    return app
+
+
+app = create_app()
+
+
+__all__ = ["create_app", "app"]
+\n```\n\n#### app/config.py\n```\nfrom __future__ import annotations
+
+import os
+from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
+from typing import List, Optional
+
+SERVICE_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = SERVICE_ROOT.parent
+DATA_DIR = (SERVICE_ROOT / "data").resolve()
+LEGACY_DATA_DIR = (DATA_DIR / ".old").resolve()
+
+
+def _default_data_file(filename: str) -> Path:
+    primary = (DATA_DIR / filename).resolve()
+    legacy = (LEGACY_DATA_DIR / filename).resolve()
+    if primary.exists():
+        return primary
+    if legacy.exists():
+        return legacy
+    return primary
+
+
+DEFAULT_DATA_PATH = _default_data_file("problems.json")
+DEFAULT_DB_PATH = (DATA_DIR / "attempts.db").resolve()
+DEFAULT_CONCEPT_PATH = _default_data_file("concepts.json")
+DEFAULT_TEMPLATE_PATH = _default_data_file("templates.json")
+DEFAULT_DAG_PATH = _default_data_file("dag.json")
+DEFAULT_PROGRESS_PATH = _default_data_file("dag_progress.json")
+
+
+def _load_env_file() -> None:
+    """Populate process env vars from a local .env file if present."""
+
+    env_path = REPO_ROOT / ".env"
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        os.environ.setdefault(key, value)
+
+
+def _parse_bool(value: str | None, default: bool) -> bool:
+    if value is None:
+        return default
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    return default
+
+
+def _parse_int(value: str | None, default: int) -> int:
+    if value is None or not value.strip():
+        return default
+    try:
+        return int(value)
+    except ValueError:
+ \n... [truncated] ...\nl(os.getenv("ENABLE_OPENAPI"), True),
+        allowed_problem_categories=_parse_categories(os.getenv("ALLOWED_PROBLEM_CATEGORIES")),
+        invite_token_ttl_minutes=_parse_int(os.getenv("INVITE_TOKEN_TTL_MINUTES"), 180),
+        invite_token_bytes=_parse_int(os.getenv("INVITE_TOKEN_BYTES"), 16),
+        session_token_secret=os.getenv("SESSION_TOKEN_SECRET", "calculate-dev-secret"),
+        session_token_ttl_minutes=_parse_int(os.getenv("SESSION_TOKEN_TTL_MINUTES"), 60),
+        session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "session_token"),
+        session_cookie_secure=_parse_bool(os.getenv("SESSION_COOKIE_SECURE"), True),
+        session_cookie_samesite=_parse_samesite(os.getenv("SESSION_COOKIE_SAMESITE"), "strict"),
+        problem_data_path=_resolve_path(os.getenv("PROBLEM_DATA_PATH"), default=DEFAULT_DATA_PATH),
+        attempts_database_path=_resolve_path(os.getenv("ATTEMPTS_DATABASE_PATH"), default=DEFAULT_DB_PATH),
+        concept_data_path=_resolve_path(os.getenv("CONCEPT_DATA_PATH"), default=DEFAULT_CONCEPT_PATH),
+        template_data_path=_resolve_path(os.getenv("TEMPLATE_DATA_PATH"), default=DEFAULT_TEMPLATE_PATH),
+        dag_data_path=_resolve_path(os.getenv("DAG_DATA_PATH"), default=DEFAULT_DAG_PATH),
+        progress_data_path=_resolve_path(os.getenv("DAG_PROGRESS_PATH"), default=DEFAULT_PROGRESS_PATH),
+        skill_tree_list_rollout_percentage=_clamp_percentage(os.getenv("SKILL_TREE_LIST_ROLLOUT"), default=50),
+        external_hub_url=_parse_optional_str(os.getenv("HUB_URL")),
+        password_pepper=os.getenv("PASSWORD_PEPPER", "calculate-pepper"),
+        login_rate_limit_attempts=_parse_positive_int(os.getenv("LOGIN_RATE_LIMIT_ATTEMPTS"), 5),
+        login_rate_limit_window_seconds=_parse_positive_int(
+            os.getenv("LOGIN_RATE_LIMIT_WINDOW_SECONDS"), 60
+        ),
+    )
+
+
+@lru_cache
+def get_settings() -> Settings:
+    """Return cached settings instance."""
+
+    return _build_settings()
+
+
+__all__ = ["Settings", "get_settings"]
+\n```\n\n#### app/routers/practice.py\n```\ndiff --git a/app/routers/practice.py b/app/routers/practice.py
+index 177e804..e4de8c9 100644
+--- a/app/routers/practice.py
++++ b/app/routers/practice.py
+@@ -1,24 +1,34 @@
+-from __future__ import annotations
+-
+-import hashlib
+-import random
+-import time
++from __future__ import annotations
++
++import hashlib
++import logging
++import random
++import time
+ from dataclasses import dataclass
+ from enum import Enum
+ from typing import List, Optional
+-
+-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+-from pydantic import BaseModel, Field
+-
+-from ..dependencies.auth import (
+-    SessionTokenService,
+-    get_current_user,
+-    get_session_token_service,
+-    get_user_repository,
+-)
+-from ..repositories import UserRecord, UserRepository
+-
++ 
++from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
++from pydantic import BaseModel, Field
++
++from ..config import Settings, get_settings
++from ..dependencies.auth import (
++    SessionTokenService,
++    get_current_user,
++    get_session_token_service,
++    get_user_repository,
++)
++from ..repositories import UserRecord, UserRepository
++from ..security.passwords import (
++    hash_password as secure_hash_password,
++    is_argon_hash,
++    needs_rehash,
++    verify_password,
++)
++from ..security.rate_limiter import SlidingWindowRateLimiter
++
+ router = APIRouter(prefix="/api", tags=["practice"])
++login_logger = logging.getLogger("calculate_service.api.login")
+@@
+-class SessionResponse(BaseModel):
+-    session_id: int
+-    problems: List[SessionProblem]
+-
+-
+-def _hash_password(raw: str) -> str:
+-    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+-
+-
+-def _set_session_cookie(
+-    response: Response, session_service: SessionTokenService, token: str
+-) -> None:
+-    response.set_cookie(
+-        key=session_service.cookie_name,
+-        value=token,
+-        httponly=True,
+-        secure=session_service.cookie_secure,
+-        samesite="lax",
+-        max_age=session_service\n... [truncated] ...\nwn"
++    if not limiter.allow(client_ip):
++        login_logger.warning("login rate limit exceeded", extra={"client_ip": client_ip})
++        raise HTTPException(
++            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
++            detail={"message": "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요."},
++        )
++
++    existing = repository.get_by_nickname(normalized_nickname)
++    pepper = settings.password_pepper
++
++    if existing is None:
++        created = repository.create_user(
++            nickname=normalized_nickname,
++            password_hash=secure_hash_password(payload.password, pepper=pepper),
++            role="student",
++        )
++        session_token, session_record = session_service.issue_session(
++            user_id=created.id,
++            user_agent=request.headers.get("user-agent"),
++        )
++        _set_session_cookie(response, request, session_service, session_token)
++        return LoginResponse(
++            user_id=created.id,
++            nickname=created.nickname,
++            role=created.role,
++            message="새 계정이 생성되었습니다",
++            session_token=session_token,
++            expires_at=session_record.expires_at.timestamp(),
++        )
++
++    if not _verify_and_upgrade_password(
++        password=payload.password,
++        record=existing,
++        repository=repository,
++        pepper=pepper,
++    ):
++        raise HTTPException(
++            status_code=status.HTTP_401_UNAUTHORIZED,
++            detail={"message": "비밀번호가 일치하지 않습니다."},
++        )
++
++    session_token, session_record = session_service.issue_session(
++        user_id=existing.id,
++        user_agent=request.headers.get("user-agent"),
++    )
++    _set_session_cookie(response, request, session_service, session_token)
++    return LoginResponse(
++        user_id=existing.id,
++        nickname=existing.nickname,
++        role=existing.role,
++        message="로그인 성공",
++        session_token=session_token,
++        expires_at=session_record.expires_at.timestamp(),
++    )
+\n```\n\n#### app/routers/skills.py\n```\nfrom __future__ import annotations
+
+import json
+import logging
+from copy import deepcopy
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from pydantic import BaseModel, Field
+
+from ..bipartite_loader import (
+    BipartiteSpecError,
+    get_atomic_skills,
+    get_bipartite_graph,
+    get_course_steps,
+)
+from ..dependencies.auth import get_optional_user
+from ..feature_flags import assign_skill_tree_variant
+from ..progress_store import (
+    NodeProgress,
+    ProgressSnapshot,
+    ProgressStore,
+    SkillProgress,
+    get_progress_store,
+)
+from ..repositories import UserRecord
+from ..services import SkillProgressService
+from ..services.skill_tree_projection import build_skill_tree_projection
+from ..services.skill_ui_layout import build_ui_layout_from_projection
+from ..skills_loader import SkillSpecError
+
+router = APIRouter(prefix="/api/v1", tags=["skills"])
+logger = logging.getLogger("calculate_service.api.skills")
+
+_SKILL_UI_PATH = Path(__file__).resolve().parent.parent / "data" / "skills.ui.json"
+_LEGACY_SKILL_UI_PATH = _SKILL_UI_PATH.parent / ".old" / _SKILL_UI_PATH.name
+
+
+def _resolve_skill_ui_path() -> Path | None:
+    if _SKILL_UI_PATH.exists():
+        return _SKILL_UI_PATH
+    if _LEGACY_SKILL_UI_PATH.exists():
+        return _LEGACY_SKILL_UI_PATH
+    return None
+
+
+@lru_cache(maxsize=1)
+def _load_skill_ui_graph() -> Dict[str, Any]:
+    source_path = _resolve_skill_ui_path()
+    if source_path is None:
+        raise SkillSpecError(
+            f"Skill UI graph not found (searched {_SKILL_UI_PATH} and {_LEGACY_SKILL_UI_PATH})"
+        )
+    try:
+        payload = json.loads(source_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:  # pragma: no cover - defensive guard
+        raise SkillSpecError(f"Invalid skill UI graph specification at {source_path}") from exc
+    return payload
+
+
+class SkillProgressReq\n... [truncated] ...\n.",
+                "kind": progress_error.__class__.__name__,
+            }
+        )
+    if graph_error is not None:
+        graph_issue: dict[str, Any] = {
+            "message": "UI 레이아웃 데이터를 불러오지 못해 기본 레이아웃을 사용합니다.",
+            "kind": graph_error.__class__.__name__,
+            "detail": str(graph_error),
+        }
+        if fallback_reason is not None:
+            graph_issue["meta"] = {"fallback_reason": fallback_reason}
+        issues.append(graph_issue)
+    if issues:
+        combined_issue = issues[0]
+        if len(issues) > 1:
+            combined_issue["causes"] = issues[1:]
+        payload["error"] = combined_issue
+
+    return payload
+
+
+@router.post("/skills/progress")
+async def api_update_skill_progress(
+    request: Request,
+    payload: SkillProgressRequest,
+    user: UserRecord | None = Depends(get_optional_user),
+) -> Dict[str, Any]:
+    bipartite_graph = get_bipartite_graph()
+    course_steps = get_course_steps()
+    atomic_skills = get_atomic_skills()
+    service = SkillProgressService(course_steps, atomic_skills, bipartite_graph.edges)
+    store = _resolve_progress_store(request)
+
+    effective_user_id = payload.user_id or (user.id if user else None)
+    if effective_user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"message": "사용자 정보를 찾을 수 없습니다."},
+        )
+
+    def mutator(snapshot: ProgressSnapshot) -> None:
+        for _ in range(payload.attempts):
+            service.apply_course_attempt(snapshot, payload.course_step_id, correct=payload.correct)
+
+    snapshot = store.update_snapshot(effective_user_id, mutator)
+    return {
+        "user_id": snapshot.user_id,
+        "updated_at": snapshot.updated_at.isoformat(),
+        "total_xp": snapshot.total_xp,
+        "nodes": {node_id: progress.dict() for node_id, progress in snapshot.nodes.items()},
+        "skills": {skill_id: progress.dict() for skill_id, progress in snapshot.skills.items()},
+    }
+
+
+__all__ = ["router"]
+\n```\n\n#### frontend/src/components/SkillTreePage.tsx\n```\ndiff --git a/frontend/src/components/SkillTreePage.tsx b/frontend/src/components/SkillTreePage.tsx
+index 6b450b0..a270484 100644
+--- a/frontend/src/components/SkillTreePage.tsx
++++ b/frontend/src/components/SkillTreePage.tsx
+@@ -227,6 +227,8 @@ const SkillTreePage: React.FC = () => {
+   const [experiment, setExperiment] = useState<ExperimentAssignment | null>(null);
+   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+   const [isSimpleSkillTree, setIsSimpleSkillTree] = useState(false);
++  const [seedDiagnostics, setSeedDiagnostics] =
++    useState<SkillTreeResponse['diagnostics'] | null>(null);
+   const isMountedRef = useRef(true);
+   const [isRefreshing, setIsRefreshing] = useState(false);
+   const [zoom, setZoom] = useState(1);
+@@ -312,6 +314,9 @@ useUnlockFx(recentlyUnlocked);
+         setProgress(createEmptyProgress());
+         setExperiment(null);
+         setIsSimpleSkillTree(true);
++        setSeedDiagnostics(
++          payload.diagnostics?.fallback === 'seed' ? payload.diagnostics : null,
++        );
+         setError(null);
+         if (!silent) {
+           setSelectedNodeId(null);
+@@ -321,6 +326,7 @@ useUnlockFx(recentlyUnlocked);
+       }
+ 
+       setIsSimpleSkillTree(false);
++      setSeedDiagnostics(null);
+       setVersion(payload.version ?? null);
+       setPalette(payload.palette ?? {});
+       const nodeList = Array.isArray(payload.nodes) ? payload.nodes : [];
+@@ -423,6 +429,7 @@ useUnlockFx(recentlyUnlocked);
+     registerCourseConcept,
+     trackExperimentExposure,
+     fetchSkillTree,
++    setSeedDiagnostics,
+   ],
+ );
+ 
+@@ -747,7 +754,24 @@ useEffect(() => {
+ 
+       {isSimpleSkillTree ? (
+         <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-100">
+-          시작용 스킬 트리를 표시합니다. 선행 관계를 빠르게 확인할 수 있고, 학습 시작은 추후 단계별 업데이트와 함께 활성화됩니다.
++          <p>
++            {(() => {
++              const reason = seedDiagnostics?.reason ?? 'seed_mode';
++              if (reason === 'api_error') {
++                return '라이브 스킬 트리를 불러오지 못해 시드 데이터를 표시합니다.';
++              }
++              if (reason === 'graph_unavailable') {
++                return '서버에서 UI 레이아웃이 비어 있어 시드 스킬 트리를 임시로 사용합니다.';
++              }
++              if (reason === 'nodes_unavailable') {
++                return '스킬 노드가 비어 있어 시드 스킬 트리를 임시로 사용합니다.';
++              }
++              return '시작용 스킬 트리를 표시합니다.';
++            })()}
++          </p>
++          <p className="mt-1 text-[11px] text-amber-200/80">
++            라이브 데이터가 준비되면 새로고침하여 최신 경로·진행도를 확인하세요. fallback 발생은 텔레메트리에 기록되어 운영팀이 즉시 추적합니다.
++          </p>
+         </div>
+       ) : null}
+ 
+\n```\n\n#### frontend/src/utils/api.ts\n```\ndiff --git a/frontend/src/utils/api.ts b/frontend/src/utils/api.ts
+index a4bc687..222ad2d 100644
+--- a/frontend/src/utils/api.ts
++++ b/frontend/src/utils/api.ts
+@@ -16,6 +16,7 @@ import type {
+ } from '../types';
+ import { STARTER_SKILL_TREE, SKILL_TREE_SEED_VERSION } from '../constants/skillTreeSeed';
+ import { buildSimpleSkillTree } from './simpleSkillTree';
++import { trackApiError, trackSkillTreeFallback } from './analytics';
+ 
+ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
+ 
+@@ -38,33 +39,30 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
+   });
+ 
+   if (!response.ok) {
+-    let bodyPreview: string | undefined;
+-    try {
+-      const text = await response.clone().text();
+-      bodyPreview = text.trim().slice(0, 200);
+-    } catch (error) {
+-      bodyPreview = undefined;
+-    }
++    const requestId = response.headers.get('x-request-id');
+     console.error('[API] 호출 실패', {
+       url,
+       status: response.status,
+       statusText: response.statusText,
+-      bodyPreview,
++      requestId,
++    });
++    trackApiError({
++      endpoint,
++      method: options?.method ?? 'GET',
++      status: response.status,
++      requestId,
+     });
+-    throw new Error(
+-      `API 호출 실패: ${response.status} ${response.statusText} @ ${url}${
+-        bodyPreview ? ` → ${bodyPreview}` : ''
+-      }`,
+-    );
++    throw new Error(`API 호출 실패: ${response.status} ${response.statusText} @ ${url}`);
+   }
+ 
+   return response.json();
+ }
+ 
+-// 기본값을 live로 올려서 백엔드 트리를 우선 사용하고, seed는 명시적으로만 활성화한다.
+-const skillTreeMode = (import.meta.env.VITE_SKILL_TREE_MODE ?? 'live').toLowerCase();
++const rawSkillTreeMode = (import.meta.env.VITE_SKILL_TREE_MODE ?? 'auto-seed').toLowerCase();
++const supportedModes = new Set(['live', 'seed', 'auto-seed']);
++const skillTreeMode = supportedModes.has(rawSkillTreeMode) ? rawSkillTreeMode : 'auto-seed';
+ const useSeedSkillTree = skillTreeMode === 'seed';
+-const allowSeedFallback = useSeedSkillTr\n... [truncated] ...\n@ -95,6 +93,26 @@ const seedSkillTreePayload: SkillTreeResponse = {
+   },
+ };
+ 
++type SeedFallbackReason = 'seed_mode' | 'api_error' | 'graph_unavailable' | 'nodes_unavailable';
++
++const createSeedPayload = (reason: SeedFallbackReason, detail?: string): SkillTreeResponse => ({
++  ...seedSkillTreePayload,
++  diagnostics: {
++    fallback: 'seed',
++    reason,
++    mode: skillTreeMode,
++    detail,
++  },
++});
++
++const reportSeedFallback = (reason: SeedFallbackReason, detail?: string) => {
++  trackSkillTreeFallback({
++    reason,
++    mode: skillTreeMode,
++    detail,
++  });
++};
++
+ // 세션 생성 (20문제 세트)
+ export async function createSession(
+   token?: string,
+@@ -245,14 +263,26 @@ export async function fetchLatestLRC(userId: string): Promise<LRCEvaluation | nu
+ export async function fetchSkillTree(): Promise<SkillTreeResponse> {
+   if (useSeedSkillTree) {
+     console.info('[API] 스킬 트리를 시드 데이터로 로드합니다.');
+-    return seedSkillTreePayload;
++    reportSeedFallback('seed_mode');
++    return createSeedPayload('seed_mode');
+   }
+   try {
+-    return await apiCall<SkillTreeResponse>('/v1/skills/tree');
++    const payload = await apiCall<SkillTreeResponse>('/v1/skills/tree');
++    const hasNodes = Array.isArray(payload.nodes) && payload.nodes.length > 0;
++    const hasGraphNodes =
++      Array.isArray(payload.graph?.nodes) && (payload.graph?.nodes?.length ?? 0) > 0;
++    if ((!hasNodes || !hasGraphNodes) && allowSeedFallback) {
++      const reason: SeedFallbackReason = hasNodes ? 'graph_unavailable' : 'nodes_unavailable';
++      reportSeedFallback(reason);
++      return createSeedPayload(reason);
++    }
++    return payload;
+   } catch (error) {
+     if (allowSeedFallback) {
+       console.warn('[API] 스킬 트리 API 호출 실패 → 시드 데이터로 대체합니다.', error);
+-      return seedSkillTreePayload;
++      const detail = error instanceof Error ? error.message : undefined;
++      reportSeedFallback('api_error', detail);
++      return createSeedPayload('api_error', detail);
+     }
+     throw error;
+   }
+\n```\n\n#### tasks/2025-12-02-1_handoff.json\n```\n{
+  "task_id": "2025-12-02-1",
+  "title": "스킬 트리 데이터/인증 복구 및 프런트 fallback 적용",
+  "description": "필수 데이터(JSON) 누락으로 백엔드 기동과 /api/v1/skills/tree가 실패하거나 빈 payload를 내려 프런트가 비어 보이는 문제를 해소하고, 로그인 보안을 강화하며 프런트 SkillTreePage에 seed/auto-seed fallback을 기본 적용합니다.",
+  "required_roles_for_signoff": [
+    "backend",
+    "frontend",
+    "security",
+    "qa_release",
+    "senior_engineer"
+  ],
+  "chain": [
+    {
+      "owner": "backend",
+      "task": ".old의 problems/dag/dag_progress/skills.ui JSON을 기본 경로로 이동하거나 기본값을 수정하고, 미존재 시 안전한 fallback 처리"
+    },
+    {
+      "owner": "backend",
+      "task": "/api/v1/skills/tree에 skills.ui.json이 없을 때 bipartite projection을 graph로 내려주는 fallback과 레이아웃 생성 스크립트/문서 추가"
+    },
+    {
+      "owner": "security",
+      "task": "로그인 해시를 bcrypt/argon2로 교체하고 SESSION_COOKIE_SECURE 기본 True, 로그인 rate limit 적용"
+    },
+    {
+      "owner": "frontend",
+      "task": "SkillTreePage 기본 모드를 auto-seed로 두고 API 실패/빈 그래프 시 seed 트리와 안내를 표시, 서버 제공 레이아웃을 우선 사용해 ELK 의존을 줄임"
+    },
+    {
+      "owner": "qa_release",
+      "task": "클린 환경에서 /readyz와 /api/v1/skills/tree 응답 검증 및 로그인/스킬 트리 회귀 테스트"
+    },
+    {
+      "owner": "senior_engineer",
+      "task": "최종 통합 리뷰 및 승인"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "report",
+      "uri": "tasks/2025-12-02-1_handoff.json",
+      "status": "draft"
+    }
+  ],
+  "priority": "high",
+  "deadline": "2025-12-09",
+  "created_at": "2025-12-02T00:00:00",
+  "created_by": "senior_engineer"
+}
+\n```
