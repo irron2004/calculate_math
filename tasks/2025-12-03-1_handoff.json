@@ -1,0 +1,41 @@
+{
+  "task_id": "2025-12-03-1",
+  "title": "Skill Tree viewport & flow polish",
+  "description": "Responsive fixes for the overcrowded Skill Tree (viewport auto-fit, hover spacing, arrow rendering) plus a unified student flow that ties the dashboard, skill selection, and practice sessions together.",
+  "required_roles_for_signoff": [
+    "ux",
+    "frontend",
+    "backend",
+    "qa_release",
+    "senior_engineer"
+  ],
+  "chain": [
+    {
+      "owner": "ux",
+      "task": "Define the combined student + skill-tree experience (landing layout, tooltip behavior, session confirmation) with responsive breakpoints and updated copy."
+    },
+    {
+      "owner": "frontend",
+      "task": "Implement the responsive SkillTreeGraph (auto-fit, spacing, arrow rendering), overlay tooltips, and merge the student dashboard with skill-driven practice launches."
+    },
+    {
+      "owner": "backend",
+      "task": "Confirm or extend practice/session APIs so selected skill IDs feed into generated problem sets and expose any needed metadata for the unified view."
+    },
+    {
+      "owner": "qa_release",
+      "task": "Verify on desktop/mobile that the entire tree fits on load, hover cards don’t overlap, arrows terminate on nodes, and the new flow launches the correct skill-specific practice."
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "document",
+      "uri": "tasks/2025-12-03-1.md",
+      "status": "new"
+    }
+  ],
+  "priority": "high",
+  "deadline": "2025-12-10",
+  "created_at": "2025-12-03T00:00:00",
+  "created_by": "senior_engineer"
+}
