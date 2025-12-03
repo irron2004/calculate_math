@@ -7,24 +7,33 @@
     "frontend",
     "backend",
     "qa_release",
-    "senior_engineer"
+    "senior_engineer",
+    "planner"
   ],
   "chain": [
     {
+      "owner": "planner",
+      "task": "Align scope/OKR impact, lock timelines, and publish UX brief (layout goals, target devices, success metrics)."
+    },
+    {
       "owner": "ux",
-      "task": "Define the combined student + skill-tree experience (landing layout, tooltip behavior, session confirmation) with responsive breakpoints and updated copy."
+      "task": "Produce responsive mockups + interaction specs (hover, tooltips, seed fallback messaging) and update copy for merged dashboard."
     },
     {
       "owner": "frontend",
-      "task": "Implement the responsive SkillTreeGraph (auto-fit, spacing, arrow rendering), overlay tooltips, and merge the student dashboard with skill-driven practice launches."
+      "task": "Implement SkillTreeGraph auto-fit + spacing changes, collision-safe tooltips, arrow rendering, and integrate the unified student/skill flow."
     },
     {
       "owner": "backend",
-      "task": "Confirm or extend practice/session APIs so selected skill IDs feed into generated problem sets and expose any needed metadata for the unified view."
+      "task": "Expose/confirm practice session parameters for skill-scoped launches and surface any metadata UX needs (e.g., tier labels, prerequisites)."
     },
     {
       "owner": "qa_release",
-      "task": "Verify on desktop/mobile that the entire tree fits on load, hover cards don’t overlap, arrows terminate on nodes, and the new flow launches the correct skill-specific practice."
+      "task": "Regression test desktop/mobile for viewport fit, hover clarity, arrow alignment, and the new practice launch flow, attaching evidence."
+    },
+    {
+      "owner": "senior_engineer",
+      "task": "Final integration review ensuring UX spec adherence, code quality, and instrumentation coverage before release."
     }
   ],
   "artifacts": [
@@ -37,5 +46,5 @@
   "priority": "high",
   "deadline": "2025-12-10",
   "created_at": "2025-12-03T00:00:00",
-  "created_by": "senior_engineer"
+  "created_by": "planner"
 }
