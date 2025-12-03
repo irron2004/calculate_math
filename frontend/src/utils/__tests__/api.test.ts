@@ -1,1 +1,1 @@
-- reset `VITE_SKILL_TREE_MODE` between tests, assert diagnostics when hard-coded seed mode is used, and add a regression that simulates API failure in auto-seed mode
+Covers explicit seed mode and auto-seed fallback diagnostics.

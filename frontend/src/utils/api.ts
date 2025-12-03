@@ -1,4 +1,1 @@
-- track `x-request-id` on failed requests and emit `api_error` telemetry via `trackApiError`
-- normalize `VITE_SKILL_TREE_MODE` into `rawSkillTreeMode` with supported modes, add `SeedFallbackReason`, `createSeedPayload`, and `reportSeedFallback`
-- attach diagnostics to seed responses and detect missing nodes/graph payloads to auto-fallback with telemetry context
-- reuse the new helpers inside `fetchSkillTree` so server outages, missing assets, and seed-mode all yield consistent metadata
+Added skill-tree mode normalization, telemetry-backed fallbacks, and `fetchPracticePlan`; emits diagnostics for seed fallbacks.

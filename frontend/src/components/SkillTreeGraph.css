@@ -1,1 +1,259 @@
-- restyle `.skill-card__tooltip` so it can anchor above/below/left/right via modifier classes, reducing collisions across the denser layout
+.skill-tree-graph {
+  position: relative;
+  width: 100%;
+  min-height: 640px;
+  overflow: auto;
+  padding: 2rem 2rem 3rem;
+  background: radial-gradient(circle at top, rgba(30, 41, 59, 0.95), #0f1729);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.skill-tree-graph__canvas {
+  position: relative;
+  min-height: 540px;
+  transform-origin: top left;
+  will-change: transform;
+}
+
+.skill-tree-graph__edge-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.skill-tree-node {
+  position: absolute;
+  width: 220px;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.85);
+  box-shadow: 0 18px 40px -24px rgba(56, 189, 248, 0.45);
+  color: #e2e8f0;
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  cursor: default;
+}
+
+.skill-tree-node[role='button'] {
+  cursor: pointer;
+}
+
+.skill-tree-node:focus-visible {
+  outline: 2px solid rgba(56, 189, 248, 0.8);
+  outline-offset: 6px;
+}
+
+.skill-tree-node:hover {
+  transform: translateY(-4px);
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 20px 48px -18px rgba(56, 189, 248, 0.6);
+}
+
+.skill-tree-node[data-state='completed'] {
+  border-color: rgba(16, 185, 129, 0.65);
+  box-shadow: 0 22px 48px -18px rgba(16, 185, 129, 0.5);
+}
+
+.skill-tree-node[data-state='locked'] {
+  border-color: rgba(148, 163, 184, 0.2);
+  opacity: 0.65;
+  box-shadow: none;
+}
+
+.skill-tree-node__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.skill-tree-node__title {
+  margin: 0.4rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.skill-tree-node__boss {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(250, 204, 21, 0.6);
+  background: rgba(234, 179, 8, 0.12);
+  color: #facc15;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.skill-tree-node__stats {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.skill-tree-node__badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.6rem;
+}
+
+.skill-tree-node__badge {
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.skill-tree-node__action {
+  margin-top: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.6);
+  background: rgba(14, 165, 233, 0.2);
+  color: #e0f2fe;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.skill-tree-node[data-state='locked'] .skill-tree-node__action {
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+  opacity: 0.6;
+}
+
+.skill-card__tooltip {
+  position: absolute;
+  min-width: 220px;
+  max-width: 260px;
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 18px 38px -18px rgba(15, 23, 42, 0.8);
+  pointer-events: none;
+  opacity: 0.95;
+  color: #e2e8f0;
+}
+
+.skill-card__tooltip-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.skill-card__tooltip-meta {
+  margin: 0.2rem 0;
+  font-size: 0.7rem;
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.skill-card__tooltip-body {
+  margin: 0.4rem 0 0;
+  font-size: 0.7rem;
+  color: rgba(148, 163, 184, 0.9);
+}
+
+.skill-card__tooltip--north {
+  left: 50%;
+  bottom: 100%;
+  transform: translate(-50%, -16px);
+}
+
+.skill-card__tooltip--south {
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 16px);
+}
+
+.skill-card__tooltip--east {
+  left: 100%;
+  top: 50%;
+  transform: translate(16px, -50%);
+}
+
+.skill-card__tooltip--west {
+  right: 100%;
+  top: 50%;
+  transform: translate(-16px, -50%);
+}
+
+.skill-tree-graph__group-label {
+  position: absolute;
+  top: -2.5rem;
+  width: 220px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(203, 213, 225, 0.7);
+}
+
+.skill-tree-graph__group-column {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 240px;
+  border-right: 1px dashed rgba(148, 163, 184, 0.18);
+}
+
+.skill-tree-graph__group-column:last-of-type {
+  border-right: none;
+}
+
+.skill-tree-graph__tier-guideline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.12), rgba(148, 163, 184, 0.02));
+}
+
+.skill-tree-graph__tier-label {
+  position: absolute;
+  left: -60px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(148, 163, 184, 0.65);
+}
+
+.skill-tree-graph__edge {
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.55;
+}
+
+.skill-tree-graph__node-glow {
+  position: absolute;
+  inset: -12px;
+  border-radius: 1.4rem;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.15), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.skill-tree-node:hover .skill-tree-graph__node-glow,
+.skill-tree-node[data-state='completed'] .skill-tree-graph__node-glow {
+  opacity: 1;
+}
+
+.skill-tree-node[data-state='locked'] .skill-tree-graph__node-glow {
+  opacity: 0;
+}

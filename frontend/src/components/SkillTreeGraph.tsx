@@ -1,2 +1,1 @@
-- accept the new `onViewportFit`/`onNodeHover` props, enlarge node spacing, and auto-fit on load and window resize
-- reposition edge endpoints/tooltip placement, add hover cleanup, and feed telemetry callbacks while preserving keyboard focus handling
+Responsive viewport scaling, hover callbacks, telemetry hooks, and tooltip rendering to prevent collisions; CSS updated accordingly.

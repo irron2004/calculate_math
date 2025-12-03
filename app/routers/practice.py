@@ -1,1 +1,1 @@
-Restored from commit b18f7c6 to remove literal diff artfacts and bring back the working login/practice router so FastAPI imports succeed.
+Reinstated the arithmetic practice router to the working baseline so FastAPI startup succeeds.

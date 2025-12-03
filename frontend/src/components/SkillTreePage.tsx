@@ -1,3 +1,1 @@
-- import the new analytics helpers/types, track viewport-fit and node-hover callbacks, and log practice launches (including blocked reasons)
-- keep `seedDiagnostics` state so the UI can surface why the graph fell back to seed-data
-- wire the SkillTreeGraph callbacks plus the updated low-contrast banner copy referencing diagnostics
+Displays seed diagnostics, fetches practice-plan data, gates CTAs, and tracks telemetry on viewport/hover/practice launch.

@@ -1,1 +1,1 @@
-- add `trackSkillTreeFallback`, `trackApiError`, `trackSkillTreeViewportFit`, `trackSkillTreeNodeHover`, and `trackSkillTreePracticeLaunch` so the UI can log resilience + interaction events
+New analytics emitters for API errors, viewport fit, hover, fallback, and practice launches.
