@@ -1,1 +1,1 @@
-New analytics emitters for API errors, viewport fit, hover, fallback, and practice launches.
+- extended analytics emitters with fallback, API error, viewport-fit, node-hover, and practice-launch events so both SkillTree page and dashboard can log interactions (`frontend/src/utils/analytics.ts:180`).

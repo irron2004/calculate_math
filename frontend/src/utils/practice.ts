@@ -1,1 +1,1 @@
-Shared helper to serialize `practice_launch` metadata into `/game` URL params.
+- introduced helpers to serialize practice-launch metadata, build `/game` URLs, and surface blocked reasons/shared readiness states (`frontend/src/utils/practice.ts:1`).

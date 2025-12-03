@@ -1,0 +1,1 @@
+- verified practice URL serialization and readiness helpers to guard the dashboard modal flow (`frontend/src/utils/__tests__/practice.test.ts:1`).

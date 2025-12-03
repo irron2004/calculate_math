@@ -1,1 +1,1 @@
-Displays seed diagnostics, fetches practice-plan data, gates CTAs, and tracks telemetry on viewport/hover/practice launch.
+- surfaced seed diagnostics, wired viewport/hover analytics, and routed the CTA through `fetchPracticePlan` with blocked-reason messaging plus telemetry (`frontend/src/components/SkillTreePage.tsx:95`).

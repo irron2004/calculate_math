@@ -1,1 +1,1 @@
-Loads the skill tree summary, surfaces recommended nodes, and adds a confirmation modal wired to `fetchPracticePlan`; paired CSS supports the new layout.
+- merged the skill overview and practice flow by loading live nodes, recommending available skills, and gating launches behind the new confirmation modal/telemetry (`frontend/src/components/StudentDashboard.tsx:27`).

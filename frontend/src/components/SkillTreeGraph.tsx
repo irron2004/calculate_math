@@ -1,1 +1,1 @@
-Responsive viewport scaling, hover callbacks, telemetry hooks, and tooltip rendering to prevent collisions; CSS updated accordingly.
+- rebuilt the graph with responsive auto-fit, adjacency-based dimming, hover tooltips, and telemetry callbacks so `/skills` and the dashboard can track viewport + hover events (`frontend/src/components/SkillTreeGraph.tsx:41`).
