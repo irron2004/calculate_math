@@ -1,0 +1,50 @@
+{
+  "task_id": "2025-12-04-1",
+  "title": "Restore & ship Skill Tree UX fixes",
+  "description": "Recover the broken Skill Tree router/tests, then implement the responsive viewport, tooltip/arrow fixes, and unified student flow that were missing from 2025-12-03-1.",
+  "required_roles_for_signoff": [
+    "planner",
+    "ux",
+    "frontend",
+    "backend",
+    "qa_release",
+    "senior_engineer"
+  ],
+  "chain": [
+    {
+      "owner": "planner",
+      "task": "Confirm updated scope/timeline, restate spec (2025-12-03-1 goals + recovery plan), and align stakeholders."
+    },
+    {
+      "owner": "backend",
+      "task": "Restore `app/routers/skills.py` and related modules, reapply intended logic (practice-plan, fallbacks) in valid Python, and ensure pytest passes."
+    },
+    {
+      "owner": "frontend",
+      "task": "Implement responsive Skill Tree layout, collision-free tooltips/arrows, and merge the student dashboard flow (CTA + confirmation modal, legacy copy removal)."
+    },
+    {
+      "owner": "ux",
+      "task": "Review/adjust designs for the merged dashboard + skill flow, ensuring copy and interactions match Diablo-style goals."
+    },
+    {
+      "owner": "qa_release",
+      "task": "Regression test `/api/v1/skills/*`, practice-plan endpoint, and desktop/mobile Skill Tree UX; attach evidence for telemetry events."
+    },
+    {
+      "owner": "senior_engineer",
+      "task": "Final integration review verifying code quality, tests, and adherence to the original spec before merge."
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "document",
+      "uri": "tasks/2025-12-04-1.md",
+      "status": "new"
+    }
+  ],
+  "priority": "high",
+  "deadline": "2025-12-12",
+  "created_at": "2025-12-04T00:00:00",
+  "created_by": "planner"
+}
