@@ -1,0 +1,288 @@
+[
+  {
+    "id": "chain-1",
+    "assignee": "backend",
+    "action": "Restore `app/routers/skills.py` and related modules, reapply intended logic (practice-plan, fallbacks) in valid Python, and ensure pytest passes.",
+    "priority": "high",
+    "due_date": "2025-12-12",
+    "status": "done",
+    "source_role": "handoff",
+    "created_at": "2025-12-03T15:24:50.647707+00:00",
+    "context": {
+      "notes": "Recover the broken Skill Tree router/tests, then implement the responsive viewport, tooltip/arrow fixes, and unified student flow that were missing from 2025-12-03-1.",
+      "risks": null,
+      "artifacts_out": null
+    },
+    "updated_at": "2025-12-03T15:39:58.195298+00:00"
+  },
+  {
+    "id": "chain-2",
+    "assignee": "frontend",
+    "action": "Implement responsive Skill Tree layout, collision-free tooltips/arrows, and merge the student dashboard flow (CTA + confirmation modal, legacy copy removal).",
+    "priority": "high",
+    "due_date": "2025-12-12",
+    "status": "done",
+    "source_role": "handoff",
+    "created_at": "2025-12-03T15:24:50.647714+00:00",
+    "context": {
+      "notes": "Recover the broken Skill Tree router/tests, then implement the responsive viewport, tooltip/arrow fixes, and unified student flow that were missing from 2025-12-03-1.",
+      "risks": null,
+      "artifacts_out": null
+    },
+    "updated_at": "2025-12-03T15:59:21.171259+00:00"
+  },
+  {
+    "id": "chain-5",
+    "assignee": "senior_engineer",
+    "action": "Final integration review verifying code quality, tests, and adherence to the original spec before merge.",
+    "priority": "high",
+    "due_date": "2025-12-12",
+    "status": "done",
+    "source_role": "handoff",
+    "created_at": "2025-12-03T15:24:50.647732+00:00",
+    "context": {
+      "notes": "Recover the broken Skill Tree router/tests, then implement the responsive viewport, tooltip/arrow fixes, and unified student flow that were missing from 2025-12-03-1.",
+      "risks": null,
+      "artifacts_out": null
+    },
+    "updated_at": "2025-12-03T16:28:56.078760+00:00"
+  },
+  {
+    "id": "frontend-1764777561171-0",
+    "assignee": "senior_engineer",
+    "action": "Finish the student dashboard + practice modal flow (Skill Tree summary, modal wiring, practice-plan data/telemetry) and re-align with backend once the router/tests are restored.",
+    "priority": "high",
+    "due_date": "TBD",
+    "status": "done",
+    "source_role": "frontend",
+    "created_at": "2025-12-03T15:59:21.171346+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": []
+    },
+    "updated_at": "2025-12-03T16:28:56.078884+00:00"
+  },
+  {
+    "id": "backend-1764776398195-0",
+    "assignee": "senior_engineer",
+    "action": "Spot-check restored practice router/login flow for regressions beyond syntax fixes",
+    "priority": "medium",
+    "due_date": "TBD",
+    "status": "done",
+    "source_role": "backend",
+    "created_at": "2025-12-03T15:39:58.195365+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": [
+        {
+          "type": "report",
+          "uri": "reports/backend/2025-12-04-1/summary.md",
+          "note": "Backend summary + pytest results"
+        }
+      ]
+    },
+    "updated_at": "2025-12-03T16:28:56.078894+00:00"
+  },
+  {
+    "id": "chain-0",
+    "assignee": "planner",
+    "action": "Confirm updated scope/timeline, restate spec (2025-12-03-1 goals + recovery plan), and align stakeholders.",
+    "priority": "high",
+    "due_date": "2025-12-12",
+    "status": "pending",
+    "source_role": "handoff",
+    "created_at": "2025-12-03T15:24:50.647671+00:00",
+    "context": {
+      "notes": "Recover the broken Skill Tree router/tests, then implement the responsive viewport, tooltip/arrow fixes, and unified student flow that were missing from 2025-12-03-1.",
+      "risks": null,
+      "artifacts_out": null
+    }
+  },
+  {
+    "id": "qa_release-1764777990127-0",
+    "assignee": "backend",
+    "action": "Restore app/routers/skills.py to valid FastAPI router implementations for /api/v1/skills/tree and practice-plan, ensuring telemetry hooks work and removing embedded diff text.",
+    "priority": "high",
+    "due_date": "TBD",
+    "status": "done",
+    "source_role": "qa_release",
+    "created_at": "2025-12-03T16:06:30.127805+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": null
+    },
+    "updated_at": "2025-12-03T16:41:45.565120+00:00"
+  },
+  {
+    "id": "qa_release-1764777990127-1",
+    "assignee": "backend",
+    "action": "Replace the diff artifact in tests/test_api.py with the actual pytest suite so CI can cover login and skills flows again.",
+    "priority": "high",
+    "due_date": "TBD",
+    "status": "done",
+    "source_role": "qa_release",
+    "created_at": "2025-12-03T16:06:30.127849+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": null
+    },
+    "updated_at": "2025-12-03T16:41:45.565153+00:00"
+  },
+  {
+    "id": "qa_release-1764777990127-2",
+    "assignee": "backend",
+    "action": "Fix app/routers/practice.py by removing prose placeholders and reinstating executable practice-session logic so practice-plan tests can load the router.",
+    "priority": "high",
+    "due_date": "TBD",
+    "status": "done",
+    "source_role": "qa_release",
+    "created_at": "2025-12-03T16:06:30.127859+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": null
+    },
+    "updated_at": "2025-12-03T16:41:45.565158+00:00"
+  },
+  {
+    "id": "qa_release-1764777990127-3",
+    "assignee": "frontend",
+    "action": "Implement and demonstrate the responsive Skill Tree layout, StudentDashboard integration, tooltip/arrow fixes, and telemetry events on desktop/mobile with QA captures once backend is stable.",
+    "priority": "high",
+    "due_date": "TBD",
+    "status": "done",
+    "source_role": "qa_release",
+    "created_at": "2025-12-03T16:06:30.127867+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": null
+    },
+    "updated_at": "2025-12-03T17:03:07.859501+00:00"
+  },
+  {
+    "id": "senior_engineer-1764779336078-0",
+    "assignee": "frontend",
+    "action": "Add an npm `test` script or document the replacement command so dashboard/skill-tree unit tests can run in CI.",
+    "priority": "medium",
+    "due_date": "TBD",
+    "status": "done",
+    "source_role": "senior_engineer",
+    "created_at": "2025-12-03T16:28:56.078964+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": []
+    },
+    "updated_at": "2025-12-03T17:03:07.859567+00:00"
+  },
+  {
+    "id": "frontend-1764781387859-0",
+    "assignee": "senior_engineer",
+    "action": "Investigate the Vitest Tinypool crash when running `npm test -- --run` so the frontend suite can pass again.",
+    "priority": "high",
+    "due_date": "TBD",
+    "status": "pending",
+    "source_role": "frontend",
+    "created_at": "2025-12-03T17:03:07.859643+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": []
+    }
+  },
+  {
+    "id": "frontend-1764781387859-1",
+    "assignee": "senior_engineer",
+    "action": "QA the responsive Skill Tree + StudentDashboard modal on desktop/mobile once backend practice-plan responses are available.",
+    "priority": "medium",
+    "due_date": "TBD",
+    "status": "pending",
+    "source_role": "frontend",
+    "created_at": "2025-12-03T17:03:07.859692+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": []
+    }
+  },
+  {
+    "id": "chain-3",
+    "assignee": "ux",
+    "action": "Review/adjust designs for the merged dashboard + skill flow, ensuring copy and interactions match Diablo-style goals.",
+    "priority": "high",
+    "due_date": "2025-12-12",
+    "status": "pending",
+    "source_role": "handoff",
+    "created_at": "2025-12-03T15:24:50.647719+00:00",
+    "context": {
+      "notes": "Recover the broken Skill Tree router/tests, then implement the responsive viewport, tooltip/arrow fixes, and unified student flow that were missing from 2025-12-03-1.",
+      "risks": null,
+      "artifacts_out": null
+    }
+  },
+  {
+    "id": "chain-4",
+    "assignee": "qa_release",
+    "action": "Regression test `/api/v1/skills/*`, practice-plan endpoint, and desktop/mobile Skill Tree UX; attach evidence for telemetry events.",
+    "priority": "high",
+    "due_date": "2025-12-12",
+    "status": "pending",
+    "source_role": "handoff",
+    "created_at": "2025-12-03T15:24:50.647723+00:00",
+    "context": {
+      "notes": "Recover the broken Skill Tree router/tests, then implement the responsive viewport, tooltip/arrow fixes, and unified student flow that were missing from 2025-12-03-1.",
+      "risks": null,
+      "artifacts_out": null
+    }
+  },
+  {
+    "id": "qa_release-1764781427967-0",
+    "assignee": "backend",
+    "action": "Restore `app/routers/skills.py` to executable FastAPI router code and ensure `/skills/tree` plus `/nodes/{id}/practice-plan` endpoints run under pytest with session/prerequisite metadata.",
+    "priority": "high",
+    "due_date": "TBD",
+    "status": "pending",
+    "source_role": "qa_release",
+    "created_at": "2025-12-03T17:03:47.967897+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": null
+    }
+  },
+  {
+    "id": "qa_release-1764781427967-1",
+    "assignee": "backend",
+    "action": "Provide regression tests (pytest) covering restored router/practice-plan behavior and confirm telemetry events emit for viewport fit, hover, and practice launch.",
+    "priority": "high",
+    "due_date": "TBD",
+    "status": "pending",
+    "source_role": "qa_release",
+    "created_at": "2025-12-03T17:03:47.967992+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": null
+    }
+  },
+  {
+    "id": "qa_release-1764781427968-2",
+    "assignee": "frontend",
+    "action": "Rebuild the Skill Tree UX per spec (viewport fit, spacing, tooltip collision avoidance, arrow endpoints) and unify StudentDashboard with the skill-specific practice flow + confirmation modal, removing legacy S1/S2/S3 copy.",
+    "priority": "high",
+    "due_date": "TBD",
+    "status": "pending",
+    "source_role": "qa_release",
+    "created_at": "2025-12-03T17:03:47.968003+00:00",
+    "context": {
+      "notes": null,
+      "risks": null,
+      "artifacts_out": null
+    }
+  }
+]

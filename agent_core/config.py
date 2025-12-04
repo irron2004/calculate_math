@@ -49,8 +49,8 @@ def load_project_config(root: pathlib.Path) -> ProjectConfig:
         charter_file=charter_file,
         default_llm=raw.get("default_llm", "codex"),
         roles=raw.get("roles", {}),
-        test_cmd=raw.get("test_cmd", "pytest -q"),
+        test_cmd=raw.get("test_cmd",None),
         editing_rules=editing_rules,
-        max_rounds=raw.get("max_rounds", 20),
+        max_rounds=raw.get("max_rounds"),
         priority_rank=raw.get("priority_rank", {"high": 0, "medium": 1, "low": 2}),
     )
