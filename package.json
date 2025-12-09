@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "playwright": "^1.56.1"
+    "playwright": "^1.56.1",
+    "cytoscape": "^3.30.2"
   }
 }

@@ -4624,8 +4624,8 @@
       "kind": "core",
       "requires": {
         "all_of": [
-          "INDUCTION_BASE_STEP",
-          "EXP_LAWS"
+          "INDUCTION_BASE_STEP"
+          // "EXP_LAWS"
         ],
         "any_of": [],
         "min_level": null

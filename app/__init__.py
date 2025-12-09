@@ -32,6 +32,7 @@ from .routers import (
     practice,
     problems,
     skill_problems,
+    skill_tree_viewer,
     skills,
 )
 from .progress_store import (
@@ -198,6 +199,7 @@ def create_app() -> FastAPI:
     app.include_router(curriculum.router)
     app.include_router(dag.router)
     app.include_router(skill_problems.router)
+    app.include_router(skill_tree_viewer.router)
     app.include_router(skills.router)
 
     @app.exception_handler(404)

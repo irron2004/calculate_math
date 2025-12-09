@@ -8,6 +8,7 @@ from . import (
     practice,
     problems,
     skill_problems,
+    skill_tree_viewer,
     skills,
 )
 
@@ -22,5 +23,6 @@ __all__ = [
     "practice",
     "problems",
     "skill_problems",
+    "skill_tree_viewer",
     "skills",
 ]

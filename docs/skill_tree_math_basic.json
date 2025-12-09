@@ -1,0 +1,52 @@
+{
+  "tree_id": "math_basic",
+  "title": "기초 수학 스킬트리",
+  "description": "초등 ~ 중등 수준의 기초 수학 개념 스킬트리",
+  "skills": [
+    {
+      "id": "nat_num",
+      "name": "자연수 이해",
+      "level": 1,
+      "description": "1, 2, 3... 자연수 개념 이해",
+      "prerequisites": []
+    },
+    {
+      "id": "int_num",
+      "name": "정수 이해",
+      "level": 2,
+      "description": "음수/0을 포함한 정수 개념",
+      "prerequisites": [
+        "nat_num"
+      ]
+    },
+    {
+      "id": "add_sub",
+      "name": "정수 덧셈/뺄셈",
+      "level": 3,
+      "description": "정수의 사칙연산 중 덧셈과 뺄셈",
+      "prerequisites": [
+        "int_num"
+      ]
+    },
+    {
+      "id": "mul_div",
+      "name": "정수 곱셈/나눗셈",
+      "level": 4,
+      "description": "정수의 곱셈과 나눗셈",
+      "prerequisites": [
+        "add_sub"
+      ]
+    },
+    {
+      "id": "fraction_basic",
+      "name": "분수의 이해",
+      "level": 5,
+      "description": "분수 개념 이해",
+      "prerequisites": [
+        "mul_div"
+      ]
+    }
+  ]
+}
+
+
