@@ -1,0 +1,1011 @@
+{
+  "target": "TS_COMB_PROB",
+  "depth": 2,
+  "nodes": [
+    {
+      "id": "ADD_SUB_MULTI",
+      "label": "여러 자리 수 덧셈·뺄셈",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_PLACEVALUE"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "COMB_BASIC",
+      "label": "조합 C(n, r)의 뜻과 계산",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "PERM_BASIC",
+          "INT_RATIONAL_OP"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "COUNT_MIXED_APPLIED",
+      "label": "합·곱·순열·조합을 섞은 경우의 수",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "COUNT_RULE_ADD",
+          "COUNT_RULE_MULT",
+          "PERM_BASIC",
+          "COMB_BASIC"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "COUNT_RULE_ADD",
+      "label": "합의 법칙(겹치지 않는 사건)",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "TREE_TABLE_OUTCOMES",
+          "INT_RATIONAL_OP"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "COUNT_RULE_MULT",
+      "label": "곱의 법칙(순차 선택)",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "TREE_TABLE_OUTCOMES",
+          "INT_RATIONAL_OP"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "FACTORIAL_NOTATION",
+      "label": "계승 n!의 의미",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "MULT_DIV_BASIC"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "FRAC_BASIC",
+      "label": "분수의 뜻과 등분할",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "MULT_DIV_BASIC"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "FRAC_DEC_OP",
+      "label": "분수·소수의 사칙연산",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "FRAC_DEC_REL"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "FRAC_DEC_REL",
+      "label": "분수와 소수의 관계",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "FRAC_BASIC"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "INT_RATIONAL_OP",
+      "label": "정수·유리수의 사칙연산",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "FRAC_DEC_OP"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "LIST_OUTCOMES_SMALL",
+      "label": "작은 표본공간 나열하기",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "SET_BASIC_EVENTS",
+          "NUM_PLACEVALUE"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "MULT_DIV_BASIC",
+      "label": "곱셈·나눗셈 기초(구구단)",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "ADD_SUB_MULTI"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "NUM_PLACEVALUE",
+      "label": "자리값·수의 분해/합성",
+      "tier": 1,
+      "kind": "core",
+      "requires": null,
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "PERM_BASIC",
+      "label": "순열 P(n, r)의 뜻과 계산",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "FACTORIAL_NOTATION",
+          "COUNT_RULE_MULT"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "PROB_BASIC_EQUALLYLIKELY",
+      "label": "동일한 가능성에서의 확률 p = 유리수/전체",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "LIST_OUTCOMES_SMALL",
+          "INT_RATIONAL_OP"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "PROB_BAYES_INTRO",
+      "label": "간단한 베이즈 정리 예시",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "PROB_COND_BASIC"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "PROB_COND_BASIC",
+      "label": "조건부확률 P(A|B) 기초",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "PROB_EVENT_OPERATIONS",
+          "COUNT_MIXED_APPLIED"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "PROB_EVENT_OPERATIONS",
+      "label": "여러 사건의 합·곱·여사건",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "PROB_BASIC_EQUALLYLIKELY"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "SET_BASIC_EVENTS",
+      "label": "사건과 표본공간(집합 언어)",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "NUM_PLACEVALUE"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "TREE_TABLE_OUTCOMES",
+      "label": "나무·표를 이용한 경우 나열",
+      "tier": 1,
+      "kind": "core",
+      "requires": {
+        "all_of": [
+          "LIST_OUTCOMES_SMALL"
+        ],
+        "any_of": [],
+        "min_level": null
+      },
+      "boss": null,
+      "xp_per_try": 1,
+      "xp_per_correct": 2,
+      "xp_to_level": [
+        0,
+        10,
+        30,
+        60
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    },
+    {
+      "id": "TS_COMB_PROB",
+      "label": "보스 스킬: 경우의 수·확률 마스터",
+      "tier": 1,
+      "kind": "boss",
+      "requires": null,
+      "boss": null,
+      "xp_per_try": 0,
+      "xp_per_correct": 0,
+      "xp_to_level": [
+        0
+      ],
+      "lens": [
+        "general"
+      ],
+      "keywords": [],
+      "micro_skills": [],
+      "misconceptions": [],
+      "lrc_min": null,
+      "description": ""
+    }
+  ],
+  "edges": [
+    {
+      "from": "NUM_PLACEVALUE",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_PLACEVALUE",
+      "to": "ADD_SUB_MULTI",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "ADD_SUB_MULTI",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "ADD_SUB_MULTI",
+      "to": "MULT_DIV_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "MULT_DIV_BASIC",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "MULT_DIV_BASIC",
+      "to": "FRAC_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FRAC_BASIC",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FRAC_BASIC",
+      "to": "FRAC_DEC_REL",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FRAC_DEC_REL",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FRAC_DEC_REL",
+      "to": "FRAC_DEC_OP",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FRAC_DEC_OP",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FRAC_DEC_OP",
+      "to": "INT_RATIONAL_OP",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "INT_RATIONAL_OP",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_PLACEVALUE",
+      "to": "SET_BASIC_EVENTS",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "SET_BASIC_EVENTS",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "SET_BASIC_EVENTS",
+      "to": "LIST_OUTCOMES_SMALL",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_PLACEVALUE",
+      "to": "LIST_OUTCOMES_SMALL",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "LIST_OUTCOMES_SMALL",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "LIST_OUTCOMES_SMALL",
+      "to": "TREE_TABLE_OUTCOMES",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "TREE_TABLE_OUTCOMES",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "TREE_TABLE_OUTCOMES",
+      "to": "COUNT_RULE_ADD",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "INT_RATIONAL_OP",
+      "to": "COUNT_RULE_ADD",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COUNT_RULE_ADD",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "TREE_TABLE_OUTCOMES",
+      "to": "COUNT_RULE_MULT",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "INT_RATIONAL_OP",
+      "to": "COUNT_RULE_MULT",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COUNT_RULE_MULT",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "MULT_DIV_BASIC",
+      "to": "FACTORIAL_NOTATION",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FACTORIAL_NOTATION",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FACTORIAL_NOTATION",
+      "to": "PERM_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COUNT_RULE_MULT",
+      "to": "PERM_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PERM_BASIC",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PERM_BASIC",
+      "to": "COMB_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "INT_RATIONAL_OP",
+      "to": "COMB_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COMB_BASIC",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COUNT_RULE_ADD",
+      "to": "COUNT_MIXED_APPLIED",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COUNT_RULE_MULT",
+      "to": "COUNT_MIXED_APPLIED",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PERM_BASIC",
+      "to": "COUNT_MIXED_APPLIED",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COMB_BASIC",
+      "to": "COUNT_MIXED_APPLIED",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COUNT_MIXED_APPLIED",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "LIST_OUTCOMES_SMALL",
+      "to": "PROB_BASIC_EQUALLYLIKELY",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "INT_RATIONAL_OP",
+      "to": "PROB_BASIC_EQUALLYLIKELY",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_BASIC_EQUALLYLIKELY",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_BASIC_EQUALLYLIKELY",
+      "to": "PROB_EVENT_OPERATIONS",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_EVENT_OPERATIONS",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_EVENT_OPERATIONS",
+      "to": "PROB_COND_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COUNT_MIXED_APPLIED",
+      "to": "PROB_COND_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_COND_BASIC",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_COND_BASIC",
+      "to": "PROB_BAYES_INTRO",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_BAYES_INTRO",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "COUNT_MIXED_APPLIED",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_EVENT_OPERATIONS",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_COND_BASIC",
+      "to": "TS_COMB_PROB",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "NUM_PLACEVALUE",
+      "to": "ADD_SUB_MULTI",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "ADD_SUB_MULTI",
+      "to": "MULT_DIV_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "MULT_DIV_BASIC",
+      "to": "FRAC_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FRAC_BASIC",
+      "to": "FRAC_DEC_REL",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FRAC_DEC_REL",
+      "to": "FRAC_DEC_OP",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FRAC_DEC_OP",
+      "to": "INT_RATIONAL_OP",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "INT_RATIONAL_OP",
+      "to": "PROB_BASIC_EQUALLYLIKELY",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "PROB_BASIC_EQUALLYLIKELY",
+      "to": "PROB_EVENT_OPERATIONS",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "MULT_DIV_BASIC",
+      "to": "FACTORIAL_NOTATION",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "FACTORIAL_NOTATION",
+      "to": "COMB_BASIC",
+      "type": "requires",
+      "lens": null
+    },
+    {
+      "from": "INT_RATIONAL_OP",
+      "to": "COMB_BASIC",
+      "type": "requires",
+      "lens": null
+    }
+  ]
+}

@@ -66,3 +66,43 @@ graph LR
 - 새 레벨을 추가할 때마다 `--max-level N`으로 짧게 검증 → Mermaid로 연결 상태 확인
 - 에이전트/플래너가 특정 레벨까지만 작업하도록 할 때, 같은 플래그를 재사용하면 됩니다.
 - 기본 샘플(`docs/skill_tree_math_basic.json`)을 복사해 자신만의 트리를 시작하세요.
+
+## tmux 오케스트레이터로 “커리큘럼 촘촘히” 작업하기
+
+이 repo에는 tmux 기반 멀티 에이전트 오케스트레이터(`agents_up.sh`, `orchestrate_tmux.py`)가 포함되어 있습니다.
+
+### Task 파일 예시
+`tasks/<id>/task.md`(권장) 또는 `tasks/<id>.md`에 아래처럼 최소 메타를 적습니다.
+
+```md
+---
+workflow: curriculum
+mode: boss
+dataset_path: app/data/curriculum_skill.json
+boss_id: TS_COMB_PROB
+subgraph_depth: 2
+---
+
+# 목표
+- TS_COMB_PROB(경우의 수·확률) 라인을 2~3 depth까지 촘촘히 세분화한다.
+```
+
+### 실행
+```bash
+# task.md의 front-matter에 workflow: curriculum 이 있으면 자동 감지됩니다.
+./agents_up.sh <id>
+
+# 이미 같은 tmux 세션이 떠있어서(다른 작업/이전 실행) 초기화가 필요하면:
+TMUX_RESET=1 ./agents_up.sh <id>
+
+# 필요시 강제로 워크플로우 지정(우선순위: env/CLI > task.md)
+ORCH_WORKFLOW=curriculum ./agents_up.sh <id>
+# 또는
+source .venv/bin/activate
+python orchestrate_tmux.py --workflow curriculum <id>
+```
+
+> 기본 tmux 세션명은 현재 프로젝트 폴더명(예: `calculate_math`)으로 자동 설정됩니다. 필요하면 `TMUX_SESSION=...`로 오버라이드하세요.
+
+### 산출물 위치
+- `tasks/<id>/curriculum/`에 역할별 출력과 `subgraph.json`이 저장됩니다.

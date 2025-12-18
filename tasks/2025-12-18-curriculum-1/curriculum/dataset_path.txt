@@ -1,0 +1,1 @@
+/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/app/data/curriculum_skill.json
