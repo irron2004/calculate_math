@@ -1,9 +1,9 @@
-# PM/Planner Request {req_id}
+# PM/Planner Request a110ddeaf3
 
 너는 이 프로젝트의 PM/Planner다. 목표는 “작업을 잘게 쪼개서, Frontend/Backend가 TDD로 바로 착수할 수 있게” 만드는 것이다.
 
 [Task 파일]
-{task_path}
+/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/tasks/2025-12-19-level1-subjective-1/task.md
 
 위 파일을 직접 읽고, 아래 산출물을 만들어라.
 
@@ -11,8 +11,8 @@
 1) 요구사항을 1~2문장으로 요약.
 2) 범위(Scope)/비범위(Non-goals) 명확히.
 3) 티켓을 역할별로 분해:
-   - 현재 graph_profile: {graph_profile}
-   - 허용 역할: {ticket_roles}
+   - 현재 graph_profile: end2end
+   - 허용 역할: FE, BE
    - 여러 역할이 필요하면 티켓을 분리하고 의존성으로 연결해라.
 4) 각 티켓마다:
    - 목표/설명
@@ -32,7 +32,7 @@
   - non_goals: string[]
   - tickets: object[]
     - id: string (예: FE-1, BE-2)
-    - role: {ticket_roles_schema}
+    - role: "FE" | "BE"
     - title: string
     - description: string
     - acceptance_criteria: string[]
@@ -41,6 +41,6 @@
     - depends_on: string[]
   - next_ticket_id: string (tickets 안의 id 중 하나)
 
-###BEGIN:{req_id}###
+###BEGIN:a110ddeaf3###
 (여기에 JSON만)
-###DONE:{req_id}###
+###DONE:a110ddeaf3###

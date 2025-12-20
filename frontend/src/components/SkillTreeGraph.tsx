@@ -83,6 +83,14 @@ export const SkillTreeGraph: React.FC<Props> = ({ nodes, edges }) => {
       container: containerRef.current,
       elements,
       layout: { name: 'preset' },
+      minZoom: 0.2,
+      maxZoom: 2.5,
+      boxSelectionEnabled: false,
+      autoungrabify: true,
+      autolock: true,
+      userZoomingEnabled: true,
+      userPanningEnabled: true,
+      panningEnabled: true,
       style: [
         {
           selector: 'node',

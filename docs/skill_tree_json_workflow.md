@@ -103,6 +103,8 @@ python orchestrate_tmux.py --workflow curriculum <id>
 ```
 
 > 기본 tmux 세션명은 현재 프로젝트 폴더명(예: `calculate_math`)으로 자동 설정됩니다. 필요하면 `TMUX_SESSION=...`로 오버라이드하세요.
+>
+> `workflow: curriculum`일 때는 역할별로 **10개 pane + Orchestrator 1개 pane(총 11개)**가 생성됩니다.
 
 ### 산출물 위치
 - `tasks/<id>/curriculum/`에 역할별 출력과 `subgraph.json`이 저장됩니다.

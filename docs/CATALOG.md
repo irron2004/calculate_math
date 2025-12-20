@@ -38,6 +38,8 @@ type: catalog
 - 전이 커리큘럼 패키지: `docs/handbook/transfer_curriculum_package.md`
 - 전이 커리큘럼 키워드/교수 포인트: `docs/handbook/transfer_curriculum_keywords_points.md`
 - DAG 편집 워크플로우: `docs/process/dag_edit_workflow.md`
+- 오케스트레이터 그래프 프로필: `docs/process/orchestrator_profiles.md`
+- 에이전트 서브모듈 설정: `docs/agents-submodule-setup.md`
 - 스펙 루프 러너/역할: `scripts/spec/spec_loop.py`, `roles/`
 
 ## BE(Backend)

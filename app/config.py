@@ -28,6 +28,7 @@ DEFAULT_CONCEPT_PATH = _default_data_file("concepts.json")
 DEFAULT_TEMPLATE_PATH = _default_data_file("templates.json")
 DEFAULT_DAG_PATH = _default_data_file("dag.json")
 DEFAULT_PROGRESS_PATH = _default_data_file("dag_progress.json")
+DEFAULT_LEVEL1_PATH = _default_data_file("level1.json")
 
 
 def _load_env_file() -> None:
@@ -137,6 +138,7 @@ class Settings:
     template_data_path: Path
     dag_data_path: Path
     progress_data_path: Path
+    level1_data_path: Path
     skill_tree_list_rollout_percentage: int
     external_hub_url: Optional[str]
     password_pepper: str
@@ -165,6 +167,7 @@ def _build_settings() -> Settings:
         template_data_path=_resolve_path(os.getenv("TEMPLATE_DATA_PATH"), default=DEFAULT_TEMPLATE_PATH),
         dag_data_path=_resolve_path(os.getenv("DAG_DATA_PATH"), default=DEFAULT_DAG_PATH),
         progress_data_path=_resolve_path(os.getenv("DAG_PROGRESS_PATH"), default=DEFAULT_PROGRESS_PATH),
+        level1_data_path=_resolve_path(os.getenv("LEVEL1_DATA_PATH"), default=DEFAULT_LEVEL1_PATH),
         skill_tree_list_rollout_percentage=_clamp_percentage(os.getenv("SKILL_TREE_LIST_ROLLOUT"), default=50),
         external_hub_url=_parse_optional_str(os.getenv("HUB_URL")),
         password_pepper=os.getenv("PASSWORD_PEPPER", "calculate-pepper"),

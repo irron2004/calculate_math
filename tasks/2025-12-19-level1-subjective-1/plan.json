@@ -1,0 +1,79 @@
+{
+  "summary": "Build the Level 1 subjective practice flow\n  from JSON data with deterministic grading and immediate\n  feedback, plus per-skill/overall accuracy and progress.\n  Add schema validation and local attempt persistence\n  with reset controls.",
+  "scope": [
+    "Level 1 skill list\n  rendered as a tree-style list from JSON\n  data",
+    "Subjective input with immediate correct/\n  incorrect feedback and correct answer\n  display",
+    "Accuracy and progress computed from the\n  latest submission per problem (per-skill and\n  overall)",
+    "Local persistence for attempts with reset\n  per-skill and reset-all",
+    "Validation rules enforcing ID\n  uniqueness, skill/problem relationships, and grading\n  constraints"
+  ],
+  "non_goals": [
+    "AI/semantic grading,\n  partial credit, or explanation generation",
+    "Level 2+\n  skills, prerequisite graph traversal, or adaptive\n  sequencing",
+    "Login, cloud sync, or cross-device\n  persistence",
+    "Automatic problem generation or external\n  data imports"
+  ],
+  "tickets": [
+    {
+      "id": "BE-\n  1",
+      "role": "BE",
+      "title": "Level 1 data schema,\n  validation, and API delivery",
+      "description": "Define\n  Pydantic schemas and validation for Level 1 Skill/\n  Problem/Attempt data, ensure relationship/order/grading\n  rules, and provide an API endpoint that returns the\n  dataset or actionable validation errors; include JSON\n  examples in docs.",
+      "acceptance_criteria": [
+        "Skill/\n  Problem/Attempt/Grading schemas are defined and JSON\n  examples are documented",
+        "Validation rejects missing\n  skill_id/problem_id references, duplicate order per\n  skill, and invalid grading mode/answer type",
+        "GET\n  endpoint returns Level 1 dataset with HTTP 200 when\n  data is valid",
+        "Invalid data returns a 4xx error with\n  actionable IDs (skill_id/problem_id/order) in the\n  payload",
+        "Backend tests cover missing skill, missing\n  problem, duplicate order, and invalid grading mode\n  cases and pass with make test"
+      ],
+      "tdd_plan": [
+        "Red: write\n  pytest cases for missing skill_id, missing problem_id,\n  duplicate order per skill, and invalid grading mode/\n  answer type",
+        "Red: add API test asserting validation\n  errors include actionable IDs",
+        "Green: implement\n  Pydantic schemas and a validator enforcing relationship\n  and grading constraints",
+        "Green: add data loader and\n  API route to return dataset or validation\n  errors",
+        "Refactor: document JSON examples and keep\n  validation helpers reusable"
+      ],
+      "commands": {
+        "run": "make\n  run",
+        "test": "make test"
+      },
+      "depends_on": []
+    },
+    {
+      "id": "FE-\n  1",
+      "role": "FE",
+      "title": "Level 1 practice UI, grading,\n  accuracy, and local storage",
+      "description": "Implement\n  the skill list and problem screens, deterministic\n  grading (numeric_equal/exact_string with\n  normalization), accuracy/progress aggregation using\n  latest attempts, and local persistence with reset\n  actions.",
+      "acceptance_criteria": [
+        "Skill list screen\n  shows overall accuracy (correct/attempted, %) and\n  overall progress (attempted/total)",
+        "Each skill shows\n  title, progress, and accuracy computed from latest\n  attempts per problem",
+        "Problem screen shows prompt,\n  input, submit, immediate feedback, and correct answer\n  display",
+        "Grading supports numeric_equal and\n  exact_string with trim/remove_spaces/remove_commas\n  normalization",
+        "Attempts persist in localStorage across\n  reloads; reset per-skill and reset-all clear attempts\n  and update UI",
+        "Frontend tests cover grading rules and\n  accuracy aggregation and pass with CI=1 npm test --\n  --run"
+      ],
+      "tdd_plan": [
+        "Red: add unit tests for\n  normalization and grading (numeric_equal/exact_string\n  with commas/spaces/decimals)",
+        "Red: add unit tests for\n  accuracy aggregation using latest attempt per problem\n  and per-skill/overall rollups",
+        "Red: add component test\n  for skill list showing progress/accuracy from mocked\n  data and localStorage",
+        "Green: implement grading\n  helpers, attempt store, and aggregation logic",
+        "Green:\n  build skill list and problem UI, wire data fetch, local\n  persistence, and reset actions"
+      ],
+      "commands": {
+        "run": "npm\n  run dev",
+        "test": "CI=1 npm test -- --run"
+      },
+      "depends_on": [
+        "BE-1"
+      ]
+    }
+  ],
+  "next_ticket_id": "BE-\n  1",
+  "risks": [
+    "Numeric parsing may accept\n  unexpected formats unless strictly validated (e.g.,\n  leading zeros, scientific notation)",
+    "Latest-attempt\n  selection can be inconsistent across tabs without\n  timestamps/versioning",
+    "LocalStorage schema changes may\n  break existing attempts without migration",
+    "Data\n  validation failures could block the UI if no graceful\n  fallback is defined"
+  ],
+  "questions": []
+}
