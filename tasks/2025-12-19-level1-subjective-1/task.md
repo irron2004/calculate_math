@@ -7,14 +7,14 @@ graph_profile: end2end
 
 ## Goal
 - Render a Level 1 skill list (tree-style list) from JSON data.
-- Enable subjective answer submission with immediate grading feedback.
+- Provide fixed-order, subjective problems per skill with immediate grading feedback.
 - Show per-skill accuracy and overall accuracy on the skill list screen.
 - Enforce data validation rules to prevent schema/relationship drift.
 
 ## Definition of Done
-- Skill/Problem/Attempt schemas are finalized and documented (JSON examples included).
-- Subjective grading works deterministically with normalization + numeric/string rules.
-- Accuracy is computed using **latest submission per problem** and shown per-skill + overall.
+- Skill/Problem/Attempt schemas are finalized and documented with JSON examples.
+- Grading works deterministically with normalization + `numeric_equal` and `exact_string`.
+- Accuracy is computed using the latest submission per problem and shown per-skill + overall.
 - Progress is shown as attempted/total per skill and overall.
 - Local persistence stores attempts and supports reset per-skill and reset-all.
 - Validation errors include actionable IDs (missing skill/problem, bad order, invalid grading).
@@ -23,9 +23,9 @@ graph_profile: end2end
 ## Scope
 - Level 1 only; no prerequisites or multi-level tree logic.
 - Problems are fixed order per skill (`order` field, no randomization).
-- Subjective input only; immediate correct/incorrect feedback + correct answer display.
-- Grading modes: `numeric_equal` and `exact_string` with normalization rules.
-- Data source is JSON (initially local), attempts stored locally (localStorage/IndexedDB).
+- Subjective input only; submit triggers immediate correct/incorrect plus correct answer display.
+- Data source is JSON (initially local); attempts stored locally (localStorage/IndexedDB).
+- Skill list is a tree-style list (not a true multi-level tree in v0.2).
 
 ## Non-goals
 - AI/semantic grading, partial credit, or solution explanation generation.
@@ -41,17 +41,21 @@ graph_profile: end2end
 - Grading constraints are valid:
   - `grading.mode` must be allowed.
   - `answer.type` is compatible with `grading.mode`.
+- Normalization defaults to `trim`, `remove_spaces`, `remove_commas`.
+
+## Aggregation Rules
+- Use the latest submission per problem for accuracy.
+- Skill accuracy = correct_latest / attempted_latest per skill.
+- Overall accuracy = correct_latest / attempted_latest across all skills.
+- Progress = attempted_latest / total problems.
 
 ## UX Notes
-- Skill list screen shows:
-  - Overall accuracy (correct/attempted, %).
-  - Overall progress (attempted/total).
-  - Per-skill: title, progress, accuracy.
-- Problem screen shows prompt, input, submit, instant feedback, and next action.
+- Skill list screen shows overall accuracy + overall progress at the top.
+- Each skill node shows title, progress, and accuracy.
+- Problem screen shows prompt, input, submit, immediate feedback, correct answer, and next action.
 
 ## Open Questions / Assumptions
 - Numeric grading supports integers/decimals only; fractions like `1/2` are deferred.
-- Normalization list defaults to `trim`, `remove_spaces`, `remove_commas`.
 - JSON file locations: confirm whether data lives under `app/data/` or `frontend/src/`.
 
 ## References

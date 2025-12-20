@@ -1,7 +1,7 @@
 # Orchestrator Graph Profiles
 
 The code workflow in `orchestrate_tmux.py` can switch its LangGraph stages per task.
-Profiles are defined in `config/graph_profiles.json` and selected via `graph_profile` in the task front-matter.
+Profiles are defined in `agents/config/graph_profiles.json` and selected via `graph_profile` in the task front-matter.
 Stages must follow the order `pm -> dev -> qa -> reviewer` (you can skip stages, but not reorder them).
 
 ## Task Example
@@ -18,13 +18,19 @@ graph_profile: backend
 
 ## Profile Definition
 
-`config/graph_profiles.json`:
+`agents/config/graph_profiles.json`:
 
 ```json
 {
   "backend": {
     "stages": ["pm", "dev", "qa", "reviewer"],
-    "ticket_roles": ["BE"]
+    "ticket_roles": ["BE"],
+    "templates": {
+      "pm": "agents/.agents/templates/pm_prompt.md",
+      "be": "agents/.agents/templates/backend_dev_prompt.md",
+      "qa": "agents/.agents/templates/qa_prompt.md",
+      "reviewer": "agents/.agents/templates/reviewer_prompt.md"
+    }
   },
   "frontend": {
     "stages": ["pm", "dev", "qa", "reviewer"],
@@ -40,6 +46,9 @@ graph_profile: backend
   }
 }
 ```
+
+`templates` is optional. Supported keys: `pm`, `fe`, `be`, `research`, `dev` (fallback for dev roles), `qa`, `reviewer`.
+Paths can be absolute or repo‑relative.
 
 ## CLI Override
 

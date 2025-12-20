@@ -21,8 +21,8 @@ Then add root wrappers so the repo calls the submodule (and sets `ROOT` to the r
 
 ## Graph profiles (optional)
 
-Profiles live in `config/graph_profiles.json`. You can override with:
+Profiles live in `agents/config/graph_profiles.json`. You can override with:
 
 ```bash
-GRAPH_PROFILE=backend GRAPH_PROFILES_PATH=config/graph_profiles.json ./agents_up.sh <task_id>
+GRAPH_PROFILE=backend GRAPH_PROFILES_PATH=agents/config/graph_profiles.json ./agents_up.sh <task_id>
 ```
