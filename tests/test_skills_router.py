@@ -161,3 +161,35 @@ async def test_skill_tree_uses_projection_layout_when_ui_missing(monkeypatch, tm
     assert payload["error"]["kind"] == "SkillSpecError"
 
     skills_module._load_skill_ui_graph.cache_clear()
+
+
+async def test_skill_tree_payload_aligns_with_ui_graph_and_progress(client):
+    response = await client.get("/api/v1/skills/tree")
+    assert response.status_code == 200
+    payload = response.json()
+
+    graph = payload["graph"]
+    assert graph is not None
+    assert isinstance(graph["version"], str) and graph["version"]
+    assert isinstance(graph["nodes"], list) and graph["nodes"]
+    assert isinstance(graph["edges"], list)
+
+    graph_node_ids = {node["id"] for node in graph["nodes"]}
+    unlocked_map = payload["unlocked"]
+    assert isinstance(unlocked_map, dict) and unlocked_map
+
+    progress_nodes = payload["progress"]["nodes"]
+    assert isinstance(progress_nodes, dict) and progress_nodes
+
+    for node in payload["nodes"]:
+        node_id = node["id"]
+        assert node_id in graph_node_ids
+        assert node_id in unlocked_map
+        node_state = node["state"]
+        assert isinstance(node_state, dict)
+        assert unlocked_map[node_id] == bool(node_state.get("completed") or node_state.get("available"))
+
+        node_progress = progress_nodes[node_id]
+        assert node_progress["unlocked"] == node_state.get("unlocked")
+        assert node_progress["completed"] == node_state.get("completed")
+
