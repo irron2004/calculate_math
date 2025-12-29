@@ -1,1 +1,0 @@
-- restored skill-problem response types and added optional `diagnostics` metadata to `SkillTreeResponse` for UI fallbacks (`frontend/src/types/index.ts:42`).

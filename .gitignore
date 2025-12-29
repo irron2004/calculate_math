@@ -2,3 +2,9 @@ __pycache__/
 app/data/*.db
 .venv/
 node_modules/
+dist/
+inbox/
+.legacy/
+__cache__
+npm-cache
+_cacache/

@@ -1,0 +1,8 @@
+
+> curriculum-viewer@0.0.0 dev
+> vite --host 127.0.0.1 --port 5179 --strictPort
+
+
+  VITE v5.4.21  ready in 1649 ms
+
+  ➜  Local:   http://127.0.0.1:5179/

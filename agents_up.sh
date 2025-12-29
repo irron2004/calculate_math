@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export ROOT
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export ROOT="${ROOT:-$ROOT_DIR}"
 
-TARGET="$ROOT/agents/agents_up.sh"
-if [ ! -x "$TARGET" ]; then
-  echo "agents submodule not initialized: $TARGET" >&2
-  echo "Run: git submodule update --init --recursive" >&2
-  exit 1
+# Prefer a local venv; fall back to the legacy venv so `./agents_up.sh` works out of the box.
+if [ -z "${VENV_ACTIVATE:-}" ]; then
+  if [ -f "$ROOT_DIR/.venv/bin/activate" ]; then
+    export VENV_ACTIVATE=".venv/bin/activate"
+  elif [ -f "$ROOT_DIR/.legacy/.venv/bin/activate" ]; then
+    export VENV_ACTIVATE=".legacy/.venv/bin/activate"
+  fi
 fi
 
-exec "$TARGET" "$@"
+exec "$ROOT_DIR/agents/agents_up.sh" "$@"
+

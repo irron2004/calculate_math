@@ -1,1 +1,0 @@
-- introduced helpers to serialize practice-launch metadata, build `/game` URLs, and surface blocked reasons/shared readiness states (`frontend/src/utils/practice.ts:1`).

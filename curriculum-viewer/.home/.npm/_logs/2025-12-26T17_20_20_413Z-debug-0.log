@@ -1,0 +1,18 @@
+0 verbose cli /home/hskim/.nvm/versions/node/v20.19.5/bin/node /home/hskim/.nvm/versions/node/v20.19.5/bin/npm
+1 info using npm@10.8.2
+2 info using node@v20.19.5
+3 silly config load:file:/home/hskim/.nvm/versions/node/v20.19.5/lib/node_modules/npm/npmrc
+4 silly config load:file:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/curriculum-viewer/.npmrc
+5 silly config load:file:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/curriculum-viewer/.home/.npmrc
+6 silly config load:file:/home/hskim/.nvm/versions/node/v20.19.5/etc/npmrc
+7 verbose title npm run build
+8 verbose argv "run" "build"
+9 verbose logfile logs-max:10 dir:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/curriculum-viewer/.home/.npm/_logs/2025-12-26T17_20_20_413Z-
+10 verbose logfile /mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/curriculum-viewer/.home/.npm/_logs/2025-12-26T17_20_20_413Z-debug-0.log
+11 silly logfile done cleaning log files
+12 verbose cwd /mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/curriculum-viewer
+13 verbose os Linux 5.15.167.4-microsoft-standard-WSL2
+14 verbose node v20.19.5
+15 verbose npm  v10.8.2
+16 verbose exit 2
+17 verbose code 2

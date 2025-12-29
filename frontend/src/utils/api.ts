@@ -1,2 +1,0 @@
-- normalized skill-tree mode detection with override-friendly helpers and exported `__setSkillTreeModeForTests` for Vitest control (`frontend/src/utils/api.ts:34`).
-- added consistent seed diagnostics/telemetry plus the `/v1/skills/nodes/{id}/practice-plan` client for the unified practice flow (`frontend/src/utils/api.ts:62`).

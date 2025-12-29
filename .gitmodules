@@ -1,3 +1,0 @@
-[submodule "agents"]
-	path = agents
-	url = https://github.com/irron2004/langgraph-agent.git

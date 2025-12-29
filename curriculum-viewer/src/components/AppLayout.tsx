@@ -1,0 +1,45 @@
+import { type ReactNode, useState } from 'react'
+import { NavLink, Outlet } from 'react-router-dom'
+import { ROUTES } from '../routes'
+
+export type DetailPanelContext = {
+  setDetail: (detail: ReactNode) => void
+}
+
+export default function AppLayout() {
+  const [detail, setDetail] = useState<ReactNode>(
+    <p>노드를 선택하면 상세가 표시됩니다.</p>
+  )
+
+  const outletContext: DetailPanelContext = { setDetail }
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <nav aria-label="Primary">
+          <ul className="app-nav">
+            <li>
+              <NavLink to={ROUTES.tree} end>
+                트리
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to={ROUTES.graph}>그래프</NavLink>
+            </li>
+            <li>
+              <NavLink to={ROUTES.health}>리포트</NavLink>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <main className="app-main">
+        <div className="app-content">
+          <Outlet context={outletContext} />
+        </div>
+        <aside className="app-detail" aria-label="Detail panel">
+          {detail}
+        </aside>
+      </main>
+    </div>
+  )
+}

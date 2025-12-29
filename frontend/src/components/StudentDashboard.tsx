@@ -1,1 +1,0 @@
-- merged the skill overview and practice flow by loading live nodes, recommending available skills, and gating launches behind the new confirmation modal/telemetry (`frontend/src/components/StudentDashboard.tsx:27`).
