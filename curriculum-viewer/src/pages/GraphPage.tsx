@@ -7,58 +7,20 @@ import ReactFlow, {
   MarkerType,
   MiniMap,
   type Edge,
-  type Node
+  type Node,
+  type ReactFlowInstance
 } from 'reactflow'
 import 'reactflow/dist/style.css'
+import NodeDetail from '../components/NodeDetail'
 import type { DetailPanelContext } from '../components/AppLayout'
-
-type GradeBandFilter = 'all' | '1-2' | '3-4' | '5-6'
-
-type CurriculumNodeType =
-  | 'root'
-  | 'schoolLevel'
-  | 'gradeBand'
-  | 'domain'
-  | 'achievement'
-  | 'textbookUnit'
-
-type CurriculumNode = {
-  id: string
-  nodeType: CurriculumNodeType
-  label: string
-  parentId?: string
-  gradeBand?: string
-  domainCode?: string
-  officialCode?: string
-  skillLevel?: number
-  order?: number
-  tags?: string[]
-  text?: string
-  note?: string
-}
-
-type CurriculumEdgeType = 'contains' | 'alignsTo' | 'prereq'
-
-type CurriculumEdge = {
-  id: string
-  edgeType: CurriculumEdgeType
-  source: string
-  target: string
-  weight?: number
-  note?: string
-}
-
-type CurriculumGraph = {
-  meta: Record<string, unknown>
-  nodes: CurriculumNode[]
-  edges: CurriculumEdge[]
-}
-
-type EdgeFlags = {
-  contains: boolean
-  alignsTo: boolean
-  prereq: boolean
-}
+import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
+import {
+  buildContainsEdgeRefsSkippingGradeNodes,
+  getGraphVisibleNodes
+} from '../lib/curriculum/graphView'
+import { buildProgressionEdges } from '../lib/curriculum/progression'
+import type { CurriculumNode, CurriculumNodeType } from '../lib/curriculum/types'
+import { useFocusNodeId } from '../lib/routing/useFocusNodeId'
 
 type GraphNodeData = {
   label: React.ReactNode
@@ -66,35 +28,22 @@ type GraphNodeData = {
 }
 
 type GraphEdgeData = {
-  edgeType: CurriculumEdgeType
-  note?: string
+  edgeType: 'contains' | 'progression'
 }
 
 type GraphNode = Node<GraphNodeData>
 
 type GraphEdge = Edge<GraphEdgeData>
 
-const DEFAULT_GRADE_BAND: GradeBandFilter = '3-4'
-
-const DEFAULT_EDGE_FLAGS: EdgeFlags = {
-  contains: true,
-  alignsTo: false,
-  prereq: false
-}
-
 function getNodeDims(nodeType: CurriculumNodeType): { width: number; height: number } {
   switch (nodeType) {
-    case 'root':
+    case 'subject':
       return { width: 260, height: 64 }
-    case 'schoolLevel':
+    case 'grade':
       return { width: 220, height: 56 }
-    case 'gradeBand':
-      return { width: 240, height: 56 }
     case 'domain':
       return { width: 220, height: 56 }
-    case 'textbookUnit':
-      return { width: 280, height: 64 }
-    case 'achievement':
+    case 'standard':
       return { width: 320, height: 72 }
     default:
       return { width: 240, height: 56 }
@@ -111,18 +60,14 @@ function getNodeStyle(node: CurriculumNode): React.CSSProperties {
     lineHeight: 1.2
   }
 
-  switch (node.nodeType) {
-    case 'root':
+  switch (node.type) {
+    case 'subject':
       return { ...base, background: '#0f172a', borderColor: '#0f172a', color: '#ffffff' }
-    case 'schoolLevel':
+    case 'grade':
       return { ...base, background: '#e0f2fe', borderColor: '#7dd3fc' }
-    case 'gradeBand':
-      return { ...base, background: '#ecfccb', borderColor: '#bef264' }
     case 'domain':
       return { ...base, background: '#ede9fe', borderColor: '#c4b5fd' }
-    case 'textbookUnit':
-      return { ...base, background: '#fff7ed', borderColor: '#fed7aa' }
-    case 'achievement':
+    case 'standard':
       return { ...base, background: '#ffffff' }
     default:
       return base
@@ -173,277 +118,136 @@ function layoutWithDagre(
   })
 }
 
-function renderNodeDetail(node: CurriculumNode): React.ReactNode {
-  return (
-    <div>
-      <h2>노드 상세</h2>
-      <dl className="detail-dl">
-        <dt>ID</dt>
-        <dd>{node.id}</dd>
-        <dt>Type</dt>
-        <dd>{node.nodeType}</dd>
-        <dt>Label</dt>
-        <dd>{node.label}</dd>
-        {node.gradeBand ? (
-          <>
-            <dt>Grade Band</dt>
-            <dd>{node.gradeBand}</dd>
-          </>
-        ) : null}
-        {node.domainCode ? (
-          <>
-            <dt>Domain</dt>
-            <dd>{node.domainCode}</dd>
-          </>
-        ) : null}
-        {node.officialCode ? (
-          <>
-            <dt>Official Code</dt>
-            <dd>{node.officialCode}</dd>
-          </>
-        ) : null}
-        {typeof node.skillLevel === 'number' ? (
-          <>
-            <dt>Skill Level</dt>
-            <dd>{node.skillLevel}</dd>
-          </>
-        ) : null}
-      </dl>
-      {node.text ? (
-        <>
-          <h3>Text</h3>
-          <p className="detail-text">{node.text}</p>
-        </>
-      ) : null}
-      {node.note ? (
-        <>
-          <h3>Note</h3>
-          <p className="detail-text">{node.note}</p>
-        </>
-      ) : null}
-    </div>
-  )
-}
-
 export default function GraphPage() {
   const { setDetail } = useOutletContext<DetailPanelContext>()
+  const { data, index, loading, error } = useCurriculum()
+  const { focusNodeId, setFocusNodeId } = useFocusNodeId()
+  const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
 
-  const [graph, setGraph] = useState<CurriculumGraph | null>(null)
-  const [loadError, setLoadError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  const [gradeBand, setGradeBand] = useState<GradeBandFilter>(DEFAULT_GRADE_BAND)
-  const [edgeFlags, setEdgeFlags] = useState<EdgeFlags>(DEFAULT_EDGE_FLAGS)
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const selectedNodeId = useMemo(() => {
+    if (!focusNodeId) return null
+    if (!index?.nodeById.has(focusNodeId)) return null
+    return focusNodeId
+  }, [focusNodeId, index])
 
   useEffect(() => {
+    if (selectedNodeId) {
+      setDetail(<NodeDetail nodeId={selectedNodeId} />)
+      return
+    }
+
     setDetail(
       <div>
         <h2>상세</h2>
-        <p>`curriculum_math_v1.json`을 로드해 노드/엣지를 표시합니다.</p>
         <p>노드를 클릭하면 상세가 표시됩니다.</p>
+        <p>
+          <span className="legend-inline contains" aria-hidden="true" /> contains
+          · <span className="legend-inline progression" aria-hidden="true" /> progression
+        </p>
       </div>
     )
-  }, [setDetail])
-
-  useEffect(() => {
-    if (import.meta.env.MODE === 'test') {
-      return
-    }
-
-    const controller = new AbortController()
-
-    async function run() {
-      setLoading(true)
-      setLoadError(null)
-
-      try {
-        const response = await fetch('/data/curriculum_math_v1.json', {
-          signal: controller.signal
-        })
-
-        if (!response.ok) {
-          throw new Error(`Failed to load curriculum data (HTTP ${response.status})`)
-        }
-
-        const json = (await response.json()) as CurriculumGraph
-        setGraph(json)
-      } catch (error) {
-        if (controller.signal.aborted) {
-          return
-        }
-
-        const message = error instanceof Error ? error.message : String(error)
-        setLoadError(message)
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false)
-        }
-      }
-    }
-
-    run()
-
-    return () => {
-      controller.abort()
-    }
-  }, [])
-
-  const nodeById = useMemo(() => {
-    return new Map<string, CurriculumNode>((graph?.nodes ?? []).map((node) => [node.id, node]))
-  }, [graph])
-
-  const includedNodeIds = useMemo(() => {
-    if (!graph) {
-      return new Set<string>()
-    }
-
-    if (gradeBand === 'all') {
-      return new Set(graph.nodes.map((node) => node.id))
-    }
-
-    const rootId = `KR-MATH-2022-E-${gradeBand}`
-    const include = new Set<string>()
-
-    function hasAncestor(nodeId: string, ancestorId: string): boolean {
-      let cursor: string | undefined = nodeId
-
-      while (cursor) {
-        if (cursor === ancestorId) {
-          return true
-        }
-
-        const current = nodeById.get(cursor)
-        cursor = current?.parentId
-      }
-
-      return false
-    }
-
-    for (const node of graph.nodes) {
-      if (hasAncestor(node.id, rootId)) {
-        include.add(node.id)
-      }
-    }
-
-    include.add('KR-MATH-2022')
-    include.add('KR-MATH-2022-E')
-
-    return include
-  }, [graph, gradeBand, nodeById])
-
-  useEffect(() => {
-    if (!selectedNodeId) {
-      return
-    }
-
-    if (!includedNodeIds.has(selectedNodeId)) {
-      setSelectedNodeId(null)
-    }
-  }, [includedNodeIds, selectedNodeId])
+  }, [selectedNodeId, setDetail])
 
   const graphNodes = useMemo((): GraphNode[] => {
-    if (!graph) {
-      return []
-    }
+    if (!data) return []
 
-    return graph.nodes
-      .filter((node) => includedNodeIds.has(node.id))
+    return getGraphVisibleNodes(data.nodes)
       .map((node) => {
-        const dims = getNodeDims(node.nodeType)
+        const dims = getNodeDims(node.type)
         const style = {
           ...getNodeStyle(node),
-          width: dims.width,
-          height: dims.height,
-          borderColor: node.id === selectedNodeId ? '#0f172a' : undefined,
-          boxShadow:
-            node.id === selectedNodeId ? '0 0 0 2px rgba(15, 23, 42, 0.15)' : undefined
-        } as const
+        width: dims.width,
+        height: dims.height,
+        borderColor: node.id === selectedNodeId ? '#0f172a' : undefined,
+        boxShadow:
+          node.id === selectedNodeId ? '0 0 0 2px rgba(15, 23, 42, 0.15)' : undefined
+      } as const
 
-        return {
-          id: node.id,
-          position: { x: 0, y: 0 },
-          data: {
-            nodeType: node.nodeType,
-            label: (
-              <div className="graph-node-label">
-                <div className="graph-node-title">{node.label}</div>
-                <div className="graph-node-id">{node.id}</div>
-              </div>
-            )
-          },
-          style
+      return {
+        id: node.id,
+        position: { x: 0, y: 0 },
+        data: {
+          nodeType: node.type,
+          label: (
+            <div className="graph-node-label">
+              <div className="graph-node-title">{node.title}</div>
+              <div className="graph-node-id">{node.id}</div>
+            </div>
+          )
+        },
+        style
+      }
+    })
+  }, [data, selectedNodeId])
+
+  const containsEdges = useMemo((): GraphEdge[] => {
+    if (!data || !index) return []
+
+    const refs = buildContainsEdgeRefsSkippingGradeNodes(data.nodes, index.nodeById)
+
+    return refs.map((edge) => ({
+      id: `contains:${edge.source}->${edge.target}`,
+      source: edge.source,
+      target: edge.target,
+      type: 'smoothstep',
+      data: { edgeType: 'contains' },
+      markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18 },
+      style: { stroke: '#94a3b8' }
+    }))
+  }, [data, index])
+
+  const progressionEdges = useMemo((): GraphEdge[] => {
+    if (!data) return []
+
+    return buildProgressionEdges(data.nodes).map((edge) => {
+      return {
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: 'smoothstep',
+        data: { edgeType: 'progression' },
+        markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
+        style: {
+          stroke: '#0284c7',
+          strokeDasharray: '6 4'
         }
-      })
-  }, [graph, includedNodeIds, selectedNodeId])
+      }
+    })
+  }, [data])
 
-  const graphEdges = useMemo((): GraphEdge[] => {
-    if (!graph) {
-      return []
-    }
-
-    const allowedTypes = new Set<CurriculumEdgeType>(
-      (Object.keys(edgeFlags) as CurriculumEdgeType[]).filter(
-        (type) => edgeFlags[type]
-      )
-    )
-
-    return graph.edges
-      .filter((edge) => allowedTypes.has(edge.edgeType))
-      .filter(
-        (edge) => includedNodeIds.has(edge.source) && includedNodeIds.has(edge.target)
-      )
-      .map((edge) => {
-        const base: GraphEdge = {
-          id: edge.id,
-          source: edge.source,
-          target: edge.target,
-          type: 'smoothstep',
-          data: { edgeType: edge.edgeType, note: edge.note },
-          markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18 }
-        }
-
-        if (edge.edgeType === 'contains') {
-          return { ...base, style: { stroke: '#94a3b8' } }
-        }
-
-        if (edge.edgeType === 'alignsTo') {
-          return {
-            ...base,
-            style: { stroke: '#3b82f6', strokeDasharray: '4 4' }
-          }
-        }
-
-        return {
-          ...base,
-          animated: true,
-          style: { stroke: '#f97316', strokeDasharray: '6 4' }
-        }
-      })
-  }, [edgeFlags, graph, includedNodeIds])
+  const graphEdges = useMemo(() => {
+    return [...containsEdges, ...progressionEdges]
+  }, [containsEdges, progressionEdges])
 
   const layoutedNodes = useMemo(() => {
     if (graphNodes.length === 0) {
       return []
     }
 
-    return layoutWithDagre(graphNodes, graphEdges, 'TB')
-  }, [graphEdges, graphNodes])
+    return layoutWithDagre(graphNodes, containsEdges, 'TB')
+  }, [containsEdges, graphNodes])
 
-  const edgeKey = `${edgeFlags.contains ? 'c' : ''}${edgeFlags.alignsTo ? 'a' : ''}${edgeFlags.prereq ? 'p' : ''}`
-  const reactFlowKey = `${gradeBand}:${edgeKey}:${layoutedNodes.length}:${graphEdges.length}`
+  useEffect(() => {
+    if (!rfInstance || !selectedNodeId) {
+      return
+    }
+
+    const target = layoutedNodes.find((node) => node.id === selectedNodeId)
+    if (!target) {
+      return
+    }
+
+    const dims = getNodeDims(target.data.nodeType)
+    const centerX = target.position.x + dims.width / 2
+    const centerY = target.position.y + dims.height / 2
+    rfInstance.setCenter(centerX, centerY, { zoom: 1.2, duration: 450 })
+  }, [layoutedNodes, rfInstance, selectedNodeId])
 
   const onNodeClick = useCallback(
     (_event: React.MouseEvent, node: GraphNode) => {
-      const source = nodeById.get(node.id)
-      if (!source) {
-        return
-      }
-
-      setSelectedNodeId(source.id)
-      setDetail(renderNodeDetail(source))
+      setFocusNodeId(node.id)
     },
-    [nodeById, setDetail]
+    [setFocusNodeId]
   )
 
   return (
@@ -451,72 +255,44 @@ export default function GraphPage() {
       <h1>그래프</h1>
 
       <div className="graph-toolbar">
-        <label className="graph-control">
-          학년군
-          <select
-            value={gradeBand}
-            onChange={(event) => setGradeBand(event.target.value as GradeBandFilter)}
+        <div className="graph-legend">
+          <span className="legend-item">
+            <span className="legend-line contains" aria-hidden="true" /> contains
+          </span>
+          <span className="legend-item">
+            <span className="legend-line progression" aria-hidden="true" /> progression
+          </span>
+        </div>
+
+        {selectedNodeId ? (
+          <button
+            type="button"
+            className="button button-ghost"
+            onClick={() => setFocusNodeId(null, { replace: true })}
           >
-            <option value="3-4">초등 3~4학년군</option>
-            <option value="1-2">초등 1~2학년군</option>
-            <option value="5-6">초등 5~6학년군</option>
-            <option value="all">전체</option>
-          </select>
-        </label>
-
-        <label className="graph-control">
-          <input
-            type="checkbox"
-            checked={edgeFlags.contains}
-            onChange={(event) =>
-              setEdgeFlags((prev) => ({ ...prev, contains: event.target.checked }))
-            }
-          />
-          계층(contains)
-        </label>
-
-        <label className="graph-control">
-          <input
-            type="checkbox"
-            checked={edgeFlags.alignsTo}
-            onChange={(event) =>
-              setEdgeFlags((prev) => ({ ...prev, alignsTo: event.target.checked }))
-            }
-          />
-          매핑(alignsTo)
-        </label>
-
-        <label className="graph-control">
-          <input
-            type="checkbox"
-            checked={edgeFlags.prereq}
-            onChange={(event) =>
-              setEdgeFlags((prev) => ({ ...prev, prereq: event.target.checked }))
-            }
-          />
-          선수(prereq)
-        </label>
+            선택 해제
+          </button>
+        ) : null}
 
         <div className="graph-meta">
-          {graph ? (
+          {data ? (
             <span>
-              nodes: {Array.from(includedNodeIds).length} / {graph.nodes.length} · edges:{' '}
-              {graphEdges.length}
+              nodes: {graphNodes.length} · edges: {graphEdges.length}
             </span>
           ) : null}
         </div>
       </div>
 
       {loading ? <p>Loading…</p> : null}
-      {loadError ? <p className="error">{loadError}</p> : null}
+      {error ? <p className="error">{error}</p> : null}
 
-      {graph ? (
+      {data ? (
         <div className="graph-canvas">
           <ReactFlow
-            key={reactFlowKey}
             nodes={layoutedNodes}
             edges={graphEdges}
             onNodeClick={onNodeClick}
+            onInit={setRfInstance}
             fitView
           >
             <Background gap={16} color="#e2e8f0" />
@@ -525,11 +301,8 @@ export default function GraphPage() {
               zoomable
               nodeColor={(node) => {
                 const t = (node.data as GraphNodeData | undefined)?.nodeType
-                if (t === 'root') return '#0f172a'
+                if (t === 'subject') return '#0f172a'
                 if (t === 'domain') return '#a78bfa'
-                if (t === 'gradeBand') return '#84cc16'
-                if (t === 'schoolLevel') return '#38bdf8'
-                if (t === 'textbookUnit') return '#fb923c'
                 return '#cbd5e1'
               }}
             />

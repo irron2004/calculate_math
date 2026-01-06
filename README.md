@@ -13,6 +13,13 @@
 ./agents_up.sh curriculum_viewer_mvp_v1
 ```
 
+여러 task를 순차 실행:
+```bash
+./agents_up.sh curriculum_viewer_mvp curriculum_viewer_data_visualization_v1
+# 또는
+TASK_IDS="curriculum_viewer_mvp curriculum_viewer_data_visualization_v1" ./agents_up.sh
+```
+
 작업(task) 파일은 `tasks/<id>.md` 또는 `tasks/<id>/task.md` 형태를 사용한다.
 
 > `agents_up.sh`는 기본적으로 `.venv/bin/activate`를 찾고, 없으면 `.legacy/.venv/bin/activate`를 사용한다.

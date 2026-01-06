@@ -6,5 +6,6 @@ dist/
 inbox/
 .legacy/
 __cache__
-npm-cache
+.npm-cache
 _cacache/
+.playwright-browsers

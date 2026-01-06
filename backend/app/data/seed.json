@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "graphId": "math-graph",
+  "draft": {
+    "nodes": [
+      {
+        "id": "ROOT-MATH",
+        "nodeType": "root",
+        "label": "Math",
+        "text": null,
+        "meta": { "level": "E" },
+        "order": 0
+      },
+      {
+        "id": "E-3-ADD-001",
+        "nodeType": "skill",
+        "label": "Add three-digit numbers",
+        "text": "Add three-digit numbers with regrouping.",
+        "meta": { "level": "E", "gradeBand": "3-4", "domain": "NA", "tags": ["addition"] },
+        "order": 101
+      },
+      {
+        "id": "E-3-ADD-002",
+        "nodeType": "skill",
+        "label": "Add three-digit numbers (mixed)",
+        "text": "Solve mixed three-digit addition problems.",
+        "meta": { "level": "E", "gradeBand": "3-4", "domain": "NA", "tags": ["addition"] },
+        "order": 102
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-root-001",
+        "edgeType": "contains",
+        "source": "ROOT-MATH",
+        "target": "E-3-ADD-001",
+        "note": "Root to addition"
+      },
+      {
+        "id": "edge-add-001",
+        "edgeType": "prereq",
+        "source": "E-3-ADD-001",
+        "target": "E-3-ADD-002",
+        "note": "Regrouping before mixed"
+      }
+    ]
+  },
+  "published": {
+    "nodes": [
+      {
+        "id": "ROOT-MATH",
+        "nodeType": "root",
+        "label": "Math",
+        "text": null,
+        "meta": { "level": "E" },
+        "order": 0
+      },
+      {
+        "id": "E-3-ADD-001",
+        "nodeType": "skill",
+        "label": "Add three-digit numbers",
+        "text": "Add three-digit numbers with regrouping.",
+        "meta": { "level": "E", "gradeBand": "3-4", "domain": "NA", "tags": ["addition"] },
+        "order": 101
+      },
+      {
+        "id": "E-3-ADD-002",
+        "nodeType": "skill",
+        "label": "Add three-digit numbers (mixed)",
+        "text": "Solve mixed three-digit addition problems.",
+        "meta": { "level": "E", "gradeBand": "3-4", "domain": "NA", "tags": ["addition"] },
+        "order": 102
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-root-001",
+        "edgeType": "contains",
+        "source": "ROOT-MATH",
+        "target": "E-3-ADD-001",
+        "note": "Root to addition"
+      },
+      {
+        "id": "edge-add-001",
+        "edgeType": "prereq",
+        "source": "E-3-ADD-001",
+        "target": "E-3-ADD-002",
+        "note": "Regrouping before mixed"
+      }
+    ]
+  },
+  "problems": [
+    {
+      "problemId": "P-ADD-0001",
+      "nodeId": "E-3-ADD-001",
+      "order": 1,
+      "prompt": "345 + 270 = ?",
+      "grading": { "mode": "numeric_equal", "normalize": ["trim", "removeSpaces", "removeCommas"] },
+      "answer": { "type": "number", "value": "615", "tolerance": 0 }
+    },
+    {
+      "problemId": "P-ADD-0002",
+      "nodeId": "E-3-ADD-001",
+      "order": 2,
+      "prompt": "120 + 380 = ?",
+      "grading": { "mode": "numeric_equal", "normalize": ["trim", "removeSpaces", "removeCommas"] },
+      "answer": { "type": "number", "value": "500", "tolerance": 0 }
+    },
+    {
+      "problemId": "P-ADD-0003",
+      "nodeId": "E-3-ADD-002",
+      "order": 1,
+      "prompt": "437 + 185 = ?",
+      "grading": { "mode": "numeric_equal", "normalize": ["trim", "removeSpaces", "removeCommas"] },
+      "answer": { "type": "number", "value": "622", "tolerance": 0 }
+    }
+  ]
+}

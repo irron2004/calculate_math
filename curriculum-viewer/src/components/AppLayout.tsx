@@ -1,5 +1,7 @@
 import { type ReactNode, useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useAuth } from '../lib/auth/AuthProvider'
+import { useFocusNodeId } from '../lib/routing/useFocusNodeId'
 import { ROUTES } from '../routes'
 
 export type DetailPanelContext = {
@@ -7,6 +9,12 @@ export type DetailPanelContext = {
 }
 
 export default function AppLayout() {
+  const { isAuthenticated, user, logout } = useAuth()
+  const navigate = useNavigate()
+  const { focusNodeId } = useFocusNodeId()
+
+  const focusQuery = focusNodeId ? `?focus=${encodeURIComponent(focusNodeId)}` : ''
+
   const [detail, setDetail] = useState<ReactNode>(
     <p>노드를 선택하면 상세가 표시됩니다.</p>
   )
@@ -19,18 +27,40 @@ export default function AppLayout() {
         <nav aria-label="Primary">
           <ul className="app-nav">
             <li>
-              <NavLink to={ROUTES.tree} end>
+              <NavLink to={`${ROUTES.tree}${focusQuery}`} end>
                 트리
               </NavLink>
             </li>
             <li>
-              <NavLink to={ROUTES.graph}>그래프</NavLink>
+              <NavLink to={`${ROUTES.graph}${focusQuery}`}>그래프</NavLink>
             </li>
             <li>
               <NavLink to={ROUTES.health}>리포트</NavLink>
             </li>
           </ul>
         </nav>
+
+        <div className="app-auth">
+          {isAuthenticated ? (
+            <>
+              <span className="app-auth-user">{user?.username}</span>
+              <button
+                type="button"
+                className="button button-ghost"
+                onClick={() => {
+                  logout()
+                  navigate(ROUTES.login, { replace: true })
+                }}
+              >
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <NavLink to={ROUTES.login} className="button button-ghost">
+              로그인
+            </NavLink>
+          )}
+        </div>
       </header>
       <main className="app-main">
         <div className="app-content">

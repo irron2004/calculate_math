@@ -1,0 +1,3457 @@
+{
+  "meta": {
+    "curriculumId": "KR-MATH-2022",
+    "locale": "ko-KR",
+    "createdAt": "2025-12-29",
+    "sources": [
+      {
+        "title": "교육부 고시 제2022-33호(2022.12.22) 2022 개정 교육과정",
+        "url": "https://www.moe.go.kr/boardCnts/viewRenew.do?boardID=141&boardSeq=93458"
+      },
+      {
+        "title": "국가교육과정정보센터(NCIC)",
+        "url": "https://ncic.re.kr"
+      }
+    ],
+    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨"
+  },
+  "nodes": [
+    {
+      "id": "KR-MATH-2022",
+      "nodeType": "root",
+      "label": "수학 (2022 개정)"
+    },
+    {
+      "id": "KR-MATH-2022-E",
+      "nodeType": "schoolLevel",
+      "label": "초등수학",
+      "parentId": "KR-MATH-2022",
+      "order": 1
+    },
+    {
+      "id": "KR-MATH-2022-M",
+      "nodeType": "schoolLevel",
+      "label": "중등수학",
+      "parentId": "KR-MATH-2022",
+      "order": 2
+    },
+    {
+      "id": "KR-MATH-2022-H",
+      "nodeType": "schoolLevel",
+      "label": "고등수학",
+      "parentId": "KR-MATH-2022",
+      "order": 3
+    },
+    {
+      "id": "KR-MATH-2022-E-1-2",
+      "nodeType": "gradeBand",
+      "label": "초등 1~2학년군",
+      "parentId": "KR-MATH-2022-E",
+      "gradeBand": "1-2",
+      "order": 1
+    },
+    {
+      "id": "KR-MATH-2022-E-1-2-NA",
+      "nodeType": "domain",
+      "label": "수와 연산",
+      "parentId": "KR-MATH-2022-E-1-2",
+      "domainCode": "NA",
+      "gradeBand": "1-2",
+      "order": 1
+    },
+    {
+      "id": "2수01-A",
+      "nodeType": "textbookUnit",
+      "label": "네 자리 이하의 수",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "officialCode": "2수01-A",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "order": 1,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "2수01-01",
+      "nodeType": "achievement",
+      "label": "0~100 수: 세기·읽기·쓰기",
+      "officialCode": "2수01-01",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "0과 100까지의 수 개념을 이해하고, 수를 세고 읽고 쓸 수 있다"
+    },
+    {
+      "id": "2수01-02",
+      "nodeType": "achievement",
+      "label": "자릿값(일·십·백·천)과 위치적 기수법",
+      "officialCode": "2수01-02",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "일·십·백·천의 자릿값과 위치적 기수법을 이해하여 네 자리 이하의 수를 읽고 쓸 수 있다"
+    },
+    {
+      "id": "2수01-03",
+      "nodeType": "achievement",
+      "label": "네 자리 이하 자연수 계열·크기 비교",
+      "officialCode": "2수01-03",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "네 자리 이하 자연수의 계열과 크기를 이해하고 비교할 수 있다"
+    },
+    {
+      "id": "2수01-04",
+      "nodeType": "achievement",
+      "label": "수 분해·합성(수 감각)",
+      "officialCode": "2수01-04",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 4,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "하나의 수를 두 수로 분해하고 합성하는 활동을 통해 수 감각을 기른다"
+    },
+    {
+      "id": "2수01-B",
+      "nodeType": "textbookUnit",
+      "label": "두 자리 수 범위의 덧셈과 뺄셈",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "officialCode": "2수01-B",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "order": 2,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "2수01-05",
+      "nodeType": "achievement",
+      "label": "덧셈·뺄셈 의미(실생활)",
+      "officialCode": "2수01-05",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 5,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "실생활 상황과 연결하여 덧셈과 뺄셈의 의미를 이해한다"
+    },
+    {
+      "id": "2수01-06",
+      "nodeType": "achievement",
+      "label": "두 자리 수 덧셈·뺄셈 계산 원리",
+      "officialCode": "2수01-06",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 6,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "두 자리 수의 덧셈과 뺄셈 계산 원리를 이해하고 계산할 수 있다"
+    },
+    {
+      "id": "2수01-07",
+      "nodeType": "achievement",
+      "label": "덧셈과 뺄셈의 관계",
+      "officialCode": "2수01-07",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 7,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "덧셈과 뺄셈 사이의 관계를 이해한다"
+    },
+    {
+      "id": "2수01-08",
+      "nodeType": "achievement",
+      "label": "세 수의 덧셈·뺄셈(두 자리 수 범위)",
+      "officialCode": "2수01-08",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 8,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "두 자리 수 범위에서 세 수의 덧셈과 뺄셈을 할 수 있다"
+    },
+    {
+      "id": "2수01-09",
+      "nodeType": "achievement",
+      "label": "□ 포함 덧셈·뺄셈식 만들기·해결",
+      "officialCode": "2수01-09",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 9,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "□가 사용된 덧셈·뺄셈식을 만들고 □의 값을 구할 수 있다"
+    },
+    {
+      "id": "2수01-C",
+      "nodeType": "textbookUnit",
+      "label": "한 자리 수의 곱셈",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "officialCode": "2수01-C",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "order": 3,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "2수01-10",
+      "nodeType": "achievement",
+      "label": "곱셈 의미(실생활)",
+      "officialCode": "2수01-10",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 10,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "실생활 상황과 연결하여 곱셈의 의미를 이해한다"
+    },
+    {
+      "id": "2수01-11",
+      "nodeType": "achievement",
+      "label": "곱셈구구·한 자리 수 곱셈",
+      "officialCode": "2수01-11",
+      "parentId": "KR-MATH-2022-E-1-2-NA",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 11,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산"
+      ],
+      "text": "곱셈구구를 이해하고, 한 자리 수의 곱셈을 할 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-1-2-RR",
+      "nodeType": "domain",
+      "label": "변화와 관계",
+      "parentId": "KR-MATH-2022-E-1-2",
+      "domainCode": "RR",
+      "gradeBand": "1-2",
+      "order": 2
+    },
+    {
+      "id": "2수02-A",
+      "nodeType": "textbookUnit",
+      "label": "규칙",
+      "parentId": "KR-MATH-2022-E-1-2-RR",
+      "officialCode": "2수02-A",
+      "gradeBand": "1-2",
+      "domainCode": "RR",
+      "order": 1,
+      "tags": [
+        "초등",
+        "1-2",
+        "변화와 관계"
+      ]
+    },
+    {
+      "id": "2수02-01",
+      "nodeType": "achievement",
+      "label": "규칙적인 변화 찾기·표현",
+      "officialCode": "2수02-01",
+      "parentId": "KR-MATH-2022-E-1-2-RR",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "RR",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "1-2",
+        "변화와 관계"
+      ],
+      "text": "생활 주변의 규칙적인 변화를 찾아 여러 가지 방법으로 표현할 수 있다",
+      "note": "조사 메모 기반(예상 성취기준)"
+    },
+    {
+      "id": "KR-MATH-2022-E-1-2-GM",
+      "nodeType": "domain",
+      "label": "도형과 측정",
+      "parentId": "KR-MATH-2022-E-1-2",
+      "domainCode": "GM",
+      "gradeBand": "1-2",
+      "order": 3
+    },
+    {
+      "id": "2수03-A",
+      "nodeType": "textbookUnit",
+      "label": "입체도형의 모양",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "officialCode": "2수03-A",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "order": 1,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "2수03-01",
+      "nodeType": "achievement",
+      "label": "입체도형 직관적 인식(상자·공 등)",
+      "officialCode": "2수03-01",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ],
+      "text": "주변 사물에서 입체도형의 모양(예: 상자, 공)을 직관적으로 알아본다"
+    },
+    {
+      "id": "2수03-B",
+      "nodeType": "textbookUnit",
+      "label": "평면도형과 그 구성 요소",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "officialCode": "2수03-B",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "order": 2,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "2수03-02",
+      "nodeType": "achievement",
+      "label": "삼각형·사각형과 구성 요소(변·꼭짓점)",
+      "officialCode": "2수03-02",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ],
+      "text": "삼각형과 사각형을 알고 그 구성 요소(변, 꼭짓점)를 이해한다"
+    },
+    {
+      "id": "2수03-C",
+      "nodeType": "textbookUnit",
+      "label": "양의 비교",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "officialCode": "2수03-C",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "order": 3,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "2수03-03",
+      "nodeType": "achievement",
+      "label": "길이·무게·넓이 등 직접 비교",
+      "officialCode": "2수03-03",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ],
+      "text": "두 대상의 길이, 무게, 넓이 등을 직접 비교하여 어느 쪽이 더 큰지 판단할 수 있다"
+    },
+    {
+      "id": "2수03-D",
+      "nodeType": "textbookUnit",
+      "label": "시각과 시간",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "officialCode": "2수03-D",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "order": 4,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "2수03-04",
+      "nodeType": "achievement",
+      "label": "시·분: 시각/시간 이해",
+      "officialCode": "2수03-04",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 4,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ],
+      "text": "시계 보기를 통해 시각과 시간(시와 분)을 이해하고 말할 수 있다"
+    },
+    {
+      "id": "2수03-E",
+      "nodeType": "textbookUnit",
+      "label": "길이 측정",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "officialCode": "2수03-E",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "order": 5,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "2수03-05",
+      "nodeType": "achievement",
+      "label": "cm/m로 길이 측정·비교",
+      "officialCode": "2수03-05",
+      "parentId": "KR-MATH-2022-E-1-2-GM",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 5,
+      "tags": [
+        "초등",
+        "1-2",
+        "도형과 측정"
+      ],
+      "text": "길이의 단위(cm, m)를 사용하여 길이를 측정하고 비교할 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-1-2-DP",
+      "nodeType": "domain",
+      "label": "자료와 가능성",
+      "parentId": "KR-MATH-2022-E-1-2",
+      "domainCode": "DP",
+      "gradeBand": "1-2",
+      "order": 4
+    },
+    {
+      "id": "2수04-A",
+      "nodeType": "textbookUnit",
+      "label": "자료의 분류",
+      "parentId": "KR-MATH-2022-E-1-2-DP",
+      "officialCode": "2수04-A",
+      "gradeBand": "1-2",
+      "domainCode": "DP",
+      "order": 1,
+      "tags": [
+        "초등",
+        "1-2",
+        "자료와 가능성"
+      ]
+    },
+    {
+      "id": "2수04-01",
+      "nodeType": "achievement",
+      "label": "기준에 따라 분류·결과 말하기",
+      "officialCode": "2수04-01",
+      "parentId": "KR-MATH-2022-E-1-2-DP",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "DP",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "1-2",
+        "자료와 가능성"
+      ],
+      "text": "주어진 대상들을 기준에 따라 분류하고, 분류 결과를 말할 수 있다"
+    },
+    {
+      "id": "2수04-B",
+      "nodeType": "textbookUnit",
+      "label": "표와 그림그래프",
+      "parentId": "KR-MATH-2022-E-1-2-DP",
+      "officialCode": "2수04-B",
+      "gradeBand": "1-2",
+      "domainCode": "DP",
+      "order": 2,
+      "tags": [
+        "초등",
+        "1-2",
+        "자료와 가능성"
+      ]
+    },
+    {
+      "id": "2수04-02",
+      "nodeType": "achievement",
+      "label": "분류한 자료를 표로 정리",
+      "officialCode": "2수04-02",
+      "parentId": "KR-MATH-2022-E-1-2-DP",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "DP",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "1-2",
+        "자료와 가능성"
+      ],
+      "text": "분류한 자료를 표로 정리할 수 있다"
+    },
+    {
+      "id": "2수04-03",
+      "nodeType": "achievement",
+      "label": "기호(O/X/…)로 그림그래프 표현·해석",
+      "officialCode": "2수04-03",
+      "parentId": "KR-MATH-2022-E-1-2-DP",
+      "schoolLevel": "E",
+      "gradeBand": "1-2",
+      "domainCode": "DP",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "1-2",
+        "자료와 가능성"
+      ],
+      "text": "자료를 O, X, / 기호 등을 이용한 그림그래프로 나타내고 해석할 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-3-4",
+      "nodeType": "gradeBand",
+      "label": "초등 3~4학년군",
+      "parentId": "KR-MATH-2022-E",
+      "gradeBand": "3-4",
+      "order": 2
+    },
+    {
+      "id": "KR-MATH-2022-E-3-4-NA",
+      "nodeType": "domain",
+      "label": "수와 연산",
+      "parentId": "KR-MATH-2022-E-3-4",
+      "domainCode": "NA",
+      "gradeBand": "3-4",
+      "order": 1
+    },
+    {
+      "id": "4수01-A",
+      "nodeType": "textbookUnit",
+      "label": "다섯 자리 이상의 수",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "officialCode": "4수01-A",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "4수01-01",
+      "nodeType": "achievement",
+      "label": "큰 수 읽고 쓰기(5자리 이상)",
+      "officialCode": "4수01-01",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ],
+      "text": "다섯 자리 이상의 큰 수를 읽고 쓸 수 있다"
+    },
+    {
+      "id": "4수01-B",
+      "nodeType": "textbookUnit",
+      "label": "분수",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "officialCode": "4수01-B",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "4수01-02",
+      "nodeType": "achievement",
+      "label": "분수 의미·읽기/쓰기",
+      "officialCode": "4수01-02",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ],
+      "text": "분수의 의미(전체-부분 관계 등)를 알고 분수를 읽고 쓸 수 있다"
+    },
+    {
+      "id": "4수01-C",
+      "nodeType": "textbookUnit",
+      "label": "소수",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "officialCode": "4수01-C",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "order": 3,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "4수01-03",
+      "nodeType": "achievement",
+      "label": "소수 개념·읽기/쓰기",
+      "officialCode": "4수01-03",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ],
+      "text": "소수의 개념을 이해하고 소수를 읽고 쓸 수 있다"
+    },
+    {
+      "id": "4수01-D",
+      "nodeType": "textbookUnit",
+      "label": "세 자리 수의 덧셈과 뺄셈",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "officialCode": "4수01-D",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "order": 4,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "4수01-04",
+      "nodeType": "achievement",
+      "label": "세 자리 수 덧셈·뺄셈(원리/계산)",
+      "officialCode": "4수01-04",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 4,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ],
+      "text": "세 자리 수 범위에서 덧셈과 뺄셈의 계산 원리를 이해하고 계산할 수 있다"
+    },
+    {
+      "id": "4수01-E",
+      "nodeType": "textbookUnit",
+      "label": "자연수의 곱셈과 나눗셈",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "officialCode": "4수01-E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "order": 5,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "4수01-05",
+      "nodeType": "achievement",
+      "label": "자연수 곱셈 계산 원리(예: 2자리×2자리)",
+      "officialCode": "4수01-05",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 5,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ],
+      "text": "자연수의 곱셈(예: 두 자리 수 × 두 자리 수)의 계산 원리를 이해하고 계산할 수 있다"
+    },
+    {
+      "id": "4수01-06",
+      "nodeType": "achievement",
+      "label": "나눗셈 의미·한 자리 수로 나눗셈",
+      "officialCode": "4수01-06",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 6,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ],
+      "text": "나눗셈의 의미를 알고 한 자리 수로 나눗셈을 할 수 있다"
+    },
+    {
+      "id": "4수01-F",
+      "nodeType": "textbookUnit",
+      "label": "분모가 같은 분수의 덧셈과 뺄셈",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "officialCode": "4수01-F",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "order": 6,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "4수01-07",
+      "nodeType": "achievement",
+      "label": "분모 같은 분수 덧셈·뺄셈(의미 포함)",
+      "officialCode": "4수01-07",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 7,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ],
+      "text": "분모가 같은 분수의 덧셈과 뺄셈을 계산하고 그 의미를 이해한다"
+    },
+    {
+      "id": "4수01-G",
+      "nodeType": "textbookUnit",
+      "label": "소수의 덧셈과 뺄셈",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "officialCode": "4수01-G",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "order": 7,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "4수01-08",
+      "nodeType": "achievement",
+      "label": "소수 덧셈·뺄셈(방법 설명)",
+      "officialCode": "4수01-08",
+      "parentId": "KR-MATH-2022-E-3-4-NA",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 8,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산"
+      ],
+      "text": "소수의 덧셈과 뺄셈을 계산하고 그 방법을 설명할 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-3-4-RR",
+      "nodeType": "domain",
+      "label": "변화와 관계",
+      "parentId": "KR-MATH-2022-E-3-4",
+      "domainCode": "RR",
+      "gradeBand": "3-4",
+      "order": 2
+    },
+    {
+      "id": "4수02-A",
+      "nodeType": "textbookUnit",
+      "label": "규칙",
+      "parentId": "KR-MATH-2022-E-3-4-RR",
+      "officialCode": "4수02-A",
+      "gradeBand": "3-4",
+      "domainCode": "RR",
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "변화와 관계"
+      ]
+    },
+    {
+      "id": "4수02-01",
+      "nodeType": "achievement",
+      "label": "배열에서 규칙 찾아 표현",
+      "officialCode": "4수02-01",
+      "parentId": "KR-MATH-2022-E-3-4-RR",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "RR",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "변화와 관계"
+      ],
+      "text": "물체, 무늬, 수의 배열에서 규칙을 찾아 여러 가지 방법으로 표현한다"
+    },
+    {
+      "id": "4수02-B",
+      "nodeType": "textbookUnit",
+      "label": "동치 관계",
+      "parentId": "KR-MATH-2022-E-3-4-RR",
+      "officialCode": "4수02-B",
+      "gradeBand": "3-4",
+      "domainCode": "RR",
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "변화와 관계"
+      ]
+    },
+    {
+      "id": "4수02-02",
+      "nodeType": "achievement",
+      "label": "등호 의미·동치 관계",
+      "officialCode": "4수02-02",
+      "parentId": "KR-MATH-2022-E-3-4-RR",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "RR",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "변화와 관계"
+      ],
+      "text": "등호(=)의 의미를 알고 동치 관계를 이해한다"
+    },
+    {
+      "id": "4수02-C",
+      "nodeType": "textbookUnit",
+      "label": "대응 관계",
+      "parentId": "KR-MATH-2022-E-3-4-RR",
+      "officialCode": "4수02-C",
+      "gradeBand": "3-4",
+      "domainCode": "RR",
+      "order": 3,
+      "tags": [
+        "초등",
+        "3-4",
+        "변화와 관계"
+      ]
+    },
+    {
+      "id": "4수02-03",
+      "nodeType": "achievement",
+      "label": "대응 관계를 표/식으로 나타내기",
+      "officialCode": "4수02-03",
+      "parentId": "KR-MATH-2022-E-3-4-RR",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "RR",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "3-4",
+        "변화와 관계"
+      ],
+      "text": "한 양이 변함에 따라 다른 양이 정해지는 대응 관계를 표나 식으로 나타낼 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-3-4-GM",
+      "nodeType": "domain",
+      "label": "도형과 측정",
+      "parentId": "KR-MATH-2022-E-3-4",
+      "domainCode": "GM",
+      "gradeBand": "3-4",
+      "order": 3
+    },
+    {
+      "id": "4수03-A",
+      "nodeType": "textbookUnit",
+      "label": "도형의 기초",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "officialCode": "4수03-A",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "4수03-01",
+      "nodeType": "achievement",
+      "label": "직선/선분/각 + 평행/수직",
+      "officialCode": "4수03-01",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "직선, 선분, 각 등의 기본 도형 요소를 알고, 평행과 수직을 이해한다"
+    },
+    {
+      "id": "4수03-B",
+      "nodeType": "textbookUnit",
+      "label": "원의 구성 요소",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "officialCode": "4수03-B",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "4수03-02",
+      "nodeType": "achievement",
+      "label": "중심/반지름/지름 이해·원 그리기",
+      "officialCode": "4수03-02",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "원의 중심, 반지름, 지름의 의미를 알고, 주어진 원을 그릴 수 있다"
+    },
+    {
+      "id": "4수03-C",
+      "nodeType": "textbookUnit",
+      "label": "여러 가지 삼각형",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "officialCode": "4수03-C",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 3,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "4수03-03",
+      "nodeType": "achievement",
+      "label": "삼각형 종류와 특성",
+      "officialCode": "4수03-03",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "삼각형의 종류(예: 이등변, 정삼각형)와 특성을 이해한다"
+    },
+    {
+      "id": "4수03-D",
+      "nodeType": "textbookUnit",
+      "label": "여러 가지 사각형",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "officialCode": "4수03-D",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 4,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "4수03-04",
+      "nodeType": "achievement",
+      "label": "사각형 종류와 성질",
+      "officialCode": "4수03-04",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 4,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "사각형의 종류(예: 직사각형, 평행사변형)와 성질을 이해한다"
+    },
+    {
+      "id": "4수03-E",
+      "nodeType": "textbookUnit",
+      "label": "다각형",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "officialCode": "4수03-E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 5,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "4수03-05",
+      "nodeType": "achievement",
+      "label": "다각형 개념 + 오각형/육각형 특징",
+      "officialCode": "4수03-05",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 5,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "다각형의 개념을 알고 오각형, 육각형의 특징을 설명할 수 있다"
+    },
+    {
+      "id": "4수03-F",
+      "nodeType": "textbookUnit",
+      "label": "평면도형의 이동",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "officialCode": "4수03-F",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 6,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "4수03-06",
+      "nodeType": "achievement",
+      "label": "밀기/뒤집기/돌리기 불변 성질",
+      "officialCode": "4수03-06",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 6,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "평면도형을 밀기, 뒤집기, 돌리기 했을 때 달라지지 않는 성질을 찾는다"
+    },
+    {
+      "id": "4수03-G",
+      "nodeType": "textbookUnit",
+      "label": "시각과 시간(초)",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "officialCode": "4수03-G",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 7,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "4수03-07",
+      "nodeType": "achievement",
+      "label": "초 단위까지 시간 읽기·측정",
+      "officialCode": "4수03-07",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 7,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "초 단위까지 시간을 읽고 측정할 수 있다"
+    },
+    {
+      "id": "4수03-H",
+      "nodeType": "textbookUnit",
+      "label": "긴 길이/들이/무게/각도 측정",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "officialCode": "4수03-H",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 8,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "4수03-08",
+      "nodeType": "achievement",
+      "label": "mm↔km 등 길이 단위 관계 활용",
+      "officialCode": "4수03-08",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 8,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "길이의 단위(mm, km) 사이의 관계를 이해하고 활용한다"
+    },
+    {
+      "id": "4수03-09",
+      "nodeType": "achievement",
+      "label": "들이·무게 단위(L/mL, kg/g) 측정",
+      "officialCode": "4수03-09",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 9,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "들이와 무게의 단위(L, mL, kg, g)를 알고 측정할 수 있다"
+    },
+    {
+      "id": "4수03-10",
+      "nodeType": "achievement",
+      "label": "각도(°) 이해·각도기 측정",
+      "officialCode": "4수03-10",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 10,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ],
+      "text": "각도의 단위(°)를 알고, 각도기로 각의 크기를 측정할 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-3-4-DP",
+      "nodeType": "domain",
+      "label": "자료와 가능성",
+      "parentId": "KR-MATH-2022-E-3-4",
+      "domainCode": "DP",
+      "gradeBand": "3-4",
+      "order": 4
+    },
+    {
+      "id": "4수04-A",
+      "nodeType": "textbookUnit",
+      "label": "막대그래프",
+      "parentId": "KR-MATH-2022-E-3-4-DP",
+      "officialCode": "4수04-A",
+      "gradeBand": "3-4",
+      "domainCode": "DP",
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "자료와 가능성"
+      ]
+    },
+    {
+      "id": "4수04-01",
+      "nodeType": "achievement",
+      "label": "막대그래프 표현·해석",
+      "officialCode": "4수04-01",
+      "parentId": "KR-MATH-2022-E-3-4-DP",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "DP",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "자료와 가능성"
+      ],
+      "text": "자료를 막대그래프로 나타내고 그래프를 해석할 수 있다"
+    },
+    {
+      "id": "4수04-B",
+      "nodeType": "textbookUnit",
+      "label": "꺾은선그래프",
+      "parentId": "KR-MATH-2022-E-3-4-DP",
+      "officialCode": "4수04-B",
+      "gradeBand": "3-4",
+      "domainCode": "DP",
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "자료와 가능성"
+      ]
+    },
+    {
+      "id": "4수04-02",
+      "nodeType": "achievement",
+      "label": "꺾은선그래프 표현·해석",
+      "officialCode": "4수04-02",
+      "parentId": "KR-MATH-2022-E-3-4-DP",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "DP",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "자료와 가능성"
+      ],
+      "text": "변화하는 자료를 꺾은선그래프로 나타내고 해석할 수 있다"
+    },
+    {
+      "id": "4수04-C",
+      "nodeType": "textbookUnit",
+      "label": "평균",
+      "parentId": "KR-MATH-2022-E-3-4-DP",
+      "officialCode": "4수04-C",
+      "gradeBand": "3-4",
+      "domainCode": "DP",
+      "order": 3,
+      "tags": [
+        "초등",
+        "3-4",
+        "자료와 가능성"
+      ]
+    },
+    {
+      "id": "4수04-03",
+      "nodeType": "achievement",
+      "label": "평균 구하기·의미 설명",
+      "officialCode": "4수04-03",
+      "parentId": "KR-MATH-2022-E-3-4-DP",
+      "schoolLevel": "E",
+      "gradeBand": "3-4",
+      "domainCode": "DP",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "3-4",
+        "자료와 가능성"
+      ],
+      "text": "여러 자료의 평균을 구하고 그 의미를 설명할 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-5-6",
+      "nodeType": "gradeBand",
+      "label": "초등 5~6학년군",
+      "parentId": "KR-MATH-2022-E",
+      "gradeBand": "5-6",
+      "order": 3
+    },
+    {
+      "id": "KR-MATH-2022-E-5-6-NA",
+      "nodeType": "domain",
+      "label": "수와 연산",
+      "parentId": "KR-MATH-2022-E-5-6",
+      "domainCode": "NA",
+      "gradeBand": "5-6",
+      "order": 1
+    },
+    {
+      "id": "6수01-A",
+      "nodeType": "textbookUnit",
+      "label": "수의 범위와 어림",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "officialCode": "6수01-A",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "order": 1,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "6수01-02",
+      "nodeType": "achievement",
+      "label": "이상/이하/초과/미만 의미·범위 표현",
+      "officialCode": "6수01-02",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "실생활과 연결하여 이상, 이하, 초과, 미만의 의미를 알고 수의 범위를 나타낼 수 있다"
+    },
+    {
+      "id": "6수01-03",
+      "nodeType": "achievement",
+      "label": "올림/버림/반올림으로 어림값 활용",
+      "officialCode": "6수01-03",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "올림, 버림, 반올림의 의미와 필요성을 알고 이를 활용하여 어림값을 구하고 활용할 수 있다"
+    },
+    {
+      "id": "6수01-B",
+      "nodeType": "textbookUnit",
+      "label": "자연수의 혼합 계산",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "officialCode": "6수01-B",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "order": 2,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "6수01-01",
+      "nodeType": "achievement",
+      "label": "혼합 계산 순서 이해·계산",
+      "officialCode": "6수01-01",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "덧셈, 뺄셈, 곱셈, 나눗셈의 혼합 계산에서 계산 순서를 알고 혼합 계산을 할 수 있다"
+    },
+    {
+      "id": "6수01-C",
+      "nodeType": "textbookUnit",
+      "label": "약수와 배수",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "officialCode": "6수01-C",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "order": 3,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "6수01-04",
+      "nodeType": "achievement",
+      "label": "약수/공약수/최대공약수",
+      "officialCode": "6수01-04",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 4,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "약수, 공약수, 최대공약수를 이해하고 구할 수 있다"
+    },
+    {
+      "id": "6수01-05",
+      "nodeType": "achievement",
+      "label": "배수/공배수/최소공배수",
+      "officialCode": "6수01-05",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 5,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "배수, 공배수, 최소공배수를 이해하고 구할 수 있다"
+    },
+    {
+      "id": "6수01-D",
+      "nodeType": "textbookUnit",
+      "label": "분수의 덧셈과 뺄셈",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "officialCode": "6수01-D",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "order": 4,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "6수01-06",
+      "nodeType": "achievement",
+      "label": "약분·통분(동치 분수 만들기)",
+      "officialCode": "6수01-06",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 6,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "크기가 같은 분수를 만드는 방법을 이해하고 분수를 약분, 통분할 수 있다"
+    },
+    {
+      "id": "6수01-07",
+      "nodeType": "achievement",
+      "label": "분모 다른 분수 크기 비교(방법 설명)",
+      "officialCode": "6수01-07",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 7,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "분모가 다른 분수의 크기를 비교하고 그 방법을 설명할 수 있다"
+    },
+    {
+      "id": "6수01-08",
+      "nodeType": "achievement",
+      "label": "분모 다른 분수 덧셈·뺄셈(원리 탐구/계산)",
+      "officialCode": "6수01-08",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 8,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "분모가 다른 분수의 덧셈과 뺄셈의 계산 원리를 탐구하고 계산할 수 있다"
+    },
+    {
+      "id": "6수01-E",
+      "nodeType": "textbookUnit",
+      "label": "분수의 곱셈과 나눗셈",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "officialCode": "6수01-E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "order": 5,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "6수01-09",
+      "nodeType": "achievement",
+      "label": "분수 곱셈(원리 탐구/계산)",
+      "officialCode": "6수01-09",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 9,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "분수의 곱셈의 계산 원리를 탐구하고 그 계산을 할 수 있다"
+    },
+    {
+      "id": "6수01-11",
+      "nodeType": "achievement",
+      "label": "분수 나눗셈(원리 탐구/계산)",
+      "officialCode": "6수01-11",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 11,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "분수의 나눗셈의 계산 원리를 탐구하고 그 계산을 할 수 있다"
+    },
+    {
+      "id": "6수01-F",
+      "nodeType": "textbookUnit",
+      "label": "분수와 소수의 관계",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "officialCode": "6수01-F",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "order": 6,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "6수01-12",
+      "nodeType": "achievement",
+      "label": "분수↔소수 관계 이해·비교·설명",
+      "officialCode": "6수01-12",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 12,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "분수와 소수의 관계를 이해하고 크기를 비교하며 설명할 수 있다"
+    },
+    {
+      "id": "6수01-G",
+      "nodeType": "textbookUnit",
+      "label": "소수의 곱셈과 나눗셈",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "officialCode": "6수01-G",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "order": 7,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "6수01-13",
+      "nodeType": "achievement",
+      "label": "소수 곱셈(원리 탐구/계산)",
+      "officialCode": "6수01-13",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 13,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "소수의 곱셈의 계산 원리를 탐구하고 그 계산을 할 수 있다"
+    },
+    {
+      "id": "6수01-15",
+      "nodeType": "achievement",
+      "label": "소수 나눗셈(원리 탐구/계산)",
+      "officialCode": "6수01-15",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 15,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "소수의 나눗셈의 계산 원리를 탐구하고 그 계산을 할 수 있다"
+    },
+    {
+      "id": "6수01-H",
+      "nodeType": "textbookUnit",
+      "label": "나눗셈에서의 몫 표현(분수/소수)",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "officialCode": "6수01-H",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "order": 8,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ]
+    },
+    {
+      "id": "6수01-10",
+      "nodeType": "achievement",
+      "label": "자연수÷자연수 몫을 분수로",
+      "officialCode": "6수01-10",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 10,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "(자연수)÷(자연수)에서 나눗셈의 몫을 분수로 나타낼 수 있다"
+    },
+    {
+      "id": "6수01-14",
+      "nodeType": "achievement",
+      "label": "자연수÷자연수 몫을 소수로",
+      "officialCode": "6수01-14",
+      "parentId": "KR-MATH-2022-E-5-6-NA",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "NA",
+      "skillLevel": 1,
+      "order": 14,
+      "tags": [
+        "초등",
+        "5-6",
+        "수와 연산"
+      ],
+      "text": "(자연수)÷(자연수)에서 나눗셈의 몫을 소수로 나타낼 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-5-6-RR",
+      "nodeType": "domain",
+      "label": "변화와 관계",
+      "parentId": "KR-MATH-2022-E-5-6",
+      "domainCode": "RR",
+      "gradeBand": "5-6",
+      "order": 2
+    },
+    {
+      "id": "6수02-A",
+      "nodeType": "textbookUnit",
+      "label": "비와 비율",
+      "parentId": "KR-MATH-2022-E-5-6-RR",
+      "officialCode": "6수02-A",
+      "gradeBand": "5-6",
+      "domainCode": "RR",
+      "order": 1,
+      "tags": [
+        "초등",
+        "5-6",
+        "변화와 관계"
+      ]
+    },
+    {
+      "id": "6수02-01",
+      "nodeType": "achievement",
+      "label": "비/비율 이해",
+      "officialCode": "6수02-01",
+      "parentId": "KR-MATH-2022-E-5-6-RR",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "RR",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "5-6",
+        "변화와 관계"
+      ],
+      "text": "두 양을 비교하여 비로 나타내고, 비율을 이해한다"
+    },
+    {
+      "id": "6수02-02",
+      "nodeType": "achievement",
+      "label": "비율을 분수/소수/백분율로",
+      "officialCode": "6수02-02",
+      "parentId": "KR-MATH-2022-E-5-6-RR",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "RR",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "5-6",
+        "변화와 관계"
+      ],
+      "text": "비율을 분수, 소수, 백분율로 나타낼 수 있다"
+    },
+    {
+      "id": "6수02-B",
+      "nodeType": "textbookUnit",
+      "label": "비례식과 비례배분",
+      "parentId": "KR-MATH-2022-E-5-6-RR",
+      "officialCode": "6수02-B",
+      "gradeBand": "5-6",
+      "domainCode": "RR",
+      "order": 2,
+      "tags": [
+        "초등",
+        "5-6",
+        "변화와 관계"
+      ]
+    },
+    {
+      "id": "6수02-03",
+      "nodeType": "achievement",
+      "label": "비례식 풀이·비례배분",
+      "officialCode": "6수02-03",
+      "parentId": "KR-MATH-2022-E-5-6-RR",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "RR",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "5-6",
+        "변화와 관계"
+      ],
+      "text": "비례식을 풀고, 주어진 양을 비례배분할 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-5-6-GM",
+      "nodeType": "domain",
+      "label": "도형과 측정",
+      "parentId": "KR-MATH-2022-E-5-6",
+      "domainCode": "GM",
+      "gradeBand": "5-6",
+      "order": 3
+    },
+    {
+      "id": "6수03-A",
+      "nodeType": "textbookUnit",
+      "label": "합동과 대칭",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "officialCode": "6수03-A",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "order": 1,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "6수03-01",
+      "nodeType": "achievement",
+      "label": "합동 판단·합동 도형 그리기",
+      "officialCode": "6수03-01",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ],
+      "text": "두 도형이 합동인지 판단하고, 합동인 도형을 그릴 수 있다"
+    },
+    {
+      "id": "6수03-02",
+      "nodeType": "achievement",
+      "label": "선대칭/점대칭 도형 찾기",
+      "officialCode": "6수03-02",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ],
+      "text": "선대칭도형과 점대칭도형의 개념을 알고 그것을 찾을 수 있다"
+    },
+    {
+      "id": "6수03-B",
+      "nodeType": "textbookUnit",
+      "label": "입체도형",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "officialCode": "6수03-B",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "order": 2,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "6수03-03",
+      "nodeType": "achievement",
+      "label": "직육면체·정육면체 특징",
+      "officialCode": "6수03-03",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 3,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ],
+      "text": "직육면체와 정육면체의 구성 요소와 특징을 이해한다"
+    },
+    {
+      "id": "6수03-04",
+      "nodeType": "achievement",
+      "label": "각기둥/각뿔 특징·전개도",
+      "officialCode": "6수03-04",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 4,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ],
+      "text": "각기둥과 각뿔의 특징을 알고 전개도를 이해한다"
+    },
+    {
+      "id": "6수03-05",
+      "nodeType": "achievement",
+      "label": "원기둥/원뿔/구 특징 비교",
+      "officialCode": "6수03-05",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 5,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ],
+      "text": "원기둥, 원뿔, 구의 특징을 알고 비교할 수 있다"
+    },
+    {
+      "id": "6수03-C",
+      "nodeType": "textbookUnit",
+      "label": "도형의 측정",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "officialCode": "6수03-C",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "order": 3,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ]
+    },
+    {
+      "id": "6수03-06",
+      "nodeType": "achievement",
+      "label": "다각형 둘레·넓이 구하기",
+      "officialCode": "6수03-06",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 6,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ],
+      "text": "다각형의 둘레와 넓이를 구하는 방법을 이해하고 계산할 수 있다"
+    },
+    {
+      "id": "6수03-07",
+      "nodeType": "achievement",
+      "label": "원주율·원의 넓이",
+      "officialCode": "6수03-07",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 7,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ],
+      "text": "원주율의 의미를 알고 원의 넓이를 구할 수 있다"
+    },
+    {
+      "id": "6수03-08",
+      "nodeType": "achievement",
+      "label": "직육면체/정육면체 겉넓이·부피",
+      "officialCode": "6수03-08",
+      "parentId": "KR-MATH-2022-E-5-6-GM",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "GM",
+      "skillLevel": 1,
+      "order": 8,
+      "tags": [
+        "초등",
+        "5-6",
+        "도형과 측정"
+      ],
+      "text": "직육면체와 정육면체의 겉넓이와 부피를 구하는 방법을 알고 계산할 수 있다"
+    },
+    {
+      "id": "KR-MATH-2022-E-5-6-DP",
+      "nodeType": "domain",
+      "label": "자료와 가능성",
+      "parentId": "KR-MATH-2022-E-5-6",
+      "domainCode": "DP",
+      "gradeBand": "5-6",
+      "order": 4
+    },
+    {
+      "id": "6수04-A",
+      "nodeType": "textbookUnit",
+      "label": "띠그래프와 원그래프",
+      "parentId": "KR-MATH-2022-E-5-6-DP",
+      "officialCode": "6수04-A",
+      "gradeBand": "5-6",
+      "domainCode": "DP",
+      "order": 1,
+      "tags": [
+        "초등",
+        "5-6",
+        "자료와 가능성"
+      ]
+    },
+    {
+      "id": "6수04-01",
+      "nodeType": "achievement",
+      "label": "띠그래프/원그래프로 표현·해석",
+      "officialCode": "6수04-01",
+      "parentId": "KR-MATH-2022-E-5-6-DP",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "DP",
+      "skillLevel": 1,
+      "order": 1,
+      "tags": [
+        "초등",
+        "5-6",
+        "자료와 가능성"
+      ],
+      "text": "주어진 자료를 띠그래프와 원그래프로 나타내고 해석할 수 있다"
+    },
+    {
+      "id": "6수04-B",
+      "nodeType": "textbookUnit",
+      "label": "가능성",
+      "parentId": "KR-MATH-2022-E-5-6-DP",
+      "officialCode": "6수04-B",
+      "gradeBand": "5-6",
+      "domainCode": "DP",
+      "order": 2,
+      "tags": [
+        "초등",
+        "5-6",
+        "자료와 가능성"
+      ]
+    },
+    {
+      "id": "6수04-02",
+      "nodeType": "achievement",
+      "label": "가능성 정도 구별·설명",
+      "officialCode": "6수04-02",
+      "parentId": "KR-MATH-2022-E-5-6-DP",
+      "schoolLevel": "E",
+      "gradeBand": "5-6",
+      "domainCode": "DP",
+      "skillLevel": 1,
+      "order": 2,
+      "tags": [
+        "초등",
+        "5-6",
+        "자료와 가능성"
+      ],
+      "text": "가능성이 높은 상황과 낮은 상황을 구별하고, 일어날 가능성을 말로 설명할 수 있다"
+    }
+  ],
+  "edges": [
+    {
+      "id": "alignsTo:2수01-A->2수01-01",
+      "edgeType": "alignsTo",
+      "source": "2수01-A",
+      "target": "2수01-01"
+    },
+    {
+      "id": "alignsTo:2수01-A->2수01-02",
+      "edgeType": "alignsTo",
+      "source": "2수01-A",
+      "target": "2수01-02"
+    },
+    {
+      "id": "alignsTo:2수01-A->2수01-03",
+      "edgeType": "alignsTo",
+      "source": "2수01-A",
+      "target": "2수01-03"
+    },
+    {
+      "id": "alignsTo:2수01-A->2수01-04",
+      "edgeType": "alignsTo",
+      "source": "2수01-A",
+      "target": "2수01-04"
+    },
+    {
+      "id": "alignsTo:2수01-B->2수01-05",
+      "edgeType": "alignsTo",
+      "source": "2수01-B",
+      "target": "2수01-05"
+    },
+    {
+      "id": "alignsTo:2수01-B->2수01-06",
+      "edgeType": "alignsTo",
+      "source": "2수01-B",
+      "target": "2수01-06"
+    },
+    {
+      "id": "alignsTo:2수01-B->2수01-07",
+      "edgeType": "alignsTo",
+      "source": "2수01-B",
+      "target": "2수01-07"
+    },
+    {
+      "id": "alignsTo:2수01-B->2수01-08",
+      "edgeType": "alignsTo",
+      "source": "2수01-B",
+      "target": "2수01-08"
+    },
+    {
+      "id": "alignsTo:2수01-B->2수01-09",
+      "edgeType": "alignsTo",
+      "source": "2수01-B",
+      "target": "2수01-09"
+    },
+    {
+      "id": "alignsTo:2수01-C->2수01-10",
+      "edgeType": "alignsTo",
+      "source": "2수01-C",
+      "target": "2수01-10"
+    },
+    {
+      "id": "alignsTo:2수01-C->2수01-11",
+      "edgeType": "alignsTo",
+      "source": "2수01-C",
+      "target": "2수01-11"
+    },
+    {
+      "id": "alignsTo:2수02-A->2수02-01",
+      "edgeType": "alignsTo",
+      "source": "2수02-A",
+      "target": "2수02-01"
+    },
+    {
+      "id": "alignsTo:2수03-A->2수03-01",
+      "edgeType": "alignsTo",
+      "source": "2수03-A",
+      "target": "2수03-01"
+    },
+    {
+      "id": "alignsTo:2수03-B->2수03-02",
+      "edgeType": "alignsTo",
+      "source": "2수03-B",
+      "target": "2수03-02"
+    },
+    {
+      "id": "alignsTo:2수03-C->2수03-03",
+      "edgeType": "alignsTo",
+      "source": "2수03-C",
+      "target": "2수03-03"
+    },
+    {
+      "id": "alignsTo:2수03-D->2수03-04",
+      "edgeType": "alignsTo",
+      "source": "2수03-D",
+      "target": "2수03-04"
+    },
+    {
+      "id": "alignsTo:2수03-E->2수03-05",
+      "edgeType": "alignsTo",
+      "source": "2수03-E",
+      "target": "2수03-05"
+    },
+    {
+      "id": "alignsTo:2수04-A->2수04-01",
+      "edgeType": "alignsTo",
+      "source": "2수04-A",
+      "target": "2수04-01"
+    },
+    {
+      "id": "alignsTo:2수04-B->2수04-02",
+      "edgeType": "alignsTo",
+      "source": "2수04-B",
+      "target": "2수04-02"
+    },
+    {
+      "id": "alignsTo:2수04-B->2수04-03",
+      "edgeType": "alignsTo",
+      "source": "2수04-B",
+      "target": "2수04-03"
+    },
+    {
+      "id": "alignsTo:4수01-A->4수01-01",
+      "edgeType": "alignsTo",
+      "source": "4수01-A",
+      "target": "4수01-01"
+    },
+    {
+      "id": "alignsTo:4수01-B->4수01-02",
+      "edgeType": "alignsTo",
+      "source": "4수01-B",
+      "target": "4수01-02"
+    },
+    {
+      "id": "alignsTo:4수01-C->4수01-03",
+      "edgeType": "alignsTo",
+      "source": "4수01-C",
+      "target": "4수01-03"
+    },
+    {
+      "id": "alignsTo:4수01-D->4수01-04",
+      "edgeType": "alignsTo",
+      "source": "4수01-D",
+      "target": "4수01-04"
+    },
+    {
+      "id": "alignsTo:4수01-E->4수01-05",
+      "edgeType": "alignsTo",
+      "source": "4수01-E",
+      "target": "4수01-05"
+    },
+    {
+      "id": "alignsTo:4수01-E->4수01-06",
+      "edgeType": "alignsTo",
+      "source": "4수01-E",
+      "target": "4수01-06"
+    },
+    {
+      "id": "alignsTo:4수01-F->4수01-07",
+      "edgeType": "alignsTo",
+      "source": "4수01-F",
+      "target": "4수01-07"
+    },
+    {
+      "id": "alignsTo:4수01-G->4수01-08",
+      "edgeType": "alignsTo",
+      "source": "4수01-G",
+      "target": "4수01-08"
+    },
+    {
+      "id": "alignsTo:4수02-A->4수02-01",
+      "edgeType": "alignsTo",
+      "source": "4수02-A",
+      "target": "4수02-01"
+    },
+    {
+      "id": "alignsTo:4수02-B->4수02-02",
+      "edgeType": "alignsTo",
+      "source": "4수02-B",
+      "target": "4수02-02"
+    },
+    {
+      "id": "alignsTo:4수02-C->4수02-03",
+      "edgeType": "alignsTo",
+      "source": "4수02-C",
+      "target": "4수02-03"
+    },
+    {
+      "id": "alignsTo:4수03-A->4수03-01",
+      "edgeType": "alignsTo",
+      "source": "4수03-A",
+      "target": "4수03-01"
+    },
+    {
+      "id": "alignsTo:4수03-B->4수03-02",
+      "edgeType": "alignsTo",
+      "source": "4수03-B",
+      "target": "4수03-02"
+    },
+    {
+      "id": "alignsTo:4수03-C->4수03-03",
+      "edgeType": "alignsTo",
+      "source": "4수03-C",
+      "target": "4수03-03"
+    },
+    {
+      "id": "alignsTo:4수03-D->4수03-04",
+      "edgeType": "alignsTo",
+      "source": "4수03-D",
+      "target": "4수03-04"
+    },
+    {
+      "id": "alignsTo:4수03-E->4수03-05",
+      "edgeType": "alignsTo",
+      "source": "4수03-E",
+      "target": "4수03-05"
+    },
+    {
+      "id": "alignsTo:4수03-F->4수03-06",
+      "edgeType": "alignsTo",
+      "source": "4수03-F",
+      "target": "4수03-06"
+    },
+    {
+      "id": "alignsTo:4수03-G->4수03-07",
+      "edgeType": "alignsTo",
+      "source": "4수03-G",
+      "target": "4수03-07"
+    },
+    {
+      "id": "alignsTo:4수03-H->4수03-08",
+      "edgeType": "alignsTo",
+      "source": "4수03-H",
+      "target": "4수03-08"
+    },
+    {
+      "id": "alignsTo:4수03-H->4수03-09",
+      "edgeType": "alignsTo",
+      "source": "4수03-H",
+      "target": "4수03-09"
+    },
+    {
+      "id": "alignsTo:4수03-H->4수03-10",
+      "edgeType": "alignsTo",
+      "source": "4수03-H",
+      "target": "4수03-10"
+    },
+    {
+      "id": "alignsTo:4수04-A->4수04-01",
+      "edgeType": "alignsTo",
+      "source": "4수04-A",
+      "target": "4수04-01"
+    },
+    {
+      "id": "alignsTo:4수04-B->4수04-02",
+      "edgeType": "alignsTo",
+      "source": "4수04-B",
+      "target": "4수04-02"
+    },
+    {
+      "id": "alignsTo:4수04-C->4수04-03",
+      "edgeType": "alignsTo",
+      "source": "4수04-C",
+      "target": "4수04-03"
+    },
+    {
+      "id": "alignsTo:6수01-A->6수01-02",
+      "edgeType": "alignsTo",
+      "source": "6수01-A",
+      "target": "6수01-02"
+    },
+    {
+      "id": "alignsTo:6수01-A->6수01-03",
+      "edgeType": "alignsTo",
+      "source": "6수01-A",
+      "target": "6수01-03"
+    },
+    {
+      "id": "alignsTo:6수01-B->6수01-01",
+      "edgeType": "alignsTo",
+      "source": "6수01-B",
+      "target": "6수01-01"
+    },
+    {
+      "id": "alignsTo:6수01-C->6수01-04",
+      "edgeType": "alignsTo",
+      "source": "6수01-C",
+      "target": "6수01-04"
+    },
+    {
+      "id": "alignsTo:6수01-C->6수01-05",
+      "edgeType": "alignsTo",
+      "source": "6수01-C",
+      "target": "6수01-05"
+    },
+    {
+      "id": "alignsTo:6수01-D->6수01-06",
+      "edgeType": "alignsTo",
+      "source": "6수01-D",
+      "target": "6수01-06"
+    },
+    {
+      "id": "alignsTo:6수01-D->6수01-07",
+      "edgeType": "alignsTo",
+      "source": "6수01-D",
+      "target": "6수01-07"
+    },
+    {
+      "id": "alignsTo:6수01-D->6수01-08",
+      "edgeType": "alignsTo",
+      "source": "6수01-D",
+      "target": "6수01-08"
+    },
+    {
+      "id": "alignsTo:6수01-E->6수01-09",
+      "edgeType": "alignsTo",
+      "source": "6수01-E",
+      "target": "6수01-09"
+    },
+    {
+      "id": "alignsTo:6수01-E->6수01-11",
+      "edgeType": "alignsTo",
+      "source": "6수01-E",
+      "target": "6수01-11"
+    },
+    {
+      "id": "alignsTo:6수01-F->6수01-12",
+      "edgeType": "alignsTo",
+      "source": "6수01-F",
+      "target": "6수01-12"
+    },
+    {
+      "id": "alignsTo:6수01-G->6수01-13",
+      "edgeType": "alignsTo",
+      "source": "6수01-G",
+      "target": "6수01-13"
+    },
+    {
+      "id": "alignsTo:6수01-G->6수01-15",
+      "edgeType": "alignsTo",
+      "source": "6수01-G",
+      "target": "6수01-15"
+    },
+    {
+      "id": "alignsTo:6수01-H->6수01-10",
+      "edgeType": "alignsTo",
+      "source": "6수01-H",
+      "target": "6수01-10"
+    },
+    {
+      "id": "alignsTo:6수01-H->6수01-14",
+      "edgeType": "alignsTo",
+      "source": "6수01-H",
+      "target": "6수01-14"
+    },
+    {
+      "id": "alignsTo:6수02-A->6수02-01",
+      "edgeType": "alignsTo",
+      "source": "6수02-A",
+      "target": "6수02-01"
+    },
+    {
+      "id": "alignsTo:6수02-A->6수02-02",
+      "edgeType": "alignsTo",
+      "source": "6수02-A",
+      "target": "6수02-02"
+    },
+    {
+      "id": "alignsTo:6수02-B->6수02-03",
+      "edgeType": "alignsTo",
+      "source": "6수02-B",
+      "target": "6수02-03"
+    },
+    {
+      "id": "alignsTo:6수03-A->6수03-01",
+      "edgeType": "alignsTo",
+      "source": "6수03-A",
+      "target": "6수03-01"
+    },
+    {
+      "id": "alignsTo:6수03-A->6수03-02",
+      "edgeType": "alignsTo",
+      "source": "6수03-A",
+      "target": "6수03-02"
+    },
+    {
+      "id": "alignsTo:6수03-B->6수03-03",
+      "edgeType": "alignsTo",
+      "source": "6수03-B",
+      "target": "6수03-03"
+    },
+    {
+      "id": "alignsTo:6수03-B->6수03-04",
+      "edgeType": "alignsTo",
+      "source": "6수03-B",
+      "target": "6수03-04"
+    },
+    {
+      "id": "alignsTo:6수03-B->6수03-05",
+      "edgeType": "alignsTo",
+      "source": "6수03-B",
+      "target": "6수03-05"
+    },
+    {
+      "id": "alignsTo:6수03-C->6수03-06",
+      "edgeType": "alignsTo",
+      "source": "6수03-C",
+      "target": "6수03-06"
+    },
+    {
+      "id": "alignsTo:6수03-C->6수03-07",
+      "edgeType": "alignsTo",
+      "source": "6수03-C",
+      "target": "6수03-07"
+    },
+    {
+      "id": "alignsTo:6수03-C->6수03-08",
+      "edgeType": "alignsTo",
+      "source": "6수03-C",
+      "target": "6수03-08"
+    },
+    {
+      "id": "alignsTo:6수04-A->6수04-01",
+      "edgeType": "alignsTo",
+      "source": "6수04-A",
+      "target": "6수04-01"
+    },
+    {
+      "id": "alignsTo:6수04-B->6수04-02",
+      "edgeType": "alignsTo",
+      "source": "6수04-B",
+      "target": "6수04-02"
+    },
+    {
+      "id": "prereq:2수01-01->2수01-02",
+      "edgeType": "prereq",
+      "source": "2수01-01",
+      "target": "2수01-02",
+      "note": "수 읽기/쓰기 → 자릿값"
+    },
+    {
+      "id": "prereq:4수01-01->4수01-04",
+      "edgeType": "prereq",
+      "source": "4수01-01",
+      "target": "4수01-04",
+      "note": "큰 수 이해 → 자리올림/내림 있는 계산"
+    },
+    {
+      "id": "prereq:6수01-06->6수01-08",
+      "edgeType": "prereq",
+      "source": "6수01-06",
+      "target": "6수01-08",
+      "note": "약분/통분 → 분수 덧셈·뺄셈"
+    },
+    {
+      "id": "contains:KR-MATH-2022->KR-MATH-2022-E",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022",
+      "target": "KR-MATH-2022-E"
+    },
+    {
+      "id": "contains:KR-MATH-2022->KR-MATH-2022-M",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022",
+      "target": "KR-MATH-2022-M"
+    },
+    {
+      "id": "contains:KR-MATH-2022->KR-MATH-2022-H",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022",
+      "target": "KR-MATH-2022-H"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E->KR-MATH-2022-E-1-2",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E",
+      "target": "KR-MATH-2022-E-1-2"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2->KR-MATH-2022-E-1-2-NA",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2",
+      "target": "KR-MATH-2022-E-1-2-NA"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-04",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-04"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-05",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-05"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-06",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-06"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-07",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-07"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-08",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-08"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-09",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-09"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-C",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-C"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-10",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-10"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-NA->2수01-11",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-NA",
+      "target": "2수01-11"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2->KR-MATH-2022-E-1-2-RR",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2",
+      "target": "KR-MATH-2022-E-1-2-RR"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-RR->2수02-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-RR",
+      "target": "2수02-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-RR->2수02-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-RR",
+      "target": "2수02-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2->KR-MATH-2022-E-1-2-GM",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2",
+      "target": "KR-MATH-2022-E-1-2-GM"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-C",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-C"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-D",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-D"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-04",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-04"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-E",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-E"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-GM->2수03-05",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-GM",
+      "target": "2수03-05"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2->KR-MATH-2022-E-1-2-DP",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2",
+      "target": "KR-MATH-2022-E-1-2-DP"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-DP->2수04-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-DP",
+      "target": "2수04-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-DP->2수04-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-DP",
+      "target": "2수04-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-DP->2수04-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-DP",
+      "target": "2수04-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-DP->2수04-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-DP",
+      "target": "2수04-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-1-2-DP->2수04-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-1-2-DP",
+      "target": "2수04-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E->KR-MATH-2022-E-3-4",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E",
+      "target": "KR-MATH-2022-E-3-4"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4->KR-MATH-2022-E-3-4-NA",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4",
+      "target": "KR-MATH-2022-E-3-4-NA"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-C",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-C"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-D",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-D"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-04",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-04"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-E",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-E"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-05",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-05"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-06",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-06"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-F",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-F"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-07",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-07"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-G",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-G"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-NA->4수01-08",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-NA",
+      "target": "4수01-08"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4->KR-MATH-2022-E-3-4-RR",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4",
+      "target": "KR-MATH-2022-E-3-4-RR"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-RR->4수02-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-RR",
+      "target": "4수02-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-RR->4수02-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-RR",
+      "target": "4수02-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-RR->4수02-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-RR",
+      "target": "4수02-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-RR->4수02-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-RR",
+      "target": "4수02-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-RR->4수02-C",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-RR",
+      "target": "4수02-C"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-RR->4수02-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-RR",
+      "target": "4수02-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4->KR-MATH-2022-E-3-4-GM",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4",
+      "target": "KR-MATH-2022-E-3-4-GM"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-C",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-C"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-D",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-D"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-04",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-04"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-E",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-E"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-05",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-05"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-F",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-F"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-06",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-06"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-G",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-G"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-07",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-07"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-H",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-H"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-08",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-08"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-09",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-09"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->4수03-10",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "4수03-10"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4->KR-MATH-2022-E-3-4-DP",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4",
+      "target": "KR-MATH-2022-E-3-4-DP"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-DP->4수04-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-DP",
+      "target": "4수04-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-DP->4수04-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-DP",
+      "target": "4수04-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-DP->4수04-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-DP",
+      "target": "4수04-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-DP->4수04-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-DP",
+      "target": "4수04-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-DP->4수04-C",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-DP",
+      "target": "4수04-C"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-DP->4수04-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-DP",
+      "target": "4수04-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E->KR-MATH-2022-E-5-6",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E",
+      "target": "KR-MATH-2022-E-5-6"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6->KR-MATH-2022-E-5-6-NA",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6",
+      "target": "KR-MATH-2022-E-5-6-NA"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-C",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-C"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-04",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-04"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-05",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-05"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-D",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-D"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-06",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-06"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-07",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-07"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-08",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-08"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-E",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-E"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-09",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-09"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-11",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-11"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-F",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-F"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-12",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-12"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-G",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-G"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-13",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-13"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-15",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-15"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-H",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-H"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-10",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-10"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-NA->6수01-14",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-NA",
+      "target": "6수01-14"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6->KR-MATH-2022-E-5-6-RR",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6",
+      "target": "KR-MATH-2022-E-5-6-RR"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-RR->6수02-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-RR",
+      "target": "6수02-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-RR->6수02-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-RR",
+      "target": "6수02-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-RR->6수02-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-RR",
+      "target": "6수02-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-RR->6수02-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-RR",
+      "target": "6수02-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-RR->6수02-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-RR",
+      "target": "6수02-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6->KR-MATH-2022-E-5-6-GM",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6",
+      "target": "KR-MATH-2022-E-5-6-GM"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-02"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-03",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-03"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-04",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-04"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-05",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-05"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-C",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-C"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-06",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-06"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-07",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-07"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-GM->6수03-08",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-GM",
+      "target": "6수03-08"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6->KR-MATH-2022-E-5-6-DP",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6",
+      "target": "KR-MATH-2022-E-5-6-DP"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-DP->6수04-A",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-DP",
+      "target": "6수04-A"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-DP->6수04-01",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-DP",
+      "target": "6수04-01"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-DP->6수04-B",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-DP",
+      "target": "6수04-B"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-5-6-DP->6수04-02",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-5-6-DP",
+      "target": "6수04-02"
+    }
+  ]
+}

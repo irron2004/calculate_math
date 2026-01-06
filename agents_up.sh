@@ -4,6 +4,9 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export ROOT="${ROOT:-$ROOT_DIR}"
 
+# Ensure we run from the project root even if invoked from a subdirectory.
+cd "$ROOT_DIR"
+
 # Prefer a local venv; fall back to the legacy venv so `./agents_up.sh` works out of the box.
 if [ -z "${VENV_ACTIVATE:-}" ]; then
   if [ -f "$ROOT_DIR/.venv/bin/activate" ]; then
@@ -14,4 +17,3 @@ if [ -z "${VENV_ACTIVATE:-}" ]; then
 fi
 
 exec "$ROOT_DIR/agents/agents_up.sh" "$@"
-
