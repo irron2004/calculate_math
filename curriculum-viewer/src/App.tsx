@@ -8,6 +8,7 @@ import GraphPage from './pages/GraphPage'
 import HealthPage from './pages/HealthPage'
 import LearnPage from './pages/LearnPage'
 import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
 import { ROUTE_SEGMENTS, ROUTES } from './routes'
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
         <CurriculumProvider>
           <Routes>
             <Route path={ROUTES.login} element={<LoginPage />} />
+            <Route path={ROUTES.signup} element={<SignupPage />} />
             <Route path={ROUTES.root} element={<AppLayout />}>
               <Route index element={<Navigate to={ROUTES.tree} replace />} />
               <Route

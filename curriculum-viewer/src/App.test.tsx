@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
-import { AUTH_STORAGE_KEY } from './lib/auth/AuthProvider'
+import { AUTH_STORAGE_KEY, AUTH_USER_DB_STORAGE_KEY } from './lib/auth/AuthProvider'
 
 describe('App routing', () => {
   beforeEach(() => {
@@ -67,11 +67,29 @@ describe('App routing', () => {
   })
 
   it('logs in from /login and navigates to /tree', async () => {
+    window.localStorage.setItem(
+      AUTH_USER_DB_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        usersById: {
+          demo: {
+            id: 'demo',
+            password: 'pw',
+            name: 'demo',
+            grade: '3',
+            email: 'demo@example.com',
+            createdAt: '2026-01-01T00:00:00.000Z'
+          }
+        }
+      })
+    )
+
     window.history.pushState({}, '', '/login')
     render(<App />)
 
     const user = userEvent.setup()
-    await user.type(screen.getByLabelText('사용자명'), 'demo')
+    await user.type(screen.getByLabelText('아이디'), 'demo')
+    await user.type(screen.getByLabelText('비밀번호'), 'pw')
     await user.click(screen.getByRole('button', { name: '로그인' }))
 
     expect(
@@ -79,7 +97,7 @@ describe('App routing', () => {
     ).toBeInTheDocument()
     await waitFor(() => expect(window.location.pathname).toBe('/tree'))
     expectPersistentLayout()
-    expect(screen.getByText('demo')).toBeInTheDocument()
+    expect(screen.getByText(/demo/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '로그아웃' })).toBeInTheDocument()
   })
 

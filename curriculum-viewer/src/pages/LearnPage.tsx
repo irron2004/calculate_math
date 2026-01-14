@@ -3,7 +3,7 @@ import { useOutletContext, useParams } from 'react-router-dom'
 import NodeDetail from '../components/NodeDetail'
 import type { DetailPanelContext } from '../components/AppLayout'
 import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
-import { gradeNumericAnswer } from '../lib/learn/grading'
+import { gradeNumericAnswer, normalizeNumericInput } from '../lib/learn/grading'
 import type { Problem } from '../lib/learn/problems'
 import { loadProblemBank } from '../lib/learn/problems'
 
@@ -89,10 +89,6 @@ export default function LearnPage() {
   }, [nodeId, storageKey])
 
   useEffect(() => {
-    if (import.meta.env.MODE === 'test') {
-      return
-    }
-
     const controller = new AbortController()
 
     async function run() {
@@ -137,6 +133,9 @@ export default function LearnPage() {
 
   const score = useMemo(() => {
     if (problems.length === 0) return null
+    if (!problems.every((problem) => Boolean(resultByProblemId[problem.id]))) {
+      return null
+    }
 
     let correct = 0
     for (const problem of problems) {
@@ -148,42 +147,62 @@ export default function LearnPage() {
     return { correct, total: problems.length }
   }, [problems, resultByProblemId])
 
-  const submitProblem = (problem: Problem) => {
-    if (!nodeId) return
+  const allAnswered = useMemo(() => {
+    if (problems.length === 0) return false
 
-    const submitted = answerByProblemId[problem.id] ?? ''
-    const graded = gradeNumericAnswer(submitted, problem.answer)
+    return problems.every((problem) => {
+      const raw = answerByProblemId[problem.id] ?? ''
+      return normalizeNumericInput(raw).length > 0
+    })
+  }, [answerByProblemId, problems])
 
-    const nextResult = {
-      submitted,
-      isCorrect: graded.isCorrect
+  const submitAll = () => {
+    if (!nodeId || problems.length === 0) return
+
+    const submissions: StoredResult['submissions'] = {}
+    for (const problem of problems) {
+      const submitted = answerByProblemId[problem.id] ?? ''
+      const graded = gradeNumericAnswer(submitted, problem.answer)
+      submissions[problem.id] = { submitted, isCorrect: graded.isCorrect }
     }
 
-    setResultByProblemId((prev) => ({
-      ...prev,
-      [problem.id]: nextResult
-    }))
+    setResultByProblemId(submissions)
 
     if (!storageKey) return
 
     try {
-      const existingRaw = window.localStorage.getItem(storageKey)
-      const existing: StoredResult | null = existingRaw
-        ? (JSON.parse(existingRaw) as StoredResult)
-        : null
-
-      const submissions: StoredResult['submissions'] = {
-        ...(existing?.submissions ?? {}),
-        [problem.id]: nextResult
-      }
-
       const payload: StoredResult = {
         nodeId,
         updatedAt: new Date().toISOString(),
         submissions
       }
-
       window.localStorage.setItem(storageKey, JSON.stringify(payload))
+    } catch {
+      // ignore storage failures
+    }
+  }
+
+  const resetAttempt = () => {
+    setAnswerByProblemId({})
+    setResultByProblemId({})
+
+    if (!storageKey) return
+    try {
+      window.localStorage.removeItem(storageKey)
+    } catch {
+      // ignore storage failures
+    }
+  }
+
+  const handleAnswerChange = (problemId: string, value: string) => {
+    setAnswerByProblemId((prev) => ({ ...prev, [problemId]: value }))
+
+    if (Object.keys(resultByProblemId).length === 0) return
+    setResultByProblemId({})
+
+    if (!storageKey) return
+    try {
+      window.localStorage.removeItem(storageKey)
     } catch {
       // ignore storage failures
     }
@@ -218,58 +237,63 @@ export default function LearnPage() {
       {problemBankLoading ? <p>문제 로딩중…</p> : null}
       {problemBankError ? <p className="error">{problemBankError}</p> : null}
 
-      {score ? (
-        <p className="learn-score">
-          점수: {score.correct} / {score.total}
-        </p>
-      ) : null}
+      {score ? <p className="learn-score">점수: {score.correct} / {score.total}</p> : null}
 
       {!problemBankLoading && !problemBankError && problems.length === 0 ? (
         <p className="muted">문제 준비중</p>
       ) : null}
 
       {problems.length > 0 ? (
-        <ol className="problem-list">
-          {problems.map((problem) => {
-            const result = resultByProblemId[problem.id]
-            const isCorrect = result?.isCorrect ?? null
+        <>
+          <div className="health-toolbar">
+            <button
+              type="button"
+              className="button button-primary"
+              onClick={submitAll}
+              disabled={!allAnswered}
+            >
+              채점하기
+            </button>
+            <button type="button" className="button button-ghost" onClick={resetAttempt}>
+              다시 풀기
+            </button>
+            {!allAnswered ? (
+              <span className="muted">모든 문제에 답을 입력하면 채점할 수 있어요.</span>
+            ) : null}
+          </div>
 
-            return (
-              <li key={problem.id} className="problem-card">
-                <h3 className="problem-title">{problem.prompt}</h3>
-                <div className="problem-answer">
-                  <input
-                    value={answerByProblemId[problem.id] ?? ''}
-                    onChange={(event) =>
-                      setAnswerByProblemId((prev) => ({
-                        ...prev,
-                        [problem.id]: event.target.value
-                      }))
-                    }
-                    placeholder="정답 입력"
-                  />
-                  <button
-                    type="button"
-                    className="button button-primary"
-                    onClick={() => submitProblem(problem)}
-                  >
-                    제출
-                  </button>
-                </div>
+          <ol className="problem-list">
+            {problems.map((problem) => {
+              const result = resultByProblemId[problem.id]
+              const isCorrect = result?.isCorrect ?? null
 
-                {isCorrect !== null ? (
-                  <p
-                    className={
-                      isCorrect ? 'problem-result correct' : 'problem-result wrong'
-                    }
-                  >
-                    {isCorrect ? '정답' : '오답'} · 정답: {problem.answer}
-                  </p>
-                ) : null}
-              </li>
-            )
-          })}
-        </ol>
+              return (
+                <li key={problem.id} className="problem-card">
+                  <h3 className="problem-title">{problem.prompt}</h3>
+                  <div className="problem-answer">
+                    <input
+                      value={answerByProblemId[problem.id] ?? ''}
+                      onChange={(event) =>
+                        handleAnswerChange(problem.id, event.target.value)
+                      }
+                      placeholder="정답 입력"
+                    />
+                  </div>
+
+                  {isCorrect !== null ? (
+                    <p
+                      className={
+                        isCorrect ? 'problem-result correct' : 'problem-result wrong'
+                      }
+                    >
+                      {isCorrect ? '정답' : '오답'} · 정답: {problem.answer}
+                    </p>
+                  ) : null}
+                </li>
+              )
+            })}
+          </ol>
+        </>
       ) : null}
     </section>
   )

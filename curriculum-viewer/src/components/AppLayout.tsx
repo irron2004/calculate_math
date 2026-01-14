@@ -15,6 +15,12 @@ export default function AppLayout() {
 
   const focusQuery = focusNodeId ? `?focus=${encodeURIComponent(focusNodeId)}` : ''
 
+  const userLabel = user
+    ? user.name && user.name !== user.id
+      ? `${user.name} (${user.id})`
+      : user.id
+    : null
+
   const [detail, setDetail] = useState<ReactNode>(
     <p>노드를 선택하면 상세가 표시됩니다.</p>
   )
@@ -43,7 +49,7 @@ export default function AppLayout() {
         <div className="app-auth">
           {isAuthenticated ? (
             <>
-              <span className="app-auth-user">{user?.username}</span>
+              <span className="app-auth-user">{userLabel}</span>
               <button
                 type="button"
                 className="button button-ghost"

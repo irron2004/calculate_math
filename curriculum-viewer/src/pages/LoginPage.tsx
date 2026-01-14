@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { ROUTES } from '../routes'
 
@@ -16,13 +16,16 @@ export default function LoginPage() {
   const state = location.state as RedirectState | null
   const fromPathname = state?.from?.pathname ?? ROUTES.tree
 
-  const [username, setUsername] = useState('')
+  const [userId, setUserId] = useState('')
+  const [password, setPassword] = useState('')
   const [didLogin, setDidLogin] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   if (isAuthenticated) {
     return <Navigate to={didLogin ? fromPathname : ROUTES.tree} replace />
   }
-  const submitDisabled = username.trim().length === 0
+
+  const submitDisabled = userId.trim().length === 0 || password.trim().length === 0
 
   return (
     <section className="login-page">
@@ -35,19 +38,38 @@ export default function LoginPage() {
             return
           }
 
-          login(username)
+          setError(null)
+          const message = login(userId, password)
+          if (message) {
+            setError(message)
+            return
+          }
           setDidLogin(true)
         }}
       >
         <label className="form-field">
-          사용자명
+          아이디
           <input
-            name="username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
+            name="userId"
+            value={userId}
+            onChange={(event) => setUserId(event.target.value)}
             autoComplete="username"
           />
         </label>
+
+        <label className="form-field">
+          비밀번호
+          <input
+            name="password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
+          />
+        </label>
+
+        {error ? <p className="error">{error}</p> : null}
+
         <button
           type="submit"
           className="button button-primary"
@@ -55,6 +77,15 @@ export default function LoginPage() {
         >
           로그인
         </button>
+
+        <div className="muted">계정이 없나요?</div>
+        <Link
+          to={ROUTES.signup}
+          state={{ from: state?.from ?? { pathname: fromPathname } }}
+          className="button button-ghost"
+        >
+          회원가입
+        </Link>
       </form>
     </section>
   )

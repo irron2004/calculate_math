@@ -1,6 +1,34 @@
 {
   "version": 1,
   "problemsByNodeId": {
+    "MATH-2022-G-1-NA-001": [
+      {
+        "id": "g1-na-001-1",
+        "type": "numeric",
+        "prompt": "0~100 사이에서 9보다 1 큰 수는?",
+        "answer": "10"
+      },
+      {
+        "id": "g1-na-001-2",
+        "type": "numeric",
+        "prompt": "90보다 7 작은 수는?",
+        "answer": "83"
+      }
+    ],
+    "MATH-2022-G-1-NA-002": [
+      {
+        "id": "g1-na-002-1",
+        "type": "numeric",
+        "prompt": "73에서 십의 자리 숫자를 입력하세요.",
+        "answer": "7"
+      },
+      {
+        "id": "g1-na-002-2",
+        "type": "numeric",
+        "prompt": "58에서 일의 자리 숫자를 입력하세요.",
+        "answer": "8"
+      }
+    ],
     "MATH-2022-G-2-NA-001": [
       {
         "id": "na-2-001-1",
@@ -14,7 +42,146 @@
         "prompt": "350 + 470 의 값을 입력하세요.",
         "answer": "820"
       }
+    ],
+    "MATH-2022-G-2-NA-002": [
+      {
+        "id": "g2-na-002-1",
+        "type": "numeric",
+        "prompt": "450 + 320 의 값을 입력하세요.",
+        "answer": "770"
+      },
+      {
+        "id": "g2-na-002-2",
+        "type": "numeric",
+        "prompt": "900 - 275 의 값을 입력하세요.",
+        "answer": "625"
+      }
+    ],
+    "MATH-2022-G-3-NA-001": [
+      {
+        "id": "g3-na-001-1",
+        "type": "numeric",
+        "prompt": "12,345에서 천의 자리 숫자를 입력하세요.",
+        "answer": "2"
+      },
+      {
+        "id": "g3-na-001-2",
+        "type": "numeric",
+        "prompt": "50,000 + 4,000 의 값을 입력하세요.",
+        "answer": "54000"
+      }
+    ],
+    "MATH-2022-G-3-NA-002": [
+      {
+        "id": "g3-na-002-1",
+        "type": "numeric",
+        "prompt": "3/7 과 5/7 중 더 큰 분수의 분자만 입력하세요.",
+        "answer": "5"
+      },
+      {
+        "id": "g3-na-002-2",
+        "type": "numeric",
+        "prompt": "2/9 과 7/9 중 더 큰 분수의 분자만 입력하세요.",
+        "answer": "7"
+      }
+    ],
+    "MATH-2022-G-3-NA-003": [
+      {
+        "id": "g3-na-003-1",
+        "type": "numeric",
+        "prompt": "3개씩 4묶음이면 모두 몇 개인가요?",
+        "answer": "12"
+      },
+      {
+        "id": "g3-na-003-2",
+        "type": "numeric",
+        "prompt": "12개를 3명에게 똑같이 나누어 주면 한 명당 몇 개인가요?",
+        "answer": "4"
+      }
+    ],
+    "MATH-2022-G-3-RR-001": [
+      {
+        "id": "g3-rr-001-1",
+        "type": "numeric",
+        "prompt": "수열 2, 4, 6, 8, ( ) 다음 수를 입력하세요.",
+        "answer": "10"
+      },
+      {
+        "id": "g3-rr-001-2",
+        "type": "numeric",
+        "prompt": "수열 3, 6, 12, 24, ( ) 다음 수를 입력하세요.",
+        "answer": "48"
+      }
+    ],
+    "MATH-2022-G-3-RR-002": [
+      {
+        "id": "g3-rr-002-1",
+        "type": "numeric",
+        "prompt": "□ + 3 = 7 일 때 □의 값을 입력하세요.",
+        "answer": "4"
+      },
+      {
+        "id": "g3-rr-002-2",
+        "type": "numeric",
+        "prompt": "8 - □ = 5 일 때 □의 값을 입력하세요.",
+        "answer": "3"
+      }
+    ],
+    "MATH-2022-G-4-NA-001": [
+      {
+        "id": "g4-na-001-1",
+        "type": "numeric",
+        "prompt": "0.25를 소수로 입력하세요.",
+        "answer": "0.25"
+      },
+      {
+        "id": "g4-na-001-2",
+        "type": "numeric",
+        "prompt": "3.4에서 1의 자리 숫자를 입력하세요.",
+        "answer": "3"
+      }
+    ],
+    "MATH-2022-G-4-NA-002": [
+      {
+        "id": "g4-na-002-1",
+        "type": "numeric",
+        "prompt": "7 × 8 의 값을 입력하세요.",
+        "answer": "56"
+      },
+      {
+        "id": "g4-na-002-2",
+        "type": "numeric",
+        "prompt": "96 ÷ 12 의 값을 입력하세요.",
+        "answer": "8"
+      }
+    ],
+    "MATH-2022-G-5-NA-001": [
+      {
+        "id": "g5-na-001-1",
+        "type": "numeric",
+        "prompt": "18과 24의 최대공약수를 입력하세요.",
+        "answer": "6"
+      },
+      {
+        "id": "g5-na-001-2",
+        "type": "numeric",
+        "prompt": "6의 배수 중 30보다 작은 가장 큰 수를 입력하세요.",
+        "answer": "24"
+      }
+    ],
+    "MATH-2022-G-6-NA-001": [
+      {
+        "id": "g6-na-001-1",
+        "type": "numeric",
+        "prompt": "전체가 50이고 부분이 20일 때 비율(부분/전체)을 소수로 입력하세요.",
+        "answer": "0.4"
+      },
+      {
+        "id": "g6-na-001-2",
+        "type": "numeric",
+        "prompt": "A:B = 3:5이고 A=12일 때 B의 값을 입력하세요.",
+        "answer": "20"
+      }
     ]
   }
 }
-

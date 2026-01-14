@@ -1,0 +1,331 @@
+{
+  "add_edges": [
+    {
+      "confidence": 0.72,
+      "from": "FACTORIAL_ZERO_MEANING",
+      "to": "FACTORIAL_CONCEPT",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.83,
+      "from": "COUNT_MUL_RULE_MEANING",
+      "to": "PERM_AS_FILLING_SLOTS",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.84,
+      "from": "FACTORIAL_CONCEPT",
+      "to": "PERM_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.8,
+      "from": "ORDER_SENSITIVE_CHECK",
+      "to": "PERM_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.78,
+      "from": "PERM_AS_FILLING_SLOTS",
+      "to": "PERM_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.83,
+      "from": "FACTORIAL_CONCEPT",
+      "to": "COMB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.78,
+      "from": "ORDER_SENSITIVE_CHECK",
+      "to": "COMB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.81,
+      "from": "COMB_AS_SUBSET",
+      "to": "COMB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.8,
+      "from": "COMB_ORDER_IGNORED_REASON",
+      "to": "COMB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.76,
+      "from": "SET_NOTATION_BASICS",
+      "to": "SAMPLE_SPACE_AS_SET",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.76,
+      "from": "SYSTEMATIC_LISTING_BASIC",
+      "to": "SAMPLE_SPACE_AS_SET",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.79,
+      "from": "SAMPLE_SPACE_AS_SET",
+      "to": "EVENT_AS_SUBSET",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.8,
+      "from": "SAMPLE_SPACE_AS_SET",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.82,
+      "from": "EVENT_AS_SUBSET",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.76,
+      "from": "INTERSECTION_UNION_MEANING",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.74,
+      "from": "DISJOINT_EVENTS",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.73,
+      "from": "COMPLEMENT_EVENT",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.78,
+      "from": "RATIO_AS_PART_WHOLE",
+      "to": "PROB_AS_RATIO",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.8,
+      "from": "PROB_AS_RATIO",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.77,
+      "from": "CLASSICAL_PROB_EQUIPROBABLE_CHECK",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.78,
+      "from": "COUNT_FAVORABLE_TOTAL",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    }
+  ],
+  "add_nodes": [
+    {
+      "confidence": 0.78,
+      "domain": "DA",
+      "id": "SET_NOTATION_BASICS",
+      "name_ko": "집합 기   초(원소/부분집합/기호)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.82,
+      "domain": "DA",
+      "id": "COUNT_MUL_RULE_MEANING",
+      "name_ko": "곱셈   원리 의미(단계 곱)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.76,
+      "domain": "DA",
+      "id": "SYSTEMATIC_LISTING_BASIC",
+      "name_ko": "체   계적 나열 기초(표/규칙)",
+      "rep": "P",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.72,
+      "domain": "DA",
+      "id": "TREE_DIAGRAM_BASIC",
+      "name_ko": "트리 다이   어그램 기초(경우의 수 나열)",
+      "rep": "P",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.86,
+      "domain": "DA",
+      "id": "FACTORIAL_CONCEPT",
+      "name_ko": "팩토리얼   개념(n!)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.74,
+      "domain": "DA",
+      "id": "FACTORIAL_ZERO_MEANING",
+      "name_ko": "0! =   1 의미(경계 사례)",
+      "rep": "A",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.82,
+      "domain": "DA",
+      "id": "ORDER_SENSITIVE_CHECK",
+      "name_ko": "순서   고려 여부 판별(순열/조합)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.83,
+      "domain": "DA",
+      "id": "PERM_AS_FILLING_SLOTS",
+      "name_ko": "순열   의미(자리 채우기)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.82,
+      "domain": "DA",
+      "id": "COMB_AS_SUBSET",
+      "name_ko": "조합 의미(부   분집합 선택)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.81,
+      "domain": "DA",
+      "id": "COMB_ORDER_IGNORED_REASON",
+      "name_ko": "조   합에서 r!로 나누는 이유(중복 제거)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.79,
+      "domain": "DA",
+      "id": "SAMPLE_SPACE_AS_SET",
+      "name_ko": "표본공간   정의(전체 경우의 집합)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.8,
+      "domain": "DA",
+      "id": "EVENT_AS_SUBSET",
+      "name_ko": "사건 정의(표   본공간의 부분집합)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.77,
+      "domain": "DA",
+      "id": "CLASSICAL_PROB_EQUIPROBABLE_CHECK",
+      "name_ko": "고전확률 등확률 가정 확인",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.78,
+      "domain": "DA",
+      "id": "COUNT_FAVORABLE_TOTAL",
+      "name_ko": "유리/   전체 경우의 수 세기(분자/분모 산정)",
+      "rep": "P",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.8,
+      "domain": "DA",
+      "id": "PROB_AS_RATIO",
+      "name_ko": "확률=비율   (0~1)",
+      "rep": "A",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.75,
+      "domain": "DA",
+      "id": "RATIO_AS_PART_WHOLE",
+      "name_ko": "비율/분   수 해석(부분/전체)",
+      "rep": "A",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.77,
+      "domain": "DA",
+      "id": "DISJOINT_EVENTS",
+      "name_ko": "서로소 사건   (겹치지 않음)",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.74,
+      "domain": "DA",
+      "id": "COMPLEMENT_EVENT",
+      "name_ko": "여사건(보   완) 개념",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.78,
+      "domain": "DA",
+      "id": "INTERSECTION_UNION_MEANING",
+      "name_ko": "교집합/합집합 의미",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.74,
+      "domain": "DA",
+      "id": "VENN_DIAGRAM_2SET",
+      "name_ko": "벤 다이어   그램(2집합)",
+      "rep": "P",
+      "type": "micro"
+    }
+  ],
+  "merge_aliases": [
+    {
+      "alias": "COMB_MEANING_SUBSET",
+      "keep": "COMB_AS_SUBSET"
+    },
+    {
+      "alias": "EVENT_DEFINE",
+      "keep": "EVENT_AS_SUBSET"
+    },
+    {
+      "alias": "SET_INTERSECTION_UNION",
+      "keep": "INTERSECTION_UNION_MEANING"
+    }
+  ],
+  "notes": [
+    {
+      "claim": "TREE_DIAGRAM_BASIC은 표본공간을 빠짐없이 구성하게 해 표   본공간/사건 정의 오류를 줄인다.",
+      "confidence": 0.72,
+      "reason": "분기 구조를 절차로 고정하면   전체(분모) 설정이 안정되고 이후 확률 비율로 자연스럽게 연결된다."
+    },
+    {
+      "claim": "VENN_DIAGRAM_2SET은 교집합/합집합 및 서로소 조건을 시각   화해 포함배제·덧셈법칙 오용을 줄인다.",
+      "confidence": 0.74,
+      "reason": "겹침(교집합) 보정 필   요성을 그림으로 확인할 수 있어 기계적 공식 대입을 완화한다."
+    },
+    {
+      "claim": "COMB_ORDER_IGNORED_REASON이 없으면 nCr을 정당화하지 못해   순열/조합 혼동이 지속된다.",
+      "confidence": 0.81,
+      "reason": "같은 선택이 순서만 다른 경우를   r!로 묶어 중복 제거하는 논리가 조합의 핵심이다."
+    },
+    {
+      "claim": "CLASSICAL_PROB_EQUIPROBABLE_CHECK이 없으면 등확률이 아닌   상황에서 고전확률을 오적용할 위험이 크다.",
+      "confidence": 0.77,
+      "reason": "고전확률은 등확률   가정이 전제이며, 이 전제 확인이 문제 풀이의 분기점이 된다."
+    }
+  ],
+  "remove_edges": [],
+  "researcher": "R1",
+  "scope": "TS_COMB_PROB"
+}

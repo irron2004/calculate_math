@@ -1,0 +1,542 @@
+{
+  "add_edges": [
+    {
+      "confidence": 0.8,
+      "from": "FACTORIAL_CONCEPT",
+      "to": "FACTORIAL_EXPANSION",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.8,
+      "from": "FACTORIAL_EXPANSION",
+      "to": "FACTORIAL_CANCELLATION",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.77,
+      "from": "PERM_AS_FILLING_SLOTS",
+      "to": "PERM_PRODUCT_FORM",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.76,
+      "from": "PERM_PRODUCT_FORM",
+      "to": "STEP_PERM_DERIVE",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.78,
+      "from": "FACTORIAL_CONCEPT",
+      "to": "STEP_PERM_DERIVE",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.76,
+      "from": "STEP_PERM_DERIVE",
+      "to": "PERM_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.79,
+      "from": "COMB_AS_SUBSET",
+      "to": "COMB_ORDER_IGNORED_REASON",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.74,
+      "from": "PERM_PRODUCT_FORM",
+      "to": "COMB_FROM_PERM_DIVIDE",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.8,
+      "from": "COMB_ORDER_IGNORED_REASON",
+      "to": "COMB_FROM_PERM_DIVIDE",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.79,
+      "from": "FACTORIAL_CANCELLATION",
+      "to": "STEP_COMB_DERIVE",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.75,
+      "from": "COMB_FROM_PERM_DIVIDE",
+      "to": "STEP_COMB_DERIVE",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.74,
+      "from": "STEP_COMB_DERIVE",
+      "to": "COMB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.74,
+      "from": "SET_NOTATION_BASICS",
+      "to": "STEP_SAMPLE_SPACE_BUILD",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.75,
+      "from": "SYSTEMATIC_LISTING_BASIC",
+      "to": "STEP_SAMPLE_SPACE_BUILD",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.75,
+      "from": "STEP_SAMPLE_SPACE_BUILD",
+      "to": "STEP_PROB_SETUP",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.78,
+      "from": "RATIO_AS_PART_WHOLE",
+      "to": "PROB_AS_RATIO",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.79,
+      "from": "EVENT_AS_SUBSET",
+      "to": "PROB_AS_RATIO",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.76,
+      "from": "PROB_AS_RATIO",
+      "to": "STEP_PROB_SETUP",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.77,
+      "from": "CLASSICAL_PROB_EQUIPROBABLE_CHECK",
+      "to": "STEP_PROB_SETUP",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.78,
+      "from": "COUNT_FAVORABLE_TOTAL",
+      "to": "STEP_PROB_SETUP",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.76,
+      "from": "STEP_PROB_SETUP",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.77,
+      "from": "EVENT_AS_SUBSET",
+      "to": "INTERSECTION_UNION_MEANING",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.75,
+      "from": "INTERSECTION_UNION_MEANING",
+      "to": "CHECK_DOUBLE_COUNTING",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.75,
+      "from": "CHECK_DOUBLE_COUNTING",
+      "to": "INCL_EXCL_2SET_MEANING",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.73,
+      "from": "INCL_EXCL_2SET_MEANING",
+      "to": "APPLY_INCL_EXCL_2SET",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.76,
+      "from": "INTERSECTION_UNION_MEANING",
+      "to": "STEP_EVENT_OPS_INCL_EXCL",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.74,
+      "from": "DISJOINT_EVENTS",
+      "to": "STEP_EVENT_OPS_INCL_EXCL",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.73,
+      "from": "COMPLEMENT_EVENT",
+      "to": "STEP_EVENT_OPS_INCL_EXCL",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.73,
+      "from": "APPLY_INCL_EXCL_2SET",
+      "to": "STEP_EVENT_OPS_INCL_EXCL",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.74,
+      "from": "STEP_EVENT_OPS_INCL_EXCL",
+      "to": "INCLUSION_EXCLUSION_2SET",
+      "type": "requires"
+    }
+  ],
+  "add_nodes": [
+    {
+      "confidence": 0.78,
+      "domain": "DA",
+      "id": "SLOT_DIAGRAM_BASIC",
+      "lens": [
+        "transform"
+      ],
+      "name_ko": "슬롯(자   리) 도식으로 선택 과정을 표현한다",
+      "rep": "P",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.8,
+      "domain": "DA",
+      "id": "COUNT_ADD_RULE_DISJOINT",
+      "lens": [
+        "accumulation"
+      ],
+      "name_ko": "서   로소일 때 덧셈 원리를 적용한다",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.77,
+      "domain": "DA",
+      "id": "CHECK_DOUBLE_COUNTING",
+      "lens": [
+        "transform"
+      ],
+      "name_ko": "중복   계수(겹침) 발생을 점검한다",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.81,
+      "domain": "DA",
+      "id": "FACTORIAL_EXPANSION",
+      "lens": [
+        "accumulation"
+      ],
+      "name_ko": "n!을 곱   으로 전개한다",
+      "rep": "P",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.8,
+      "domain": "DA",
+      "id": "FACTORIAL_CANCELLATION",
+      "lens": [
+        "transform"
+      ],
+      "name_ko": "팩토   리얼 분수식을 약분한다",
+      "rep": "P",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.79,
+      "domain": "DA",
+      "id": "PERM_PRODUCT_FORM",
+      "lens": [
+        "accumulation"
+      ],
+      "name_ko": "nPr을 곱   의 형태로 쓴다",
+      "rep": "P",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.77,
+      "domain": "DA",
+      "id": "COMB_FROM_PERM_DIVIDE",
+      "lens": [
+        "transform"
+      ],
+      "name_ko": "nPr/   r!로 nCr을 유도한다",
+      "rep": "P",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.76,
+      "domain": "DA",
+      "id": "COMB_SYMMETRY",
+      "lens": [
+        "transform"
+      ],
+      "name_ko": "조합 대칭성   nCr=nC(n-r)을 사용한다",
+      "rep": "A",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.72,
+      "domain": "DA",
+      "id": "COMB_BOUNDARY_CASES",
+      "lens": [
+        "transform"
+      ],
+      "name_ko": "nC0,nCn   등 경계를 처리한다",
+      "rep": "A",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.71,
+      "domain": "DA",
+      "id": "PERM_BOUNDARY_CASES",
+      "lens": [
+        "transform"
+      ],
+      "name_ko": "nP0,nPn   등 경계를 처리한다",
+      "rep": "A",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.74,
+      "domain": "DA",
+      "id": "INCL_EXCL_2SET_MEANING",
+      "lens": [
+        "random",
+        "transform"
+      ],
+      "name_ko": "2집   합 포함배제의 의미를 설명한다",
+      "rep": "C",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.73,
+      "domain": "DA",
+      "id": "APPLY_INCL_EXCL_2SET",
+      "lens": [
+        "random",
+        "transform"
+      ],
+      "name_ko": "2집합   포함배제를 계산한다",
+      "rep": "P",
+      "type": "micro"
+    },
+    {
+      "confidence": 0.75,
+      "domain": "DA",
+      "id": "STEP_SAMPLE_SPACE_BUILD",
+      "lens": [
+        "random",
+        "transform"
+      ],
+      "name_ko": "표본   공간 구성 단계",
+      "rep": "C",
+      "type": "step"
+    },
+    {
+      "confidence": 0.77,
+      "domain": "DA",
+      "id": "STEP_PERM_DERIVE",
+      "lens": [
+        "accumulation",
+        "transform"
+      ],
+      "name_ko": "순열 공식   도출 단계",
+      "rep": "C",
+      "type": "step"
+    },
+    {
+      "confidence": 0.75,
+      "domain": "DA",
+      "id": "STEP_COMB_DERIVE",
+      "lens": [
+        "transform"
+      ],
+      "name_ko": "조합 공식   도출 단계",
+      "rep": "C",
+      "type": "step"
+    },
+    {
+      "confidence": 0.76,
+      "domain": "DA",
+      "id": "STEP_PROB_SETUP",
+      "lens": [
+        "random",
+        "ratio"
+      ],
+      "name_ko": "고전확률 설   정 단계",
+      "rep": "C",
+      "type": "step"
+    },
+    {
+      "confidence": 0.74,
+      "domain": "DA",
+      "id": "STEP_EVENT_OPS_INCL_EXCL",
+      "lens": [
+        "random",
+        "transform"
+      ],
+      "name_ko": "사   건 연산→포함배제 단계",
+      "rep": "C",
+      "type": "step"
+    }
+  ],
+  "notes": [
+    {
+      "claim": "TREE_DIAGRAM_BASIC은 STEP_SAMPLE_SPACE_BUILD의 권장 선   행",
+      "confidence": 0.72,
+      "reason": "분기 구조를 시각화하면 누락/중복을 스스로 점검하기 쉬   움"
+    },
+    {
+      "claim": "SLOT_DIAGRAM_BASIC은 PERM_AS_FILLING_SLOTS의 권장 선   행",
+      "confidence": 0.74,
+      "reason": "자리/슬롯 표현 전환이 순열 의미를 빠르게 고정함"
+    },
+    {
+      "claim": "ORDER_SENSITIVE_CHECK는 STEP_PERM_DERIVE의 권장 선행",
+      "confidence": 0.73,
+      "reason": "순서 판단 습관이 공식 선택 오남용을 줄임(필수 잠금까지는 아   님)"
+    },
+    {
+      "claim": "ORDER_SENSITIVE_CHECK는 STEP_COMB_DERIVE의 권장 선행",
+      "confidence": 0.73,
+      "reason": "비순서 판단이 조합/순열 혼동을 줄임"
+    },
+    {
+      "claim": "COUNT_ADD_RULE_DISJOINT은 CHECK_DOUBLE_COUNTING의 권장   선행",
+      "confidence": 0.7,
+      "reason": "서로소(겹침 없음) 기준이 있어야 ‘겹침 보정’ 필요성을   인식하기 쉬움"
+    },
+    {
+      "claim": "VENN_DIAGRAM_2SET은 STEP_EVENT_OPS_INCL_EXCL의 권장 선   행",
+      "confidence": 0.74,
+      "reason": "합/교/서로소/여사건을 한 표현으로 연결해 부호 실수를 줄   임"
+    },
+    {
+      "claim": "COMB_SYMMETRY와 COMB_BOUNDARY_CASES는 COMB_BASIC의 권장   선행",
+      "confidence": 0.7,
+      "reason": "계산 단축/검산과 경계값 처리로 오답을 크게 줄임"
+    },
+    {
+      "claim": "PERM_BOUNDARY_CASES는 PERM_BASIC의 권장 선행",
+      "confidence": 0.68,
+      "reason": "nP0, 0! 관련 경계 오답을 줄임"
+    },
+    {
+      "claim": "직접 requires(마이크로→단원) 대신 STEP_* 브릿지를 두면   학습 점프가 줄어든다",
+      "confidence": 0.78,
+      "reason": "의미/표현/절차를 단계로 묶어 인지부하   를 분산하고 공식 대입형 오용을 줄임"
+    }
+  ],
+  "remove_edges": [
+    {
+      "confidence": 0.7,
+      "from": "SYSTEMATIC_LISTING_BASIC",
+      "reason": "표본공간 ‘정의’는 절차 없이도 가능하므로   권장 선행으로 완화(구성은 STEP_SAMPLE_SPACE_BUILD로 잠금)",
+      "to": "SAMPLE_SPACE_AS_SET",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.72,
+      "from": "FACTORIAL_CONCEPT",
+      "reason": "직접 잠금 대신 STEP_PERM_DERIVE를 통해 순열 단원   진입 점프를 완화",
+      "to": "PERM_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.72,
+      "from": "PERM_AS_FILLING_SLOTS",
+      "reason": "의미→단원 점프를 STEP_PERM_DERIVE로 중간화",
+      "to": "PERM_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.7,
+      "from": "ORDER_SENSITIVE_CHECK",
+      "reason": "순서 판단은 단원 진입의 필수 잠금이 아니라 권장   (오남용 방지용)",
+      "to": "PERM_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.72,
+      "from": "FACTORIAL_CONCEPT",
+      "reason": "직접 잠금 대신 STEP_COMB_DERIVE로 유도/약분 절차   를 거치게 함",
+      "to": "COMB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.72,
+      "from": "COMB_AS_SUBSET",
+      "reason": "의미→단원 점프를 STEP_COMB_DERIVE로 중간화",
+      "to": "COMB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.72,
+      "from": "COMB_ORDER_IGNORED_REASON",
+      "reason": "중복 제거 논리를 STEP_COMB_DERIVE 안에서 연결해   점프 완화",
+      "to": "COMB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.7,
+      "from": "ORDER_SENSITIVE_CHECK",
+      "reason": "순서 판단은 권장 선행으로 두고 잠금은 유도 단계   로 설정",
+      "to": "COMB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.72,
+      "from": "SAMPLE_SPACE_AS_SET",
+      "reason": "직접 잠금 대신 STEP_PROB_SETUP로 표본공간/사건/   등확률/카운팅을 묶어 진입",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.72,
+      "from": "EVENT_AS_SUBSET",
+      "reason": "사건 정의를 STEP_PROB_SETUP에 포함시켜 분모/분자   점프를 완화",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.72,
+      "from": "PROB_AS_RATIO",
+      "reason": "비율 정의만으로 단원 진입하지 않도록 STEP_PROB_SETUP로 중간   화",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.71,
+      "from": "CLASSICAL_PROB_EQUIPROBABLE_CHECK",
+      "reason": "등확률 점검을 STEP_PROB_SETUP의 분기 규   칙으로 이동",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.71,
+      "from": "COUNT_FAVORABLE_TOTAL",
+      "reason": "카운팅 절차를 STEP_PROB_SETUP에 포함시켜 계산 진   입을 안정화",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.69,
+      "from": "INTERSECTION_UNION_MEANING",
+      "reason": "사건 연산은 포함배제/심화로 분리   (STEP_EVENT_OPS_INCL_EXCL)하여 과잉 잠금 방지",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.69,
+      "from": "DISJOINT_EVENTS",
+      "reason": "서로소/여사건은 포함배제 단계에서 핵심이므로 별   도 단계로 분리",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    },
+    {
+      "confidence": 0.69,
+      "from": "COMPLEMENT_EVENT",
+      "reason": "여사건은 STEP_EVENT_OPS_INCL_EXCL에서 의미 기반   으로 연결(과잉 잠금 방지)",
+      "to": "PROB_BASIC",
+      "type": "requires"
+    }
+  ],
+  "researcher": "R2",
+  "scope": "TS_COMB_PROB"
+}
