@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "nodes": [
+    { "id": "MATH-2022-G-1-NA-001", "isStart": true, "order": 1 },
+    { "id": "MATH-2022-G-1-NA-002", "order": 2 },
+    { "id": "MATH-2022-G-2-NA-001", "order": 3 },
+    { "id": "MATH-2022-G-2-NA-002", "order": 4 },
+    { "id": "MATH-2022-G-3-NA-001", "order": 5 },
+    { "id": "MATH-2022-G-3-NA-002", "order": 6 }
+  ],
+  "edges": [
+    { "sourceId": "MATH-2022-G-1-NA-001", "targetId": "MATH-2022-G-1-NA-002", "type": "requires" },
+    { "sourceId": "MATH-2022-G-1-NA-002", "targetId": "MATH-2022-G-2-NA-001", "type": "requires" },
+    { "sourceId": "MATH-2022-G-2-NA-001", "targetId": "MATH-2022-G-2-NA-002", "type": "requires" },
+    { "sourceId": "MATH-2022-G-2-NA-002", "targetId": "MATH-2022-G-3-NA-001", "type": "requires" },
+    { "sourceId": "MATH-2022-G-3-NA-001", "targetId": "MATH-2022-G-3-NA-002", "type": "requires" },
+    { "sourceId": "MATH-2022-G-2-NA-001", "targetId": "MATH-2022-G-3-NA-001", "type": "prepares_for" }
+  ]
+}
+

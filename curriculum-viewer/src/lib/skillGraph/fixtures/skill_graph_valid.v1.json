@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "skill-graph-v1",
+  "graphId": "COURSE_ADD_PATTERN_V1",
+  "title": "MVP 코스: 덧셈(Core) + 규칙성 도전(Challenge)",
+  "nodes": [
+    {
+      "id": "CORE_PLACE_VALUE_3DIGIT",
+      "nodeCategory": "core",
+      "label": "자리값(백/십/일) 이해",
+      "start": true,
+      "order": 10
+    },
+    {
+      "id": "CHAL_PATTERN_NEXT_TERM",
+      "nodeCategory": "challenge",
+      "label": "도전: 다음 항 찾기",
+      "order": 110
+    }
+  ],
+  "edges": [
+    {
+      "edgeType": "requires",
+      "source": "CORE_PLACE_VALUE_3DIGIT",
+      "target": "CHAL_PATTERN_NEXT_TERM"
+    }
+  ]
+}
+

@@ -27,3 +27,10 @@ TASK_IDS="curriculum_viewer_mvp curriculum_viewer_data_visualization_v1" ./agent
 ## MVP v1 Task
 
 - PRD v1 작업 파일: `tasks/curriculum_viewer_mvp_v1.md`
+
+## Curriculum Viewer v1 — Data Validation
+
+```bash
+cd curriculum-viewer && npm run validate:data
+cd curriculum-viewer && npm run validate:data -- --file <path>
+```

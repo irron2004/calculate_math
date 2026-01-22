@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "skill-graph-v1",
+  "graphId": "COURSE_INVALID_DUPLICATE_ID",
+  "title": "Invalid: duplicate node id",
+  "nodes": [
+    {
+      "id": "DUP",
+      "nodeCategory": "core",
+      "label": "Node 1"
+    },
+    {
+      "id": "DUP",
+      "nodeCategory": "core",
+      "label": "Node 2"
+    }
+  ],
+  "edges": []
+}
+

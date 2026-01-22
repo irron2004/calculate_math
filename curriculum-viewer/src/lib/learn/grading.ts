@@ -19,6 +19,20 @@ export function gradeNumericAnswer(
     return { isCorrect: false, normalizedSubmitted, normalizedExpected }
   }
 
+  const isIntegerToken = (value: string) => /^[+-]?\d+$/.test(value)
+
+  if (isIntegerToken(normalizedSubmitted) && isIntegerToken(normalizedExpected)) {
+    try {
+      return {
+        isCorrect: BigInt(normalizedSubmitted) === BigInt(normalizedExpected),
+        normalizedSubmitted,
+        normalizedExpected
+      }
+    } catch {
+      // fall through to Number/string handling
+    }
+  }
+
   const submittedNumber = Number(normalizedSubmitted)
   const expectedNumber = Number(normalizedExpected)
 
@@ -36,4 +50,3 @@ export function gradeNumericAnswer(
     normalizedExpected
   }
 }
-

@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "schema_version": "curriculum_math_v1"
+  },
+  "nodes": [
+    {
+      "id": "MATH-2022",
+      "type": "subject",
+      "title": "Math",
+      "children_ids": []
+    },
+    {
+      "id": "MATH-2022",
+      "type": "subject",
+      "title": "Math Duplicate",
+      "children_ids": []
+    }
+  ]
+}

@@ -48,7 +48,7 @@ npm run generate:problems:gemini -- \
   "version": 1,
   "problemsByNodeId": {
     "MATH-2022-G-2-NA-001": [
-      { "id": "gen-...", "type": "numeric", "prompt": "...", "answer": "123" }
+      { "id": "gen-...", "type": "numeric", "prompt": "...", "answer": "123", "explanation": "..." }
     ]
   }
 }
@@ -56,6 +56,6 @@ npm run generate:problems:gemini -- \
 
 ## 주의
 - 현재 채점기는 `numeric` 타입만 지원합니다.
+- `explanation`은 optional이며, 상세 규격은 `docs/problem-explanation.md`를 따릅니다.
 - Gemini가 JSON 앞뒤로 설명/코드펜스를 붙일 수 있어, 스크립트는 이를 최대한 제거/추출하지만 완벽하지 않을 수 있습니다.
   - 이 경우 `--cmd`에 출력 형식 강제 옵션(예: “JSON만 출력”)을 추가하거나 프롬프트를 강화하세요.
-

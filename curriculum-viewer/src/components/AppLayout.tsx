@@ -9,7 +9,7 @@ export type DetailPanelContext = {
 }
 
 export default function AppLayout() {
-  const { isAuthenticated, user, logout } = useAuth()
+  const { isAuthenticated, isAdmin, user, logout, setMode } = useAuth()
   const navigate = useNavigate()
   const { focusNodeId } = useFocusNodeId()
 
@@ -33,15 +33,18 @@ export default function AppLayout() {
         <nav aria-label="Primary">
           <ul className="app-nav">
             <li>
-              <NavLink to={`${ROUTES.tree}${focusQuery}`} end>
-                트리
+              <NavLink to={ROUTES.dashboard} end>
+                대시보드
               </NavLink>
             </li>
             <li>
-              <NavLink to={`${ROUTES.graph}${focusQuery}`}>그래프</NavLink>
+              <NavLink to={`${ROUTES.map}${focusQuery}`}>지도</NavLink>
             </li>
             <li>
-              <NavLink to={ROUTES.health}>리포트</NavLink>
+              <NavLink to={ROUTES.report}>리포트</NavLink>
+            </li>
+            <li>
+              <NavLink to={ROUTES.preview}>프리뷰</NavLink>
             </li>
           </ul>
         </nav>
@@ -50,6 +53,18 @@ export default function AppLayout() {
           {isAuthenticated ? (
             <>
               <span className="app-auth-user">{userLabel}</span>
+              {isAdmin ? (
+                <button
+                  type="button"
+                  className="button button-ghost"
+                  onClick={() => {
+                    setMode('author')
+                    navigate(ROUTES.authorImport)
+                  }}
+                >
+                  관리자 모드
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="button button-ghost"

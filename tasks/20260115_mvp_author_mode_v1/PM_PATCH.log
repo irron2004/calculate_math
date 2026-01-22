@@ -1,0 +1,929 @@
+
+============================================================
+[2026-01-20 15:48:12] PM_PATCH (req_id: 1d931b642b)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ source '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && codex
+╭───────────────────────────────────────────────────────╮
+│ >_ OpenAI Codex (v0.87.0)                             │
+│                                                       │
+│ model:     gpt-5.2-codex xhigh   /model to change     │
+│ directory: /mnt/c/…/my/web_service_new/calculate_math │
+╰───────────────────────────────────────────────────────╯
+
+  Tip: Run /review to get a code review of your current
+  changes.
+
+
+› Desktop/my/web_service_new/calculate_math/.agents/inbox/
+  pm_695bae1461.md
+
+
+  100% context left
+
+
+
+› Request 695bae1461: 아래 파일을 읽고 지시사항대로 작업 계획(JSON)을
+  작성해줘. 마지막에 마커를 그대로 출력해. -> /mnt/c/Users/irron/
+  Desktop/my/web_service_new/calculate_math/.agents/inbox/
+  pm_695bae1461.md
+
+
+
+• Explored
+  └ Read pm_695bae1461.md, task.md
+
+• The task file is large and covers the whole backlog, so I’m focusing
+  on extracting and summarizing requirements specifically for the
+  "math-knowledge-graph-mvp" to define MVP scope and produce FE/BE
+  ticket plans as requested. Next, I’ll verify any explicit
+  instructions or scoped sections related to MVP in the document.
+
+                                         
+
+• Explored
+                          
+
+
+◦ Checking backend models (1m 01s • esc to interrupt)    
+                         
+
+• I'm reviewing the backen                                     
+                                                                      
+  planning next steps.
+
+
+• Explored
+  └ Read api.py, models.py
+
+■ Conversation interrupted - tell the model what to do differently.
+Something went wrong? Hit `/feedback` to report the issue.
+Token usage: total=36,874 input=35,297 (+ 133,632 cached) output=1,577 (reasoning 896)
+To continue this session, run codex resume 019bd8e9-ed04-7481-a705-7162726f28a4
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ ^C
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/m
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ source '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && codexsource '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && codex
+codexsource: command not found
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ source '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && codex
+
+╭───────────────────────────────────────────────────────╮
+│ >_ OpenAI Codex (v0.87.0)                             │
+│                                                       │
+│ model:     gpt-5.2-codex xhigh   /model to change     │
+│                                                        
+
+
+›                                                       
+
+• Explored
+                         
+
+• Explored
+  └ Read task.md
+
+• I'll base the JSON plan on the request's graph_profile
+  (curriculum_viewer_v1), include RESEARCH and FE tickets,
+  and summarize requirements, scope, and non-goals for the
+  curriculum-viewer React Flow graph using static JSON
+  data.
+
+  Reconciling scope and generating tickets
+
+  I identified a mismatch between the task file (MVP
+  author mode) and the PM request focus (viewer +
+  structure validator) and will limit scope accordingly,
+                                                      
+                                                          
+  and validation aligned with the                     
+                                                         
+  commands after confirming scripts f                 
+
+
+• Explored
+  └ List calculate_math
+    Read package.json
+
+
+• Explored
+  └ List data
+    Read validate-data.mjs, validateCore.js
+
+•                                            
+                                                 
+                                              
+
+•         
+                          
+
+•         
+                
+
+•                                                
+
+›                                
+
+  99% context left · ? for shortcuts
+
+• Explored
+  └ Read curriculum_math_v1.json
+
+◦ Designing detailed ticket plan (4m 15s • esc to
+
+
+› Find and fix a bug in @filename
+
+  99% context left · ? for shortcuts
+
+
+• Explored
+  └ Read curriculum_math_v1.json
+
+• The graph data is hierarchical using parent/
+  child IDs without explicit edges, fitting a
+  React Flow DAG layout. The focus is on planning
+  a v1 viewer and validator while excluding
+  advanced features like Author Mode; I'll align
+  scope and tickets accordingly and confirm the
+  output formatting includes the required marker
+  block.
+
+  Designing detailed ticket plan
+
+  The plan defines 5 tickets from research (data
+  schema, validation rules) through frontend
+  tasks (data loading/validation, graph
+  rendering, validation UI, detail panel) with
+  clear dependencies, acceptance criteria in
+  Korean, TDD steps, and commands; it also
+  includes risks and open questions clarifying
+  scope and constraints while excluding editing
+  and backend features. The final output will be
+  a JSON marker block only.
+
+  ###BEGIN:de8531a134###
+  {
+  "summary": "curriculum_viewer_v1 그래프 프로필
+  기준으로 정적 JSON을 로딩해 React Flow로 시각화
+  하고 구조 검증 리포트를 제공하는 v1을 만든다.
+  편집과 문제풀이 없이 읽기 전용 뷰어와 검증기에
+  집중한다.",
+  "scope": [
+  "정적 데이터 파일 curriculum-viewer/public/
+  data/curriculum_math_v1.json 로딩 및 파싱",
+  "TS 타입과 런타임 검증(스키마 및 구조)과 이슈
+  리스트 생성",
+  "React Flow와 dagre 또는 elk 레이아웃 기반 읽기
+  전용 그래프 뷰",
+  "노드 상세 패널과 검증 리포트 UI 제공(이슈 클릭
+  시 그래프 포커스)",
+  "검증 CLI 스크립트(npm run validate:data) 연동
+  및 문서화",
+  "새 코드는 curriculum-viewer 디렉터리에만 구현
+  하고 .legacy 디렉터리는 변경하지 않음"
+  ],
+  "non_goals": [
+  "Author 모드 편집(엣지 추가/삭제/타입 변경)",
+  "문제풀이, 채점, 정답률, 세션 관리",
+  "로그인, 권한 관리, 백엔드 API, 데이터 퍼블리시
+  기능",
+  "대시보드, 리포트, 추천 시스템 구현",
+  "동적 데이터 소스 및 서버 저장소 연동"
+  ],
+  "tickets": [
+  {
+  "id": "RESEARCH-1",
+  "role": "RESEARCH",
+  "title": "curriculum_math_v1 데이터 계약 및 검
+  증 규칙 정리",
+  "description": "정적 JSON 스키마(메타, 노드, 관
+  계)와 구조 검증 규칙을 문서화하고, 프론트엔드가
+  구현할 검증 기준과 그래프 매핑 방향을 확정한
+  다.",
+  "acceptance_criteria": [
+  "필수 필드 및 타입(id, type, title, parent_id,
+  children_ids, metadata)을 문서화한다.",
+  "노드 타입 계층(subject, grade, domain,
+  standard)과 허용 관계를 정의한다.",
+  "검증 규칙(중복 ID, 누락된 parent/child, 타입
+  불일치, 사이클, orphan)에 대한 에러/경고 분류를
+  정한다.",
+  "그래프 엣지 방향(부모에서 자식) 및 레이아웃 방
+  향을 결정한다.",
+  "테스트용 잘못된 JSON 예시 3개 이상을 제공한
+  다."
+  ],
+  "tdd_plan": [
+  "Red: 규칙별 실패 사례 데이터를 먼저 정의한
+  다.",
+  "Green: 규칙 설명을 다듬어 각 실패 사례가 단일
+  이슈로 매핑되도록 한다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run
+  validate:data",
+  "test": "cd curriculum-viewer && npm run
+  validate:data"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-1",
+  "role": "FE",
+  "title": "데이터 로더 및 런타임 검증 파이프라인
+  구현",
+  "description": "curriculum_math_v1.json을 로드
+  하고 타입 및 구조 검증을 수행해 UI에 오류 및 경
+  고를 전달하는 데이터 파이프라인을 구현한다.",
+  "acceptance_criteria": [
+  "앱 시작 시 정적 JSON을 fetch하여 타입 안전하게
+  보관한다.",
+  "스키마 오류 발생 시 차단 오류 화면에 메시지를
+  표시한다.",
+  "검증 결과(오류 및 경고 리스트)를 UI에서 활용
+  가능하다.",
+  "npm run validate:data 가 동일한 규칙을 사용하
+  며 오류 시 비정상 종료한다.",
+  "유닛 테스트에 유효/무효 데이터에 대한 검증 케
+  이스가 포함된다."
+  ],
+  "tdd_plan": [
+  "Red: 필수 필드 누락 및 타입 오류에 대한 파서
+  테스트를 추가한다.",
+  "Green: 파서 및 검증 기능을 구현해 테스트를 통
+  과시킨다.",
+  "Red: 중복 ID, 누락된 parent/child, 사이클 등
+  구조적 오류 테스트를 추가한다.",
+  "Green: 검증 결과를 생성하고 UI에 노출한다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm test &&
+  npm run validate:data"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-2",
+  "role": "FE",
+  "title": "React Flow 기반 읽기 전용 그래프 뷰
+  및 레이아웃 구현",
+  "description": "검증된 데이터를 React Flow 노드
+  와 엣지로 변환하고 dagre 또는 elk 레이아웃을 적
+  용해 읽기 전용 그래프를 구현한다.",
+  "acceptance_criteria": [
+  "노드와 엣지가 데이터 기준에 맞게 올바르게 렌더
+  링된다.",
+  "레이아웃은 dagre 또는 elk를 사용하며 방향과 간
+  격이 문서화된 값으로 고정된다.",
+  "그래프는 읽기 전용이며 데이터 변경이 불가능하
+  다.",
+  "초기 로드 시 fit view가 적용되고 줌과 패닝이
+  정상 작동한다.",
+  "노드 클릭 시 선택 상태가 업데이트된다."
+  ],
+  "tdd_plan": [
+  "Red: 데이터에서 노드/엣지 변환 테스트를 추가한
+  다.",
+  "Green: 변환 함수와 레이아웃 적용을 구현한다.",
+  "Red: 노드 선택 이벤트 상태 갱신 테스트를 추가
+  한다.",
+  "Green: React Flow 이벤트 핸들러를 연결한다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm test"
+  },
+  "depends_on": [
+  "FE-1"
+  ]
+  },
+  {
+  "id": "FE-3",
+  "role": "FE",
+  "title": "노드 상세 패널(읽기 전용) 구현",
+  "description": "선택된 노드의 메타 정보와 부모/
+  자식 관계를 표시하는 상세 패널을 개발한다.",
+  "acceptance_criteria": [
+  "선택된 노드의 title, id, type이 패널에 표시된
+  다.",
+  "parent 및 children 목록을 보여주고 클릭 시 해
+  당 노드로 이동한다.",
+  "노드가 선택되지 않은 경우 빈 상태 메시지를 보
+  여준다.",
+  "모바일 환경에서도 패널이 정상적으로 표시되고
+  작동한다."
+  ],
+  "tdd_plan": [
+  "Red: 선택 여부에 따른 렌더링 테스트를 작성한
+  다.",
+  "Green: 상세 패널 컴포넌트와 상태 바인딩을 구현
+  한다.",
+  "Red: 관계 노드 클릭 시 선택 변경 테스트를 추가
+  한다.",
+  "Green: 클릭 핸들러와 그래프 포커스 연동을 구현
+  한다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm test"
+  },
+  "depends_on": [
+  "FE-2"
+  ]
+  },
+  {
+  "id": "FE-4",
+  "role": "FE",
+  "title": "구조 검증 리포트 UI 및 그래프 포커스
+  기능 구현",
+  "description": "검증 결과를 이슈 리스트 형태로
+  보여주고, 클릭 시 그래프가 해당 노드로 포커스
+  및 하이라이트되도록 구현한다.",
+  "acceptance_criteria": [
+  "오류 및 경고 개수를 집계하여 표시한다.",
+  "이슈 리스트는 severity 및 코드 순으로 정렬된
+  다.",
+  "이슈 클릭 시 그래프가 해당 노드를 중앙에 배치
+  하고 하이라이트한다.",
+  "이슈가 없으면 성공 상태를 표시한다.",
+  "그래프 뷰와 검증 리포트 UI가 동일 화면에서 함
+  께 사용 가능하다."
+  ],
+  "tdd_plan": [
+  "Red: 리스트 정렬 및 렌더링 테스트를 작성한
+  다.",
+  "Green: 리포트 컴포넌트를 구현한다.",
+  "Red: 이슈 클릭 시 포커스 이동 테스트를 추가한
+  다.",
+  "Green: 그래프 포커스 및 하이라이트 연동 기능을
+  구현한다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm test"
+  },
+  "depends_on": [
+  "FE-1",
+  "FE-2"
+  ]
+  }
+  ],
+  "risks": [
+  "노드 수가 증가할 경우 React Flow 성능 저하 가
+  능성",
+  "데이터 스키마 변경 시 검증 규칙 및 UI 불일치
+  위험",
+  "레이아웃 방향 및 간격 결정이 가독성에 큰 영향"
+  ],
+  "open_questions": [
+  "children_ids와 parent_id 중 어느 필드를 진실
+  소스로 삼을지 여부",
+  "레이아웃 방향을 위→아래 또는 좌→우 중 무엇으로
+  고정할지",
+  "경고 수준 이슈 발생 시
+
+─ Worked for 4m 15s ─────────────────────────────
+
+• ###BEGIN:de8531a134###
+  {
+  "summary": "curriculum_viewer_v1 그래프 프로필
+  기준으로 정적 JSON을 로딩해 React Flow로 시각화
+  하고 구조 검증 리포트를 제공하는 v1을 만든다.
+  편집/문제풀이 없이 읽기 전용 뷰어 + 검증기에 집
+  중한다.",
+  "scope": [
+  "정적 데이터 파일 curriculum-viewer/public/
+  data/curriculum_math_v1.json 로딩 및 파싱",
+  "TS 타입 + 런타임 검증(스키마/구조)과 이슈 리스
+  트 생성",
+  "React Flow + dagre/elk 레이아웃 기반 읽기 전용
+  그래프 뷰",
+  "노드 상세 패널과 검증 리포트 UI(클릭 시 그래프
+  포커스)",
+  "검증 CLI 스크립트(npm run validate:data) 정합
+  성 확보",
+  "새 코드는 curriculum-viewer/에만 추가하
+  고 .legacy/는 수정하지 않음"
+  ],
+  "non_goals": [
+  "Author 모드 편집(엣지 추가/삭제/타입 변경)",
+  "문제풀이/채점/정답률/세션 관리",
+  "로그인/권한/백엔드 API/퍼블리시 스냅샷",
+  "대시보드/리포트/추천 시스템",
+  "동적 데이터 소스 또는 서버 저장소 연동"
+  ],
+  "tickets": [
+  {
+  "id": "RESEARCH-1",
+  "role": "RESEARCH",
+  "title": "curriculum_math_v1 데이터 계약/검증
+  규칙 정리",
+  "description": "정적 JSON 스키마(메타/노드/관
+  계)와 구조 검증 규칙을 문서화하고, FE가 구현할
+  검증 기준과 그래프 매핑 방향을 확정한다.",
+  "acceptance_criteria": [
+  "필수 필드와 타입(id/type/title/parent_id/
+  children_ids/meta)을 문서로 정리한다.",
+  "노드 타입 계층(subject/grade/domain/standard)
+  과 허용 관계를 명확히 정의한다.",
+  "검증 규칙(중복 ID, 누락 parent/child, 타입 불
+  일치, 사이클, orphan)의 에러/경고 분류를 정한
+  다.",
+  "그래프 엣지 방향(부모->자식 등)과 레이아웃 방
+  향을 결정한다.",
+  "테스트용 invalid JSON 예시 3개 이상을 제공한
+  다."
+  ],
+  "tdd_plan": [
+  "Red: 규칙별로 실패해야 하는 예시 데이터를 먼저
+  정의한다.",
+  "Green: 규칙 서술을 다듬어 예시가 단일 이슈로
+  매핑되게 정리한다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run
+  validate:data",
+  "test": "cd curriculum-viewer && npm run
+  validate:data"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-1",
+  "role": "FE",
+  "title": "데이터 로더 + 런타임 검증 파이프라
+  인",
+  "description": "curriculum_math_v1.json을 로딩/
+  파싱하고 스키마 및 구조 검증을 수행해 UI에 전달
+  하는 데이터 파이프라인을 구현한다.",
+  "acceptance_criteria": [
+  "앱 시작 시 curriculum_math_v1.json을 fetch하여
+  파싱하고 타입 안전하게 보관한다.",
+  "스키마 오류(필수 필드 누락/타입 불일치)는 차단
+  오류 화면으로 노출된다.",
+  "구조 검증 결과(에러/경고 리스트)가 UI에서 사용
+  가능하다.",
+  "npm run validate:data가 동일 규칙을 사용하며
+  에러 시 non-zero exit를 반환한다.",
+  "유효/무효 데이터에 대한 유닛 테스트가 추가되어
+  있다."
+  ],
+  "tdd_plan": [
+  "Red: 필수 필드 누락/타입 오류에 대한 파서 테스
+  트를 추가한다.",
+  "Green: 로더와 스키마 검증을 구현해 테스트를 통
+  과시킨다.",
+  "Red: 구조 오류(중복 ID, 누락 parent/child, 사
+  이클)에 대한 테스트를 추가한다.",
+  "Green: 구조 검증 결과를 생성하고 UI에 노출한
+  다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm test &&
+  npm run validate:data"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-2",
+  "role": "FE",
+  "title": "React Flow 기반 읽기 전용 그래프 뷰 +
+  레이아웃",
+  "description": "검증된 데이터를 React Flow 노
+  드/엣지로 변환하고 dagre/elk 레이아웃을 적용한
+  읽기 전용 그래프 뷰를 제공한다.",
+  "acceptance_criteria": [
+  "노드/엣지가 데이터 기준으로 정확히 렌더링된
+  다.",
+  "레이아웃은 dagre/elk를 사용하며 방향과 간격이
+  문서화된 값으로 고정된다.",
+  "그래프는 읽기 전용이며 드래그로 데이터가 변경
+  되지 않는다.",
+  "초기 로드 시 fit view가 적용되고 줌/패닝이 동
+  작한다.",
+  "노드 클릭 시 선택 상태가 업데이트된다."
+  ],
+  "tdd_plan": [
+  "Red: 데이터→노드/엣지 변환 테스트를 추가한
+  다.",
+  "Green: 변환 로직과 레이아웃 적용 함수를 구현한
+  다.",
+  "Red: 노드 선택 이벤트가 상태를 갱신하는 테스트
+  를 추가한다.",
+  "Green: React Flow 이벤트 핸들러를 연결한다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm test"
+  },
+  "depends_on": [
+  "FE-1"
+  ]
+  },
+  {
+  "id": "FE-3",
+  "role": "FE",
+  "title": "노드 상세 패널(읽기 전용) 구현",
+  "description": "선택된 노드의 메타 정보와 부모/
+  자식 관계를 보여주는 상세 패널을 구현한다.",
+  "acceptance_criteria": [
+  "선택된 노드의 title/id/type이 패널에 표시된
+  다.",
+  "parent/children 목록이 표시되며 클릭 시 해당
+  노드로 이동한다.",
+  "선택이 없으면 빈 상태 메시지가 보인다.",
+  "모바일 화면에서 패널이 접근 가능하고 레이아웃
+  이 깨지지 않는다."
+  ],
+  "tdd_plan": [
+  "Red: 선택 없음/선택 있음 상태에 대한 렌더링 테
+  스트를 추가한다.",
+  "Green: 패널 컴포넌트와 상태 바인딩을 구현한
+  다.",
+  "Red: 관계 노드 클릭 시 선택이 변경되는 테스트
+  를 추가한다.",
+  "Green: 클릭 핸들러와 그래프 포커스 연동을 구현
+  한다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm test"
+  },
+  "depends_on": [
+  "FE-2"
+  ]
+  },
+  {
+  "id": "FE-4",
+  "role": "FE",
+  "title": "구조 검증 리포트 UI + 그래프 포커스",
+  "description": "구조 검증 결과를 리스트로 보여
+  주고 이슈 클릭 시 그래프가 해당 노드로 이동/강
+  조되는 리포트 UI를 구현한다.",
+  "acceptance_criteria": [
+  "에러/경고 개수와 리스트가 표시된다.",
+  "리스트 정렬이 severity→code 기준으로 일관되
+  다.",
+  "이슈 클릭 시 그래프가 관련 노드를 중앙으로 이
+  동하고 하이라이트된다.",
+  "이슈가 없을 때는 성공 상태가 표시된다.",
+  "그래프 뷰와 리포트가 동일 화면에서 함께 사용
+  가능하다."
+  ],
+  "tdd_plan": [
+  "Red: 리포트 정렬/렌더링 테스트를 추가한다.",
+  "Green: 리포트 컴포넌트를 구현한다.",
+  "Red: 이슈 클릭 시 포커스 이동 테스트를 추가한
+  다.",
+  "Green: 그래프 포커스/하이라이트 연동을 구현한
+  다."
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm test"
+  },
+  "depends_on": [
+  "FE-1",
+  "FE-2"
+  ]
+  }
+  ],
+  "risks": [
+  "노드 수 증가 시 React Flow 성능 저하 가능성",
+  "데이터 스키마 변경 시 검증 규칙과 UI가 동시에
+  깨질 위험",
+  "레이아웃 방향/간격 결정이 가독성에 큰 영향"
+  ],
+  "open_questions": [
+  "children_ids와 parent_id 중 어느 필드를 진실
+  소스로 삼을지?",
+  "레이아웃 방향을 위→아래 vs 좌→우 중 어떤 것으
+  로 고정할지?",
+  "경고 수준 이슈가 있을 때 뷰어를 차단할지 허용
+  할지?",
+  "curriculum_math_v1.json 외 다른 데이터 파일
+  (예: learning_graph_v1.json)을 지원할지?"
+  ],
+  "next_ticket_id": "RESEARCH-1"
+  }
+  ###DONE:de8531a134###
+
+
+› Request 1d931b642b: 아래 파일을 읽고 필요한 패
+  치를 JSON으로 출력해줘. 마지막에 마커를 그대로
+  출력해. -> /mnt/c/Users/irron/Desktop/my/
+  web_service_new/calculate_math/.agents/inbox/
+  pm_patch_1d931b642b.md
+
+
+• I'm using a straightforward method to read the
+  instructions file since no special skills are
+  indicated or required.
+
+• Explored
+  └ Read pm_patch_1d931b642b.md
+
+• I'm preparing a JSON patch to split RESEARCH-1
+  into smaller tickets with clearer acceptance
+  criteria, referencing base plan version 1 and
+  providing a rationale for reducing QA failures.
+
+  {
+    "kind": "plan_patch",
+    "base_plan_version": 1,
+    "reason": "RESEARCH-1 failed twice; scope too
+  broad and deliverables unclear. Splitting into
+  two focused research tasks with concrete
+  outputs and verification steps to unblock FE
+  work.",
+    "ops": [
+      {
+        "op": "split_ticket",
+        "ticket_id": "RESEARCH-1",
+        "rewrite_dependents": "last",
+        "new_tickets": [
+          {
+            "id": "RESEARCH-1A",
+            "owner_role": "RESEARCH",
+            "title": "Document
+  curriculum_viewer_v1 data contract and graph
+  mapping",
+            "description": "Audit existing
+  curriculum_math_v1.json and validator to define
+  minimal data contract (fields, types,
+  hierarchy) and mapping to React Flow nodes/
+  edges.",
+            "acceptance_criteria": [
+              "Provide docs/
+  curriculum_viewer_v1_contract.md listing
+  required meta fields and node fields with
+  types.",
+              "Specify allowed node types and
+  hierarchy (subject->grade->domain->standard).",
+              "Document source of truth for
+  relationships between parent_id and
+  children_ids for validation and rendering.",
+              "Define graph mapping including
+  node to React Flow, edge direction, and layout
+  orientation.",
+              "Note any deviations or extra
+  fields in curriculum_math_v1.json and specify
+  if ignored or required."
+            ],
+            "depends_on": [],
+            "verify": [
+              "test -f docs/
+  curriculum_viewer_v1_contract.md"
+            ]
+          },
+          {
+            "id": "RESEARCH-1B",
+            "owner_role": "RESEARCH",
+            "title": "Define validation rules and
+  create fixture matrix",
+            "description": "Based on contract,
+  define validation rules and create fixture
+  files to exercise error and warning cases for
+  QA.",
+            "acceptance_criteria": [
+              "Provide docs/
+  curriculum_viewer_v1_validation_rules.md
+  listing validation rules with severity (error
+  or warning).",
+              "Create at least three invalid JSON
+  fixture files in curriculum-viewer/public/data/
+  fixtures/: invalid_duplicate_id.json,
+  invalid_missing_parent.json,
+  invalid_cycle.json.",
+              "Include mapping table in the doc
+  linking fixture filenames to expected error
+  codes and messages."
+            ],
+            "depends_on": [
+              "RESEARCH-1A"
+            ],
+            "verify": [
+              "test -f docs/
+  curriculum_viewer_v1_validation_rules.md",
+              "ls curriculum-viewer/public/data/
+  fixtures/*.json"
+            ]
+          }
+        ]
+      },
+      {
+        "op": "reorder_queue",
+        "new_order": [
+          "RESEARCH-1A",
+          "RESEARCH-1B",
+          "FE-1",
+          "FE-2",
+          "FE-3",
+          "FE-4"
+        ]
+      }
+    ]
+  }
+
+  {
+    "kind": "plan_patch",
+    "base_plan_version": 1,
+    "reason": "RESEARCH-1 failed twice; scope too
+  broad and deliverables unclear. Splitting into
+  two focused research tasks with concrete
+  outputs and verification steps to unblock FE
+  work.",
+    "ops": [
+      {
+        "op": "split_ticket",
+        "ticket_id": "RESEARCH-1",
+        "rewrite_dependents": "last",
+        "new_tickets": [
+          {
+            "id": "RESEARCH-1A",
+            "owner_role": "RESEARCH",
+            "title": "Document
+  curriculum_viewer_v1 data contract and graph
+  mapping",
+            "description": "Audit existing
+  curriculum_math_v1.json and validator to define
+  minimal data contract (fields, types,
+  hierarchy) and mapping to React Flow nodes/
+  edges.",
+            "acceptance_criteria": [
+              "Provide docs/
+  curriculum_viewer_v1_contract.md listing
+  required meta fields and node fields with
+  types.",
+              "Specify allowed node types and
+  hierarchy (subject->grade->domain->standard).",
+              "Document source of truth for
+  relationships between parent_id and
+  children_ids for validation and rendering.",
+              "Define graph mapping including
+  node to React Flow, edge direction, and layout
+  orientation.",
+              "Note any deviations or extra
+  fields in curriculum_math_v1.json and specify
+  if ignored or required."
+            ],
+            "depends_on": [],
+            "verify": [
+              "test -f docs/
+  curriculum_viewer_v1_contract.md"
+            ]
+          },
+          {
+            "id": "RESEARCH-1B",
+            "owner_role": "RESEARCH",
+            "title": "Define validation rules and
+  create fixture matrix",
+            "description": "Based on contract,
+  define validation rules and create fixture
+  files to exercise error and warning cases for
+  QA.",
+            "acceptance_criteria": [
+              "Provide docs/
+  curriculum_viewer_v1_validation_rules.md
+  listing validation rules with severity (error
+  or warning).",
+              "Create at least three invalid JSON
+  fixture files in curriculum-viewer/public/data/
+  fixtures/: invalid_duplicate_id.json,
+  invalid_missing_parent.json,
+  invalid_cycle.json.",
+              "Include mapping table in the doc
+  linking fixture filenames to expected error
+  codes and messages."
+            ],
+            "depends_on": [
+              "RESEARCH-1A"
+            ],
+            "verify": [
+              "test -f docs/
+  curriculum_viewer_v1_validation_rules.md",
+              "ls curriculum-viewer/public/data/
+  fixtures/*.json"
+            ]
+          }
+        ]
+      },
+      {
+        "op": "reorder_queue",
+        "new_order": [
+          "RESEARCH-1A",
+          "RESEARCH-1B",
+          "FE-1",
+          "FE-2",
+          "FE-3",
+          "FE-4"
+        ]
+      }
+    ]
+  }
+
+─ Worked for 1m 58s ─────────────────────────────
+
+• ###BEGIN:1d931b642b###
+  {
+  "kind": "plan_patch",
+  "base_plan_version": 1,
+  "reason": "RESEARCH-1 failed twice due to broad
+  scope and unclear deliverables; split into two
+  smaller research tasks with concrete artifacts
+  and verification to unblock FE.",
+  "ops": [
+  {
+  "op": "split_ticket",
+  "ticket_id": "RESEARCH-1",
+  "rewrite_dependents": "last",
+  "new_tickets": [
+  {
+  "id": "RESEARCH-1A",
+  "owner_role": "RESEARCH",
+  "title": "Document curriculum_viewer_v1 data
+  contract + graph mapping",
+  "description": "Audit curriculum_math_v1.json
+  and existing validator to define the minimal
+  data contract (fields/types) and mapping to
+  React Flow nodes/edges.",
+  "acceptance_criteria": [
+  "Create docs/curriculum_viewer_v1_contract.md
+  listing required meta fields and node fields
+  with types.",
+  "Document allowed node types and hierarchy
+  (subject -> grade -> domain -> standard).",
+  "Decide and document the source of truth
+  between parent_id and children_ids for
+  validation/rendering.",
+  "Define graph mapping (node/edge direction and
+  layout orientation) for React Flow.",
+  "List any extra fields in
+  curriculum_math_v1.json and whether they are
+  ignored or required."
+  ],
+  "depends_on": [],
+  "verify": [
+  "test -f docs/curriculum_viewer_v1_contract.md"
+  ]
+  },
+  {
+  "id": "RESEARCH-1B",
+  "owner_role": "RESEARCH",
+  "title": "Define validation rules + create
+  fixture matrix",
+  "description": "Based on the contract, document
+  validation rules and provide fixture JSON files
+  to exercise error and warning cases.",
+  "acceptance_criteria": [
+  "Create docs/
+  curriculum_viewer_v1_validation_rules.md
+  listing each rule and severity (error or
+  warning).",
+  "Add invalid fixtures under curriculum-viewer/
+  public/data/fixtures/:
+  invalid_duplicate_id.json,
+  invalid_missing_parent.json,
+  invalid_cycle.json.",
+  "Include a mapping table in the doc from
+  fixture filename to expected error codes/
+  messages.",
+  "State how fixtures should be used with npm run
+  validate:data for QA verification."
+  ],
+  "depends_on": [
+  "RESEARCH-1A"
+  ],
+  "verify": [
+  "test -f docs/
+  curriculum_viewer_v1_validation_rules.md",
+  "ls curriculum-viewer/public/data/fixtures/
+  *.json"
+  ]
+  }
+  ]
+  },
+  {
+  "op": "reorder_queue",
+  "new_order": [
+  "RESEARCH-1A",
+  "RESEARCH-1B",
+  "FE-1",
+  "FE-2",
+  "FE-3",
+  "FE-4"
+  ]
+  }
+  ]
+  }
+  ###DONE:1d931b642b###
+
+
+› Find and fix a bug in @filename
+
+  96% context left · ? for shortcuts
+

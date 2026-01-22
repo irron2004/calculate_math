@@ -1,0 +1,12 @@
+
+> curriculum-viewer@0.0.0 dev
+> vite --host 127.0.0.1 --port 5189 --strictPort
+
+
+  VITE v5.4.21  ready in 1526 ms
+
+  ➜  Local:   http://127.0.0.1:5189/
+12:25:17 PM [vite] vite.config.ts changed, restarting server...
+12:25:17 PM [vite] server restarted.
+7:24:42 PM [vite] vite.config.ts changed, restarting server...
+7:24:43 PM [vite] server restarted.

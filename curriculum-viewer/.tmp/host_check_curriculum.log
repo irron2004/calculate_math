@@ -1,0 +1,19 @@
+
+> curriculum-viewer@0.0.0 dev
+> vite --port 5180 --strictPort
+
+
+  VITE v5.4.21  ready in 1128 ms
+
+  ➜  Local:   http://localhost:5180/
+  ➜  Network: http://10.255.255.254:5180/
+  ➜  Network: http://172.23.182.109:5180/
+7:24:42 PM [vite] vite.config.ts changed, restarting server...
+7:24:42 PM [vite] vite.config.ts changed, restarting server...
+7:24:43 PM [vite] server restarted.
+
+  ➜  Local:   http://localhost:5180/
+  ➜  Network: use --host to expose
+
+  ➜  Local:   http://localhost:5180/
+  ➜  Network: use --host to expose

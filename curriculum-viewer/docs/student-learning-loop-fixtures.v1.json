@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "clearThreshold": 0.8,
+  "cases": [
+    {
+      "id": "C1-start-available",
+      "description": "isStart 노드는 선행 없이 AVAILABLE",
+      "graph": {
+        "nodes": [
+          { "id": "A", "isStart": true, "order": 1 },
+          { "id": "B", "isStart": false, "order": 2 }
+        ],
+        "edges": [
+          { "sourceId": "A", "targetId": "B", "type": "requires" }
+        ]
+      },
+      "store": { "version": 1, "sessionsById": {}, "draftSessionIdByNodeId": {} },
+      "expected": {
+        "statusByNodeId": { "A": "AVAILABLE", "B": "LOCKED" },
+        "recommendedNodeId": "A",
+        "lockedReasonsByNodeId": { "B": { "missingPrereqNodeIds": ["A"] } }
+      }
+    },
+    {
+      "id": "C2-draft-in-progress",
+      "description": "DRAFT 세션 존재 시 IN_PROGRESS (제출 전)",
+      "graph": {
+        "nodes": [
+          { "id": "A", "isStart": true, "order": 1 }
+        ],
+        "edges": []
+      },
+      "store": {
+        "version": 1,
+        "sessionsById": {
+          "s1": {
+            "nodeId": "A",
+            "sessionId": "s1",
+            "status": "DRAFT",
+            "responses": {
+              "p1": { "problemId": "p1", "inputRaw": "1", "updatedAt": "2026-01-15T00:00:00.000Z" }
+            },
+            "createdAt": "2026-01-15T00:00:00.000Z",
+            "updatedAt": "2026-01-15T00:01:00.000Z"
+          }
+        },
+        "draftSessionIdByNodeId": { "A": "s1" }
+      },
+      "expected": {
+        "statusByNodeId": { "A": "IN_PROGRESS" },
+        "recommendedNodeId": "A"
+      }
+    },
+    {
+      "id": "C3-submit-below-threshold-in-progress",
+      "description": "SUBMITTED지만 accuracy < 0.8이면 IN_PROGRESS 유지",
+      "graph": {
+        "nodes": [
+          { "id": "A", "isStart": true, "order": 1 }
+        ],
+        "edges": []
+      },
+      "store": {
+        "version": 1,
+        "sessionsById": {
+          "s2": {
+            "nodeId": "A",
+            "sessionId": "s2",
+            "status": "SUBMITTED",
+            "responses": {},
+            "grading": { "totalCount": 5, "correctCount": 3, "accuracy": 0.6, "cleared": false, "perProblem": {} },
+            "createdAt": "2026-01-15T00:00:00.000Z",
+            "updatedAt": "2026-01-15T00:10:00.000Z"
+          }
+        },
+        "draftSessionIdByNodeId": {}
+      },
+      "expected": {
+        "statusByNodeId": { "A": "IN_PROGRESS" },
+        "recommendedNodeId": "A"
+      }
+    },
+    {
+      "id": "C4-submit-at-threshold-cleared",
+      "description": "accuracy == 0.8이면 CLEARED (>= 80%)",
+      "graph": {
+        "nodes": [
+          { "id": "A", "isStart": true, "order": 1 }
+        ],
+        "edges": []
+      },
+      "store": {
+        "version": 1,
+        "sessionsById": {
+          "s3": {
+            "nodeId": "A",
+            "sessionId": "s3",
+            "status": "SUBMITTED",
+            "responses": {},
+            "grading": { "totalCount": 5, "correctCount": 4, "accuracy": 0.8, "cleared": true, "perProblem": {} },
+            "createdAt": "2026-01-15T00:00:00.000Z",
+            "updatedAt": "2026-01-15T00:10:00.000Z"
+          }
+        },
+        "draftSessionIdByNodeId": {}
+      },
+      "expected": {
+        "statusByNodeId": { "A": "CLEARED" },
+        "recommendedNodeId": null
+      }
+    },
+    {
+      "id": "C5-unlock-requires-all",
+      "description": "requires 선행이 모두 CLEARED면 target AVAILABLE, 아니면 LOCKED(사유 포함)",
+      "graph": {
+        "nodes": [
+          { "id": "A", "isStart": true, "order": 1 },
+          { "id": "B", "isStart": true, "order": 2 },
+          { "id": "C", "isStart": false, "order": 3 }
+        ],
+        "edges": [
+          { "sourceId": "A", "targetId": "C", "type": "requires" },
+          { "sourceId": "B", "targetId": "C", "type": "requires" }
+        ]
+      },
+      "store": {
+        "version": 1,
+        "sessionsById": {
+          "sa": {
+            "nodeId": "A",
+            "sessionId": "sa",
+            "status": "SUBMITTED",
+            "responses": {},
+            "grading": { "totalCount": 5, "correctCount": 5, "accuracy": 1, "cleared": true, "perProblem": {} },
+            "createdAt": "2026-01-15T00:00:00.000Z",
+            "updatedAt": "2026-01-15T00:10:00.000Z"
+          }
+        },
+        "draftSessionIdByNodeId": {}
+      },
+      "expected": {
+        "statusByNodeId": { "A": "CLEARED", "B": "AVAILABLE", "C": "LOCKED" },
+        "recommendedNodeId": "B",
+        "lockedReasonsByNodeId": { "C": { "missingPrereqNodeIds": ["B"] } }
+      }
+    },
+    {
+      "id": "C6-recommend-in-progress-over-available",
+      "description": "추천 우선순위: IN_PROGRESS > AVAILABLE (tie-breaker는 lastAttemptAt 최신)",
+      "graph": {
+        "nodes": [
+          { "id": "A", "isStart": true, "order": 1 },
+          { "id": "B", "isStart": true, "order": 2 }
+        ],
+        "edges": []
+      },
+      "store": {
+        "version": 1,
+        "sessionsById": {
+          "sA": {
+            "nodeId": "A",
+            "sessionId": "sA",
+            "status": "DRAFT",
+            "responses": {},
+            "createdAt": "2026-01-15T00:00:00.000Z",
+            "updatedAt": "2026-01-15T00:01:00.000Z"
+          },
+          "sB": {
+            "nodeId": "B",
+            "sessionId": "sB",
+            "status": "DRAFT",
+            "responses": {},
+            "createdAt": "2026-01-15T00:00:00.000Z",
+            "updatedAt": "2026-01-15T00:02:00.000Z"
+          }
+        },
+        "draftSessionIdByNodeId": { "A": "sA", "B": "sB" }
+      },
+      "expected": {
+        "statusByNodeId": { "A": "IN_PROGRESS", "B": "IN_PROGRESS" },
+        "recommendedNodeId": "B"
+      }
+    }
+  ]
+}

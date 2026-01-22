@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "skill-graph-v1",
+  "note": "이 파일은 스키마 자체가 아니라, 문서/토론을 위한 fixture pack 입니다. 실제 스키마/검증은 src/lib/skillGraph/schema.ts 를 따릅니다.",
+  "fixtures": [
+    {
+      "id": "F1-valid-minimal",
+      "description": "정상: core start + requires + prepares_for",
+      "graph": {
+        "schemaVersion": "skill-graph-v1",
+        "graphId": "MVP_ADD_PATTERN_V1",
+        "title": "덧셈+규칙성(도전) MVP",
+        "nodes": [
+          {
+            "id": "CORE_A",
+            "label": "코어 A",
+            "nodeCategory": "core",
+            "start": true,
+            "order": 10
+          },
+          { "id": "CORE_B", "label": "코어 B", "nodeCategory": "core", "order": 20 },
+          {
+            "id": "CHAL_X",
+            "label": "도전 X",
+            "nodeCategory": "challenge",
+            "order": 110
+          }
+        ],
+        "edges": [
+          {
+            "edgeType": "requires",
+            "source": "CORE_A",
+            "target": "CORE_B"
+          },
+          {
+            "edgeType": "prepares_for",
+            "source": "CORE_B",
+            "target": "CHAL_X"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E1-missing-required-field",
+      "description": "오류: node.label 누락",
+      "graph": {
+        "schemaVersion": "skill-graph-v1",
+        "nodes": [{ "id": "CORE_A", "nodeCategory": "core", "start": true }],
+        "edges": []
+      },
+      "expectedIssuesHint": [{ "path": "nodes[0].label", "messageContains": "label" }]
+    },
+    {
+      "id": "E2-invalid-edgeType",
+      "description": "오류: edgeType enum 불일치",
+      "graph": {
+        "schemaVersion": "skill-graph-v1",
+        "nodes": [{ "id": "CORE_A", "label": "A", "nodeCategory": "core", "start": true }],
+        "edges": [
+          { "edgeType": "unlock", "source": "CORE_A", "target": "CORE_A" }
+        ]
+      },
+      "expectedIssuesHint": [{ "path": "edges[0].edgeType", "messageContains": "Must be one of" }]
+    },
+    {
+      "id": "E3-duplicate-node-id",
+      "description": "오류: node id 중복",
+      "graph": {
+        "schemaVersion": "skill-graph-v1",
+        "nodes": [
+          { "id": "DUP", "label": "A", "nodeCategory": "core", "start": true },
+          { "id": "DUP", "label": "B", "nodeCategory": "core" }
+        ],
+        "edges": []
+      },
+      "expectedIssuesHint": [{ "path": "nodes[1].id", "messageContains": "Duplicate node id" }]
+    },
+    {
+      "id": "E4-edge-ref-missing-node",
+      "description": "오류: edge가 없는 nodeId를 참조",
+      "graph": {
+        "schemaVersion": "skill-graph-v1",
+        "nodes": [{ "id": "CORE_A", "label": "A", "nodeCategory": "core", "start": true }],
+        "edges": [
+          {
+            "edgeType": "requires",
+            "source": "CORE_A",
+            "target": "CORE_B"
+          }
+        ]
+      },
+      "expectedIssuesHint": [{ "path": "edges[0].target", "messageContains": "Unknown node id" }]
+    },
+    {
+      "id": "E5-requires-cycle",
+      "description": "오류: start:true 노드에 incoming requires 존재(결정 로그 #3)",
+      "graph": {
+        "schemaVersion": "skill-graph-v1",
+        "nodes": [
+          { "id": "CORE_A", "label": "A", "nodeCategory": "core", "start": true },
+          { "id": "CORE_B", "label": "B", "nodeCategory": "core", "start": true }
+        ],
+        "edges": [
+          {
+            "edgeType": "requires",
+            "source": "CORE_A",
+            "target": "CORE_B"
+          }
+        ]
+      },
+      "expectedIssuesHint": [{ "path": "nodes[1].start", "messageContains": "incoming requires" }]
+    }
+  ]
+}

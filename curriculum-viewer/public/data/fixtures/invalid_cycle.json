@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "schema_version": "curriculum_math_v1"
+  },
+  "nodes": [
+    {
+      "id": "S",
+      "type": "subject",
+      "title": "Subject",
+      "parent_id": "D",
+      "children_ids": [
+        "G"
+      ]
+    },
+    {
+      "id": "G",
+      "type": "grade",
+      "title": "Grade",
+      "parent_id": "S",
+      "children_ids": [
+        "D"
+      ]
+    },
+    {
+      "id": "D",
+      "type": "domain",
+      "title": "Domain",
+      "parent_id": "G",
+      "children_ids": []
+    }
+  ]
+}

@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
 import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
 import type { CurriculumNode } from '../lib/curriculum/types'
 import { useFocusNodeId } from '../lib/routing/useFocusNodeId'
@@ -151,9 +150,7 @@ export default function NodeDetail({ nodeId }: Props) {
 
       {node.type === 'standard' ? (
         <div className="node-actions">
-          <Link to={`/learn/${encodeURIComponent(node.id)}`} className="button">
-            학습하기
-          </Link>
+          <p className="muted">학습/평가 기능은 v2 범위입니다.</p>
         </div>
       ) : null}
     </div>

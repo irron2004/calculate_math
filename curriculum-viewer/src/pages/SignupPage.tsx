@@ -24,7 +24,7 @@ export default function SignupPage() {
   const location = useLocation()
 
   const state = location.state as RedirectState | null
-  const fromPathname = state?.from?.pathname ?? ROUTES.tree
+  const fromPathname = state?.from?.pathname ?? ROUTES.dashboard
 
   const [didSignup, setDidSignup] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +45,7 @@ export default function SignupPage() {
   }, [email, grade, name, password, userId])
 
   if (isAuthenticated) {
-    return <Navigate to={didSignup ? fromPathname : ROUTES.tree} replace />
+    return <Navigate to={didSignup ? fromPathname : ROUTES.dashboard} replace />
   }
 
   return (
@@ -144,4 +144,3 @@ export default function SignupPage() {
     </section>
   )
 }
-

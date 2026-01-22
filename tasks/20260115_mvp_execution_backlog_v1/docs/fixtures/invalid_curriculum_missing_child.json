@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "version": 1
+  },
+  "nodes": [
+    {
+      "id": "S",
+      "type": "subject",
+      "title": "Subject S",
+      "children_ids": [
+        "G"
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,1092 @@
+
+============================================================
+[2026-01-22 19:57:55] ORCHESTRATOR (ticket_id: FE-1)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 20:06:41] ORCHESTRATOR (ticket_id: FE-2)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 20:12:23] ORCHESTRATOR (ticket_id: FE-3)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 20:17:52] ORCHESTRATOR (ticket_id: FE-4)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 20:25:14] ORCHESTRATOR (ticket_id: FE-5)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 20:29:10] ORCHESTRATOR (ticket_id: FE-6)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 20:37:55] ORCHESTRATOR (ticket_id: FE-7)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 20:49:47] ORCHESTRATOR (ticket_id: FE-8)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 20:55:47] ORCHESTRATOR (ticket_id: FE-9)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 20:59:44] ORCHESTRATOR (ticket_id: FE-10)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 21:10:03] ORCHESTRATOR (ticket_id: FE-11)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 21:16:57] ORCHESTRATOR (ticket_id: FE-12)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+
+
+============================================================
+[2026-01-22 21:22:47] ORCHESTRATOR (ticket_id: FE-13)
+============================================================
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ sleep 10
+. '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2333, in <module>
+    main()
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2312, in main
+    final = app.invoke(init_state)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 2005, in <lambda>
+    g.add_node("pm_plan", lambda s: pm_plan_node(
+                                    ^^^^^^^^^^^^^
+  File "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py", line 750, in pm_plan_node
+    raise RuntimeError("PM plan has no tickets")
+RuntimeError: PM plan has no tickets
+During task with name 'pm_plan' and id '08fcd0a1-dc66-c37f-2498-7348a0df6199'
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ 
+(.venv) hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ . '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && ROOT='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math' ORCH_PATH='/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py' ORCH_PANE='20260122_remaining_implementation_v1:work.5' MAX_ATTEMPTS='5' ORCH_VERSION='v2' MAX_ATTEMPTS_BEFORE_PM_PATCH='2' TMUX_SESSION='20260122_remaining_implementation_v1' PM_PANE='20260122_remaining_implementation_v1:work.0' PM_PANE_1='20260122_remaining_implementation_v1:work.0' FE_PANE='20260122_remaining_implementation_v1:work.1' FE_PANE_1='20260122_remaining_implementation_v1:work.1' BE_PANE='20260122_remaining_implementation_v1:work.2' BE_PANE_1='20260122_remaining_implementation_v1:work.2' QA_PANE='20260122_remaining_implementation_v1:work.3' QA_PANE_1='20260122_remaining_implementation_v1:work.3' REVIEWER_PANE='20260122_remaining_implementation_v1:work.4' REVIEWER_PANE_1='20260122_remaining_implementation_v1:work.4' TMUX_SUBMIT_MODE='enter' TMUX_SUBMIT_DELAY_MS='' TMUX_SUBMIT_ENTER_COUNT='' TMUX_SUBMIT_ENTER_GAP_MS='' ORCH_WORKFLOW='code' GRAPH_PROFILE='end2end' python '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/agents/orchestrate_tmux_v2.py'  --workflow 'code' '20260122_remaining_implementation_v1'
+
+==================================================
+B 방식 오케스트레이터 v2
+==================================================
+Task: 20260122_remaining_implementation_v1
+Graph profile: end2end
+Stages: pm, dev, qa, reviewer
+Roles: FE, BE
+Max attempts: 5
+Max attempts before PM patch: 2
+==================================================
+
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+[notify] mail/mailx/sendmail not found; skip email
+[QA] verdict=OK, parse_method=text
+[Reviewer] verdict=APPROVE, parse_method=json
+
+

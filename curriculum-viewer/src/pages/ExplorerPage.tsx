@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useOutletContext } from 'react-router-dom'
+import { useOutletContext } from 'react-router-dom'
 import NodeDetail from '../components/NodeDetail'
 import type { DetailPanelContext } from '../components/AppLayout'
 import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
@@ -15,7 +15,6 @@ function matchesQuery(node: CurriculumNode, query: string): boolean {
 
 export default function ExplorerPage() {
   const { setDetail } = useOutletContext<DetailPanelContext>()
-  const navigate = useNavigate()
   const { index, loading, error } = useCurriculum()
   const { focusNodeId, setFocusNodeId } = useFocusNodeId()
 
@@ -33,7 +32,7 @@ export default function ExplorerPage() {
     setDetail(
       <div>
         <h2>상세</h2>
-        <p>트리에서 노드를 선택하면 상세가 표시됩니다.</p>
+        <p>대시보드에서 노드를 선택하면 상세가 표시됩니다.</p>
       </div>
     )
   }, [focusNodeId, setDetail])
@@ -94,13 +93,10 @@ export default function ExplorerPage() {
           className={`tree-node ${isFocused ? 'tree-node-active' : ''}`}
           style={{ paddingLeft: `${depth * 14 + 10}px` }}
           onClick={() => {
-            if (node.type === 'standard') {
-              navigate(`/learn/${encodeURIComponent(node.id)}`)
-              return
-            }
-
-            toggleExpanded(node.id)
             setFocusNodeId(node.id)
+            if (node.type !== 'standard') {
+              toggleExpanded(node.id)
+            }
           }}
         >
           {children.length > 0 ? (

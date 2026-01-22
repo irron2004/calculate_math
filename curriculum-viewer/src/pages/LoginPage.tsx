@@ -14,7 +14,7 @@ export default function LoginPage() {
   const location = useLocation()
 
   const state = location.state as RedirectState | null
-  const fromPathname = state?.from?.pathname ?? ROUTES.tree
+  const fromPathname = state?.from?.pathname ?? ROUTES.dashboard
 
   const [userId, setUserId] = useState('')
   const [password, setPassword] = useState('')
@@ -22,7 +22,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
 
   if (isAuthenticated) {
-    return <Navigate to={didLogin ? fromPathname : ROUTES.tree} replace />
+    return <Navigate to={didLogin ? fromPathname : ROUTES.dashboard} replace />
   }
 
   const submitDisabled = userId.trim().length === 0 || password.trim().length === 0
@@ -86,6 +86,14 @@ export default function LoginPage() {
         >
           회원가입
         </Link>
+
+        <div className="muted">또는</div>
+        <Link to={ROUTES.author} className="button button-ghost">
+          관리자 모드로
+        </Link>
+        <p className="muted" style={{ marginTop: 8 }}>
+          관리자 계정: <span className="mono">admin / admin</span>
+        </p>
       </form>
     </section>
   )

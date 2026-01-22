@@ -1,18 +1,42 @@
 export const ROUTE_SEGMENTS = {
   login: 'login',
   signup: 'signup',
-  tree: 'tree',
-  learn: 'learn',
+  dashboard: 'dashboard',
   graph: 'graph',
-  health: 'health'
+  map: 'map',
+  tree: 'tree',
+  report: 'report',
+  preview: 'preview',
+  learn: 'learn',
+  eval: 'eval',
+  health: 'health',
+  author: 'author',
+  authorImport: 'import',
+  authorMiniFlow: 'mini',
+  authorEditor: 'editor',
+  authorValidate: 'validate',
+  authorPublish: 'publish',
+  authorHealth: 'health'
 } as const
 
 export const ROUTES = {
   root: '/',
   login: `/${ROUTE_SEGMENTS.login}`,
   signup: `/${ROUTE_SEGMENTS.signup}`,
-  tree: `/${ROUTE_SEGMENTS.tree}`,
-  learn: `/${ROUTE_SEGMENTS.learn}`,
+  dashboard: `/${ROUTE_SEGMENTS.dashboard}`,
   graph: `/${ROUTE_SEGMENTS.graph}`,
-  health: `/${ROUTE_SEGMENTS.health}`
+  map: `/${ROUTE_SEGMENTS.map}`,
+  tree: `/${ROUTE_SEGMENTS.tree}`,
+  report: `/${ROUTE_SEGMENTS.report}`,
+  preview: `/${ROUTE_SEGMENTS.preview}`,
+  learn: `/${ROUTE_SEGMENTS.learn}`,
+  eval: `/${ROUTE_SEGMENTS.eval}`,
+  health: `/${ROUTE_SEGMENTS.health}`,
+  author: `/${ROUTE_SEGMENTS.author}`,
+  authorImport: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorImport}`,
+  authorMiniFlow: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorMiniFlow}`,
+  authorEditor: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorEditor}`,
+  authorValidate: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorValidate}`,
+  authorPublish: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorPublish}`,
+  authorHealth: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorHealth}`
 } as const

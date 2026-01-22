@@ -16,4 +16,7 @@ if [ -z "${VENV_ACTIVATE:-}" ]; then
   fi
 fi
 
+if [ -x "$ROOT_DIR/agents/agents_up_cli.sh" ]; then
+  exec "$ROOT_DIR/agents/agents_up_cli.sh" "$@"
+fi
 exec "$ROOT_DIR/agents/agents_up.sh" "$@"

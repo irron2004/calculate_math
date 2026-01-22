@@ -1,0 +1,3195 @@
+
+============================================================
+[2026-01-22 19:30:10] PM (req_id: ba0739d345)
+============================================================
+source '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && codex --model "gpt-5.2-codex" --config "model_reasoning_effort=\"xhigh\""
+hskim@WIN-T57QHJN3910:/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math$ source '/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/.venv/bin/activate' && codex --model "gpt-5.2-codex" --config "model_reasoning_effort=\"xhigh\""
+╭───────────────────────────────────────────────
+────╮
+│ >_ OpenAI Codex (v0.87.0)
+│
+│
+│
+│ model:     gpt-5.2-codex xhigh   /model to
+change │
+│ directory: /mnt/c/Users/…/calculate_math
+│
+╰───────────────────────────────────────────────
+────╯
+
+  Tip: NEW! Try Background terminals for long-
+  running commands. Enable in /experimental!
+
+
+› Request ba0739d345: 아래 파일을 읽고 지시사항
+  대로 작업 계획(JSON)을 작성해줘. 마지막에 마
+  커를 그대로 출력해. -> /mnt/c/Users/irron/
+  Desktop/my/web_service_new/
+  calculate_math/.agents/inbox/pm_ba0739d345.md
+
+
+  100% context left
+
+
+
+› Request ba0739d345: 아래 파일을 읽고 지시사항
+  대로 작업 계획(JSON)을 작성해줘. 마지막에 마
+  커를 그대로 출력해. -> /mnt/c/Users/irron/
+  Desktop/my/web_service_new/
+  calculate_math/.agents/inbox/pm_ba0739d345.md
+
+
+• Explored 
+  └ Read pm_ba0739d345.md, task.md
+
+• Planning detailed role-based tickets (3m 12s •
+
+
+› Find and fix a bug in @filename
+
+  100% context left · ? for shortcuts
+
+
+• Explored
+  └ Read pm_ba0739d345.md, task.md
+
+• The plan is to create 27 frontend tickets
+  based on each requirement item, ensuring each
+  has 3–8 acceptance criteria and a small TDD
+  plan to meet "작업을 잘게 쪼개서"
+  instructions, accepting the large but
+  necessary JSON output.
+
+  {
+    "summary": "React Flow 기반 학습 그래프/학습
+  UI의 미구현 기능을 P0P2 범위로 완성하고, 상태
+  시각화/세션 관리/Author 편집/통계/UX 개선을 포
+  함한 MVP를 마무리한다.",
+    "scope": [
+      "Grade 노드 제거 및 스킵 엣지/레이아웃 재
+  계산",
+      "노드 상태 계산 및 시각화/범례",
+      "학습 세션 임시저장/복원/제출 시 초기화",
+      "Author mode 엣지 편집/검증/노드 위치 저
+  장",
+      "진단/통계 대시보드 및 엣지/UX 개선",
+      "선택 기능(LaTeX, 해설, 고급 검증, author
+  preview)"
+    ],
+    "non_goals": [
+      "백엔드 API 개발 제외",
+      "AI 시스템 및 기타 비관련 기능 제외"
+    ],
+    "next_ticket_id": "FE-1",
+    "tickets": [
+      {
+        "id": "FE-1",
+        "title": "Grade 노드 필터링",
+        "description": "그래프 로드 시 grade 타
+  입 노드를 제거하는 filterGradeNodes 구현 및 적
+  용.",
+        "acceptance_criteria": [
+          "그래프 데이터 처리에서 type==='grade'
+  노드가 제외된다.",
+          "GraphPage 렌더 결과에서 grade 노드가
+  보이지 않는다.",
+          "filterGradeNodes 함수가 재사용 가능하
+  게 모듈화된다."
+        ],
+        "depends_on": [],
+        "tdd_plan": [
+          "Red: grade 노드가 제거되는 단위 테스
+  트 작성",
+          "Green: filterGradeNodes 함수 구현",
+          "Refactor: 관련 모듈로 분리 및 최적화"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-2",
+        "title": "스킵 엣지 생성",
+        "description": "Grade 노드 제거 후
+  A->Grade->B 구조를 A->B로 변환하며, 변환된 엣
+  지는 type 'skip'으로 표시.",
+        "acceptance_criteria": [
+          "A->Grade->B 구조가 A->B로 정상 변환된
+  다.",
+          "변환된 엣지는 type 'skip'으로 표시된
+  다.",
+          "도달 가능성이 유지되어 그래프 로직이
+  정상 동작한다."
+        ],
+        "depends_on": ["FE-1"],
+        "tdd_plan": [
+          "Red: 스킵 엣지 변환 로직 단위 테스트
+  작성",
+          "Green: 엣지 변환 함수 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-3",
+        "title": "레이아웃 재계산",
+        "description": "Grade 노드 제거 후 dagre
+  레이아웃 함수 재실행 및 노드 위치 업데이트.",
+        "acceptance_criteria": [
+          "Grade 노드 제거 후 레이아웃 계산 함수
+  가 실행된다.",
+          "재계산된 위치 값이 노드에 반영된다.",
+          "레이아웃 재실행으로 노드들이 겹치지
+  않고 정렬된다."
+        ],
+        "depends_on": ["FE-2"],
+        "tdd_plan": [
+          "Red: 레이아웃 재계산 호출 테스트 작
+  성",
+          "Green: 레이아웃 재계산 로직 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-4",
+        "title": "노드 상태 계산",
+        "description": "prerequisite 완료 여부에
+  따라 노드 상태(Locked, Available, In Progress,
+  Completed)를 계산하는 calculateNodeStatus 구
+  현.",
+        "acceptance_criteria": [
+          "calculateNodeStatus가 4개 상태 중 하
+  나를 반환한다.",
+          "각 상태가 prerequisites 완료 여부에
+  따라 정확히 결정된다."
+        ],
+        "depends_on": [],
+        "tdd_plan": [
+          "Red: 상태별 반환값 단위 테스트 작성",
+          "Green: calculateNodeStatus 함수 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-5",
+        "title": "노드 색상 및 아이콘 표시",
+        "description": "LearningNodeLabel 컴포넌
+  트에서 각 노드 상태별 색상과 아이콘이 올바르게
+  표시되도록 구현.",
+        "acceptance_criteria": [
+          "각 상태별로 다른 색상과 아이콘이 시각
+  화된다.",
+          "사용자에게 상태가 명확히 구분되어 보
+  인다."
+        ],
+        "depends_on": ["FE-4"],
+        "tdd_plan": [
+          "Red: 노드 상태별 렌더링 테스트 작성",
+          "Green: 색상 및 아이콘 반영 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-6",
+        "title": "상태 범례 컴포넌트",
+        "description": "Graph 페이지에
+  LearningStatusLegend 컴포넌트를 추가하여 상태
+  별 색상 및 아이콘 범례 제공.",
+        "acceptance_criteria": [
+          "모든 상태에 대한 색상 및 아이콘이 포
+  함된 범례가 표시된다.",
+          "범례는 Graph 페이지 내에서 항상 확인
+  가능하다."
+        ],
+        "depends_on": ["FE-5"],
+        "tdd_plan": [
+          "Red: 범례 렌더링 테스트 작성",
+          "Green: LearningStatusLegend 컴포넌트
+  구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-7",
+        "title": "세션 임시 저장",
+        "description": "sessionStorage에 학습 세
+  션 데이터를 1초 디바운스하여 저장/불러오기/삭
+  제 기능 구현.",
+        "acceptance_criteria": [
+          "답안 변경 시 1초 딜레이 후 저장된
+  다.",
+          "페이지 새로고침 시 데이터가 유지된
+  다.",
+          "저장된 데이터를 삭제하는 기능이 정상
+  동작한다."
+        ],
+        "depends_on": [],
+        "tdd_plan": [
+          "Red: 세션 저장 및 불러오기 단위 테스
+  트 작성",
+          "Green: debounce 적용 저장 로직 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-8",
+        "title": "DraftRestoreModal 구현",
+        "description": "초기 진입 시 draft 데이
+  터가 존재하면 복원 모달 표시, '계속하기'는
+  draft 로드, '새로 시작'는 삭제 및 초기화.",
+        "acceptance_criteria": [
+          "draft 데이터가 있으면 모달이 자동 표
+  시된다.",
+          "'계속하기' 선택 시 draft가 정상 로드
+  된다.",
+          "'새로 시작' 선택 시 draft 데이터가 삭
+  제된다."
+        ],
+        "depends_on": ["FE-7"],
+        "tdd_plan": [
+          "Red: 모달 표시 조건 테스트 작성",
+          "Green: 복원 및 초기화 로직 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-9",
+        "title": "제출 시 Draft 초기화",
+        "description": "제출 성공 시 draft 데이
+  터를 삭제하고, 실패 시 유지하여 다음 방문 시
+  복원 모달이 정상 동작하도록 구현.",
+        "acceptance_criteria": [
+          "성공 제출 후 draft 데이터가 삭제된
+  다.",
+          "제출 실패 시 draft 데이터는 유지된
+  다.",
+          "다음 방문 시 상태에 따라 복원 모달이
+  표시된다."
+        ],
+        "depends_on": ["FE-7", "FE-8"],
+        "tdd_plan": [
+          "Red: 제출 결과에 따른 draft 상태 테스
+  트",
+          "Green: 제출 후 draft 처리 로직 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-10",
+        "title": "엣지 연결 기능 (onConnect)",
+        "description": "AuthorEditorPage에서 노
+  드 간 드래그 연결 시 기본 타입 'requires' 엣지
+  를 생성하도록 구현.",
+        "acceptance_criteria": [
+          "드래그 연결 시 엣지가 상태에 추가된
+  다.",
+          "기본 타입은 'requires'로 설정된다.",
+          "엣지 생성 후 그래프에 시각적으로 반영
+  된다."
+        ],
+        "depends_on": [],
+        "tdd_plan": [
+          "Red: 엣지 생성 이벤트 테스트 작성",
+          "Green: onConnect 엣지 생성 로직 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-11",
+        "title": "
+
+  ###BEGIN:ba0739d345###
+  {
+    "summary": "미구현된 학습 그래프/학습 UI 기
+  능(P0P2)을 완성해 MVP를 마무리하고, 상태 시각
+  화·세션 관리·Author 편집·통계/UX 개선을 포함한
+  다.",
+    "scope": [
+      "Grade 노드 제거 및 스킵 엣지/레이아웃 재
+  계산",
+      "노드 상태 계산 및 시각화/범례",
+      "학습 세션 임시저장/복원/제출 시 초기화",
+      "Author mode 엣지 편집/검증/노드 위치 저
+  장",
+      "진단/통계 대시보드 및 엣지/UX 개선",
+      "선택 기능(LaTeX, 해설, 고급 검증, author
+  preview)"
+    ],
+    "non_goals": [
+      "백엔드 API 개발 제외",
+      "AI 시스템 및 기타 비관련 기능 제외"
+    ],
+    "next_ticket_id": "FE-1",
+    "tickets": [
+      {
+        "id": "FE-1",
+        "role": "FE",
+        "title": "Grade 노드 필터링",
+        "description": "그래프 로드 시
+  type==='grade' 노드를 숨기기 위한
+  filterGradeNodes를 구현하고 적용한다.",
+        "acceptance_criteria": [
+          "그래프 데이터에서 type==='grade' 노드
+  가 제거된다.",
+          "GraphPage 렌더에서 grade 노드가 보이
+  지 않는다.",
+          "filterGradeNodes 함수가 공용 모듈로
+  노출된다."
+        ],
+        "tdd_plan": [
+          "Red: grade/일반 노드가 섞인 입력에서
+  grade 노드만 제거되는 테스트 작성",
+          "Green: filterGradeNodes 구현 및 그래
+  프 로딩 파이프라인에 연결",
+          "Refactor: 중복 필터 로직 정리"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": []
+      },
+      {
+        "id": "FE-2",
+        "role": "FE",
+        "title": "스킵 엣지 생성",
+        "description": "Grade 노드를 거치는 경로
+  를 A→B 직접 연결(skip edge)로 변환한다.",
+        "acceptance_criteria": [
+          "A→Grade→B 구조가 A→B 엣지로 변환된
+  다.",
+          "변환된 엣지는 type이 'skip'으로 설정
+  된다.",
+          "Grade 제거 후에도 원래 연결 관계가 유
+  지된다."
+        ],
+        "tdd_plan": [
+          "Red: transformer test ensures skip
+  edge from A to B",
+          "Green: implement conversion after
+  filtering",
+          "Refactor: normalize edge creation"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-1"]
+      },
+      {
+        "id": "FE-3",
+        "role": "FE",
+        "title": "Grade 제거 후 레이아웃 재계
+  산",
+        "description": "필터/스킵 변환 후 dagre
+  레이아웃을 재실행하여 좌표를 갱신한다.",
+        "acceptance_criteria": [
+          "필터링/스킵 처리 후 레이아웃 함수가
+  호출된다.",
+          "모든 노드에 유효한 x/y 좌표가 재적용
+  된다.",
+          "그래프가 갱신된 위치로 렌더링된다."
+        ],
+        "tdd_plan": [
+          "Red: layout called with filtered
+  nodes/edges test",
+          "Green: hook layout call after
+  transform",
+          "Refactor: encapsulate in graphLayout
+  utility"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-2"]
+      },
+      {
+        "id": "FE-4",
+        "role": "FE",
+        "title": "노드 상태 계산 로직",
+        "description": "선수 완료 여부와 풀이 진
+  행 정보를 기반으로 LOCKED/AVAILABLE/
+  IN_PROGRESS/COMPLETED 상태를 계산한다.",
+        "acceptance_criteria": [
+          "calculateNodeStatus가 4개 상태 중 하
+  나만 반환한다.",
+          "모든 선수 노드가 완료되지 않으면
+  LOCKED로 계산된다.",
+          "선수 완료 후 시작 전은 AVAILABLE, 진
+  행 중은 IN_PROGRESS, 완료는 COMPLETED로 계산된
+  다."
+        ],
+        "tdd_plan": [
+          "Red: tests for each status case using
+  mock progress/prereq data",
+          "Green: implement
+  calculateNodeStatus",
+          "Refactor: extract helpers for
+  readability"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": []
+      },
+      {
+        "id": "FE-5",
+        "role": "FE",
+        "title": "노드 색상/아이콘 구분",
+        "description": "노드 상태별 색상과 아이
+  콘을 적용한다.",
+        "acceptance_criteria": [
+          "LOCKED 노드는 회색과 잠금 아이콘이 표
+  시된다.",
+          "AVAILABLE/IN_PROGRESS/COMPLETED 노드
+  는 각각 파랑/노랑/초록과 아이콘이 표시된다.",
+          "상태 변경 시 스타일이 즉시 반영된다."
+        ],
+        "tdd_plan": [
+          "Red: snapshot/DOM tests for status별
+  클래스/아이콘",
+          "Green: 상태별 스타일/아이콘 매핑 적
+  용",
+          "Refactor: 스타일 매핑을 상수로 분리"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-4"]
+      },
+      {
+        "id": "FE-6",
+        "role": "FE",
+        "title": "상태 범례 UI",
+        "description": "LearningStatusLegend 컴
+  포넌트를 추가하여 상태 의미를 표시한다.",
+        "acceptance_criteria": [
+          "범례에 4개 상태가 모두 표시된다.",
+          "범례의 색상/아이콘이 노드와 일치한
+  다.",
+          "GraphPage에서 범례가 노출된다."
+        ],
+        "tdd_plan": [
+          "Red: legend render test includes 4
+  statuses",
+          "Green: component 구현 및 GraphPage 배
+  치",
+          "Refactor: 공유 스타일 재사용"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-5"]
+      },
+      {
+        "id": "FE-7",
+        "role": "FE",
+        "title": "임시저장 모듈 및 자동 저장",
+        "description": "sessionStorage.ts에
+  saveDraft/loadDraft/clearDraft를 구현하고 답안
+  입력을 1초 디바운스로 저장한다.",
+        "acceptance_criteria": [
+          "saveDraft가 답안 데이터를
+  sessionStorage에 저장한다.",
+          "1초 디바운스로 입력 변경 시 자동 저장
+  된다.",
+          "페이지 새로고침 후 loadDraft로 답안이
+  복원된다.",
+          "clearDraft가 저장 데이터를 제거한다."
+        ],
+        "tdd_plan": [
+          "Red: save/load/clear 단위 테스트 작
+  성",
+          "Green: sessionStorage.ts 구현 및
+  LearnPage 입력 핸들러에 디바운스 적용",
+          "Refactor: 디바운스 훅/유틸 분리"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": []
+      },
+      {
+        "id": "FE-8",
+        "role": "FE",
+        "title": "이어풀기 복원 모달",
+        "description": "DraftRestoreModal을 구현
+  해 재방문 시 복원 여부를 선택하게 한다.",
+        "acceptance_criteria": [
+          "draft가 존재하면 모달이 자동 표시된
+  다.",
+          "\"이어서 풀기\" 선택 시 저장된 답안이
+  로드된다.",
+          "\"처음부터 풀기\" 선택 시 draft가 삭
+  제되고 빈 상태로 시작한다."
+        ],
+        "tdd_plan": [
+          "Red: draft 존재/부재 시 모달 표시 테
+  스트",
+          "Green: 모달 컴포넌트 구현 및
+  LearnPage 연결",
+          "Refactor: 모달 제어 로직 정리"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-7"]
+      },
+      {
+        "id": "FE-9",
+        "role": "FE",
+        "title": "제출 완료 시 draft 초기화",
+        "description": "정상 제출 성공 시 draft
+  를 삭제한다.",
+        "acceptance_criteria": [
+          "제출 성공 콜백에서 clearDraft가 호출
+  된다.",
+          "제출 성공 후 재방문 시 복원 모달이 뜨
+  지 않는다.",
+          "제출 실패/에러 시 draft는 유지된다."
+        ],
+        "tdd_plan": [
+          "Red: submit 성공/실패 시 clearDraft
+  동작 테스트",
+          "Green: 제출 성공 플로우에 clearDraft
+  연결",
+          "Refactor: 제출 처리 로직 정리
+
+─ Worked for 3m 12s ────────────────────────────
+
+• ###BEGIN:ba0739d345###
+  {
+  "summary": "미구현된 학습 그래프/학습 UI 기능
+  (P0~P2)을 완성해 MVP를 마무리하고, 상태 시각화
+  ·세션 관리·Author 편집·통계/UX 개선을 포함한
+  다.",
+  "scope": [
+  "Grade 노드 제거 및 스킵 엣지/레이아웃 재계
+  산",
+  "노드 상태 계산 및 색상/아이콘/범례 UI 적용",
+  "임시저장/이어풀기/제출 후 초기화 등 학습 세션
+  관리",
+  "Author Mode 엣지 편집/검증/노드 위치 저장",
+  "대시보드 통계/차트, 엣지 스타일/범례, UX 모
+  달/로딩 UI",
+  "선택 기능(LaTeX, 해설 표시, 고급 검증, Author
+  Preview 개선)"
+  ],
+  "non_goals": [
+  "백엔드 API 개발",
+  "curriculum_skilltree_research_v1, math-
+  knowledge-graph-mvp와 같은 완전 미구현 작업",
+  "AI 기반 진단/추천 시스템"
+  ],
+  "tickets": [
+  {
+  "id": "FE-1",
+  "role": "FE",
+  "title": "Grade 노드 필터링",
+  "description": "그래프 로드 시 type==='grade'
+  노드를 숨기기 위한 filterGradeNodes를 구현하고
+  적용한다.",
+  "acceptance_criteria": [
+  "그래프 데이터에서 type==='grade' 노드가 제거
+  된다.",
+  "GraphPage 렌더에서 grade 노드가 보이지 않는
+  다.",
+  "filterGradeNodes 함수가 공용 모듈로 노출된
+  다."
+  ],
+  "tdd_plan": [
+  "Red: grade/일반 노드가 섞인 입력에서 grade 노
+  드만 제거되는 테스트 작성",
+  "Green: filterGradeNodes 구현 및 그래프 로딩
+  파이프라인에 연결",
+  "Refactor: 중복 필터 로직 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-2",
+  "role": "FE",
+  "title": "스킵 엣지 생성",
+  "description": "Grade 노드를 거치는 경로를 A→B
+  직접 연결(skip edge)로 변환한다.",
+  "acceptance_criteria": [
+  "A→Grade→B 구조가 A→B 엣지로 변환된다.",
+  "변환된 엣지는 type이 'skip'으로 설정된다.",
+  "Grade 제거 후에도 원래 연결 관계가 유지된다."
+  ],
+  "tdd_plan": [
+  "Red: A→Grade→B 입력에서 A→B skip edge가 생성
+  되는 테스트 작성",
+  "Green: 스킵 엣지 변환 로직 구현 및 적용",
+  "Refactor: 엣지 생성 유틸 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-1"
+  ]
+  },
+  {
+  "id": "FE-3",
+  "role": "FE",
+  "title": "Grade 제거 후 레이아웃 재계산",
+  "description": "필터/스킵 변환 후 dagre 레이아
+  웃을 재실행하여 좌표를 갱신한다.",
+  "acceptance_criteria": [
+  "필터링/스킵 처리 후 레이아웃 함수가 호출된
+  다.",
+  "모든 노드에 유효한 x/y 좌표가 재적용된다.",
+  "그래프가 갱신된 위치로 렌더링된다."
+  ],
+  "tdd_plan": [
+  "Red: 변환 후 레이아웃 함수 호출 테스트 작성",
+  "Green: 변환 파이프라인 뒤에 레이아웃 재계산
+  연결",
+  "Refactor: graphLayout 호출 경로 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-2"
+  ]
+  },
+  {
+  "id": "FE-4",
+  "role": "FE",
+  "title": "노드 상태 계산 로직",
+  "description": "선수 완료 여부와 풀이 진행 정
+  보를 기반으로 LOCKED/AVAILABLE/IN_PROGRESS/
+  COMPLETED 상태를 계산한다.",
+  "acceptance_criteria": [
+  "calculateNodeStatus가 4개 상태 중 하나만 반환
+  한다.",
+  "선수 노드가 미완료면 LOCKED로 계산된다.",
+  "선수 완료 후 시작 전은 AVAILABLE, 진행 중은
+  IN_PROGRESS, 완료는 COMPLETED로 계산된다."
+  ],
+  "tdd_plan": [
+  "Red: 상태별 입력 케이스 테스트 작성",
+  "Green: calculateNodeStatus 구현",
+  "Refactor: 상태 판정 헬퍼 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-5",
+  "role": "FE",
+  "title": "노드 색상/아이콘 구분",
+  "description": "노드 상태별 색상과 아이콘을 적
+  용한다.",
+  "acceptance_criteria": [
+  "LOCKED 노드는 회색과 잠금 아이콘이 표시된
+  다.",
+  "AVAILABLE/IN_PROGRESS/COMPLETED 노드는 각각
+  파랑/노랑/초록과 아이콘이 표시된다.",
+  "상태 변경 시 스타일이 즉시 반영된다."
+  ],
+  "tdd_plan": [
+  "Red: 상태별 클래스/아이콘 렌더 테스트 작성",
+  "Green: 상태별 스타일/아이콘 매핑 적용",
+  "Refactor: 스타일 매핑 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-4"
+  ]
+  },
+  {
+  "id": "FE-6",
+  "role": "FE",
+  "title": "상태 범례 UI",
+  "description": "LearningStatusLegend 컴포넌트
+  를 추가하여 상태 의미를 표시한다.",
+  "acceptance_criteria": [
+  "범례에 4개 상태가 모두 표시된다.",
+  "범례의 색상/아이콘이 노드와 일치한다.",
+  "GraphPage에서 범례가 노출된다."
+  ],
+  "tdd_plan": [
+  "Red: 범례에 4개 상태 렌더 테스트 작성",
+  "Green: LearningStatusLegend 구현 및 GraphPage
+  배치",
+  "Refactor: 범례 스타일 재사용 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-5"
+  ]
+  },
+  {
+  "id": "FE-7",
+  "role": "FE",
+  "title": "임시저장 모듈 및 자동 저장",
+  "description": "sessionStorage.ts에 saveDraft/
+  loadDraft/clearDraft를 구현하고 답안 입력을 1
+  초 디바운스로 저장한다.",
+  "acceptance_criteria": [
+  "saveDraft가 답안 데이터를 sessionStorage에 저
+  장한다.",
+  "1초 디바운스로 입력 변경 시 자동 저장된다.",
+  "페이지 새로고침 후 loadDraft로 답안이 복원된
+  다.",
+  "clearDraft가 저장 데이터를 제거한다."
+  ],
+  "tdd_plan": [
+  "Red: save/load/clear 단위 테스트 작성",
+  "Green: sessionStorage.ts 구현 및 LearnPage 디
+  바운스 연결",
+  "Refactor: 디바운스 유틸 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-8",
+  "role": "FE",
+  "title": "이어풀기 복원 모달",
+  "description": "DraftRestoreModal을 구현해 재
+  방문 시 복원 여부를 선택하게 한다.",
+  "acceptance_criteria": [
+  "draft가 존재하면 모달이 자동 표시된다.",
+  ""이어서 풀기" 선택 시 저장된 답안이 로드된
+  다.",
+  ""처음부터 풀기" 선택 시 draft가 삭제되고 빈
+  상태로 시작한다."
+  ],
+  "tdd_plan": [
+  "Red: draft 유무에 따른 모달 표시 테스트",
+  "Green: DraftRestoreModal 구현 및 LearnPage 연
+  결",
+  "Refactor: 모달 제어 상태 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-7"
+  ]
+  },
+  {
+  "id": "FE-9",
+  "role": "FE",
+  "title": "제출 완료 시 draft 초기화",
+  "description": "정상 제출 성공 시 draft를 삭제
+  한다.",
+  "acceptance_criteria": [
+  "제출 성공 콜백에서 clearDraft가 호출된다.",
+  "제출 성공 후 재방문 시 복원 모달이 뜨지 않는
+  다.",
+  "제출 실패/에러 시 draft는 유지된다."
+  ],
+  "tdd_plan": [
+  "Red: 제출 성공/실패 시 clearDraft 동작 테스
+  트",
+  "Green: 제출 성공 플로우에 clearDraft 연결",
+  "Refactor: 제출 처리 로직 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-7",
+  "FE-8"
+  ]
+  },
+  {
+  "id": "FE-10",
+  "role": "FE",
+  "title": "Author 모드 엣지 연결",
+  "description": "React Flow onConnect를 구현해
+  노드 간 연결선을 생성한다.",
+  "acceptance_criteria": [
+  "노드 A→B 드래그로 새 엣지가 생성된다.",
+  "생성된 엣지가 그래프에 즉시 렌더링된다.",
+  "엣지에 source/target 정보가 올바르게 저장된
+  다."
+  ],
+  "tdd_plan": [
+  "Red: onConnect 이벤트로 엣지가 추가되는 테스
+  트 작성",
+  "Green: onConnect 핸들러 구현 및 상태 업데이
+  트",
+  "Refactor: 엣지 생성 유틸 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-11",
+  "role": "FE",
+  "title": "엣지 타입 선택 모달",
+  "description": "연결 시 EdgeTypeSelectModal에
+  서 requires/prepares_for를 선택하게 한다.",
+  "acceptance_criteria": [
+  "엣지 연결 시 타입 선택 모달이 표시된다.",
+  "requires 또는 prepares_for 선택 시 해당 타입
+  으로 엣지가 생성된다.",
+  "취소 시 엣지가 추가되지 않는다."
+  ],
+  "tdd_plan": [
+  "Red: 모달 선택/취소에 따른 엣지 타입 테스트",
+  "Green: EdgeTypeSelectModal 구현 및 onConnect
+  흐름 연결",
+  "Refactor: 타입 옵션 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10"
+  ]
+  },
+  {
+  "id": "FE-12",
+  "role": "FE",
+  "title": "엣지 삭제 UI",
+  "description": "엣지 클릭 후 삭제 확인을 거쳐
+  제거한다.",
+  "acceptance_criteria": [
+  "엣지 클릭 시 삭제 확인 UI가 노출된다.",
+  ""삭제" 선택 시 엣지가 그래프에서 제거된다.",
+  ""취소" 선택 시 엣지가 유지된다."
+  ],
+  "tdd_plan": [
+  "Red: 엣지 삭제/취소 동작 테스트",
+  "Green: onEdgeClick 및 삭제 처리 구현",
+  "Refactor: 확인 모달 제어 로직 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10"
+  ]
+  },
+  {
+  "id": "FE-13",
+  "role": "FE",
+  "title": "노드 드래그 위치 저장",
+  "description": "onNodeDragStop에서 변경된 좌표
+  를 저장하고 재방문 시 복원한다.",
+  "acceptance_criteria": [
+  "드래그 종료 시 노드 좌표가 상태에 반영된다.",
+  "좌표 정보가 저장되어 새로고침 후에도 유지된
+  다.",
+  "복원된 좌표로 노드가 렌더링된다."
+  ],
+  "tdd_plan": [
+  "Red: 드래그 후 좌표 저장/복원 테스트",
+  "Green: onNodeDragStop 및 저장 로직 구현",
+  "Refactor: 저장 포맷/키 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-14",
+  "role": "FE",
+  "title": "실시간 검증 업데이트",
+  "description": "엣지 편집 시 검증을 즉시 실행
+  해 사이클 등을 경고한다.",
+  "acceptance_criteria": [
+  "엣지 추가/삭제/타입 변경 시 validation이 자동
+  실행된다.",
+  "사이클 생성 시 즉시 경고가 표시된다.",
+  "검증 결과가 최신 그래프 상태와 일치한다."
+  ],
+  "tdd_plan": [
+  "Red: 엣지 변경 후 validate 호출 테스트",
+  "Green: 변경 이벤트에 validation 트리거 연결",
+  "Refactor: 검증 호출 경로 통합"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10",
+  "FE-11",
+  "FE-12"
+  ]
+  },
+  {
+  "id": "FE-15",
+  "role": "FE",
+  "title": "태그별 정답률 집계",
+  "description": "calculateTagStats로 태그별
+  total/correct/rate를 계산한다.",
+  "acceptance_criteria": [
+  "태그별 total/correct/rate가 정확히 계산된
+  다.",
+  "시도 수가 0인 태그는 rate가 0으로 처리된다.",
+  "출력 데이터가 대시보드에서 바로 사용 가능한
+  형태다."
+  ],
+  "tdd_plan": [
+  "Red: 다양한 태그 입력에 대한 통계 계산 테스
+  트",
+  "Green: calculateTagStats 구현",
+  "Refactor: 데이터 구조 명확화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-16",
+  "role": "FE",
+  "title": "취약 영역 분석",
+  "description": "정답률 <60% 및 시도 ≥3 태그를
+  추출한다.",
+  "acceptance_criteria": [
+  "rate < 0.6이고 attempts ≥ 3인 태그가 취약 목
+  록에 포함된다.",
+  "조건을 만족하지 않는 태그는 제외된다.",
+  "입력이 비어 있으면 빈 배열을 반환한다."
+  ],
+  "tdd_plan": [
+  "Red: 조건 경계값(0.6, 3회) 테스트",
+  "Green: 취약 태그 추출 로직 구현",
+  "Refactor: 조건 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-15"
+  ]
+  },
+  {
+  "id": "FE-17",
+  "role": "FE",
+  "title": "대시보드 차트",
+  "description": "Recharts BarChart로 태그별 정
+  답률을 시각화한다.",
+  "acceptance_criteria": [
+  "DashboardPage에 태그별 정답률 막대 그래프가
+  표시된다.",
+  "데이터 변경 시 차트가 갱신된다.",
+  "데이터가 없을 때 빈 상태 메시지가 표시된다."
+  ],
+  "tdd_plan": [
+  "Red: 차트 렌더링과 빈 상태 테스트",
+  "Green: Recharts 통합 및 데이터 바인딩",
+  "Refactor: 차트 옵션 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-15"
+  ]
+  },
+  {
+  "id": "FE-18",
+  "role": "FE",
+  "title": "엣지 타입별 스타일",
+  "description": "requires/prepares_for/
+  progression/skip 타입별 스타일을 적용한다.",
+  "acceptance_criteria": [
+  "requires는 실선 파랑, prepares_for는 점선 초
+  록으로 표시된다.",
+  "progression은 파선 회색, skip은 얇은 점선 회
+  색으로 표시된다.",
+  "엣지 타입 변경 시 스타일이 즉시 반영된다."
+  ],
+  "tdd_plan": [
+  "Red: 타입별 스타일 매핑 테스트",
+  "Green: edgeStyles 모듈 구현 및 GraphView 연
+  결",
+  "Refactor: 스타일 상수/테마화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-19",
+  "role": "FE",
+  "title": "엣지 범례 UI",
+  "description": "EdgeLegend로 엣지 타입 의미를
+  표시한다.",
+  "acceptance_criteria": [
+  "범례에 4개 엣지 타입이 모두 표시된다.",
+  "범례 스타일이 실제 엣지 스타일과 일치한다.",
+  "GraphPage에서 범례가 노출된다."
+  ],
+  "tdd_plan": [
+  "Red: 범례 렌더 테스트",
+  "Green: EdgeLegend 구현 및 배치",
+  "Refactor: 스타일 재사용 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-18"
+  ]
+  },
+  {
+  "id": "FE-20",
+  "role": "FE",
+  "title": "미입력 안내 모달",
+  "description": "제출 시 미입력 문항을 알려주는
+  UnansweredModal을 추가한다.",
+  "acceptance_criteria": [
+  "미입력 문항이 있을 때 제출 시 모달이 표시된
+  다.",
+  "모달에 미입력 문항 번호가 나열된다.",
+  ""돌아가기" 선택 시 제출이 중단되고 입력 화면
+  으로 돌아간다.",
+  ""그냥 제출" 선택 시 제출이 진행된다."
+  ],
+  "tdd_plan": [
+  "Red: 미입력 상태에서 모달 표시/선택 동작 테스
+  트",
+  "Green: UnansweredModal 구현 및 제출 플로우 연
+  결",
+  "Refactor: 미입력 계산 로직 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-21",
+  "role": "FE",
+  "title": "제출 확인 모달",
+  "description": "제출 전 사용자 확인을 받는
+  SubmitConfirmModal을 추가한다.",
+  "acceptance_criteria": [
+  "미입력 경고가 없을 때 제출 시 확인 모달이 표
+  시된다.",
+  ""제출" 선택 시 실제 제출이 진행된다.",
+  ""취소" 선택 시 제출이 중단된다."
+  ],
+  "tdd_plan": [
+  "Red: 확인 모달 표시/확인/취소 테스트",
+  "Green: SubmitConfirmModal 구현 및 제출 플로우
+  연결",
+  "Refactor: 모달 제어 상태 통합"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-22",
+  "role": "FE",
+  "title": "다시 풀기 버튼",
+  "description": "평가 페이지에서 재도전 버튼을
+  제공한다.",
+  "acceptance_criteria": [
+  "EvalPage에 "다시 풀기" 버튼이 표시된다.",
+  "버튼 클릭 시 LearnPage로 이동한다.",
+  "재도전 시 이전 답안이 초기화된다."
+  ],
+  "tdd_plan": [
+  "Red: 버튼 클릭 네비게이션 테스트",
+  "Green: 버튼 추가 및 라우팅 연결",
+  "Refactor: 재도전 초기화 로직 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-23",
+  "role": "FE",
+  "title": "로딩/에러 상태 UI",
+  "description": "Spinner와 에러 메시지 컴포넌트
+  를 추가하고 주요 페이지에 적용한다.",
+  "acceptance_criteria": [
+  "데이터 로딩 중 Spinner가 표시된다.",
+  "에러 발생 시 사용자 친화적 에러 메시지가 표시
+  된다.",
+  "Graph/Learn/Eval/Dashboard 페이지에 일관된 상
+  태 UI가 적용된다."
+  ],
+  "tdd_plan": [
+  "Red: 로딩/에러 상태 렌더 테스트",
+  "Green: Spinner/에러 컴포넌트 구현 및 페이지
+  적용",
+  "Refactor: 상태 UI 공통 컴포넌트화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-24",
+  "role": "FE",
+  "title": "LaTeX 렌더링",
+  "description": "KaTeX 기반 MathRenderer로 $...
+  $ 수식을 렌더링한다.",
+  "acceptance_criteria": [
+  "KaTeX가 설치되고 MathRenderer가 추가된다.",
+  "$...$ 패턴이 수식으로 렌더링된다.",
+  "수식이 없거나 파싱 실패 시 텍스트가 안전하게
+  표시된다."
+  ],
+  "tdd_plan": [
+  "Red: 텍스트/수식 혼합 입력 렌더 테스트",
+  "Green: MathRenderer 구현 및 사용처 연결",
+  "Refactor: 파서 로직 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-25",
+  "role": "FE",
+  "title": "문제별 해설 표시",
+  "description": "채점 후 explanation 필드를 표
+  시한다.",
+  "acceptance_criteria": [
+  "오답 문항에서 해설 텍스트가 표시된다.",
+  "해설에 수식이 있으면 MathRenderer로 렌더링된
+  다.",
+  "해설이 없으면 섹션이 숨겨진다."
+  ],
+  "tdd_plan": [
+  "Red: explanation 표시/비표시 조건 테스트",
+  "Green: EvalPage에 해설 렌더 추가",
+  "Refactor: 해설 UI 컴포넌트화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-24"
+  ]
+  },
+  {
+  "id": "FE-26",
+  "role": "FE",
+  "title": "고급 검증 규칙",
+  "description": "사이클/고아 노드/중복 엣지 검
+  출을 추가한다.",
+  "acceptance_criteria": [
+  "사이클이 있는 그래프를 탐지한다.",
+  "연결되지 않은 고아 노드를 검출한다.",
+  "중복 엣지를 검출해 리포트에 포함한다."
+  ],
+  "tdd_plan": [
+  "Red: 각 검증 규칙에 대한 테스트 케이스 작성",
+  "Green: validate 로직 확장 구현",
+  "Refactor: 검증 규칙을 모듈화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-14"
+  ]
+  },
+  {
+  "id": "FE-27",
+  "role": "FE",
+  "title": "Author Preview 고급",
+  "description": "연결 가능한 노드 패널과 사용자
+  지정 레이아웃 저장을 추가한다.",
+  "acceptance_criteria": [
+  "연결 가능한 노드 목록 패널이 표시된다.",
+  "사용자 지정 레이아웃이 저장되고 재방문 시 복
+  원된다.",
+  "검증 리포트가 최신 상태와 함께 표시된다."
+  ],
+  "tdd_plan": [
+  "Red: 패널 렌더 및 레이아웃 저장/복원 테스트",
+  "Green: 패널 UI와 저장 로직 구현",
+  "Refactor: Author 모드 상태 관리 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10",
+  "FE-13",
+  "FE-26"
+  ]
+  }
+  ],
+  "next_ticket_id": "FE-1"
+  }
+  ###DONE:ba0739d345###
+
+
+› Find and fix a bug in @filename
+
+  94% context left · ? for shortcuts 
+
+
+============================================================
+[2026-01-22 19:49:08] PM (req_id: efaa43c082)
+============================================================
+          "Green: 색상 및 아이콘 반영 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-6",
+        "title": "상태 범례 컴포넌트",
+        "description": "Graph 페이지에
+  LearningStatusLegend 컴포넌트를 추가하여 상태
+  별 색상 및 아이콘 범례 제공.",
+        "acceptance_criteria": [
+          "모든 상태에 대한 색상 및 아이콘이 포
+  함된 범례가 표시된다.",
+          "범례는 Graph 페이지 내에서 항상 확인
+  가능하다."
+        ],
+        "depends_on": ["FE-5"],
+        "tdd_plan": [
+          "Red: 범례 렌더링 테스트 작성",
+          "Green: LearningStatusLegend 컴포넌트
+  구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-7",
+        "title": "세션 임시 저장",
+        "description": "sessionStorage에 학습 세
+  션 데이터를 1초 디바운스하여 저장/불러오기/삭
+  제 기능 구현.",
+        "acceptance_criteria": [
+          "답안 변경 시 1초 딜레이 후 저장된
+  다.",
+          "페이지 새로고침 시 데이터가 유지된
+  다.",
+          "저장된 데이터를 삭제하는 기능이 정상
+  동작한다."
+        ],
+        "depends_on": [],
+        "tdd_plan": [
+          "Red: 세션 저장 및 불러오기 단위 테스
+  트 작성",
+          "Green: debounce 적용 저장 로직 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-8",
+        "title": "DraftRestoreModal 구현",
+        "description": "초기 진입 시 draft 데이
+  터가 존재하면 복원 모달 표시, '계속하기'는
+  draft 로드, '새로 시작'는 삭제 및 초기화.",
+        "acceptance_criteria": [
+          "draft 데이터가 있으면 모달이 자동 표
+  시된다.",
+          "'계속하기' 선택 시 draft가 정상 로드
+  된다.",
+          "'새로 시작' 선택 시 draft 데이터가 삭
+  제된다."
+        ],
+        "depends_on": ["FE-7"],
+        "tdd_plan": [
+          "Red: 모달 표시 조건 테스트 작성",
+          "Green: 복원 및 초기화 로직 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-9",
+        "title": "제출 시 Draft 초기화",
+        "description": "제출 성공 시 draft 데이
+  터를 삭제하고, 실패 시 유지하여 다음 방문 시
+  복원 모달이 정상 동작하도록 구현.",
+        "acceptance_criteria": [
+          "성공 제출 후 draft 데이터가 삭제된
+  다.",
+          "제출 실패 시 draft 데이터는 유지된
+  다.",
+          "다음 방문 시 상태에 따라 복원 모달이
+  표시된다."
+        ],
+        "depends_on": ["FE-7", "FE-8"],
+        "tdd_plan": [
+          "Red: 제출 결과에 따른 draft 상태 테스
+  트",
+          "Green: 제출 후 draft 처리 로직 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-10",
+        "title": "엣지 연결 기능 (onConnect)",
+        "description": "AuthorEditorPage에서 노
+  드 간 드래그 연결 시 기본 타입 'requires' 엣지
+  를 생성하도록 구현.",
+        "acceptance_criteria": [
+          "드래그 연결 시 엣지가 상태에 추가된
+  다.",
+          "기본 타입은 'requires'로 설정된다.",
+          "엣지 생성 후 그래프에 시각적으로 반영
+  된다."
+        ],
+        "depends_on": [],
+        "tdd_plan": [
+          "Red: 엣지 생성 이벤트 테스트 작성",
+          "Green: onConnect 엣지 생성 로직 구현"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        }
+      },
+      {
+        "id": "FE-11",
+        "title": "
+
+  ###BEGIN:ba0739d345###
+  {
+    "summary": "미구현된 학습 그래프/학습 UI 기
+  능(P0P2)을 완성해 MVP를 마무리하고, 상태 시각
+  화·세션 관리·Author 편집·통계/UX 개선을 포함한
+  다.",
+    "scope": [
+      "Grade 노드 제거 및 스킵 엣지/레이아웃 재
+  계산",
+      "노드 상태 계산 및 시각화/범례",
+      "학습 세션 임시저장/복원/제출 시 초기화",
+      "Author mode 엣지 편집/검증/노드 위치 저
+  장",
+      "진단/통계 대시보드 및 엣지/UX 개선",
+      "선택 기능(LaTeX, 해설, 고급 검증, author
+  preview)"
+    ],
+    "non_goals": [
+      "백엔드 API 개발 제외",
+      "AI 시스템 및 기타 비관련 기능 제외"
+    ],
+    "next_ticket_id": "FE-1",
+    "tickets": [
+      {
+        "id": "FE-1",
+        "role": "FE",
+        "title": "Grade 노드 필터링",
+        "description": "그래프 로드 시
+  type==='grade' 노드를 숨기기 위한
+  filterGradeNodes를 구현하고 적용한다.",
+        "acceptance_criteria": [
+          "그래프 데이터에서 type==='grade' 노드
+  가 제거된다.",
+          "GraphPage 렌더에서 grade 노드가 보이
+  지 않는다.",
+          "filterGradeNodes 함수가 공용 모듈로
+  노출된다."
+        ],
+        "tdd_plan": [
+          "Red: grade/일반 노드가 섞인 입력에서
+  grade 노드만 제거되는 테스트 작성",
+          "Green: filterGradeNodes 구현 및 그래
+  프 로딩 파이프라인에 연결",
+          "Refactor: 중복 필터 로직 정리"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": []
+      },
+      {
+        "id": "FE-2",
+        "role": "FE",
+        "title": "스킵 엣지 생성",
+        "description": "Grade 노드를 거치는 경로
+  를 A→B 직접 연결(skip edge)로 변환한다.",
+        "acceptance_criteria": [
+          "A→Grade→B 구조가 A→B 엣지로 변환된
+  다.",
+          "변환된 엣지는 type이 'skip'으로 설정
+  된다.",
+          "Grade 제거 후에도 원래 연결 관계가 유
+  지된다."
+        ],
+        "tdd_plan": [
+          "Red: transformer test ensures skip
+  edge from A to B",
+          "Green: implement conversion after
+  filtering",
+          "Refactor: normalize edge creation"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-1"]
+      },
+      {
+        "id": "FE-3",
+        "role": "FE",
+        "title": "Grade 제거 후 레이아웃 재계
+  산",
+        "description": "필터/스킵 변환 후 dagre
+  레이아웃을 재실행하여 좌표를 갱신한다.",
+        "acceptance_criteria": [
+          "필터링/스킵 처리 후 레이아웃 함수가
+  호출된다.",
+          "모든 노드에 유효한 x/y 좌표가 재적용
+  된다.",
+          "그래프가 갱신된 위치로 렌더링된다."
+        ],
+        "tdd_plan": [
+          "Red: layout called with filtered
+  nodes/edges test",
+          "Green: hook layout call after
+  transform",
+          "Refactor: encapsulate in graphLayout
+  utility"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-2"]
+      },
+      {
+        "id": "FE-4",
+        "role": "FE",
+        "title": "노드 상태 계산 로직",
+        "description": "선수 완료 여부와 풀이 진
+  행 정보를 기반으로 LOCKED/AVAILABLE/
+  IN_PROGRESS/COMPLETED 상태를 계산한다.",
+        "acceptance_criteria": [
+          "calculateNodeStatus가 4개 상태 중 하
+  나만 반환한다.",
+          "모든 선수 노드가 완료되지 않으면
+  LOCKED로 계산된다.",
+          "선수 완료 후 시작 전은 AVAILABLE, 진
+  행 중은 IN_PROGRESS, 완료는 COMPLETED로 계산된
+  다."
+        ],
+        "tdd_plan": [
+          "Red: tests for each status case using
+  mock progress/prereq data",
+          "Green: implement
+  calculateNodeStatus",
+          "Refactor: extract helpers for
+  readability"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": []
+      },
+      {
+        "id": "FE-5",
+        "role": "FE",
+        "title": "노드 색상/아이콘 구분",
+        "description": "노드 상태별 색상과 아이
+  콘을 적용한다.",
+        "acceptance_criteria": [
+          "LOCKED 노드는 회색과 잠금 아이콘이 표
+  시된다.",
+          "AVAILABLE/IN_PROGRESS/COMPLETED 노드
+  는 각각 파랑/노랑/초록과 아이콘이 표시된다.",
+          "상태 변경 시 스타일이 즉시 반영된다."
+        ],
+        "tdd_plan": [
+          "Red: snapshot/DOM tests for status별
+  클래스/아이콘",
+          "Green: 상태별 스타일/아이콘 매핑 적
+  용",
+          "Refactor: 스타일 매핑을 상수로 분리"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-4"]
+      },
+      {
+        "id": "FE-6",
+        "role": "FE",
+        "title": "상태 범례 UI",
+        "description": "LearningStatusLegend 컴
+  포넌트를 추가하여 상태 의미를 표시한다.",
+        "acceptance_criteria": [
+          "범례에 4개 상태가 모두 표시된다.",
+          "범례의 색상/아이콘이 노드와 일치한
+  다.",
+          "GraphPage에서 범례가 노출된다."
+        ],
+        "tdd_plan": [
+          "Red: legend render test includes 4
+  statuses",
+          "Green: component 구현 및 GraphPage 배
+  치",
+          "Refactor: 공유 스타일 재사용"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-5"]
+      },
+      {
+        "id": "FE-7",
+        "role": "FE",
+        "title": "임시저장 모듈 및 자동 저장",
+        "description": "sessionStorage.ts에
+  saveDraft/loadDraft/clearDraft를 구현하고 답안
+  입력을 1초 디바운스로 저장한다.",
+        "acceptance_criteria": [
+          "saveDraft가 답안 데이터를
+  sessionStorage에 저장한다.",
+          "1초 디바운스로 입력 변경 시 자동 저장
+  된다.",
+          "페이지 새로고침 후 loadDraft로 답안이
+  복원된다.",
+          "clearDraft가 저장 데이터를 제거한다."
+        ],
+        "tdd_plan": [
+          "Red: save/load/clear 단위 테스트 작
+  성",
+          "Green: sessionStorage.ts 구현 및
+  LearnPage 입력 핸들러에 디바운스 적용",
+          "Refactor: 디바운스 훅/유틸 분리"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": []
+      },
+      {
+        "id": "FE-8",
+        "role": "FE",
+        "title": "이어풀기 복원 모달",
+        "description": "DraftRestoreModal을 구현
+  해 재방문 시 복원 여부를 선택하게 한다.",
+        "acceptance_criteria": [
+          "draft가 존재하면 모달이 자동 표시된
+  다.",
+          "\"이어서 풀기\" 선택 시 저장된 답안이
+  로드된다.",
+          "\"처음부터 풀기\" 선택 시 draft가 삭
+  제되고 빈 상태로 시작한다."
+        ],
+        "tdd_plan": [
+          "Red: draft 존재/부재 시 모달 표시 테
+  스트",
+          "Green: 모달 컴포넌트 구현 및
+  LearnPage 연결",
+          "Refactor: 모달 제어 로직 정리"
+        ],
+        "commands": {
+          "run": "npm run dev",
+          "test": "npm test"
+        },
+        "depends_on": ["FE-7"]
+      },
+      {
+        "id": "FE-9",
+        "role": "FE",
+        "title": "제출 완료 시 draft 초기화",
+        "description": "정상 제출 성공 시 draft
+  를 삭제한다.",
+        "acceptance_criteria": [
+          "제출 성공 콜백에서 clearDraft가 호출
+  된다.",
+          "제출 성공 후 재방문 시 복원 모달이 뜨
+  지 않는다.",
+          "제출 실패/에러 시 draft는 유지된다."
+        ],
+        "tdd_plan": [
+          "Red: submit 성공/실패 시 clearDraft
+  동작 테스트",
+          "Green: 제출 성공 플로우에 clearDraft
+  연결",
+          "Refactor: 제출 처리 로직 정리
+
+─ Worked for 3m 12s ────────────────────────────
+
+• ###BEGIN:ba0739d345###
+  {
+  "summary": "미구현된 학습 그래프/학습 UI 기능
+  (P0~P2)을 완성해 MVP를 마무리하고, 상태 시각화
+  ·세션 관리·Author 편집·통계/UX 개선을 포함한
+  다.",
+  "scope": [
+  "Grade 노드 제거 및 스킵 엣지/레이아웃 재계
+  산",
+  "노드 상태 계산 및 색상/아이콘/범례 UI 적용",
+  "임시저장/이어풀기/제출 후 초기화 등 학습 세션
+  관리",
+  "Author Mode 엣지 편집/검증/노드 위치 저장",
+  "대시보드 통계/차트, 엣지 스타일/범례, UX 모
+  달/로딩 UI",
+  "선택 기능(LaTeX, 해설 표시, 고급 검증, Author
+  Preview 개선)"
+  ],
+  "non_goals": [
+  "백엔드 API 개발",
+  "curriculum_skilltree_research_v1, math-
+  knowledge-graph-mvp와 같은 완전 미구현 작업",
+  "AI 기반 진단/추천 시스템"
+  ],
+  "tickets": [
+  {
+  "id": "FE-1",
+  "role": "FE",
+  "title": "Grade 노드 필터링",
+  "description": "그래프 로드 시 type==='grade'
+  노드를 숨기기 위한 filterGradeNodes를 구현하고
+  적용한다.",
+  "acceptance_criteria": [
+  "그래프 데이터에서 type==='grade' 노드가 제거
+  된다.",
+  "GraphPage 렌더에서 grade 노드가 보이지 않는
+  다.",
+  "filterGradeNodes 함수가 공용 모듈로 노출된
+  다."
+  ],
+  "tdd_plan": [
+  "Red: grade/일반 노드가 섞인 입력에서 grade 노
+  드만 제거되는 테스트 작성",
+  "Green: filterGradeNodes 구현 및 그래프 로딩
+  파이프라인에 연결",
+  "Refactor: 중복 필터 로직 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-2",
+  "role": "FE",
+  "title": "스킵 엣지 생성",
+  "description": "Grade 노드를 거치는 경로를 A→B
+  직접 연결(skip edge)로 변환한다.",
+  "acceptance_criteria": [
+  "A→Grade→B 구조가 A→B 엣지로 변환된다.",
+  "변환된 엣지는 type이 'skip'으로 설정된다.",
+  "Grade 제거 후에도 원래 연결 관계가 유지된다."
+  ],
+  "tdd_plan": [
+  "Red: A→Grade→B 입력에서 A→B skip edge가 생성
+  되는 테스트 작성",
+  "Green: 스킵 엣지 변환 로직 구현 및 적용",
+  "Refactor: 엣지 생성 유틸 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-1"
+  ]
+  },
+  {
+  "id": "FE-3",
+  "role": "FE",
+  "title": "Grade 제거 후 레이아웃 재계산",
+  "description": "필터/스킵 변환 후 dagre 레이아
+  웃을 재실행하여 좌표를 갱신한다.",
+  "acceptance_criteria": [
+  "필터링/스킵 처리 후 레이아웃 함수가 호출된
+  다.",
+  "모든 노드에 유효한 x/y 좌표가 재적용된다.",
+  "그래프가 갱신된 위치로 렌더링된다."
+  ],
+  "tdd_plan": [
+  "Red: 변환 후 레이아웃 함수 호출 테스트 작성",
+  "Green: 변환 파이프라인 뒤에 레이아웃 재계산
+  연결",
+  "Refactor: graphLayout 호출 경로 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-2"
+  ]
+  },
+  {
+  "id": "FE-4",
+  "role": "FE",
+  "title": "노드 상태 계산 로직",
+  "description": "선수 완료 여부와 풀이 진행 정
+  보를 기반으로 LOCKED/AVAILABLE/IN_PROGRESS/
+  COMPLETED 상태를 계산한다.",
+  "acceptance_criteria": [
+  "calculateNodeStatus가 4개 상태 중 하나만 반환
+  한다.",
+  "선수 노드가 미완료면 LOCKED로 계산된다.",
+  "선수 완료 후 시작 전은 AVAILABLE, 진행 중은
+  IN_PROGRESS, 완료는 COMPLETED로 계산된다."
+  ],
+  "tdd_plan": [
+  "Red: 상태별 입력 케이스 테스트 작성",
+  "Green: calculateNodeStatus 구현",
+  "Refactor: 상태 판정 헬퍼 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-5",
+  "role": "FE",
+  "title": "노드 색상/아이콘 구분",
+  "description": "노드 상태별 색상과 아이콘을 적
+  용한다.",
+  "acceptance_criteria": [
+  "LOCKED 노드는 회색과 잠금 아이콘이 표시된
+  다.",
+  "AVAILABLE/IN_PROGRESS/COMPLETED 노드는 각각
+  파랑/노랑/초록과 아이콘이 표시된다.",
+  "상태 변경 시 스타일이 즉시 반영된다."
+  ],
+  "tdd_plan": [
+  "Red: 상태별 클래스/아이콘 렌더 테스트 작성",
+  "Green: 상태별 스타일/아이콘 매핑 적용",
+  "Refactor: 스타일 매핑 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-4"
+  ]
+  },
+  {
+  "id": "FE-6",
+  "role": "FE",
+  "title": "상태 범례 UI",
+  "description": "LearningStatusLegend 컴포넌트
+  를 추가하여 상태 의미를 표시한다.",
+  "acceptance_criteria": [
+  "범례에 4개 상태가 모두 표시된다.",
+  "범례의 색상/아이콘이 노드와 일치한다.",
+  "GraphPage에서 범례가 노출된다."
+  ],
+  "tdd_plan": [
+  "Red: 범례에 4개 상태 렌더 테스트 작성",
+  "Green: LearningStatusLegend 구현 및 GraphPage
+  배치",
+  "Refactor: 범례 스타일 재사용 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-5"
+  ]
+  },
+  {
+  "id": "FE-7",
+  "role": "FE",
+  "title": "임시저장 모듈 및 자동 저장",
+  "description": "sessionStorage.ts에 saveDraft/
+  loadDraft/clearDraft를 구현하고 답안 입력을 1
+  초 디바운스로 저장한다.",
+  "acceptance_criteria": [
+  "saveDraft가 답안 데이터를 sessionStorage에 저
+  장한다.",
+  "1초 디바운스로 입력 변경 시 자동 저장된다.",
+  "페이지 새로고침 후 loadDraft로 답안이 복원된
+  다.",
+  "clearDraft가 저장 데이터를 제거한다."
+  ],
+  "tdd_plan": [
+  "Red: save/load/clear 단위 테스트 작성",
+  "Green: sessionStorage.ts 구현 및 LearnPage 디
+  바운스 연결",
+  "Refactor: 디바운스 유틸 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-8",
+  "role": "FE",
+  "title": "이어풀기 복원 모달",
+  "description": "DraftRestoreModal을 구현해 재
+  방문 시 복원 여부를 선택하게 한다.",
+  "acceptance_criteria": [
+  "draft가 존재하면 모달이 자동 표시된다.",
+  ""이어서 풀기" 선택 시 저장된 답안이 로드된
+  다.",
+  ""처음부터 풀기" 선택 시 draft가 삭제되고 빈
+  상태로 시작한다."
+  ],
+  "tdd_plan": [
+  "Red: draft 유무에 따른 모달 표시 테스트",
+  "Green: DraftRestoreModal 구현 및 LearnPage 연
+  결",
+  "Refactor: 모달 제어 상태 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-7"
+  ]
+  },
+  {
+  "id": "FE-9",
+  "role": "FE",
+  "title": "제출 완료 시 draft 초기화",
+  "description": "정상 제출 성공 시 draft를 삭제
+  한다.",
+  "acceptance_criteria": [
+  "제출 성공 콜백에서 clearDraft가 호출된다.",
+  "제출 성공 후 재방문 시 복원 모달이 뜨지 않는
+  다.",
+  "제출 실패/에러 시 draft는 유지된다."
+  ],
+  "tdd_plan": [
+  "Red: 제출 성공/실패 시 clearDraft 동작 테스
+  트",
+  "Green: 제출 성공 플로우에 clearDraft 연결",
+  "Refactor: 제출 처리 로직 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-7",
+  "FE-8"
+  ]
+  },
+  {
+  "id": "FE-10",
+  "role": "FE",
+  "title": "Author 모드 엣지 연결",
+  "description": "React Flow onConnect를 구현해
+  노드 간 연결선을 생성한다.",
+  "acceptance_criteria": [
+  "노드 A→B 드래그로 새 엣지가 생성된다.",
+  "생성된 엣지가 그래프에 즉시 렌더링된다.",
+  "엣지에 source/target 정보가 올바르게 저장된
+  다."
+  ],
+  "tdd_plan": [
+  "Red: onConnect 이벤트로 엣지가 추가되는 테스
+  트 작성",
+  "Green: onConnect 핸들러 구현 및 상태 업데이
+  트",
+  "Refactor: 엣지 생성 유틸 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-11",
+  "role": "FE",
+  "title": "엣지 타입 선택 모달",
+  "description": "연결 시 EdgeTypeSelectModal에
+  서 requires/prepares_for를 선택하게 한다.",
+  "acceptance_criteria": [
+  "엣지 연결 시 타입 선택 모달이 표시된다.",
+  "requires 또는 prepares_for 선택 시 해당 타입
+  으로 엣지가 생성된다.",
+  "취소 시 엣지가 추가되지 않는다."
+  ],
+  "tdd_plan": [
+  "Red: 모달 선택/취소에 따른 엣지 타입 테스트",
+  "Green: EdgeTypeSelectModal 구현 및 onConnect
+  흐름 연결",
+  "Refactor: 타입 옵션 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10"
+  ]
+  },
+  {
+  "id": "FE-12",
+  "role": "FE",
+  "title": "엣지 삭제 UI",
+  "description": "엣지 클릭 후 삭제 확인을 거쳐
+  제거한다.",
+  "acceptance_criteria": [
+  "엣지 클릭 시 삭제 확인 UI가 노출된다.",
+  ""삭제" 선택 시 엣지가 그래프에서 제거된다.",
+  ""취소" 선택 시 엣지가 유지된다."
+  ],
+  "tdd_plan": [
+  "Red: 엣지 삭제/취소 동작 테스트",
+  "Green: onEdgeClick 및 삭제 처리 구현",
+  "Refactor: 확인 모달 제어 로직 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10"
+  ]
+  },
+  {
+  "id": "FE-13",
+  "role": "FE",
+  "title": "노드 드래그 위치 저장",
+  "description": "onNodeDragStop에서 변경된 좌표
+  를 저장하고 재방문 시 복원한다.",
+  "acceptance_criteria": [
+  "드래그 종료 시 노드 좌표가 상태에 반영된다.",
+  "좌표 정보가 저장되어 새로고침 후에도 유지된
+  다.",
+  "복원된 좌표로 노드가 렌더링된다."
+  ],
+  "tdd_plan": [
+  "Red: 드래그 후 좌표 저장/복원 테스트",
+  "Green: onNodeDragStop 및 저장 로직 구현",
+  "Refactor: 저장 포맷/키 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-14",
+  "role": "FE",
+  "title": "실시간 검증 업데이트",
+  "description": "엣지 편집 시 검증을 즉시 실행
+  해 사이클 등을 경고한다.",
+  "acceptance_criteria": [
+  "엣지 추가/삭제/타입 변경 시 validation이 자동
+  실행된다.",
+  "사이클 생성 시 즉시 경고가 표시된다.",
+  "검증 결과가 최신 그래프 상태와 일치한다."
+  ],
+  "tdd_plan": [
+  "Red: 엣지 변경 후 validate 호출 테스트",
+  "Green: 변경 이벤트에 validation 트리거 연결",
+  "Refactor: 검증 호출 경로 통합"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10",
+  "FE-11",
+  "FE-12"
+  ]
+  },
+  {
+  "id": "FE-15",
+  "role": "FE",
+  "title": "태그별 정답률 집계",
+  "description": "calculateTagStats로 태그별
+  total/correct/rate를 계산한다.",
+  "acceptance_criteria": [
+  "태그별 total/correct/rate가 정확히 계산된
+  다.",
+  "시도 수가 0인 태그는 rate가 0으로 처리된다.",
+  "출력 데이터가 대시보드에서 바로 사용 가능한
+  형태다."
+  ],
+  "tdd_plan": [
+  "Red: 다양한 태그 입력에 대한 통계 계산 테스
+  트",
+  "Green: calculateTagStats 구현",
+  "Refactor: 데이터 구조 명확화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-16",
+  "role": "FE",
+  "title": "취약 영역 분석",
+  "description": "정답률 <60% 및 시도 ≥3 태그를
+  추출한다.",
+  "acceptance_criteria": [
+  "rate < 0.6이고 attempts ≥ 3인 태그가 취약 목
+  록에 포함된다.",
+  "조건을 만족하지 않는 태그는 제외된다.",
+  "입력이 비어 있으면 빈 배열을 반환한다."
+  ],
+  "tdd_plan": [
+  "Red: 조건 경계값(0.6, 3회) 테스트",
+  "Green: 취약 태그 추출 로직 구현",
+  "Refactor: 조건 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-15"
+  ]
+  },
+  {
+  "id": "FE-17",
+  "role": "FE",
+  "title": "대시보드 차트",
+  "description": "Recharts BarChart로 태그별 정
+  답률을 시각화한다.",
+  "acceptance_criteria": [
+  "DashboardPage에 태그별 정답률 막대 그래프가
+  표시된다.",
+  "데이터 변경 시 차트가 갱신된다.",
+  "데이터가 없을 때 빈 상태 메시지가 표시된다."
+  ],
+  "tdd_plan": [
+  "Red: 차트 렌더링과 빈 상태 테스트",
+  "Green: Recharts 통합 및 데이터 바인딩",
+  "Refactor: 차트 옵션 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-15"
+  ]
+  },
+  {
+  "id": "FE-18",
+  "role": "FE",
+  "title": "엣지 타입별 스타일",
+  "description": "requires/prepares_for/
+  progression/skip 타입별 스타일을 적용한다.",
+  "acceptance_criteria": [
+  "requires는 실선 파랑, prepares_for는 점선 초
+  록으로 표시된다.",
+  "progression은 파선 회색, skip은 얇은 점선 회
+  색으로 표시된다.",
+  "엣지 타입 변경 시 스타일이 즉시 반영된다."
+  ],
+  "tdd_plan": [
+  "Red: 타입별 스타일 매핑 테스트",
+  "Green: edgeStyles 모듈 구현 및 GraphView 연
+  결",
+  "Refactor: 스타일 상수/테마화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-19",
+  "role": "FE",
+  "title": "엣지 범례 UI",
+  "description": "EdgeLegend로 엣지 타입 의미를
+  표시한다.",
+  "acceptance_criteria": [
+  "범례에 4개 엣지 타입이 모두 표시된다.",
+  "범례 스타일이 실제 엣지 스타일과 일치한다.",
+  "GraphPage에서 범례가 노출된다."
+  ],
+  "tdd_plan": [
+  "Red: 범례 렌더 테스트",
+  "Green: EdgeLegend 구현 및 배치",
+  "Refactor: 스타일 재사용 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-18"
+  ]
+  },
+  {
+  "id": "FE-20",
+  "role": "FE",
+  "title": "미입력 안내 모달",
+  "description": "제출 시 미입력 문항을 알려주는
+  UnansweredModal을 추가한다.",
+  "acceptance_criteria": [
+  "미입력 문항이 있을 때 제출 시 모달이 표시된
+  다.",
+  "모달에 미입력 문항 번호가 나열된다.",
+  ""돌아가기" 선택 시 제출이 중단되고 입력 화면
+  으로 돌아간다.",
+  ""그냥 제출" 선택 시 제출이 진행된다."
+  ],
+  "tdd_plan": [
+  "Red: 미입력 상태에서 모달 표시/선택 동작 테스
+  트",
+  "Green: UnansweredModal 구현 및 제출 플로우 연
+  결",
+  "Refactor: 미입력 계산 로직 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-21",
+  "role": "FE",
+  "title": "제출 확인 모달",
+  "description": "제출 전 사용자 확인을 받는
+  SubmitConfirmModal을 추가한다.",
+  "acceptance_criteria": [
+  "미입력 경고가 없을 때 제출 시 확인 모달이 표
+  시된다.",
+  ""제출" 선택 시 실제 제출이 진행된다.",
+  ""취소" 선택 시 제출이 중단된다."
+  ],
+  "tdd_plan": [
+  "Red: 확인 모달 표시/확인/취소 테스트",
+  "Green: SubmitConfirmModal 구현 및 제출 플로우
+  연결",
+  "Refactor: 모달 제어 상태 통합"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-22",
+  "role": "FE",
+  "title": "다시 풀기 버튼",
+  "description": "평가 페이지에서 재도전 버튼을
+  제공한다.",
+  "acceptance_criteria": [
+  "EvalPage에 "다시 풀기" 버튼이 표시된다.",
+  "버튼 클릭 시 LearnPage로 이동한다.",
+  "재도전 시 이전 답안이 초기화된다."
+  ],
+  "tdd_plan": [
+  "Red: 버튼 클릭 네비게이션 테스트",
+  "Green: 버튼 추가 및 라우팅 연결",
+  "Refactor: 재도전 초기화 로직 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-23",
+  "role": "FE",
+  "title": "로딩/에러 상태 UI",
+  "description": "Spinner와 에러 메시지 컴포넌트
+  를 추가하고 주요 페이지에 적용한다.",
+  "acceptance_criteria": [
+  "데이터 로딩 중 Spinner가 표시된다.",
+  "에러 발생 시 사용자 친화적 에러 메시지가 표시
+  된다.",
+  "Graph/Learn/Eval/Dashboard 페이지에 일관된 상
+  태 UI가 적용된다."
+  ],
+  "tdd_plan": [
+  "Red: 로딩/에러 상태 렌더 테스트",
+  "Green: Spinner/에러 컴포넌트 구현 및 페이지
+  적용",
+  "Refactor: 상태 UI 공통 컴포넌트화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-24",
+  "role": "FE",
+  "title": "LaTeX 렌더링",
+  "description": "KaTeX 기반 MathRenderer로 $...
+  $ 수식을 렌더링한다.",
+  "acceptance_criteria": [
+  "KaTeX가 설치되고 MathRenderer가 추가된다.",
+  "$...$ 패턴이 수식으로 렌더링된다.",
+  "수식이 없거나 파싱 실패 시 텍스트가 안전하게
+  표시된다."
+  ],
+  "tdd_plan": [
+  "Red: 텍스트/수식 혼합 입력 렌더 테스트",
+  "Green: MathRenderer 구현 및 사용처 연결",
+  "Refactor: 파서 로직 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-25",
+  "role": "FE",
+  "title": "문제별 해설 표시",
+  "description": "채점 후 explanation 필드를 표
+  시한다.",
+  "acceptance_criteria": [
+  "오답 문항에서 해설 텍스트가 표시된다.",
+  "해설에 수식이 있으면 MathRenderer로 렌더링된
+  다.",
+  "해설이 없으면 섹션이 숨겨진다."
+  ],
+  "tdd_plan": [
+  "Red: explanation 표시/비표시 조건 테스트",
+  "Green: EvalPage에 해설 렌더 추가",
+  "Refactor: 해설 UI 컴포넌트화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-24"
+  ]
+  },
+  {
+  "id": "FE-26",
+  "role": "FE",
+  "title": "고급 검증 규칙",
+  "description": "사이클/고아 노드/중복 엣지 검
+  출을 추가한다.",
+  "acceptance_criteria": [
+  "사이클이 있는 그래프를 탐지한다.",
+  "연결되지 않은 고아 노드를 검출한다.",
+  "중복 엣지를 검출해 리포트에 포함한다."
+  ],
+  "tdd_plan": [
+  "Red: 각 검증 규칙에 대한 테스트 케이스 작성",
+  "Green: validate 로직 확장 구현",
+  "Refactor: 검증 규칙을 모듈화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-14"
+  ]
+  },
+  {
+  "id": "FE-27",
+  "role": "FE",
+  "title": "Author Preview 고급",
+  "description": "연결 가능한 노드 패널과 사용자
+  지정 레이아웃 저장을 추가한다.",
+  "acceptance_criteria": [
+  "연결 가능한 노드 목록 패널이 표시된다.",
+  "사용자 지정 레이아웃이 저장되고 재방문 시 복
+  원된다.",
+  "검증 리포트가 최신 상태와 함께 표시된다."
+  ],
+  "tdd_plan": [
+  "Red: 패널 렌더 및 레이아웃 저장/복원 테스트",
+  "Green: 패널 UI와 저장 로직 구현",
+  "Refactor: Author 모드 상태 관리 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10",
+  "FE-13",
+  "FE-26"
+  ]
+  }
+  ],
+  "next_ticket_id": "FE-1"
+  }
+  ###DONE:ba0739d345###
+
+
+› Request efaa43c082: 아래 파일을 읽고 지시사항
+  대로 작업 계획(JSON)을 작성해줘. 마지막에 마
+  커를 그대로 출력해. -> /mnt/c/Users/irron/
+  Desktop/my/web_service_new/
+  calculate_math/.agents/inbox/pm_efaa43c082.md
+
+
+  94% context left
+
+
+
+› Request efaa43c082: 아래 파일을 읽고 지시사항
+  대로 작업 계획(JSON)을 작성해줘. 마지막에 마
+  커를 그대로 출력해. -> /mnt/c/Users/irron/
+  Desktop/my/web_service_new/
+  calculate_math/.agents/inbox/pm_efaa43c082.md
+
+
+• Explored 
+  └ Read pm_efaa43c082.md
+
+• Finalizing detailed JSON structure (32s • esc 
+
+
+› Find and fix a bug in @filename
+
+  98% context left · ? for shortcuts
+
+
+• Explored
+  └ Read pm_efaa43c082.md
+
+• Planning to produce JSON with mandatory keys
+  plus added top-level "risks" and
+  "open_questions" arrays to satisfy step 5,
+  ensuring all tasks reflect frontend scope
+  despite "end2end" label and respecting no
+  backend ticket rule.
+
+  Finalizing detailed JSON structure
+
+  Preparing a comprehensive JSON with summary,
+  scope, non-goals, and 27 frontend tickets each
+  having concise acceptance criteria, TDD plans,
+  and standard commands; including risks and
+  open questions arrays and maintaining
+  sequential FE ticket IDs with clear
+  dependencies.
+
+─ Worked for 32s ───────────────────────────────
+
+• ###BEGIN:efaa43c082###
+  {
+  "summary": "미구현된 학습 그래프/학습 UI 기능
+  (P0~P2)을 완성해 MVP를 마무리한다. 상태 시각
+  화, 세션 관리, Author 편집, 통계/UX 개선을 포
+  함한다.",
+  "scope": [
+  "Grade 노드 제거 및 스킵 엣지/레이아웃 재계
+  산",
+  "노드 상태 계산 및 색상/아이콘/범례 UI 적용",
+  "임시저장/이어풀기/제출 후 초기화 등 학습 세션
+  관리",
+  "Author Mode 엣지 편집/검증/노드 위치 저장",
+  "대시보드 통계/차트, 엣지 스타일/범례, UX 모
+  달/로딩 UI",
+  "선택 기능(LaTeX, 해설 표시, 고급 검증, Author
+  Preview 개선)"
+  ],
+  "non_goals": [
+  "백엔드 API 개발",
+  "완전 미구현 작업
+  (curriculum_skilltree_research_v1, math-
+  knowledge-graph-mvp)",
+  "AI 기반 진단/추천 시스템"
+  ],
+  "tickets": [
+  {
+  "id": "FE-1",
+  "role": "FE",
+  "title": "Grade 노드 필터링",
+  "description": "그래프 로드 시 type==='grade'
+  노드를 숨기기 위해 filterGradeNodes를 구현하고
+  적용한다.",
+  "acceptance_criteria": [
+  "type==='grade' 노드가 그래프 데이터에서 제거
+  된다.",
+  "GraphPage 렌더에서 grade 노드가 보이지 않는
+  다.",
+  "filterGradeNodes가 재사용 가능한 유틸로 제공
+  된다."
+  ],
+  "tdd_plan": [
+  "Red: grade/일반 노드 혼합 입력에서 grade만 제
+  거되는 테스트 작성",
+  "Green: filterGradeNodes 구현 및 로딩 파이프라
+  인 연결",
+  "Refactor: 중복 필터 로직 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-2",
+  "role": "FE",
+  "title": "스킵 엣지 생성",
+  "description": "Grade 노드를 거치는 경로를 A→B
+  직접 연결(skip edge)로 변환한다.",
+  "acceptance_criteria": [
+  "A→Grade→B 구조가 A→B skip 엣지로 변환된다.",
+  "생성된 엣지는 type이 'skip'으로 설정된다.",
+  "Grade 제거 후에도 연결 관계가 유지된다."
+  ],
+  "tdd_plan": [
+  "Red: A→Grade→B 입력에서 A→B skip 엣지 생성 테
+  스트 작성",
+  "Green: 스킵 엣지 변환 로직 구현",
+  "Refactor: 엣지 생성 유틸 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-1"
+  ]
+  },
+  {
+  "id": "FE-3",
+  "role": "FE",
+  "title": "Grade 제거 후 레이아웃 재계산",
+  "description": "필터/스킵 변환 후 dagre 레이아
+  웃을 재실행해 좌표를 갱신한다.",
+  "acceptance_criteria": [
+  "필터링/스킵 처리 후 레이아웃 함수가 호출된
+  다.",
+  "모든 노드에 유효한 x/y 좌표가 재적용된다.",
+  "그래프가 갱신된 위치로 렌더링된다."
+  ],
+  "tdd_plan": [
+  "Red: 변환 후 레이아웃 함수 호출 테스트 작성",
+  "Green: 변환 파이프라인 뒤에 레이아웃 재계산
+  연결",
+  "Refactor: graphLayout 호출 경로 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-2"
+  ]
+  },
+  {
+  "id": "FE-4",
+  "role": "FE",
+  "title": "노드 상태 계산 로직",
+  "description": "선수 완료 여부와 풀이 진행 정
+  보를 기반으로 상태(LOCKED/AVAILABLE/
+  IN_PROGRESS/COMPLETED)를 계산한다.",
+  "acceptance_criteria": [
+  "calculateNodeStatus가 4개 상태 중 하나만 반환
+  한다.",
+  "선수 노드 미완료 시 LOCKED로 계산된다.",
+  "진행 상태에 따라 AVAILABLE/IN_PROGRESS/
+  COMPLETED로 계산된다."
+  ],
+  "tdd_plan": [
+  "Red: 상태별 입력 케이스 테스트 작성",
+  "Green: calculateNodeStatus 구현",
+  "Refactor: 상태 판정 헬퍼 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-5",
+  "role": "FE",
+  "title": "노드 색상/아이콘 구분",
+  "description": "노드 상태별 색상과 아이콘을 적
+  용한다.",
+  "acceptance_criteria": [
+  "LOCKED는 회색+잠금 아이콘으로 표시된다.",
+  "AVAILABLE/IN_PROGRESS/COMPLETED가 각각 파랑/
+  노랑/초록으로 표시된다.",
+  "상태 변경 시 스타일이 즉시 반영된다."
+  ],
+  "tdd_plan": [
+  "Red: 상태별 클래스/아이콘 렌더 테스트 작성",
+  "Green: 상태별 스타일/아이콘 매핑 적용",
+  "Refactor: 스타일 매핑 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-4"
+  ]
+  },
+  {
+  "id": "FE-6",
+  "role": "FE",
+  "title": "상태 범례 UI",
+  "description": "LearningStatusLegend 컴포넌트
+  를 추가해 상태 의미를 표시한다.",
+  "acceptance_criteria": [
+  "범례에 4개 상태가 모두 표시된다.",
+  "범례의 색상/아이콘이 노드와 일치한다.",
+  "GraphPage에서 범례가 노출된다."
+  ],
+  "tdd_plan": [
+  "Red: 범례 렌더 테스트 작성",
+  "Green: LearningStatusLegend 구현 및 GraphPage
+  배치",
+  "Refactor: 범례 스타일 재사용 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-5"
+  ]
+  },
+  {
+  "id": "FE-7",
+  "role": "FE",
+  "title": "임시저장 모듈 및 자동 저장",
+  "description": "sessionStorage.ts에 saveDraft/
+  loadDraft/clearDraft를 구현하고 1초 디바운스로
+  자동 저장한다.",
+  "acceptance_criteria": [
+  "saveDraft가 답안을 sessionStorage에 저장한
+  다.",
+  "입력 변경 시 1초 디바운스로 자동 저장된다.",
+  "loadDraft/clearDraft가 정상 동작한다."
+  ],
+  "tdd_plan": [
+  "Red: save/load/clear 단위 테스트 작성",
+  "Green: sessionStorage.ts 구현 및 LearnPage 디
+  바운스 연결",
+  "Refactor: 디바운스 유틸 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-8",
+  "role": "FE",
+  "title": "이어풀기 복원 모달",
+  "description": "DraftRestoreModal을 구현해 재
+  방문 시 복원 여부를 선택하게 한다.",
+  "acceptance_criteria": [
+  "draft가 존재하면 모달이 자동 표시된다.",
+  "이어풀기 선택 시 저장된 답안이 로드된다.",
+  "처음부터 풀기 선택 시 draft가 삭제된다."
+  ],
+  "tdd_plan": [
+  "Red: draft 유무에 따른 모달 표시 테스트",
+  "Green: DraftRestoreModal 구현 및 LearnPage 연
+  결",
+  "Refactor: 모달 제어 상태 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-7"
+  ]
+  },
+  {
+  "id": "FE-9",
+  "role": "FE",
+  "title": "제출 완료 시 draft 초기화",
+  "description": "정상 제출 성공 시 draft를 삭제
+  한다.",
+  "acceptance_criteria": [
+  "제출 성공 콜백에서 clearDraft가 호출된다.",
+  "제출 후 재방문 시 복원 모달이 뜨지 않는다.",
+  "제출 실패 시 draft는 유지된다."
+  ],
+  "tdd_plan": [
+  "Red: 제출 성공/실패 시 clearDraft 동작 테스
+  트",
+  "Green: 제출 성공 플로우에 clearDraft 연결",
+  "Refactor: 제출 처리 로직 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-7",
+  "FE-8"
+  ]
+  },
+  {
+  "id": "FE-10",
+  "role": "FE",
+  "title": "Author 모드 엣지 연결",
+  "description": "React Flow onConnect를 구현해
+  노드 간 연결선을 생성한다.",
+  "acceptance_criteria": [
+  "노드 A→B 드래그로 새 엣지가 생성된다.",
+  "생성된 엣지가 그래프에 즉시 렌더링된다.",
+  "엣지에 source/target 정보가 올바르게 저장된
+  다."
+  ],
+  "tdd_plan": [
+  "Red: onConnect 이벤트로 엣지가 추가되는 테스
+  트 작성",
+  "Green: onConnect 핸들러 구현 및 상태 업데이
+  트",
+  "Refactor: 엣지 생성 유틸 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-11",
+  "role": "FE",
+  "title": "엣지 타입 선택 모달",
+  "description": "연결 시 EdgeTypeSelectModal에
+  서 requires/prepares_for를 선택하게 한다.",
+  "acceptance_criteria": [
+  "엣지 연결 시 타입 선택 모달이 표시된다.",
+  "타입 선택 후 해당 타입으로 엣지가 생성된다.",
+  "취소 시 엣지가 추가되지 않는다."
+  ],
+  "tdd_plan": [
+  "Red: 모달 선택/취소에 따른 엣지 타입 테스트",
+  "Green: EdgeTypeSelectModal 구현 및 onConnect
+  흐름 연결",
+  "Refactor: 타입 옵션 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10"
+  ]
+  },
+  {
+  "id": "FE-12",
+  "role": "FE",
+  "title": "엣지 삭제 UI",
+  "description": "엣지 클릭 후 삭제 확인을 거쳐
+  제거한다.",
+  "acceptance_criteria": [
+  "엣지 클릭 시 삭제 확인 UI가 노출된다.",
+  "삭제 선택 시 엣지가 그래프에서 제거된다.",
+  "취소 선택 시 엣지가 유지된다."
+  ],
+  "tdd_plan": [
+  "Red: 엣지 삭제/취소 동작 테스트",
+  "Green: onEdgeClick 및 삭제 처리 구현",
+  "Refactor: 확인 UI 제어 로직 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10"
+  ]
+  },
+  {
+  "id": "FE-13",
+  "role": "FE",
+  "title": "노드 드래그 위치 저장",
+  "description": "onNodeDragStop에서 변경된 좌표
+  를 저장하고 재방문 시 복원한다.",
+  "acceptance_criteria": [
+  "드래그 종료 시 좌표가 저장된다.",
+  "새로고침 후에도 좌표가 유지된다.",
+  "복원된 좌표로 노드가 렌더링된다."
+  ],
+  "tdd_plan": [
+  "Red: 드래그 후 좌표 저장/복원 테스트",
+  "Green: onNodeDragStop 및 저장 로직 구현",
+  "Refactor: 저장 포맷 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-14",
+  "role": "FE",
+  "title": "실시간 검증 업데이트",
+  "description": "엣지 편집 시 검증을 즉시 실행
+  해 사이클 등을 경고한다.",
+  "acceptance_criteria": [
+  "엣지 추가/삭제/타입 변경 시 validation이 자동
+  실행된다.",
+  "사이클 생성 시 즉시 경고가 표시된다.",
+  "검증 결과가 최신 그래프 상태와 일치한다."
+  ],
+  "tdd_plan": [
+  "Red: 엣지 변경 후 validate 호출 테스트",
+  "Green: 변경 이벤트에 validation 트리거 연결",
+  "Refactor: 검증 호출 경로 통합"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10",
+  "FE-11",
+  "FE-12"
+  ]
+  },
+  {
+  "id": "FE-15",
+  "role": "FE",
+  "title": "태그별 정답률 집계",
+  "description": "calculateTagStats로 태그별
+  total/correct/rate를 계산한다.",
+  "acceptance_criteria": [
+  "태그별 total/correct/rate가 정확히 계산된
+  다.",
+  "시도 수 0인 태그는 rate가 0으로 처리된다.",
+  "출력 데이터가 대시보드에서 바로 사용 가능하
+  다."
+  ],
+  "tdd_plan": [
+  "Red: 다양한 태그 입력에 대한 통계 테스트",
+  "Green: calculateTagStats 구현",
+  "Refactor: 데이터 구조 명확화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-16",
+  "role": "FE",
+  "title": "취약 영역 분석",
+  "description": "정답률 <60% 및 시도 ≥3 태그를
+  추출한다.",
+  "acceptance_criteria": [
+  "rate < 0.6이고 attempts ≥ 3인 태그가 취약 목
+  록에 포함된다.",
+  "조건 미충족 태그는 제외된다.",
+  "입력이 비어 있으면 빈 배열을 반환한다."
+  ],
+  "tdd_plan": [
+  "Red: 경계값(0.6, 3회) 테스트 작성",
+  "Green: 취약 태그 추출 로직 구현",
+  "Refactor: 조건 상수화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-15"
+  ]
+  },
+  {
+  "id": "FE-17",
+  "role": "FE",
+  "title": "대시보드 차트",
+  "description": "Recharts BarChart로 태그별 정
+  답률을 시각화한다.",
+  "acceptance_criteria": [
+  "DashboardPage에 태그별 정답률 막대 그래프가
+  표시된다.",
+  "데이터 변경 시 차트가 갱신된다.",
+  "데이터가 없을 때 빈 상태 메시지가 표시된다."
+  ],
+  "tdd_plan": [
+  "Red: 차트 렌더 및 빈 상태 테스트",
+  "Green: Recharts 통합 및 데이터 바인딩",
+  "Refactor: 차트 옵션 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-15"
+  ]
+  },
+  {
+  "id": "FE-18",
+  "role": "FE",
+  "title": "엣지 타입별 스타일",
+  "description": "requires/prepares_for/
+  progression/skip 타입별 스타일을 적용한다.",
+  "acceptance_criteria": [
+  "requires는 실선 파랑, prepares_for는 점선 초
+  록으로 표시된다.",
+  "progression은 파선 회색, skip은 얇은 점선 회
+  색으로 표시된다.",
+  "엣지 타입 변경 시 스타일이 즉시 반영된다."
+  ],
+  "tdd_plan": [
+  "Red: 타입별 스타일 매핑 테스트",
+  "Green: edgeStyles 모듈 구현 및 GraphView 연
+  결",
+  "Refactor: 스타일 상수/테마화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-19",
+  "role": "FE",
+  "title": "엣지 범례 UI",
+  "description": "EdgeLegend로 엣지 타입 의미를
+  표시한다.",
+  "acceptance_criteria": [
+  "범례에 4개 엣지 타입이 모두 표시된다.",
+  "범례 스타일이 실제 엣지 스타일과 일치한다.",
+  "GraphPage에서 범례가 노출된다."
+  ],
+  "tdd_plan": [
+  "Red: 범례 렌더 테스트",
+  "Green: EdgeLegend 구현 및 배치",
+  "Refactor: 스타일 재사용 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-18"
+  ]
+  },
+  {
+  "id": "FE-20",
+  "role": "FE",
+  "title": "미입력 안내 모달",
+  "description": "제출 시 미입력 문항을 알려주는
+  UnansweredModal을 추가한다.",
+  "acceptance_criteria": [
+  "미입력 문항이 있을 때 제출 시 모달이 표시된
+  다.",
+  "모달에 미입력 문항 번호가 나열된다.",
+  "돌아가기/그냥 제출 선택이 동작한다."
+  ],
+  "tdd_plan": [
+  "Red: 미입력 상태에서 모달 표시/선택 테스트",
+  "Green: UnansweredModal 구현 및 제출 플로우 연
+  결",
+  "Refactor: 미입력 계산 로직 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-21",
+  "role": "FE",
+  "title": "제출 확인 모달",
+  "description": "제출 전 사용자 확인을 받는
+  SubmitConfirmModal을 추가한다.",
+  "acceptance_criteria": [
+  "미입력 경고가 없을 때 제출 시 확인 모달이 표
+  시된다.",
+  "확인 선택 시 제출이 진행된다.",
+  "취소 선택 시 제출이 중단된다."
+  ],
+  "tdd_plan": [
+  "Red: 확인 모달 표시/확인/취소 테스트",
+  "Green: SubmitConfirmModal 구현 및 제출 플로우
+  연결",
+  "Refactor: 모달 제어 상태 통합"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-22",
+  "role": "FE",
+  "title": "다시 풀기 버튼",
+  "description": "평가 페이지에서 재도전 버튼을
+  제공한다.",
+  "acceptance_criteria": [
+  "EvalPage에 다시 풀기 버튼이 표시된다.",
+  "버튼 클릭 시 LearnPage로 이동한다.",
+  "재도전 시 이전 답안이 초기화된다."
+  ],
+  "tdd_plan": [
+  "Red: 버튼 클릭 네비게이션 테스트",
+  "Green: 버튼 추가 및 라우팅 연결",
+  "Refactor: 재도전 초기화 로직 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-23",
+  "role": "FE",
+  "title": "로딩/에러 상태 UI",
+  "description": "Spinner와 에러 메시지 컴포넌트
+  를 추가하고 주요 페이지에 적용한다.",
+  "acceptance_criteria": [
+  "데이터 로딩 중 Spinner가 표시된다.",
+  "에러 발생 시 사용자 친화적 메시지가 표시된
+  다.",
+  "Graph/Learn/Eval/Dashboard에 상태 UI가 적용된
+  다."
+  ],
+  "tdd_plan": [
+  "Red: 로딩/에러 상태 렌더 테스트",
+  "Green: Spinner/에러 컴포넌트 구현 및 페이지
+  적용",
+  "Refactor: 상태 UI 공통 컴포넌트화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-24",
+  "role": "FE",
+  "title": "LaTeX 렌더링",
+  "description": "KaTeX 기반 MathRenderer로 $...
+  $ 수식을 렌더링한다.",
+  "acceptance_criteria": [
+  "MathRenderer가 수식과 일반 텍스트를 구분해 렌
+  더링한다.",
+  "$...$ 패턴이 수식으로 표시된다.",
+  "파싱 실패 시 안전하게 텍스트로 표시된다."
+  ],
+  "tdd_plan": [
+  "Red: 텍스트/수식 혼합 입력 렌더 테스트",
+  "Green: MathRenderer 구현 및 사용처 연결",
+  "Refactor: 파서 로직 분리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-25",
+  "role": "FE",
+  "title": "문제별 해설 표시",
+  "description": "채점 후 explanation 필드를 표
+  시한다.",
+  "acceptance_criteria": [
+  "오답 문항에서 해설 텍스트가 표시된다.",
+  "해설에 수식이 있으면 MathRenderer로 렌더링된
+  다.",
+  "해설이 없으면 섹션이 숨겨진다."
+  ],
+  "tdd_plan": [
+  "Red: explanation 표시/비표시 조건 테스트",
+  "Green: EvalPage에 해설 렌더 추가",
+  "Refactor: 해설 UI 컴포넌트화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-24"
+  ]
+  },
+  {
+  "id": "FE-26",
+  "role": "FE",
+  "title": "고급 검증 규칙",
+  "description": "사이클/고아 노드/중복 엣지 검
+  출을 추가한다.",
+  "acceptance_criteria": [
+  "사이클이 있는 그래프를 탐지한다.",
+  "연결되지 않은 고아 노드를 검출한다.",
+  "중복 엣지를 검출해 리포트에 포함한다."
+  ],
+  "tdd_plan": [
+  "Red: 각 검증 규칙에 대한 테스트 케이스 작성",
+  "Green: validate 로직 확장 구현",
+  "Refactor: 검증 규칙 모듈화"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-14"
+  ]
+  },
+  {
+  "id": "FE-27",
+  "role": "FE",
+  "title": "Author Preview 고급",
+  "description": "연결 가능한 노드 패널과 사용자
+  지정 레이아웃 저장을 추가한다.",
+  "acceptance_criteria": [
+  "연결 가능한 노드 목록 패널이 표시된다.",
+  "사용자 지정 레이아웃이 저장되고 재방문 시 복
+  원된다.",
+  "검증 리포트가 최신 상태와 함께 표시된다."
+  ],
+  "tdd_plan": [
+  "Red: 패널 렌더 및 레이아웃 저장/복원 테스트",
+  "Green: 패널 UI와 저장 로직 구현",
+  "Refactor: Author 모드 상태 관리 정리"
+  ],
+  "commands": {
+  "run": "npm run dev",
+  "test": "npm test"
+  },
+  "depends_on": [
+  "FE-10",
+  "FE-13",
+  "FE-26"
+  ]
+  }
+  ],
+  "risks": [
+  "그래프 데이터 스키마(노드/엣지 타입, 상태 정
+  의)가 실제 구현과 불일치할 수 있음",
+  "React Flow/레거시 컴포넌트 구조에 따라
+  onConnect/onEdgeClick 이벤트 흐름이 달라질 수
+  있음",
+  "KaTeX 도입 시 번들 크기 및 스타일 충돌 가능"
+  ],
+  "open_questions": [
+  "노드 상태 계산에 필요한 진행/완료 데이터의 실
+  제 소스는 무엇인지",
+  "노드 위치/레이아웃 저장 위치가 로컬 스토리지
+  인지 별도 스토어인지",
+  "대시보드 차트 데이터의 정확한 입력 포맷 및 빈
+  상태 UX 기준"
+  ],
+  "next_ticket_id": "FE-1"
+  }
+  ###DONE:efaa43c082###
+
+
+› Find and fix a bug in @filename
+
+  95% context left · ? for shortcuts
+

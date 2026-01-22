@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 export type AuthUser = {
   id: string
@@ -15,16 +15,23 @@ export type RegisterInput = {
   email: string
 }
 
+export type AppMode = 'student' | 'author'
+
 export type AuthContextValue = {
   user: AuthUser | null
   isAuthenticated: boolean
+  isAdmin: boolean
+  mode: AppMode
   login: (id: string, password: string) => string | null
   register: (input: RegisterInput) => string | null
   logout: () => void
+  setMode: (mode: AppMode) => void
 }
 
 export const AUTH_STORAGE_KEY = 'curriculum-viewer:auth'
 export const AUTH_USER_DB_STORAGE_KEY = 'curriculum-viewer:auth:user_db:v1'
+export const ADMIN_USER_ID = 'admin'
+const ADMIN_DEFAULT_PASSWORD = 'admin'
 
 function getLocalStorage(): Storage | null {
   if (typeof window === 'undefined') return null
@@ -45,6 +52,31 @@ type StoredUser = RegisterInput & { createdAt: string }
 type StoredUserDb = {
   version: 1
   usersById: Record<string, StoredUser>
+}
+
+function ensureAdminUser(db: StoredUserDb): { db: StoredUserDb; changed: boolean } {
+  if (db.usersById[ADMIN_USER_ID]) {
+    return { db, changed: false }
+  }
+
+  const now = new Date().toISOString()
+  return {
+    db: {
+      version: 1,
+      usersById: {
+        ...db.usersById,
+        [ADMIN_USER_ID]: {
+          id: ADMIN_USER_ID,
+          password: ADMIN_DEFAULT_PASSWORD,
+          name: 'Admin',
+          grade: 'admin',
+          email: 'admin@local',
+          createdAt: now
+        }
+      }
+    },
+    changed: true
+  }
 }
 
 function readUserDb(): StoredUserDb {
@@ -79,9 +111,17 @@ function readUserDb(): StoredUserDb {
       usersById[key] = { id, password, name, grade, email, createdAt }
     }
 
-    return { version: 1, usersById }
+    const ensured = ensureAdminUser({ version: 1, usersById })
+    if (ensured.changed) {
+      writeUserDb(ensured.db)
+    }
+    return ensured.db
   } catch {
-    return { version: 1, usersById: {} }
+    const ensured = ensureAdminUser({ version: 1, usersById: {} })
+    if (ensured.changed) {
+      writeUserDb(ensured.db)
+    }
+    return ensured.db
   }
 }
 
@@ -142,6 +182,12 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => readStoredUser())
+  const [mode, setMode] = useState<AppMode>('student')
+  const isAdmin = user?.id === ADMIN_USER_ID
+
+  useEffect(() => {
+    readUserDb()
+  }, [])
 
   const login = useCallback((id: string, password: string) => {
     const normalizedId = id.trim()
@@ -223,6 +269,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(() => {
     setUser(null)
+    setMode('student')
     writeStoredUser(null)
   }, [])
 
@@ -230,11 +277,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return {
       user,
       isAuthenticated: Boolean(user),
+      isAdmin,
+      mode,
       login,
       register,
-      logout
+      logout,
+      setMode
     }
-  }, [login, logout, register, user])
+  }, [isAdmin, login, logout, mode, register, user])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

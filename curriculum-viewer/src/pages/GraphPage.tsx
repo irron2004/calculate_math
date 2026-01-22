@@ -1,315 +1,174 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import dagre from 'dagre'
-import ReactFlow, {
-  Background,
-  Controls,
-  MarkerType,
-  MiniMap,
-  type Edge,
-  type Node,
-  type ReactFlowInstance
-} from 'reactflow'
-import 'reactflow/dist/style.css'
-import NodeDetail from '../components/NodeDetail'
 import type { DetailPanelContext } from '../components/AppLayout'
+import CurriculumGraphView from '../components/CurriculumGraphView'
+import LearningNodeDetailPanel from '../components/LearningNodeDetailPanel'
+import LearningStatusLegend from '../components/LearningStatusLegend'
+import NodeDetail from '../components/NodeDetail'
+import { useAuth } from '../lib/auth/AuthProvider'
 import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
-import {
-  buildContainsEdgeRefsSkippingGradeNodes,
-  getGraphVisibleNodes
-} from '../lib/curriculum/graphView'
-import { buildProgressionEdges } from '../lib/curriculum/progression'
-import type { CurriculumNode, CurriculumNodeType } from '../lib/curriculum/types'
+import type { GraphLayoutDirection } from '../lib/curriculum/graphLayout'
+import type { CurriculumNode } from '../lib/curriculum/types'
+import { getGraphVisibleNodes } from '../lib/curriculum/graphView'
+import { createBrowserSessionRepository } from '../lib/repository/sessionRepository'
 import { useFocusNodeId } from '../lib/routing/useFocusNodeId'
+import { loadLearningGraphV1 } from '../lib/studentLearning/graph'
+import { computeNodeProgressV1 } from '../lib/studentLearning/progress'
+import type { LearningGraphV1, NodeProgressV1 } from '../lib/studentLearning/types'
 
-type GraphNodeData = {
-  label: React.ReactNode
-  nodeType: CurriculumNodeType
-}
-
-type GraphEdgeData = {
-  edgeType: 'contains' | 'progression'
-}
-
-type GraphNode = Node<GraphNodeData>
-
-type GraphEdge = Edge<GraphEdgeData>
-
-function getNodeDims(nodeType: CurriculumNodeType): { width: number; height: number } {
-  switch (nodeType) {
-    case 'subject':
-      return { width: 260, height: 64 }
-    case 'grade':
-      return { width: 220, height: 56 }
-    case 'domain':
-      return { width: 220, height: 56 }
-    case 'standard':
-      return { width: 320, height: 72 }
-    default:
-      return { width: 240, height: 56 }
-  }
-}
-
-function getNodeStyle(node: CurriculumNode): React.CSSProperties {
-  const base: React.CSSProperties = {
-    borderRadius: 12,
-    border: '1px solid #e2e8f0',
-    color: '#0f172a',
-    padding: 10,
-    fontSize: 12,
-    lineHeight: 1.2
-  }
-
-  switch (node.type) {
-    case 'subject':
-      return { ...base, background: '#0f172a', borderColor: '#0f172a', color: '#ffffff' }
-    case 'grade':
-      return { ...base, background: '#e0f2fe', borderColor: '#7dd3fc' }
-    case 'domain':
-      return { ...base, background: '#ede9fe', borderColor: '#c4b5fd' }
-    case 'standard':
-      return { ...base, background: '#ffffff' }
-    default:
-      return base
-  }
-}
-
-function layoutWithDagre(
-  nodes: GraphNode[],
-  edges: GraphEdge[],
-  direction: 'TB' | 'LR' = 'TB'
-): GraphNode[] {
-  const dagreGraph = new dagre.graphlib.Graph()
-  dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({
-    rankdir: direction,
-    nodesep: 30,
-    ranksep: 60,
-    marginx: 20,
-    marginy: 20
-  })
-
-  for (const node of nodes) {
-    const dims = getNodeDims(node.data.nodeType)
-    dagreGraph.setNode(node.id, dims)
-  }
-
-  for (const edge of edges) {
-    dagreGraph.setEdge(edge.source, edge.target)
-  }
-
-  dagre.layout(dagreGraph)
-
-  return nodes.map((node) => {
-    const dims = getNodeDims(node.data.nodeType)
-    const laidOut = dagreGraph.node(node.id) as { x: number; y: number } | undefined
-
-    if (!laidOut) {
-      return node
-    }
-
-    return {
-      ...node,
-      position: {
-        x: laidOut.x - dims.width / 2,
-        y: laidOut.y - dims.height / 2
-      }
-    }
-  })
-}
+const GRAPH_FITVIEW_PADDING = 0.15
 
 export default function GraphPage() {
   const { setDetail } = useOutletContext<DetailPanelContext>()
-  const { data, index, loading, error } = useCurriculum()
+  const { data, loading, error } = useCurriculum()
   const { focusNodeId, setFocusNodeId } = useFocusNodeId()
-  const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null)
+  const [direction, setDirection] = useState<GraphLayoutDirection>('TB')
+  const { user } = useAuth()
 
-  const selectedNodeId = useMemo(() => {
-    if (!focusNodeId) return null
-    if (!index?.nodeById.has(focusNodeId)) return null
-    return focusNodeId
-  }, [focusNodeId, index])
+  const [learningGraph, setLearningGraph] = useState<LearningGraphV1 | null>(null)
+  const [progressByNodeId, setProgressByNodeId] = useState<Record<string, NodeProgressV1> | null>(
+    null
+  )
 
+  // 학습 그래프 로딩
   useEffect(() => {
-    if (selectedNodeId) {
-      setDetail(<NodeDetail nodeId={selectedNodeId} />)
+    const controller = new AbortController()
+    loadLearningGraphV1(controller.signal)
+      .then((graph) => setLearningGraph(graph))
+      .catch(() => {
+        // 학습 그래프 로딩 실패 시 무시 (선택적 기능)
+      })
+    return () => controller.abort()
+  }, [])
+
+  // 노드 진행 상태 계산
+  useEffect(() => {
+    if (!learningGraph || !user) {
+      setProgressByNodeId(null)
       return
     }
 
-    setDetail(
-      <div>
-        <h2>상세</h2>
-        <p>노드를 클릭하면 상세가 표시됩니다.</p>
-        <p>
-          <span className="legend-inline contains" aria-hidden="true" /> contains
-          · <span className="legend-inline progression" aria-hidden="true" /> progression
-        </p>
-      </div>
-    )
-  }, [selectedNodeId, setDetail])
+    const repo = createBrowserSessionRepository()
+    if (!repo) {
+      setProgressByNodeId(null)
+      return
+    }
 
-  const graphNodes = useMemo((): GraphNode[] => {
-    if (!data) return []
+    const store = repo.readStore(user.id)
+    const progress = computeNodeProgressV1({ graph: learningGraph, store })
+    setProgressByNodeId(progress)
+  }, [learningGraph, user])
 
-    return getGraphVisibleNodes(data.nodes)
-      .map((node) => {
-        const dims = getNodeDims(node.type)
-        const style = {
-          ...getNodeStyle(node),
-        width: dims.width,
-        height: dims.height,
-        borderColor: node.id === selectedNodeId ? '#0f172a' : undefined,
-        boxShadow:
-          node.id === selectedNodeId ? '0 0 0 2px rgba(15, 23, 42, 0.15)' : undefined
-      } as const
-
-      return {
-        id: node.id,
-        position: { x: 0, y: 0 },
-        data: {
-          nodeType: node.type,
-          label: (
-            <div className="graph-node-label">
-              <div className="graph-node-title">{node.title}</div>
-              <div className="graph-node-id">{node.id}</div>
-            </div>
-          )
-        },
-        style
-      }
-    })
-  }, [data, selectedNodeId])
-
-  const containsEdges = useMemo((): GraphEdge[] => {
-    if (!data || !index) return []
-
-    const refs = buildContainsEdgeRefsSkippingGradeNodes(data.nodes, index.nodeById)
-
-    return refs.map((edge) => ({
-      id: `contains:${edge.source}->${edge.target}`,
-      source: edge.source,
-      target: edge.target,
-      type: 'smoothstep',
-      data: { edgeType: 'contains' },
-      markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18 },
-      style: { stroke: '#94a3b8' }
-    }))
-  }, [data, index])
-
-  const progressionEdges = useMemo((): GraphEdge[] => {
-    if (!data) return []
-
-    return buildProgressionEdges(data.nodes).map((edge) => {
-      return {
-        id: edge.id,
-        source: edge.source,
-        target: edge.target,
-        type: 'smoothstep',
-        data: { edgeType: 'progression' },
-        markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
-        style: {
-          stroke: '#0284c7',
-          strokeDasharray: '6 4'
-        }
-      }
-    })
+  const visibleNodeCount = useMemo(() => {
+    if (!data) return 0
+    return getGraphVisibleNodes(data.nodes).length
   }, [data])
 
-  const graphEdges = useMemo(() => {
-    return [...containsEdges, ...progressionEdges]
-  }, [containsEdges, progressionEdges])
+  const nodeById = useMemo(() => {
+    if (!data) return new Map<string, CurriculumNode>()
+    return new Map(data.nodes.map((node) => [node.id, node]))
+  }, [data])
 
-  const layoutedNodes = useMemo(() => {
-    if (graphNodes.length === 0) {
-      return []
+  const prereqByNodeId = useMemo(() => {
+    if (!learningGraph) return new Map<string, string[]>()
+    const map = new Map<string, string[]>()
+    for (const edge of learningGraph.edges) {
+      if (edge.type !== 'requires') continue
+      const list = map.get(edge.targetId) ?? []
+      list.push(edge.sourceId)
+      map.set(edge.targetId, list)
     }
+    return map
+  }, [learningGraph])
 
-    return layoutWithDagre(graphNodes, containsEdges, 'TB')
-  }, [containsEdges, graphNodes])
+  const prereqLabelByNodeId = useMemo(() => {
+    const result: Record<string, string> = {}
+    for (const node of nodeById.values()) {
+      result[node.id] = node.title
+    }
+    return result
+  }, [nodeById])
 
   useEffect(() => {
-    if (!rfInstance || !selectedNodeId) {
+    if (!focusNodeId) {
+      setDetail(
+        <div>
+          <h2>노드 상세</h2>
+          <p className="muted">지도의 노드를 클릭하세요.</p>
+        </div>
+      )
       return
     }
 
-    const target = layoutedNodes.find((node) => node.id === selectedNodeId)
-    if (!target) {
+    // 학습 노드면 LearningNodeDetailPanel 사용
+    const progress = progressByNodeId?.[focusNodeId]
+    if (progress) {
+      const node = nodeById.get(focusNodeId)
+      const meta = {
+        title: node?.title ?? focusNodeId,
+        text: node?.text ?? null
+      }
+      const prereqNodeIds = prereqByNodeId.get(focusNodeId) ?? []
+      setDetail(
+        <LearningNodeDetailPanel
+          nodeId={focusNodeId}
+          meta={meta}
+          progress={progress}
+          prereqNodeIds={prereqNodeIds}
+          prereqLabelByNodeId={prereqLabelByNodeId}
+        />
+      )
       return
     }
 
-    const dims = getNodeDims(target.data.nodeType)
-    const centerX = target.position.x + dims.width / 2
-    const centerY = target.position.y + dims.height / 2
-    rfInstance.setCenter(centerX, centerY, { zoom: 1.2, duration: 450 })
-  }, [layoutedNodes, rfInstance, selectedNodeId])
-
-  const onNodeClick = useCallback(
-    (_event: React.MouseEvent, node: GraphNode) => {
-      setFocusNodeId(node.id)
-    },
-    [setFocusNodeId]
-  )
+    // 기본: NodeDetail 사용
+    setDetail(<NodeDetail nodeId={focusNodeId} />)
+  }, [focusNodeId, setDetail, progressByNodeId, nodeById, prereqByNodeId, prereqLabelByNodeId])
 
   return (
     <section>
-      <h1>그래프</h1>
+      <h1>지도</h1>
 
       <div className="graph-toolbar">
-        <div className="graph-legend">
-          <span className="legend-item">
-            <span className="legend-line contains" aria-hidden="true" /> contains
-          </span>
-          <span className="legend-item">
-            <span className="legend-line progression" aria-hidden="true" /> progression
-          </span>
-        </div>
-
-        {selectedNodeId ? (
-          <button
-            type="button"
-            className="button button-ghost"
-            onClick={() => setFocusNodeId(null, { replace: true })}
+        <div className="graph-control">
+          Layout
+          <select
+            value={direction}
+            onChange={(event) => setDirection(event.target.value as GraphLayoutDirection)}
           >
-            선택 해제
-          </button>
-        ) : null}
-
+            <option value="TB">Top - Bottom</option>
+            <option value="LR">Left - Right</option>
+          </select>
+        </div>
         <div className="graph-meta">
-          {data ? (
-            <span>
-              nodes: {graphNodes.length} · edges: {graphEdges.length}
-            </span>
-          ) : null}
+          {visibleNodeCount > 0 ? `${visibleNodeCount} nodes` : 'Loading…'}
         </div>
       </div>
 
-      {loading ? <p>Loading…</p> : null}
-      {error ? <p className="error">{error}</p> : null}
+      <div className="graph-legend" style={{ marginBottom: 12 }}>
+        <span className="legend-item">
+          <span className="legend-inline contains" /> contains
+        </span>
+        <span className="legend-item">
+          <span className="legend-inline progression" /> progression
+        </span>
+        <span style={{ marginLeft: 16 }}>|</span>
+        <LearningStatusLegend />
+      </div>
 
-      {data ? (
-        <div className="graph-canvas">
-          <ReactFlow
-            nodes={layoutedNodes}
-            edges={graphEdges}
-            onNodeClick={onNodeClick}
-            onInit={setRfInstance}
-            fitView
-          >
-            <Background gap={16} color="#e2e8f0" />
-            <MiniMap
-              pannable
-              zoomable
-              nodeColor={(node) => {
-                const t = (node.data as GraphNodeData | undefined)?.nodeType
-                if (t === 'subject') return '#0f172a'
-                if (t === 'domain') return '#a78bfa'
-                return '#cbd5e1'
-              }}
-            />
-            <Controls />
-          </ReactFlow>
-        </div>
-      ) : null}
+      {loading && <p>Loading…</p>}
+      {error && <p className="error">{error}</p>}
+
+      <div className="graph-canvas">
+        <CurriculumGraphView
+          nodes={data?.nodes ?? null}
+          focusNodeId={focusNodeId}
+          onNodeClick={(nodeId) => setFocusNodeId(nodeId)}
+          direction={direction}
+          fitViewPadding={GRAPH_FITVIEW_PADDING}
+          progressByNodeId={progressByNodeId}
+        />
+      </div>
     </section>
   )
 }

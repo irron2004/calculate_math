@@ -1,0 +1,1963 @@
+
+============================================================
+[2026-01-16 09:59:52] PM (req_id: c9b28f7ad2)
+============================================================
+  "노드 드래그/엣지
+  연결/삭제 등 편집
+  동작이 비활성화돼
+  있다",
+  "타입별 범례와 노드
+  스타일이 일치한다",
+  "그래프 변환/선택
+  동작이 테스트로 검
+  증된다"
+  ],
+  "tdd_plan": [
+  "Red: 데이터→그래프
+  노드/엣지 변환 테스
+  트를 작성한다",
+  "Green: 변환 로직을
+  구현해 통과시킨다",
+  "Red: 레이아웃 적용
+  후 좌표 존재/기본
+  품질(단순 기준) 테
+  스트를 추가한다",
+  "Green: dagre 레이
+  아웃 적용을 구현해
+  통과시킨다",
+  "Red: 노드 클릭 시
+  패널 업데이트 테스
+  트를 추가한다",
+  "Green: 상호작용을
+  구현해 통과시킨다"
+  ],
+  "commands": {
+  "run": "cd
+  curriculum-viewer
+  && npm run dev",
+  "test": "cd
+  curriculum-viewer
+  && npm run test"
+  },
+  "depends_on": [
+  "FE-1",
+  "RESEARCH-2"
+  ]
+  },
+  {
+  "id": "FE-5",
+  "role": "FE",
+  "title": "검증 결과
+  UI 통합(오류/경고
+  표시, 안전한 실패
+  모드) + 문서",
+  "description": "앱
+  로딩 시 validator
+  결과를 UI에 통합한
+  다. error가 있으면
+  그래프/트리 렌더를
+  차단하고 이슈 목록
+  을 표시하며,
+  warning만 있으면 경
+  고 배너로 안내한다.
+  실행/검증/데이터 수
+  정 절차를 문서로 정
+  리한다.",
+  "acceptance_criteri
+  a": [
+  "error가 있으면 이
+  슈 목록이 표시되고
+  그래프/트리 렌더가
+  차단된다",
+  "warning만 있으면
+  경고 배너가 표시되
+  고 그래프/트리 렌더
+  는 유지된다",
+  "이슈 목록에
+  severity/code/
+  message/nodeId/
+  relatedId가 표시된
+  다",
+  "이슈가 많아도(예:
+  50+) UI가 멈추지 않
+  는다",
+  "ErrorBoundary(또는
+  동등)로 런타임 예외
+  시 복구 가능한 화면
+  을 제공한다",
+  "실행/테스트/
+  validate:data/build
+  및 데이터 수정 워크
+  플로우가 문서에 정
+  리돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: error일 때 차
+  단 UI/이슈 목록 렌
+  더 테스트를 작성한
+  다",
+  "Green: 차단 UI를
+  구현해 통과시킨다",
+  "Red: warning-only
+  일 때 배너 표시 +
+  뷰 렌더 테스트를 추
+  가한다",
+  "Green: warning 분
+  기 처리로 통과시킨
+  다",
+  "Refactor: 이슈 렌
+  더링 컴포넌트를 분
+  리하고 필요 시 가상
+  화 포인트를 마련한
+  다"
+  ],
+  "commands": {
+  "run": "cd
+  curriculum-viewer
+  && npm run dev",
+  "test": "cd
+  curriculum-viewer
+  && npm run test"
+  },
+  "depends_on": [
+  "FE-2",
+  "FE-3",
+  "FE-4"
+  ]
+  }
+  ],
+  "next_ticket_id":
+  "RESEARCH-1",
+  "risks_open_questio
+  ns": [
+  "단일 parent(트리)
+  만 허용할지 vs 다중
+  parent(DAG) 허용할
+  지에 따른 스키마/검
+  증/레이아웃 복잡
+  도",
+  "unknown field 허용
+  여부(향후 확장 대
+  비)와 validator 호
+  환 정책",
+  "children_ids 순서
+  의 의미(정렬/표시
+  우선순위) 및 레이아
+  웃 반영 방식",
+  "다중 루트(여러
+  subject 등)일 때 트
+  리/그래프 초기 표시
+  및 네비게이션 정
+  책",
+  "dagre로 해결되지
+  않는 교차/겹침 케이
+  스의 elk 전환 타이
+  밍과 도입 비용",
+  "React Flow 렌더링
+  성능(노드 수 증가
+  시)과 가상화/클러스
+  터링 필요 여부",
+  "validator issue 코
+  드 체계 고정/버저닝
+  및 계약 변경 시 마
+  이그레이션 가이드
+  필요"
+  ]
+  }
+  ###DONE:9bf4f7f5c7#
+  ##
+
+
+› web_service_new/
+  calculate_math/.ag
+  ents/inbox/
+  pm_71921cc7f8.md
+
+
+  93% context left
+
+
+
+› Request
+  71921cc7f8: 아래
+  파일을 읽고 지시사
+  항대로 작업 계획
+  (JSON)을 작성해줘.
+  마지막에 마커를 그
+  대로 출력해. -> /
+  mnt/c/Users/irron/
+  Desktop/my/
+  web_service_new/
+  calculate_math/.ag
+  ents/inbox/
+  pm_71921cc7f8.md
+
+
+  └ Read pm_71921cc7f
+
+• Working (6s • esc t
+
+
+› Write tests for @f
+
+  93% context left · 
+
+
+• Explored
+  └ Read
+pm_71921cc7f8.md
+
+─ Worked for 6s ─────
+
+• ###BEGIN:71921cc7f8
+  ###
+  {
+  "summary": "정적 커
+  리큘럼 JSON을 로드
+  해 트리/그래프
+  (React Flow)로 탐색
+  하는 읽기 전용 뷰어
+  와, 데이터 구조를
+  자동 검증해 계약 위
+  반을 조기에 발견하
+  는 검증기를 v1로 구
+  현한다. v1은 편집/
+  문제풀이/정답률/진
+  도 계산 없이 ‘보기
+  + 구조 검증’만 제공
+  한다.",
+  "scope": [
+  "정적 데이터 로딩:
+  curriculum-viewer/
+  public/data/
+  curriculum_math_v1.
+  json",
+  "커리큘럼 데이터 계
+  약(v1) 문서화(필드/
+  타입/ID 규칙/계층
+  규칙)",
+  "구조 검증기 구현/
+  정비 및 CLI 검증 커
+  맨드 제공(npm run
+  validate:data)",
+  "React Flow 기반 읽
+  기 전용 그래프 뷰(+
+  dagre 레이아웃 기본
+  적용)",
+  "트리(계층) 뷰 + 노
+  드 상세 패널 + 제목
+  검색",
+  "검증 결과(오류/경
+  고) UI 표기 및 안전
+  한 실패
+  (ErrorBoundary)",
+  "개발자 문서(실행/
+  검증/데이터 수정 워
+  크플로우)"
+  ],
+  "non_goals": [
+  "그래프/커리큘럼 편
+  집(Author Mode), 노
+  드/엣지 편집 및 저
+  장/퍼블리시",
+  "문제풀이/채점/학습
+  세션/정답률/노드 상
+  태(CLEARED 등) 계
+  산",
+  "백엔드 API 연동 및
+  서버 기반 인증/권
+  한/데이터 저장",
+  "AI 기반 추천/진단/
+  콘텐츠 생성 자동
+  화",
+  "대규모(수천 노드)
+  성능 최적화, SSR,
+  운영 모니터링"
+  ],
+  "tickets": [
+  {
+  "id": "RESEARCH-1",
+  "role": "RESEARCH",
+  "title":
+  "Curriculum JSON 데
+  이터 계약(v1) 확정
+  (스키마/ID/계층 규
+  칙, error/warning
+  기준)",
+  "description": "v1
+  에서 사용할 커리큘
+  럼 JSON 스키마(필
+  드/타입/허용값), ID
+  규칙, parent/
+  children 정합성, 루
+  트 정책, 순환 금지
+  등 핵심 제약과 검증
+  기준(error vs
+  warning)을 문서로
+  확정한다. FE가 타
+  입/검증기/뷰를 바로
+  구현할 수 있도록 예
+  시와 판단 기준을 포
+  함한다.",
+  "acceptance_criteri
+  a": [
+  "curriculum-viewer
+  에서 참조 가능한 데
+  이터 계약 문서가 존
+  재한다",
+  "node.type 허용값과
+  타입별 필수/선택 필
+  드가 명시돼 있다",
+  "ID 규칙(형식/중복
+  금지/문자 제한/정렬
+  기준)이 예시와 함께
+  정의돼 있다",
+  "계층 규칙
+  (parent_id/
+  children_ids 양방향
+  일치, 루트 조건,
+  cycle 금지)이 명시
+  돼 있다",
+  "검증 규칙별 error/
+  warning 분류 기준과
+  메시지 원칙이 정리
+  돼 있다",
+  "curriculum_math_v1
+  .json이 계약을 만족
+  하거나, 위반 항목이
+  문서에 명시돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: 중복 id/깨진
+  참조/순환(cycle) 위
+  반 예시와 기대 에러
+  코드 목록을 정의한
+  다",
+  "Green: 모호한 규칙
+  을 제거하고 동일 예
+  시에서 판단이 일관
+  되도록 계약을 고정
+  한다",
+  "Refactor: v2 확장
+  을 위한 reserved/
+  optional 필드 정책
+  을 문서에 추가한다"
+  ],
+  "commands": {
+  "run": "cd
+  curriculum-viewer
+  && npm run dev",
+  "test": "cd
+  curriculum-viewer
+  && npm run
+  validate:data"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "RESEARCH-2",
+  "role": "RESEARCH",
+  "title": "그래프 자
+  동 레이아웃 기준 결
+  정(dagre 기본값/elk
+  전환 조건)",
+  "description":
+  "React Flow 그래프
+  뷰의 레이아웃 기본
+  값(방향/간격 등)과
+  품질 기준(겹침/교
+  차/가독성)을 정의한
+  다. dagre를 기본으
+  로 하되, elk 도입이
+  필요한 조건과 전환
+  비용을 정리한다.",
+  "acceptance_criteri
+  a": [
+  "레이아웃 방향(TB/
+  LR) 및 주요 간격 파
+  라미터 기본값이 정
+  의돼 있다",
+  "children_ids 기반
+  edge 생성 규칙(부모
+  →자식, 중복 방지)이
+  명시돼 있다",
+  "가독성 저하 케이스
+  (교차 과다, 밀집,
+  긴 edge)와 완화책이
+  정리돼 있다",
+  "dagre로 충분한 기
+  준과 elk 전환 기준
+  이 문서화돼 있다",
+  "샘플 데이터에서 기
+  대 레이아웃 결과(서
+  술 또는 스크린샷)가
+  포함돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: 레이아웃 품질
+  체크리스트(겹침/교
+  차/방향 일관성)를
+  정의한다",
+  "Green: dagre 설정
+  제안으로 체크리스트
+  를 만족하는 기준을
+  고정한다",
+  "Refactor: 데이터
+  규모 증가(예: 200+)
+  시 성능/가독성 트레
+  이드오프를 문서에
+  추가한다"
+  ],
+  "commands": {
+  "run": "cd
+  curriculum-viewer
+  && npm run dev",
+  "test": "cd
+  curriculum-viewer
+  && npm run test"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-1",
+  "role": "FE",
+  "title": "정적 커리
+  큘럼 로더/타입/인덱
+  싱 기반 구현",
+  "description": "정
+  적 JSON을 로드해 타
+  입으로 파싱하고,
+  byId/parent/
+  children 탐색을 위
+  한 인덱스를 제공한
+  다. 로딩/파싱/정합
+  성 실패 시 UI에서
+  안전하게 오류 상태
+  를 표시할 수 있도록
+  에러 모델을 정리한
+  다.",
+  "acceptance_criteri
+  a": [
+  "앱이
+  curriculum_math_v1.
+  json을 로드해 최소
+  요약 정보(예: 노드
+  수)를 표시한다",
+  "파일 읽기/JSON 파
+  싱 실패 시 오류
+  UI(또는 오류 상태)
+  가 표시된다",
+  "byId/children/
+  parent 탐색 API가
+  제공된다",
+  "치명적 데이터 오류
+  에서 무한루프/크래
+  시 없이 안전하게 중
+  단된다",
+  "정상 1개 + 실패 2
+  개 케이스가 테스트
+  로 검증된다"
+  ],
+  "tdd_plan": [
+  "Red: 정상 fixture
+  로딩 및 특정 id 조
+  회 테스트를 작성한
+  다",
+  "Green: 로더/인덱서
+  를 구현해 테스트를
+  통과시킨다",
+  "Red: JSON 파싱 실
+  패/필수 필드 누락
+  fixture 테스트를 추
+  가한다",
+  "Green: 오류를 명시
+  적 에러 타입으로 반
+  환하거나
+  ErrorBoundary 경로
+  로 연결해 통과시킨
+  다",
+  "Refactor:
+  provider/hook API로
+  캡슐화해 페이지 의
+  존을 줄인다"
+  ],
+  "commands": {
+  "run": "cd
+  curriculum-viewer
+  && npm run dev",
+  "test": "cd
+  curriculum-viewer
+  && npm run test"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-2",
+  "role": "FE",
+  "title": "구조 검증
+  기 규칙 구현/정비 +
+  npm run
+  validate:data 확
+  정",
+  "description": "데
+  이터 계약(v1)에 맞
+  춰 구조 검증 규칙을
+  구현/정비하고, CLI
+  로 파일을 검증해
+  CI/로컬에서 재현 가
+  능하게 한다. issue
+  포맷(code/severity/
+  message/nodeId/
+  relatedId)을 표준화
+  한다.",
+  "acceptance_criteri
+  a": [
+  "npm run
+  validate:data가 기
+  본 데이터 파일을 검
+  증하고 error가 있으
+  면 exit code 1이
+  다",
+  "출력이 severity/
+  code/message/
+  nodeId/relatedId를
+  포함한다",
+  "핵심 규칙 포함 최
+  소 8개 이상의 규칙
+  이 구현돼 있다(예:
+  중복 id, 깨진
+  parent, children 불
+  일치, cycle)",
+  "warning만 존재하면
+  exit code 0이다",
+  "검증기 유닛 테스트
+  가 최소 5개 이상이
+  고 deterministic하
+  다"
+  ],
+  "tdd_plan": [
+  "Red: 중복 id/깨진
+  참조/cycle fixture
+  에 대한 기대
+  issue(code/
+  severity)를 검증하
+  는 테스트를 작성한
+  다",
+  "Green: validate
+  core 로직을 구현/정
+  비해 통과시킨다",
+  "Red: warning 규칙
+  (예: orphan, empty
+  children 등) 테스트
+  를 추가한다",
+  "Green: warning-
+  only일 때 exit code
+  0 정책을 CLI에 반영
+  한다",
+  "Refactor: 규칙을
+  작은 함수로 분리하
+  고 issue 포맷을 단
+  일화한다"
+  ],
+  "commands": {
+  "run": "cd
+  curriculum-viewer
+  && npm run
+  validate:data",
+  "test": "cd
+  curriculum-viewer
+  && npm run test"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-3",
+  "role": "FE",
+  "title": "트리(계
+  층) 뷰 페이지 + 노
+  드 상세 패널 + 검
+  색",
+  "description": "커
+  리큘럼을 계층 트리
+  로 렌더링하고 확장/
+  축소, 노드 클릭 상
+  세 패널, 제목 검색
+  (필터 또는 하이라이
+  트)을 제공한다.",
+  "acceptance_criteri
+  a": [
+  "루트부터 계층적으
+  로 트리 확장/축소가
+  가능하다",
+  "노드 클릭 시 상세
+  패널에 id/type/
+  title/parent/
+  children 정보가 표
+  시된다",
+  "검색어 입력 시 제
+  목 기준으로 필터링
+  또는 하이라이트가
+  동작한다",
+  "중간 규모 데이터
+  (예: 200 노드)에서
+  기본 조작이 체감상
+  느리지 않다",
+  "탐색/클릭/검색 동
+  작이 테스트로 검증
+  된다"
+  ],
+  "tdd_plan": [
+  "Red: 루트 노드 렌
+  더 테스트를 작성한
+  다",
+  "Green: 트리 컴포넌
+  트를 구현해 통과시
+  킨다",
+  "Red: 클릭 시 상세
+  패널 업데이트 테스
+  트를 추가한다",
+  "Green: 선택 상태/
+  패널을 구현해 통과
+  시킨다",
+  "Red: 검색 입력에
+  따른 변화 테스트를
+  추가한다",
+  "Green: 검색 로직을
+  구현해 통과시킨다"
+  ],
+  "commands": {
+  "run": "cd
+  curriculum-viewer
+  && npm run dev",
+  "test": "cd
+  curriculum-viewer
+  && npm run test"
+  },
+  "depends_on": [
+  "FE-1"
+  ]
+  },
+  {
+  "id": "FE-4",
+  "role": "FE",
+  "title": "React
+  Flow 그래프 뷰(읽기
+  전용) + dagre 레이
+  아웃 + 범례/상세",
+  "description":
+  "React Flow로 커리
+  큘럼 그래프를 시각
+  화하고 dagre로 자동
+  레이아웃을 적용한
+  다. 노드 클릭 상세
+  패널, 타입별 스타
+  일/범례, 줌/패닝/
+  fitView를 제공하며
+  편집 동작은 비활성
+  화한다.",
+  "acceptance_criteri
+  a": [
+  "모든 노드/엣지가
+  표시되고 초기
+  fitView가 적용된
+  다",
+  "레이아웃 방향이 일
+  관되고 노드 좌표가
+  유효하다",
+  "노드 클릭 시 선택
+  상태와 상세 패널이
+  갱신된다",
+  "노드 드래그/엣지
+  연결/삭제 등 편집
+  동작이 비활성화돼
+  있다",
+  "타입별 범례와 노드
+  스타일이 일치한다",
+  "그래프 변환/선택
+  동작이 테스트로 검
+  증된다"
+  ],
+  "tdd_plan": [
+  "Red: 데이터→그래프
+  노드/엣지 변환 테스
+  트를 작성한다",
+  "Green: 변환 로직을
+  구현해 통과시킨다",
+  "Red: 레이아웃 적용
+  후 좌표 존재/기본
+  품질(단순 기준) 테
+  스트를 추가한다",
+  "Green: dagre 레이
+  아웃 적용을 구현해
+  통과시킨다",
+  "Red: 노드 클릭 시
+  패널 업데이트 테스
+  트를 추가한다",
+  "Green: 상호작용을
+  구현해 통과시킨다"
+  ],
+  "commands": {
+  "run": "cd
+  curriculum-viewer
+  && npm run dev",
+  "test": "cd
+  curriculum-viewer
+  && npm run test"
+  },
+  "depends_on": [
+  "FE-1",
+  "RESEARCH-2"
+  ]
+  },
+  {
+  "id": "FE-5",
+  "role": "FE",
+  "title": "검증 결과
+  UI 통합(오류/경고
+  표시, 안전한 실패
+  모드) + 문서",
+  "description": "앱
+  로딩 시 validator
+  결과를 UI에 통합한
+  다. error가 있으면
+  그래프/트리 렌더를
+  차단하고 이슈 목록
+  을 표시하며,
+  warning만 있으면 경
+  고 배너로 안내한다.
+  실행/검증/데이터 수
+  정 절차를 문서로 정
+  리한다.",
+  "acceptance_criteri
+  a": [
+  "error가 있으면 이
+  슈 목록이 표시되고
+  그래프/트리 렌더가
+  차단된다",
+  "warning만 있으면
+  경고 배너가 표시되
+  고 그래프/트리 렌더
+  는 유지된다",
+  "이슈 목록에
+  severity/code/
+  message/nodeId/
+  relatedId가 표시된
+  다",
+  "이슈가 많아도(예:
+  50+) UI가 멈추지 않
+  는다",
+  "ErrorBoundary(또는
+  동등)로 런타임 예외
+  시 복구 가능한 화면
+  을 제공한다",
+  "실행/테스트/
+  validate:data/build
+  및 데이터 수정 워크
+  플로우가 문서에 정
+  리돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: error일 때 차
+  단 UI/이슈 목록 렌
+  더 테스트를 작성한
+  다",
+  "Green: 차단 UI를
+  구현해 통과시킨다",
+  "Red: warning-only
+  일 때 배너 표시 +
+  뷰 렌더 테스트를 추
+  가한다",
+  "Green: warning 분
+  기 처리로 통과시킨
+  다",
+  "Refactor: 이슈 렌
+  더링 컴포넌트를 분
+  리하고 필요 시 가상
+  화 포인트를 마련한
+  다"
+  ],
+  "commands": {
+  "run": "cd
+  curriculum-viewer
+  && npm run dev",
+  "test": "cd
+  curriculum-viewer
+  && npm run test"
+  },
+  "depends_on": [
+  "FE-2",
+  "FE-3",
+  "FE-4"
+  ]
+  }
+  ],
+  "next_ticket_id":
+  "RESEARCH-1",
+  "risks_open_questio
+  ns": [
+  "단일 parent(트리)
+  만 허용할지 vs 다중
+  parent(DAG) 허용할
+  지에 따른 스키마/검
+  증/레이아웃 복잡
+  도",
+  "unknown field 허용
+  여부(향후 확장 대
+  비)와 validator 호
+  환 정책",
+  "children_ids 순서
+  의 의미(정렬/표시
+  우선순위) 및 레이아
+  웃 반영 방식",
+  "다중 루트(여러
+  subject 등)일 때 트
+  리/그래프 초기 표시
+  및 네비게이션 정
+  책",
+  "dagre로 해결되지
+  않는 교차/겹침 케이
+  스의 elk 전환 타이
+  밍과 도입 비용",
+  "React Flow 렌더링
+  성능(노드 수 증가
+  시)과 가상화/클러스
+  터링 필요 여부",
+  "validator issue 코
+  드 체계 고정/버저닝
+  및 계약 변경 시 마
+  이그레이션 가이드
+  필요"
+  ]
+  }
+  ###DONE:71921cc7f8#
+  ##
+
+
+› Request 052cd6d2c7: 아래 파일을 읽고 지시사항대
+  로 작업 계획(JSON)을 작성해줘. 마지막에 마커를
+  그대로 출력해. -> /mnt/c/Users/irron/Desktop/
+  my/web_service_new/calculate_math/.agents/
+  inbox/pm_052cd6d2c7.md
+
+
+• Explored
+  └ Read pm_052cd6d2c7.md
+
+─ Worked for 9s ──────────────────────────────────
+
+• ###BEGIN:052cd6d2c7###
+  {
+  "summary": "정적 커리큘럼 JSON을 로드해 트리/그
+  래프(React Flow)로 탐색하는 읽기 전용 뷰어와, 데
+  이터 구조를 자동 검증해 계약 위반을 조기에 발견
+  하는 검증기를 v1로 구현한다. v1은 편집/문제풀이/
+  정답률/진도 계산 없이 ‘보기 + 구조 검증’만 제공
+  한다.",
+  "scope": [
+  "정적 데이터 로딩: curriculum-viewer/public/
+  data/curriculum_math_v1.json",
+  "커리큘럼 데이터 계약(v1) 문서화(필드/타입/ID 규
+  칙/계층 규칙)",
+  "구조 검증기 구현/정비 및 CLI 검증 커맨드 제공
+  (npm run validate:data)",
+  "React Flow 기반 읽기 전용 그래프 뷰(+ dagre 레
+  이아웃 기본 적용)",
+  "트리(계층) 뷰 + 노드 상세 패널 + 제목 검색",
+  "검증 결과(오류/경고) UI 표기 및 안전한 실패
+  (ErrorBoundary)",
+  "개발자 문서(실행/검증/데이터 수정 워크플로우)"
+  ],
+  "non_goals": [
+  "그래프/커리큘럼 편집(Author Mode), 노드/엣지 편
+  집 및 저장/퍼블리시",
+  "문제풀이/채점/학습 세션/정답률/노드 상태
+  (CLEARED 등) 계산",
+  "백엔드 API 연동 및 서버 기반 인증/권한/데이터
+  저장",
+  "AI 기반 추천/진단/콘텐츠 생성 자동화",
+  "대규모(수천 노드) 성능 최적화, SSR, 운영 모니터
+  링"
+  ],
+  "tickets": [
+  {
+  "id": "RESEARCH-1",
+  "role": "RESEARCH",
+  "title": "Curriculum JSON 데이터 계약(v1) 확정
+  (스키마/ID/계층 규칙, error/warning 기준)",
+  "description": "v1에서 사용할 커리큘럼 JSON 스키
+  마(필드/타입/허용값), ID 규칙, parent/children
+  정합성, 루트 정책, 순환 금지 등 핵심 제약과 검증
+  기준(error vs warning)을 문서로 확정한다. FE가
+  타입/검증기/뷰를 바로 구현할 수 있도록 예시와 판
+  단 기준을 포함한다.",
+  "acceptance_criteria": [
+  "curriculum-viewer에서 참조 가능한 데이터 계약
+  문서가 존재한다",
+  "node.type 허용값과 타입별 필수/선택 필드가 명시
+  돼 있다",
+  "ID 규칙(형식/중복 금지/문자 제한/정렬 기준)이
+  예시와 함께 정의돼 있다",
+  "계층 규칙(parent_id/children_ids 양방향 일치,
+  루트 조건, cycle 금지)이 명시돼 있다",
+  "검증 규칙별 error/warning 분류 기준과 메시지 원
+  칙이 정리돼 있다",
+  "curriculum_math_v1.json이 계약을 만족하거나, 위
+  반 항목이 문서에 명시돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: 중복 id/깨진 참조/순환(cycle) 위반 예시와
+  기대 에러 코드 목록을 정의한다",
+  "Green: 모호한 규칙을 제거하고 동일 예시에서 판
+  단이 일관되도록 계약을 고정한다",
+  "Refactor: v2 확장을 위한 reserved/optional 필드
+  정책을 문서에 추가한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run
+  validate:data"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "RESEARCH-2",
+  "role": "RESEARCH",
+  "title": "그래프 자동 레이아웃 기준 결정(dagre
+  기본값/elk 전환 조건)",
+
+
+  "description": "React
+  Flow 그래프 뷰의 레이
+  아웃
+  기본값(방향/간격 등)
+  과 품질 기준(겹침/교
+  차/가독
+  성)을 정의한다. dagre
+  를 기본으로 하되, elk
+  도입
+  이 필요한 조건과 전환
+  비용을 정리한다.",
+  "acceptance_criteria"
+  : [
+  "레이아웃 방향(TB/LR)
+  및 주요 간격 파라미터
+  기본
+  값이 정의돼 있다",
+  "children_ids 기반
+  edge 생성 규칙(부모→
+  자식, 중
+  복 방지)이 명시돼 있
+  다",
+  "가독성 저하 케이스
+  (교차 과다, 밀집, 긴
+  edge)와
+  완화책이 정리돼 있
+  다",
+  "dagre로 충분한 기준
+  과 elk 전환 기준이 문
+  서화돼
+  있다",
+  "샘플 데이터에서 기대
+  레이아웃 결과(서술 또
+  는 스
+  크린샷)가 포함돼 있
+  다"
+  ],
+  "tdd_plan": [
+  "Red: 레이아웃 품질
+  체크리스트(겹침/교차/
+  방향 일
+  관성)를 정의한다",
+  "Green: dagre 설정 제
+  안으로 체크리스트를
+  만족하
+  는 기준을 고정한다",
+  "Refactor: 데이터 규모 증가(예:
+  200+) 시 성능/가
+  독성 트레이드오프를 문서에 추가한
+  다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer &&
+  npm run dev",
+  "test": "cd curriculum-viewer &&
+  npm run test"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-1",
+  "role": "FE",
+  "title": "정적 커리큘럼 로더/타
+  입/인덱싱 기반 구
+  현",
+  "description": "정적 JSON을 로드
+  해 타입으로 파싱
+  하고, byId/parent/children 탐색을
+  위한 인덱스를
+  제공한다. 로딩/파싱/정합성 실패
+  시 UI에서 안전하
+  게 오류 상태를 표시할 수 있도록
+  에러 모델을 정리
+  한다.",
+  "acceptance_criteria": [
+  "앱이 curriculum_math_v1.json을 로드해 최소 요약
+  정보(예: 노드 수)를 표시한다",
+  "파일 읽기/JSON 파싱 실패 시 오류 UI(또는 오류
+  상태)가 표시된다",
+  "byId/children/parent 탐색 API가 제공된다",
+  "치명적 데이터 오류에서 무한루프/크래시 없이 안
+  전하게 중단된다",
+  "정상 1개 + 실패 2개 케이스가 테스트로 검증된다"
+  ],
+  "tdd_plan": [
+  "Red: 정상 fixture 로딩 및 특정 id 조회 테스트를
+  작성한다",
+  "Green: 로더/인덱서를 구현해 테스트를 통과시킨
+  다",
+  "Red: JSON 파싱 실패/필수 필드 누락 fixture 테스
+  트를 추가한다",
+  "Green: 오류를 명시적 에러 타입으로 반환하거나
+  ErrorBoundary 경로로 연결해 통과시킨다",
+  "Refactor: provider/hook API로 캡슐화해 페이지
+  의존을 줄인다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-2",
+  "role": "FE",
+  "title": "구조 검증기 규칙 구현/정비 + npm run
+  validate:data 확정",
+  "description": "데이터 계약(v1)에 맞춰 구조 검증
+  규칙을 구현/정비하고, CLI로 파일을 검증해 CI/로
+  컬에서 재현 가능하게 한다. issue 포맷(code/
+  severity/message/nodeId/relatedId)을 표준화한
+  다.",
+  "acceptance_criteria": [
+  "npm run validate:data가 기본 데이터 파일을 검증
+  하고 error가 있으면 exit code 1이다",
+  "출력이 severity/code/message/nodeId/relatedId를
+  포함한다",
+  "핵심 규칙 포함 최소 8개 이상의 규칙이 구현돼 있
+  다(예: 중복 id, 깨진 parent, children 불일치,
+  cycle)",
+  "warning만 존재하면 exit code 0이다",
+  "검증기 유닛 테스트가 최소 5개 이상이고
+  deterministic하다"
+  ],
+  "tdd_plan": [
+  "Red: 중복 id/깨진 참조/cycle fixture에 대한 기
+  대 issue(code/severity)를 검증하는 테스트를 작성
+  한다",
+  "Green: validate core 로직을 구현/정비해 통과시
+  킨다",
+  "Red: warning 규칙(예: orphan, empty children
+  등) 테스트를 추가한다",
+  "Green: warning-only일 때 exit code 0 정책을 CLI
+  에 반영한다",
+  "Refactor: 규칙을 작은 함수로 분리하고 issue 포
+  맷을 단일화한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run
+  validate:data",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-3",
+  "role": "FE",
+  "title": "트리(계층) 뷰 페이지 + 노드 상세 패널
+  + 검색",
+  "description": "커리큘럼을 계층 트리로 렌더링하
+  고 확장/축소, 노드 클릭 상세 패널, 제목 검색(필
+  터 또는 하이라이트)을 제공한다.",
+  "acceptance_criteria": [
+  "루트부터 계층적으로 트리 확장/축소가 가능하다",
+  "노드 클릭 시 상세 패널에 id/type/title/parent/
+  children 정보가 표시된다",
+  "검색어 입력 시 제목 기준으로 필터링 또는 하이라
+  이트가 동작한다",
+  "중간 규모 데이터(예: 200 노드)에서 기본 조작이
+  체감상 느리지 않다",
+  "탐색/클릭/검색 동작이 테스트로 검증된다"
+  ],
+  "tdd_plan": [
+  "Red: 루트 노드 렌더 테스트를 작성한다",
+  "Green: 트리 컴포넌트를 구현해 통과시킨다",
+  "Red: 클릭 시 상세 패널 업데이트 테스트를 추가한
+  다",
+  "Green: 선택 상태/패널을 구현해 통과시킨다",
+  "Red: 검색 입력에 따른 변화 테스트를 추가한다",
+  "Green: 검색 로직을 구현해 통과시킨다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-1"
+  ]
+  },
+  {
+  "id": "FE-4",
+  "role": "FE",
+  "title": "React Flow 그래프 뷰(읽기 전용) +
+  dagre 레이아웃 + 범례/상세",
+  "description": "React Flow로 커리큘럼 그래프를
+  시각화하고 dagre로 자동 레이아웃을 적용한다. 노
+  드 클릭 상세 패널, 타입별 스타일/범례, 줌/패닝/
+  fitView를 제공하며 편집 동작은 비활성화한다.",
+  "acceptance_criteria": [
+  "모든 노드/엣지가 표시되고 초기 fitView가 적용된
+  다",
+  "레이아웃 방향이 일관되고 노드 좌표가 유효하다",
+  "노드 클릭 시 선택 상태와 상세 패널이 갱신된다",
+  "노드 드래그/엣지 연결/삭제 등 편집 동작이 비활
+  성화돼 있다",
+  "타입별 범례와 노드 스타일이 일치한다",
+  "그래프 변환/선택 동작이 테스트로 검증된다"
+  ],
+  "tdd_plan": [
+  "Red: 데이터→그래프 노드/엣지 변환 테스트를 작성
+  한다",
+  "Green: 변환 로직을 구현해 통과시킨다",
+  "Red: 레이아웃 적용 후 좌표 존재/기본 품질(단순
+  기준) 테스트를 추가한다",
+  "Green: dagre 레이아웃 적용을 구현해 통과시킨
+  다",
+  "Red: 노드 클릭 시 패널 업데이트 테스트를 추가한
+  다",
+  "Green: 상호작용을 구현해 통과시킨다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-1",
+  "RESEARCH-2"
+  ]
+  },
+  {
+  "id": "FE-5",
+  "role": "FE",
+  "title": "검증 결과 UI 통합(오류/경고 표시, 안전
+  한 실패 모드) + 문서",
+  "description": "앱 로딩 시 validator 결과를 UI에
+  통합한다. error가 있으면 그래프/트리 렌더를 차단
+  하고 이슈 목록을 표시하며, warning만 있으면 경고
+  배너로 안내한다. 실행/검증/데이터 수정 절차를 문
+  서로 정리한다.",
+  "acceptance_criteria": [
+  "error가 있으면 이슈 목록이 표시되고 그래프/트리
+  렌더가 차단된다",
+  "warning만 있으면 경고 배너가 표시되고 그래프/트
+  리 렌더는 유지된다",
+  "이슈 목록에 severity/code/message/nodeId/
+  relatedId가 표시된다",
+  "이슈가 많아도(예: 50+) UI가 멈추지 않는다",
+  "ErrorBoundary(또는 동등)로 런타임 예외 시 복구
+  가능한 화면을 제공한다",
+  "실행/테스트/validate:data/build 및 데이터 수정
+  워크플로우가 문서에 정리돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: error일 때 차단 UI/이슈 목록 렌더 테스트를
+  작성한다",
+  "Green: 차단 UI를 구현해 통과시킨다",
+  "Red: warning-only일 때 배너 표시 + 뷰 렌더 테스
+  트를 추가한다",
+  "Green: warning 분기 처리로 통과시킨다",
+  "Refactor: 이슈 렌더링 컴포넌트를 분리하고 필요
+  시 가상화 포인트를 마련한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-2",
+  "FE-3",
+  "dagre로 해결되지 않는 교차/겹침 케이스의 elk 전
+  환 타이밍과 도입 비용",
+  "React Flow 렌더링 성능(노드 수 증가 시)과 가상
+  화/클러스터링 필요 여부",
+  "validator issue 코드 체계 고정/버저닝 및 계약
+  변경 시 마이그레이션 가이드 필요"
+  ]
+  }
+  ###DONE:052cd6d2c7###
+
+
+› Request 4790836433: 아래 파일을 읽고 지시사항
+  대로 작업 계획(JSON)을 작성해줘. 마지막에 마커
+  를 그대로 출력해. -> /mnt/c/Users/irron/
+  Desktop/my/web_service_new/
+  calculate_math/.agents/inbox/pm_4790836433.md
+
+
+• Explored
+  └ Read pm_4790836433.md
+
+─ Worked for 12s ────────────────────────────────
+
+• ###BEGIN:4790836433###
+  {
+  "summary": "정적 커리큘럼 JSON을 로드해 트리/그
+  래프(React Flow)로 탐색하는 읽기 전용 뷰어와,
+  데이터 구조를 자동 검증해 계약 위반을 조기에 발
+  견하는 검증기를 v1로 구현한다. v1은 편집/문제풀
+  이/정답률/진도 계산 없이 ‘보기 + 구조 검증’만
+  제공한다.",
+  "scope": [
+  "정적 데이터 로딩: curriculum-viewer/public/
+  data/curriculum_math_v1.json",
+  "커리큘럼 데이터 계약(v1) 문서화(필드/타입/ID
+  규칙/계층 규칙)",
+  "구조 검증기 구현/정비 및 CLI 검증 커맨드 제공
+  (npm run validate:data)",
+  "React Flow 기반 읽기 전용 그래프 뷰(+ dagre 레
+  이아웃 기본 적용)",
+  "트리(계층) 뷰 + 노드 상세 패널 + 제목 검색",
+  "검증 결과(오류/경고) UI 표기 및 안전한 실패
+  (ErrorBoundary)",
+  "개발자 문서(실행/검증/데이터 수정 워크플로우)"
+  ],
+  "non_goals": [
+  "그래프/커리큘럼 편집(Author Mode), 노드/엣지
+  편집 및 저장/퍼블리시",
+  "문제풀이/채점/학습 세션/정답률/노드 상태
+  (CLEARED 등) 계산",
+  "백엔드 API 연동 및 서버 기반 인증/권한/데이터
+  저장",
+  "AI 기반 추천/진단/콘텐츠 생성 자동화",
+  "대규모(수천 노드) 성능 최적화, SSR, 운영 모니
+  터링"
+  ],
+  "tickets": [
+  {
+  "id": "RESEARCH-1",
+  "role": "RESEARCH",
+  "title": "Curriculum JSON 데이터 계약(v1) 확정
+  (스키마/ID/계층 규칙, error/warning 기준)",
+  "description": "v1에서 사용할 커리큘럼 JSON 스
+  키마(필드/타입/허용값), ID 규칙, parent/
+  children 정합성, 루트 정책, 순환 금지 등 핵심
+  제약과 검증 기준(error vs warning)을 문서로 확
+  정한다. FE가 타입/검증기/뷰를 바로 구현할 수 있
+  도록 예시와 판단 기준을 포함한다.",
+  "acceptance_criteria": [
+  "curriculum-viewer에서 참조 가능한 데이터 계약
+  문서가 존재한다",
+  "node.type 허용값과 타입별 필수/선택 필드가 명
+  시돼 있다",
+  "ID 규칙(형식/중복 금지/문자 제한/정렬 기준)이
+  예시와 함께 정의돼 있다",
+  "계층 규칙(parent_id/children_ids 양방향 일치,
+  루트 조건, cycle 금지)이 명시돼 있다",
+  "검증 규칙별 error/warning 분류 기준과 메시지
+  원칙이 정리돼 있다",
+  "curriculum_math_v1.json이 계약을 만족하거나,
+  위반 항목이 문서에 명시돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: 중복 id/깨진 참조/순환(cycle) 위반 예시와
+  기대 에러 코드 목록을 정의한다",
+  "Green: 모호한 규칙을 제거하고 동일 예시에서 판
+  단이 일관되도록 계약을 고정한다",
+  "Refactor: v2 확장을 위한 reserved/optional 필
+  드 정책을 문서에 추가한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run
+  validate:data"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "RESEARCH-2",
+  "role": "RESEARCH",
+  "title": "그래프 자동 레이아웃 기준 결정(dagre
+  기본값/elk 전환 조건)",
+  "description": "React Flow 그래프 뷰의 레이아웃
+  기본값(방향/간격 등)과 품질 기준(겹침/교차/가독
+  성)을 정의한다. dagre를 기본으로 하되, elk 도입
+  이 필요한 조건과 전환 비용을 정리한다.",
+  "acceptance_criteria": [
+  "레이아웃 방향(TB/LR) 및 주요 간격 파라미터 기
+  본값이 정의돼 있다",
+  "children_ids 기반 edge 생성 규칙(부모→자식, 중
+  복 방지)이 명시돼 있다",
+  "가독성 저하 케이스(교차 과다, 밀집, 긴 edge)와
+  완화책이 정리돼 있다",
+  "dagre로 충분한 기준과 elk 전환 기준이 문서화돼
+  있다",
+  "샘플 데이터에서 기대 레이아웃 결과(서술 또는
+  스크린샷)가 포함돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: 레이아웃 품질 체크리스트(겹침/교차/방향
+  일관성)를 정의한다",
+  "Green: dagre 설정 제안으로 체크리스트를 만족하
+  는 기준을 고정한다",
+  "Refactor: 데이터 규모 증가(예: 200+) 시 성능/
+  가독성 트레이드오프를 문서에 추가한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-1",
+  "role": "FE",
+  "title": "정적 커리큘럼 로더/타입/인덱싱 기반
+  구현",
+  "description": "정적 JSON을 로드해 타입으로 파
+  싱하고, byId/parent/children 탐색을 위한 인덱스
+  를 제공한다. 로딩/파싱/정합성 실패 시 UI에서 안
+  전하게 오류 상태를 표시할 수 있도록 에러 모델을
+  정리한다.",
+  "acceptance_criteria": [
+  "앱이 curriculum_math_v1.json을 로드해 최소 요
+  약 정보(예: 노드 수)를 표시한다",
+  "파일 읽기/JSON 파싱 실패 시 오류 UI(또는 오류
+  상태)가 표시된다",
+  "byId/children/parent 탐색 API가 제공된다",
+  "치명적 데이터 오류에서 무한루프/크래시 없이 안
+  전하게 중단된다",
+  "정상 1개 + 실패 2개 케이스가 테스트로 검증된
+  다"
+  ],
+  "tdd_plan": [
+  "Red: 정상 fixture 로딩 및 특정 id 조회 테스트
+  를 작성한다",
+  "Green: 로더/인덱서를 구현해 테스트를 통과시킨
+  다",
+  "Red: JSON 파싱 실패/필수 필드 누락 fixture 테
+  스트를 추가한다",
+  "Green: 오류를 명시적 에러 타입으로 반환하거나
+  ErrorBoundary 경로로 연결해 통과시킨다",
+  "Refactor: provider/hook API로 캡슐화해 페이지
+  의존을 줄인다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-2",
+  "role": "FE",
+  "title": "구조 검증기 규칙 구현/정비 + npm run
+  validate:data 확정",
+  "description": "데이터 계약(v1)에 맞춰 구조 검
+  증 규칙을 구현/정비하고, CLI로 파일을 검증해
+  CI/로컬에서 재현 가능하게 한다. issue 포맷
+  (code/severity/message/nodeId/relatedId)을 표준
+  화한다.",
+  "acceptance_criteria": [
+  "npm run validate:data가 기본 데이터 파일을 검
+  증하고 error가 있으면 exit code 1이다",
+  "출력이 severity/code/message/nodeId/relatedId
+  를 포함한다",
+  "핵심 규칙 포함 최소 8개 이상의 규칙이 구현돼
+  있다(예: 중복 id, 깨진 parent, children 불일치,
+  cycle)",
+  "warning만 존재하면 exit code 0이다",
+  "검증기 유닛 테스트가 최소 5개 이상이고
+  deterministic하다"
+  ],
+  "tdd_plan": [
+  "Red: 중복 id/깨진 참조/cycle fixture에 대한 기
+  대 issue(code/severity)를 검증하는 테스트를 작
+  성한다",
+  "Green: validate core 로직을 구현/정비해 통과시
+  킨다",
+  "Red: warning 규칙(예: orphan, empty children
+  등) 테스트를 추가한다",
+  "Green: warning-only일 때 exit code 0 정책을
+  CLI에 반영한다",
+  "Refactor: 규칙을 작은 함수로 분리하고 issue 포
+  맷을 단일화한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run
+  validate:data",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-3",
+  "role": "FE",
+  "title": "트리(계층) 뷰 페이지 + 노드 상세 패널
+  + 검색",
+  "description": "커리큘럼을 계층 트리로 렌더링하
+  고 확장/축소, 노드 클릭 상세 패널, 제목 검색(필
+  터 또는 하이라이트)을 제공한다.",
+  "acceptance_criteria": [
+  "루트부터 계층적으로 트리 확장/축소가 가능하
+  다",
+  "노드 클릭 시 상세 패널에 id/type/title/parent/
+  children 정보가 표시된다",
+  "검색어 입력 시 제목 기준으로 필터링 또는 하이
+  라이트가 동작한다",
+  "중간 규모 데이터(예: 200 노드)에서 기본 조작이
+  체감상 느리지 않다",
+  "탐색/클릭/검색 동작이 테스트로 검증된다"
+  ],
+  "tdd_plan": [
+  "Red: 루트 노드 렌더 테스트를 작성한다",
+  "Green: 트리 컴포넌트를 구현해 통과시킨다",
+  "Red: 클릭 시 상세 패널 업데이트 테스트를 추가
+  한다",
+  "Green: 선택 상태/패널을 구현해 통과시킨다",
+  "Red: 검색 입력에 따른 변화 테스트를 추가한다",
+  "Green: 검색 로직을 구현해 통과시킨다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-1"
+  ]
+  },
+  {
+  "id": "FE-4",
+  "role": "FE",
+  "title": "React Flow 그래프 뷰(읽기 전용) +
+  dagre 레이아웃 + 범례/상세",
+  "description": "React Flow로 커리큘럼 그래프를
+  시각화하고 dagre로 자동 레이아웃을 적용한다. 노
+  드 클릭 상세 패널, 타입별 스타일/범례, 줌/패닝/
+  fitView를 제공하며 편집 동작은 비활성화한다.",
+  "acceptance_criteria": [
+  "모든 노드/엣지가 표시되고 초기 fitView가 적용
+  된다",
+  "레이아웃 방향이 일관되고 노드 좌표가 유효하
+  다",
+  "노드 클릭 시 선택 상태와 상세 패널이 갱신된
+  다",
+  "노드 드래그/엣지 연결/삭제 등 편집 동작이 비활
+  성화돼 있다",
+  "타입별 범례와 노드 스타일이 일치한다",
+  "그래프 변환/선택 동작이 테스트로 검증된다"
+  ],
+  "tdd_plan": [
+  "Red: 데이터→그래프 노드/엣지 변환 테스트를 작
+  성한다",
+  "Green: 변환 로직을 구현해 통과시킨다",
+  "Red: 레이아웃 적용 후 좌표 존재/기본 품질(단순
+  기준) 테스트를 추가한다",
+  "Green: dagre 레이아웃 적용을 구현해 통과시킨
+  다",
+  "Red: 노드 클릭 시 패널 업데이트 테스트를 추가
+  한다",
+  "Green: 상호작용을 구현해 통과시킨다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-1",
+  "RESEARCH-2"
+  ]
+  },
+  {
+  "id": "FE-5",
+  "role": "FE",
+  "title": "검증 결과 UI 통합(오류/경고 표시, 안
+  전한 실패 모드) + 문서",
+  "description": "앱 로딩 시 validator 결과를 UI
+  에 통합한다. error가 있으면 그래프/트리 렌더를
+  차단하고 이슈 목록을 표시하며, warning만 있으면
+  경고 배너로 안내한다. 실행/검증/데이터 수정 절
+  차를 문서로 정리한다.",
+  "acceptance_criteria": [
+  "error가 있으면 이슈 목록이 표시되고 그래프/트
+  리 렌더가 차단된다",
+  "warning만 있으면 경고 배너가 표시되고 그래프/
+  트리 렌더는 유지된다",
+  "이슈 목록에 severity/code/message/nodeId/
+  relatedId가 표시된다",
+  "이슈가 많아도(예: 50+) UI가 멈추지 않는다",
+  "ErrorBoundary(또는 동등)로 런타임 예외 시 복구
+  가능한 화면을 제공한다",
+  "실행/테스트/validate:data/build 및 데이터 수정
+  워크플로우가 문서에 정리돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: error일 때 차단 UI/이슈 목록 렌더 테스트
+  를 작성한다",
+  "Green: 차단 UI를 구현해 통과시킨다",
+  "Red: warning-only일 때 배너 표시 + 뷰 렌더 테
+  스트를 추가한다",
+  "Green: warning 분기 처리로 통과시킨다",
+  "Refactor: 이슈 렌더링 컴포넌트를 분리하고 필요
+  시 가상화 포인트를 마련한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-2",
+  "FE-3",
+  "FE-4"
+  ]
+  }
+  ],
+  "next_ticket_id": "RESEARCH-1",
+  "risks_open_questions": [
+  "단일 parent(트리)만 허용할지 vs 다중
+  parent(DAG) 허용할지에 따른 스키마/검증/레이아
+  웃 복잡도",
+  "unknown field 허용 여부(향후 확장 대비)와
+  validator 호환 정책(버전/마이그레이션)",
+  "children_ids 순서의 의미(정렬/표시 우선순위)
+  및 레이아웃 반영 방식",
+  "다중 루트(여러 subject 등)일 때 트리/그래프 초
+  기 표시 및 네비게이션 정책",
+  "dagre로 해결되지 않는 교차/겹침 케이스의 elk
+  전환 타이밍과 도입 비용",
+  "React Flow 렌더링 성능(노드 수 증가 시)과 가상
+  화/클러스터링 필요 여부",
+  "validator issue 코드 체계 고정/버저닝 및 계약
+  변경 시 하위 호환 정책"
+  ]
+  }
+  ###DONE:4790836433###
+
+
+› Request c9b28f7ad2: 아래 파일을 읽고 지시사항
+  대로 작업 계획(JSON)을 작성해줘. 마지막에 마커
+  를 그대로 출력해. -> /mnt/c/Users/irron/
+  Desktop/my/web_service_new/
+  calculate_math/.agents/inbox/pm_c9b28f7ad2.md
+
+
+• Explored
+  └ Read pm_c9b28f7ad2.md, task.md
+
+• I'm analyzing the task file regarding execution
+  backlog for student learning, which might be
+  outdated or misinterpreted. I think the actual
+  MVP is the student learning system, but the
+  constraints mention that v1 is for the viewer
+  and validator. However, it's possible the
+  "curriculum-viewer" app already has student
+  learning features. The project manager keeps
+  referring to viewer+validator for v1,
+  suggesting there may be a mix-up. I need to
+  summarize the requirements, audit current
+  features, and create tickets for implementing
+  the backlog while considering v2 for additional
+  features like student login.
+
+  Clarifying project constraints
+
+  I’m noticing a contradiction regarding project
+  constraints. The user asked to "read the file
+  and write the plan as instructed," but the file
+  pm_c9b28f7ad2 points back to the same
+  constraints. These constraints might be generic
+  rather than fully accurate. It appears that v1
+  is for the viewer and structure validator,
+  while v2 includes features like quizzes. I need
+  to evaluate if v1 can still relate to student
+  learning, even if the PM request continuously
+  emphasizes viewer+validator across all files.
+
+  Revising project focus
+
+  I'm reflecting on task
+  20260115_mvp_student_learning_v1, which focuses
+  on the learning system, yet they requested a
+  viewer+validator. My earlier planning might
+  seem inconsistent here because I created a
+  viewer+validator plan when the actual project
+  appears to be the curriculum viewer, not just
+  the student learning system. The backlog task
+  file indicates features like audits, but it
+  seems we should still focus on
+  viewer+validator. Maybe for the summary, we can
+  determine what's done, partial, or todo
+  specifically for that viewer context, despite
+  the mention of potentially unrelated features.
+
+  Addressing plan discrepancies
+
+  I'm considering how to handle discrepancies in
+  the JSON plan. It's probably wise to reflect
+  any risks or open questions, although the JSON
+  schema doesn’t officially include those keys.
+  The PM instructions for task c9b28f7ad2 mainly
+  focus on summary, scope, non-goals, tickets,
+  and the next ticket ID, without mentioning
+  risks explicitly. I think including risks/open
+  questions could be helpful, especially since
+  they weren’t required previously. My plan
+  should still focus on addressing the execution
+  backlog while maintaining the viewer+validator
+  context, aiming to define Done/Partial/To-do
+  and execution order.
+
+  Navigating project requirements
+
+  I’m mulling over how to approach the project
+  requirements. There are features related to
+  student learning, but those tickets must also
+  be feasible for the viewer+validator context.
+  While crafting the plan, I need to create
+  tickets for auditing and inventory, yet these
+  may not align with explicit backlog items. My
+  main goal is to follow the task file while
+  interpreting the PM request. We can focus on
+  creating an audit checklist and determining the
+  status of current features, ensuring it fits
+  within the viewer+validator structure while
+  marking non-goals for features not relevant to
+  v1.
+
+  Organizing ticket details
+
+  I'm outlining the tickets I need to create for
+  the front end. For AC, I’ll include a markdown
+  document with the route list and component
+  paths, confirming with npm run dev. The FE-2
+  ticket will focus on cleaning up v1 routing by
+  removing or hiding v2 routes while ensuring
+  that tree, graph, and report are accessible,
+  and fixing the default route to include a 404.
+  For FE-3, I’ll implement a data validation
+  report page that displays validation results
+  using the existing library, followed by
+  improvements on the graph view in FE-4. I
+  should also develop commands for running,
+  testing, validating, and building. Finally, I
+  need to format the JSON correctly and set up a
+  "depends_on" chain for the tickets.
+
+─ Worked for 1m 10s ─────────────────────────────
+
+• ###BEGIN:c9b28f7ad2###
+  {
+  "summary": "현재 curriculum-viewer 구현을 빠르
+  게 Audit해 Done/Partial/To-do를 확정하고, v1(커
+  리큘럼 뷰어 + 구조 검증기) 제공 범위를 기준으로
+  화면/네비/검증 파이프라인을 정리한다.",
+  "scope": [
+  "현재 구현 기능 Audit 및 Done/Partial/To-do 확
+  정 문서화",
+  "v1 범위(뷰어+구조 검증기) 기준으로 라우트/네비
+  게이션 정리",
+  "정적 커리큘럼 JSON 로딩: curriculum-viewer/
+  public/data/curriculum_math_v1.json",
+  "구조 검증기(validator) 규칙/출력 정비 및 CLI
+  검증(npm run validate:data)",
+  "검증 결과 UI(리포트/배너/이슈 목록) 제공",
+  "그래프/트리 뷰의 읽기 전용 탐색(상세 패널, 기
+  본 레이아웃) 품질 보강",
+  "개발자 문서(실행/테스트/검증/빌드) 및 품질 게
+  이트(npm test, npm run build) 확인"
+  ],
+  "non_goals": [
+  "그래프 편집(Author Mode), 노드/엣지 편집 및 저
+  장/퍼블리시",
+  "문제풀이/채점/정답률/학습 세션/진도 상태
+  (CLEARED 등) 계산 및 표시",
+  "학생 대시보드/추천/리포트(학습 통계) 등 학습
+  루프 기능",
+  "백엔드 API 연동 및 서버 기반 인증/권한/데이터
+  저장",
+  "AI 기반 추천/진단/콘텐츠 생성 파이프라인"
+  ],
+  "tickets": [
+  {
+  "id": "RESEARCH-1",
+  "role": "RESEARCH",
+  "title": "Audit 체크리스트 및 v1 기준(뷰어+검증
+  기) 재정렬",
+  "description": "현재 구현 상태를 빠르게 분류할
+  수 있는 Audit 체크리스트를 만들고, v1에서 반드
+  시 제공해야 하는 기능(뷰어+구조 검증기)과 v2로
+  미룰 기능(학습/채점/대시보드 등)을 명확히 구분
+  한다. Done/Partial/To-do/Verify 정의를 v1 관점
+  에서 재정렬한다.",
+  "acceptance_criteria": [
+  "Audit 체크리스트 문서 1개가 생성되어 있다(라우
+  트/페이지/데이터/검증/빌드 항목 포함)",
+  "Done/Partial/To-do/Verify 판정 기준이 1~2문장
+  으로 명확히 정의돼 있다",
+  "현재 백로그 항목 중 v1 포함/제외(v2) 분류표가
+  존재한다",
+  "v1 완료 조건(Verification) 5개 이상이 문서에
+  포함돼 있다",
+  "FE가 문서만 보고 어떤 화면/기능을 우선 구현해
+  야 하는지 이해 가능하다"
+  ],
+  "tdd_plan": [
+  "Red: v1 완료 조건을 '검증 가능한 문장'으로 먼
+  저 고정한다(예: validate:data exit code, UI 이
+  슈 목록 렌더 등)",
+  "Green: 체크리스트를 해당 완료 조건에 1:1로 매
+  핑해 누락 항목이 없게 만든다",
+  "Refactor: v2 항목은 별도 섹션으로 이동하고 v1
+  문서에서 혼선을 제거한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": []
+  },
+  {
+  "id": "FE-1",
+  "role": "FE",
+  "title": "레포 실사(Audit) 실행 및 기능 인벤토
+  리 문서화",
+  "description": "curriculum-viewer를 실제로 실행
+  해 라우트/페이지/주요 컴포넌트/데이터 파일/검증
+  스크립트 위치를 캡처하고, 현재 구현을 Done/
+  Partial/To-do/Verify로 판정해 문서로 남긴
+  다. .legacy/는 참고만 하고 수정하지 않는다.",
+  "acceptance_criteria": [
+  "라우트 목록과 각 라우트의 담당 파일(페이지/컴
+  포넌트) 매핑이 문서에 포함돼 있다",
+  "트리/그래프/리포트(검증) 등 주요 페이지 스크린
+  샷(또는 동등한 증빙)이 포함돼 있다",
+  "curriculum_math_v1.json 로딩 경로와 실패 시 동
+  작이 문서에 기록돼 있다",
+  "npm run validate:data 실행 결과(성공/실패 케이
+  스 중 1개 이상)가 문서에 기록돼 있다",
+  "각 백로그 항목이 Done/Partial/To-do/Verify 중
+  하나로 분류돼 있고 근거(링크/파일 경로)가 있다"
+  ],
+  "tdd_plan": [
+  "Red: Audit 문서 템플릿(라우트/데이터/검증/테스
+  트 섹션)부터 작성한다",
+  "Green: 실제 실행 결과를 채워 넣고 Verify 항목
+  을 최소화하도록 추가 확인을 진행한다",
+  "Refactor: v1 범위 밖 항목은 별도 섹션으로 분리
+  해 혼선을 줄인다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run
+  validate:data"
+  },
+  "depends_on": [
+  "RESEARCH-1"
+  ]
+  },
+  {
+  "id": "FE-2",
+  "role": "FE",
+  "title": "v1 라우팅/네비게이션 정리(뷰어+검증기
+  중심)",
+  "description": "v1 제공 범위에 맞춰 네비게이션/
+  라우트를 정리한다. v1에서 제공하는 트리/그래프/
+  검증 리포트를 명확히 하고, 학습/채점/대시보드
+  등 v2 기능은 숨기거나 접근을 차단해 사용자 혼선
+  을 제거한다.",
+  "acceptance_criteria": [
+  "상단 네비게이션이 v1 페이지(트리/그래프/검증)
+  만 노출하거나, v2 항목은 명확히 비활성/숨김 처
+  리된다",
+  "직접 URL 접근으로 v2 라우트 진입 시 안내 화면
+  (또는 404/리다이렉트)이 표시된다",
+  "기본 진입 경로(홈)가 v1 핵심 페이지 중 하나로
+  정해져 있다",
+  "라우트 변경으로 인해 npm run build가 실패하지
+  않는다",
+  "라우팅/네비게이션 동작이 최소 2개 이상의 테스
+  트로 검증된다"
+  ],
+  "tdd_plan": [
+  "Red: v1 라우트만 접근 가능해야 한다는 라우팅
+  테스트를 작성한다",
+  "Green: routes/nav 구성을 변경해 테스트를 통과
+  시킨다",
+  "Refactor: v1/v2 라우트 정의를 분리(상수/배열)
+  해 유지보수성을 높인다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-1"
+  ]
+  },
+  {
+  "id": "FE-3",
+  "role": "FE",
+  "title": "구조 검증기(validator) 규칙/출력 정비
+  + Report UI 강화",
+  "description": "npm run validate:data와 동일한
+  검증 기준을 UI 리포트로 노출한다. error/warning
+  을 구분하고, 치명적 오류 시 뷰 렌더를 안전하게
+  차단하며(또는 명확한 경고 표시), 이슈 목록을 코
+  드/메시지/nodeId 기반으로 탐색 가능하게 한다.",
+  "acceptance_criteria": [
+  "npm run validate:data가 error 존재 시 exit
+  code 1, warning-only 시 exit code 0을 유지한
+  다",
+  "UI에서 error/warning 개수와 이슈 목록
+  (severity/code/message/nodeId/relatedId)을 확인
+  할 수 있다",
+  "치명적 오류(error)가 있을 때 사용자에게 ‘데이
+  터 수정 필요’ 안내가 표시된다(크래시 없음)",
+  "검증 결과가 많은 경우에도 UI가 멈추지 않는다
+  (최소한의 성능 고려)",
+  "validator/core에 대한 유닛 테스트가 최소 5개
+  이상 존재한다"
+  ],
+  "tdd_plan": [
+  "Red: 중복 id/깨진 참조/cycle fixture에 대해 기
+  대 issue(code/severity) 테스트를 작성한다",
+  "Green: validate 로직/issue 포맷을 정비해 테스
+  트를 통과시킨다",
+  "Red: UI에서 error일 때 차단/안내가 표시되는 테
+  스트를 추가한다",
+  "Green: Report UI를 구현/연결해 통과시킨다",
+  "Refactor: rule 단위를 함수로 분리하고 issue 렌
+  더링 컴포넌트를 분리한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-2"
+  ]
+  },
+  {
+  "id": "FE-4",
+  "role": "FE",
+  "title": "그래프/트리 뷰 품질 보강(읽기 전용 탐
+  색, 레이아웃 기본값)",
+  "description": "v1 뷰어로서 트리/그래프 탐색 경
+  험을 보강한다. 그래프는 React Flow + dagre 기본
+  레이아웃을 안정 적용하고, 노드 클릭 상세 패널과
+  기본 검색(제목 기준)을 제공한다.",
+  "acceptance_criteria": [
+  "그래프 뷰가 자동 레이아웃으로 초기 배치되고
+  fitView가 적용된다",
+  "노드 클릭 시 상세 패널에 id/type/title/parent/
+  children(가능한 범위)이 표시된다",
+  "제목 검색으로 노드를 필터링 또는 하이라이트할
+  수 있다",
+  "그래프는 읽기 전용이며 편집 동작(엣지 연결/삭
+  제 등)이 비활성화돼 있다",
+  "그래프 변환/선택 동작이 테스트로 검증된다"
+  ],
+  "tdd_plan": [
+  "Red: 데이터→그래프 노드/엣지 변환 테스트를 작
+  성한다",
+  "Green: 변환 로직을 구현해 통과시킨다",
+  "Red: 노드 선택 시 패널 업데이트 테스트를 추가
+  한다",
+  "Green: UI 상호작용을 구현해 통과시킨다",
+  "Refactor: 레이아웃 파라미터를 상수로 분리하고
+  테스트 가능한 순수 함수로 정리한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-2"
+  ]
+  },
+  {
+  "id": "FE-5",
+  "role": "FE",
+  "title": "품질 게이트 및 개발자 문서 정리(실행/
+  검증/빌드)",
+  "description": "v1 작업자가 빠르게 착수할 수 있
+  도록 커맨드/절차를 문서화하고, 최소 품질 게이트
+  (test, validate:data, build)를 통과하도록 정리
+  한다.",
+  "acceptance_criteria": [
+  "실행/테스트/검증/빌드 커맨드가 문서에 정리돼
+  있다",
+  "npm run test가 통과한다",
+  "npm run validate:data가 문서에 기재된 방식으로
+  재현 가능하다",
+  "npm run build가 통과한다",
+  "대표적인 검증 실패 케이스 1개(예: 중복 id) 재
+  현/복구 절차가 문서에 포함돼 있다"
+  ],
+  "tdd_plan": [
+  "Red: 문서에 포함할 ‘검증 실패 재현’ 시나리오를
+  1개 선정하고 체크리스트를 만든다",
+  "Green: 문서를 작성하고 체크리스트대로 재현/복
+  구가 가능하게 한다",
+  "Refactor: 문서 구조를 Quickstart/데이터 계약/
+  검증/뷰어(트리·그래프)로 정리한다"
+  ],
+  "commands": {
+  "run": "cd curriculum-viewer && npm run dev",
+  "test": "cd curriculum-viewer && npm run test"
+  },
+  "depends_on": [
+  "FE-3",
+  "FE-4"
+  ]
+  }
+  ],
+  "next_ticket_id": "RESEARCH-1",
+  "risks_open_questions": [
+  "현재 task 백로그(학습/채점/대시보드 중심)와
+  ‘v1=뷰어+구조 검증기’ 제약 간 불일치가 있어 v1/
+  v2 경계 합의가 필요",
+  "리포트 페이지가 ‘학생 리포트(학습 통계)’인지
+  ‘개발자 검증 리포트’인지 최종 의도 확정 필요",
+  "커리큘럼 JSON 스키마 확장(unknown field 허용
+  여부)과 validator 호환 정책(버전/마이그레이션)
+  필요",
+  "dagre 레이아웃 품질 한계 시 elk 전환 기준과 도
+  입 시점 합의 필요",
+  "라우트 숨김/차단 시 기존 기능(학습 관련) 사용
+  자 혼선 및 테스트 수정 범위가 커질 수 있음"
+  ]
+  }
+  ###DONE:c9b28f7ad2###
+
+
+› Write tests for @filename
+
+  84% context left · ? for shortcuts
+
