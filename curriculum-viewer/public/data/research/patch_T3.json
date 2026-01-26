@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "research-patch-v1",
+  "researcher": "R3",
+  "scope": "curriculum_math_2022:textbookUnit",
+  "add_nodes": [
+    {
+      "id": "P_TU_solid_figures_bridge",
+      "nodeType": "textbookUnit",
+      "label": "입체도형의 구성 요소와 전개도",
+      "proposed": true,
+      "reason": "2수03-A(입체도형의 모양) 이후 3-4학년군에 입체도형 관련 단원이 없어 6수03-B로의 점프가 큼. 면·모서리·꼭짓점 및 전개도 개념을 bridge로 명시."
+    }
+  ],
+  "add_edges": [
+    {
+      "source": "4수01-E",
+      "target": "6수02-A",
+      "edgeType": "prereq",
+      "confidence": 0.9,
+      "rationale": "비의 정의가 ‘두 양을 나누어 비교’이므로 나눗셈 개념 없이는 비/비율 도입이 어려움"
+    },
+    {
+      "source": "6수02-A",
+      "target": "6수02-B",
+      "edgeType": "prereq",
+      "confidence": 0.95,
+      "rationale": "비와 비율 이해 없이 비례식 성질·비례배분 원리 이해 불가"
+    },
+    {
+      "source": "4수01-E",
+      "target": "6수01-H",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "자연수 나눗셈 경험이 몫을 분수/소수로 표현(자연수÷자연수)하는 학습의 전제"
+    },
+    {
+      "source": "4수01-B",
+      "target": "6수01-H",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "분수 의미 이해 없이 ‘몫을 분수로 나타내기’(6수01-H) 학습 수행 불가"
+    },
+    {
+      "source": "4수01-C",
+      "target": "6수01-H",
+      "edgeType": "prereq",
+      "confidence": 0.8,
+      "rationale": "소수 자릿값 이해 없이 ‘몫을 소수로 나타내기’(6수01-H) 학습 수행 불가"
+    },
+    {
+      "source": "4수03-F",
+      "target": "6수03-A",
+      "edgeType": "prereq",
+      "confidence": 0.9,
+      "rationale": "도형 이동 후 불변 성질 인식이 합동/대칭의 정의 이해에 필수"
+    },
+    {
+      "source": "4수03-E",
+      "target": "6수03-C",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "다각형 개념(변/꼭짓점) 이해가 다각형 둘레·넓이 구하기(6수03-C) 학습의 전제"
+    },
+    {
+      "source": "4수03-B",
+      "target": "6수03-C",
+      "edgeType": "prereq",
+      "confidence": 0.9,
+      "rationale": "반지름/지름 등 원의 구성 요소 이해 없이 원주율·원의 넓이(6수03-C) 학습 수행 불가"
+    },
+    {
+      "source": "4수03-H",
+      "target": "6수03-C",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "측정 단위(길이/각도 등) 이해가 둘레·넓이·겉넓이·부피 단위 처리의 전제"
+    },
+    {
+      "source": "2수03-A",
+      "target": "P_TU_solid_figures_bridge",
+      "edgeType": "prereq",
+      "confidence": 0.8,
+      "rationale": "입체도형 직관을 면·모서리·꼭짓점 및 전개도 개념으로 확장하는 bridge"
+    },
+    {
+      "source": "P_TU_solid_figures_bridge",
+      "target": "6수03-B",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "전개도/구성 요소 이해가 6수03-B의 입체도형(각기둥·각뿔 전개도 등) 학습의 전제"
+    },
+    {
+      "source": "6수03-B",
+      "target": "6수03-C",
+      "edgeType": "prereq",
+      "confidence": 0.8,
+      "rationale": "입체도형 특징·전개도 이해가 직육면체/정육면체 겉넓이·부피(6수03-C) 학습의 전제"
+    }
+  ],
+  "remove_edges": [],
+  "notes": [
+    {
+      "claim": "Reviewer 피드백 반영: ‘전이 도움’ 수준으로 지적된 6수02-A 관련 일부 edge 및 6수04-A/B(그래프/비중 해석) 관련 edge는 prereq 근거가 약해 제외하고, 단원 내 성취기준 수행에 직접 필요한 선수 관계 중심으로 재구성",
+      "confidence": 0.9
+    },
+    {
+      "claim": "6수01-H는 ‘자연수÷자연수 몫을 분수/소수로’(6수01-10/14) 성취기준을 포함하므로 4수01-E/4수01-B/4수01-C 선행을 핵심으로 봄",
+      "confidence": 0.85
+    },
+    {
+      "claim": "6수03-C는 원주율·원의 넓이(6수03-07), 겉넓이·부피(6수03-08)를 포함하여 원의 구성 요소(4수03-B) 및 입체도형(6수03-B) 선행이 중요",
+      "confidence": 0.85
+    }
+  ]
+}

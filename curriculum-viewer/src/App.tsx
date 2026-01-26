@@ -20,6 +20,7 @@ import AuthorHomePage from './pages/AuthorHomePage'
 import AuthorEditorPage from './pages/AuthorEditorPage'
 import AuthorMiniFlowPage from './pages/AuthorMiniFlowPage'
 import AuthorPublishPage from './pages/AuthorPublishPage'
+import AuthorResearchGraphPage from './pages/AuthorResearchGraphPage'
 import AuthorValidatePage from './pages/AuthorValidatePage'
 import SkillGraphImportPage from './pages/SkillGraphImportPage'
 import SignupPage from './pages/SignupPage'
@@ -47,6 +48,7 @@ export default function App() {
               >
                 <Route index element={<AuthorHomePage />} />
                 <Route path={ROUTE_SEGMENTS.authorEditor} element={<AuthorEditorPage />} />
+                <Route path={ROUTE_SEGMENTS.authorResearchGraph} element={<AuthorResearchGraphPage />} />
                 <Route path={ROUTE_SEGMENTS.authorValidate} element={<AuthorValidatePage />} />
                 <Route path={ROUTE_SEGMENTS.authorImport} element={<SkillGraphImportPage />} />
                 <Route path={ROUTE_SEGMENTS.authorMiniFlow} element={<AuthorMiniFlowPage />} />

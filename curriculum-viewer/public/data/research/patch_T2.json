@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "research-patch-v1",
+  "researcher": "R3",
+  "scope": "curriculum_math_2022:textbookUnit",
+  "add_nodes": [
+    {
+      "id": "P_TU_solid_figures_bridge",
+      "nodeType": "textbookUnit",
+      "label": "입체도형의 구성 요소와 전개도",
+      "proposed": true,
+      "reason": "2수03-A(입체도형의 모양) 이후 3-4학년군에 입체도형 단원이 없어 6수03-B로의 연결이 과도하게 점프함. 면·모서리·꼭짓점 및 전개도 학습을 중간 bridge로 명시할 필요가 있음."
+    }
+  ],
+  "add_edges": [
+    {
+      "source": "4수01-A",
+      "target": "6수01-A",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "큰 수의 자릿값/크기 비교가 수의 범위 파악과 어림(반올림/올림/버림) 이해의 기반"
+    },
+    {
+      "source": "4수01-E",
+      "target": "6수01-H",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "나눗셈 의미/계산 경험이 자연수÷자연수 몫을 분수/소수로 표현하는 단원(6수01-H)의 선수"
+    },
+    {
+      "source": "4수01-B",
+      "target": "6수01-H",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "분수 개념이 ‘몫을 분수로 나타내기’(6수01-10) 이해의 필수 선수"
+    },
+    {
+      "source": "4수01-E",
+      "target": "6수02-A",
+      "edgeType": "prereq",
+      "confidence": 0.9,
+      "rationale": "비의 정의가 ‘두 양을 나누어 비교’이므로 나눗셈 개념은 비/비율 학습의 필수 선수"
+    },
+    {
+      "source": "6수02-A",
+      "target": "6수02-B",
+      "edgeType": "prereq",
+      "confidence": 0.95,
+      "rationale": "비와 비율 이해 없이 비례식 성질·비례배분 원리 이해 불가"
+    },
+    {
+      "source": "4수03-F",
+      "target": "6수03-A",
+      "edgeType": "prereq",
+      "confidence": 0.9,
+      "rationale": "도형 이동 후 불변 성질 인식이 합동/대칭의 정의 이해로 전이"
+    },
+    {
+      "source": "4수03-B",
+      "target": "6수03-C",
+      "edgeType": "prereq",
+      "confidence": 0.9,
+      "rationale": "6수03-C에 원주율·원의 넓이(6수03-07)가 포함되어 반지름/지름 등 원의 구성 요소가 직접 선수"
+    },
+    {
+      "source": "2수03-D",
+      "target": "4수03-G",
+      "edgeType": "prereq",
+      "confidence": 0.9,
+      "rationale": "시·분 단위 이해가 초 단위까지 확장되는 시간 단원의 필수 기초"
+    },
+    {
+      "source": "2수04-A",
+      "target": "2수04-B",
+      "edgeType": "prereq",
+      "confidence": 0.9,
+      "rationale": "자료 분류가 표/그림그래프 표현·해석의 선수"
+    },
+    {
+      "source": "2수03-A",
+      "target": "P_TU_solid_figures_bridge",
+      "edgeType": "prereq",
+      "confidence": 0.8,
+      "rationale": "2학년 입체도형 직관을 구성 요소·전개도 개념으로 bridge"
+    },
+    {
+      "source": "P_TU_solid_figures_bridge",
+      "target": "6수03-B",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "면·모서리·꼭짓점 및 전개도 이해가 5-6학년 입체도형(특징·전개도) 학습의 필수 선수"
+    }
+  ],
+  "remove_edges": [],
+  "notes": [
+    {
+      "claim": "Reviewer 피드백 반영: 2수04-B→4수04-A, 4수04-A→4수04-B, 4수03-A→4수03-B는 단원 내 최초 도입/재도입 가능성이 있어 필수 prereq에서 제외",
+      "confidence": 0.9
+    },
+    {
+      "claim": "6수03-C에는 원주율·원의 넓이(6수03-07)가 포함되어 4수03-B(원의 구성 요소) 선행이 직접적으로 필요",
+      "confidence": 0.9
+    },
+    {
+      "claim": "6수01-H(나눗셈에서의 몫 표현)는 나눗셈과 분수 개념의 결합 지점이므로 4수01-E/4수01-B를 필수 선수로 유지",
+      "confidence": 0.85
+    },
+    {
+      "claim": "자료와 가능성 영역은 단원 간 필수 선수 관계가 상대적으로 느슨하여 2수04-A→2수04-B만 유지",
+      "confidence": 0.85
+    },
+    {
+      "claim": "수와 연산 영역: 자릿값→연산→확장의 순차적 필수 선수 관계가 가장 명확함",
+      "confidence": 0.95
+    },
+    {
+      "claim": "입체도형 3-4학년 gap은 P_TU_solid_figures_bridge로 해결 제안",
+      "confidence": 0.85
+    }
+  ]
+}

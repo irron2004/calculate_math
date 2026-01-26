@@ -14,6 +14,7 @@ export const ROUTE_SEGMENTS = {
   authorImport: 'import',
   authorMiniFlow: 'mini',
   authorEditor: 'editor',
+  authorResearchGraph: 'research-graph',
   authorValidate: 'validate',
   authorPublish: 'publish',
   authorHealth: 'health'
@@ -36,6 +37,7 @@ export const ROUTES = {
   authorImport: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorImport}`,
   authorMiniFlow: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorMiniFlow}`,
   authorEditor: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorEditor}`,
+  authorResearchGraph: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorResearchGraph}`,
   authorValidate: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorValidate}`,
   authorPublish: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorPublish}`,
   authorHealth: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorHealth}`

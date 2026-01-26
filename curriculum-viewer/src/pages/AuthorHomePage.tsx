@@ -36,6 +36,9 @@ export default function AuthorHomePage() {
         <Link to={ROUTES.authorMiniFlow} className="button button-ghost">
           Mini
         </Link>
+        <Link to={ROUTES.authorResearchGraph} className="button button-ghost">
+          Research
+        </Link>
         <Link to={ROUTES.authorPublish} className="button button-ghost">
           Publish
         </Link>

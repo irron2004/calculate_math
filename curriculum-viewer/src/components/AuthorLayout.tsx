@@ -28,6 +28,9 @@ export default function AuthorLayout() {
               </NavLink>
             </li>
             <li>
+              <NavLink to={ROUTES.authorResearchGraph}>Research</NavLink>
+            </li>
+            <li>
               <NavLink to={ROUTES.authorImport}>Import</NavLink>
             </li>
             <li>

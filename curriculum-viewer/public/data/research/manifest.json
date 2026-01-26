@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "research-manifest-v1",
+  "patchByTrack": {
+    "T1": "/data/research/patch_T1.json",
+    "T2": "/data/research/patch_T2.json",
+    "T3": "/data/research/patch_T3.json"
+  }
+}

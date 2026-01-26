@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "research-patch-v1",
+  "researcher": "R3",
+  "scope": "curriculum_math_2022:textbookUnit",
+  "add_nodes": [
+    {
+      "id": "P_TU_solid_figures_bridge",
+      "nodeType": "textbookUnit",
+      "label": "입체도형의 구성 요소와 전개도",
+      "proposed": true,
+      "reason": "2수03-A(입체도형의 모양) 이후 3-4학년군에 입체도형 단원이 없어 6수03-B(입체도형)로의 연결이 과도하게 점프함. 면·모서리·꼭짓점 및 전개도 개념을 중간 bridge로 명시할 필요가 있음."
+    }
+  ],
+  "add_edges": [
+    {
+      "source": "4수01-B",
+      "target": "6수02-A",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "6수02-A에서 비율을 분수/백분율로 나타내는 학습(6수02-02)의 직접 선수"
+    },
+    {
+      "source": "4수01-C",
+      "target": "6수02-A",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "6수02-A에서 비율을 소수/백분율로 나타내는 학습(6수02-02)의 직접 선수"
+    },
+    {
+      "source": "4수01-E",
+      "target": "6수02-A",
+      "edgeType": "prereq",
+      "confidence": 0.9,
+      "rationale": "비의 정의(두 양을 나누어 비교) 이해에는 나눗셈 개념이 필수"
+    },
+    {
+      "source": "6수02-A",
+      "target": "6수02-B",
+      "edgeType": "prereq",
+      "confidence": 0.95,
+      "rationale": "비와 비율 이해 없이 비례식 성질·비례배분 원리 이해 불가"
+    },
+    {
+      "source": "4수03-E",
+      "target": "6수03-C",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "6수03-C의 다각형 둘레·넓이(6수03-06)는 다각형 개념(4수03-E)을 전제"
+    },
+    {
+      "source": "4수03-H",
+      "target": "6수03-C",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "둘레·넓이·겉넓이·부피는 측정 단위/측정 관점(4수03-H) 위에서 확장"
+    },
+    {
+      "source": "4수03-B",
+      "target": "6수03-C",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "6수03-C에 원주율·원의 넓이(6수03-07)가 포함되어 반지름/지름 등 원의 구성 요소가 선수"
+    },
+    {
+      "source": "6수03-B",
+      "target": "6수03-C",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "6수03-C의 직육면체/정육면체 겉넓이·부피(6수03-08)는 입체도형 특징·전개도 이해(6수03-B)를 전제"
+    },
+    {
+      "source": "2수03-A",
+      "target": "P_TU_solid_figures_bridge",
+      "edgeType": "prereq",
+      "confidence": 0.8,
+      "rationale": "2수03-A 이후 3-4학년군 공백을 메우기 위한 입체도형 구성 요소/전개도 bridge"
+    },
+    {
+      "source": "P_TU_solid_figures_bridge",
+      "target": "6수03-B",
+      "edgeType": "prereq",
+      "confidence": 0.85,
+      "rationale": "6수03-B의 각기둥/각뿔 전개도(6수03-04) 학습을 위한 직접 선수"
+    }
+  ],
+  "remove_edges": [],
+  "notes": [
+    {
+      "claim": "Reviewer 피드백 반영: 4수02-C→6수02-A(대응 관계→비/비율)는 필수 선수 근거가 불명확하여 제외하고, 6수02-02(비율을 분수/소수/백분율로)와 직접 연결되는 4수01-B/4수01-C를 선수로 제안함",
+      "confidence": 0.9
+    },
+    {
+      "claim": "Reviewer 피드백 반영: 6수03-C에는 6수03-07(원주율·원의 넓이)이 포함되므로 4수03-B(원의 구성 요소)→6수03-C prereq를 유지함",
+      "confidence": 0.9
+    },
+    {
+      "claim": "6수03-C에는 6수03-08(직육면체/정육면체 겉넓이·부피)이 포함되어 6수03-B(입체도형 특징·전개도) 선행이 자연스러움",
+      "confidence": 0.85
+    },
+    {
+      "claim": "입체도형은 2수03-A 이후 3-4학년군에 공백이 있어 P_TU_solid_figures_bridge(구성 요소·전개도)를 신설해 risky jump를 완화하는 것이 유효함",
+      "confidence": 0.85
+    },
+    {
+      "claim": "도형의 측정(6수03-C)은 다각형(4수03-E)과 측정 단위(4수03-H) 위에서 둘레·넓이·겉넓이·부피로 확장되는 구조로 해석됨",
+      "confidence": 0.85
+    }
+  ]
+}
