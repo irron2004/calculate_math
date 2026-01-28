@@ -11,7 +11,10 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(find:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(tree:*)",
+      "Bash(git -C /mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math log --oneline -10)",
+      "Bash(grep:*)"
     ]
   }
 }

@@ -13,11 +13,14 @@ import EvalPage from './pages/EvalPage'
 import ExplorerPage from './pages/ExplorerPage'
 import GraphPage from './pages/GraphPage'
 import HealthPage from './pages/HealthPage'
+import HomeworkSubmitPage from './pages/HomeworkSubmitPage'
 import LearnPage from './pages/LearnPage'
 import LoginPage from './pages/LoginPage'
+import MyPage from './pages/MyPage'
 import StudentReportPage from './pages/StudentReportPage'
 import AuthorHomePage from './pages/AuthorHomePage'
 import AuthorEditorPage from './pages/AuthorEditorPage'
+import AuthorHomeworkPage from './pages/AuthorHomeworkPage'
 import AuthorMiniFlowPage from './pages/AuthorMiniFlowPage'
 import AuthorPublishPage from './pages/AuthorPublishPage'
 import AuthorResearchGraphPage from './pages/AuthorResearchGraphPage'
@@ -54,6 +57,7 @@ export default function App() {
                 <Route path={ROUTE_SEGMENTS.authorMiniFlow} element={<AuthorMiniFlowPage />} />
                 <Route path={ROUTE_SEGMENTS.authorPublish} element={<AuthorPublishPage />} />
                 <Route path={ROUTE_SEGMENTS.authorHealth} element={<HealthPage />} />
+                <Route path={ROUTE_SEGMENTS.authorHomework} element={<AuthorHomeworkPage />} />
                 <Route path="*" element={<Navigate to={ROUTES.authorEditor} replace />} />
               </Route>
               <Route path={ROUTES.root} element={<AppLayout />}>
@@ -127,6 +131,22 @@ export default function App() {
                   element={
                     <RequireAuth>
                       <HealthPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path={ROUTE_SEGMENTS.mypage}
+                  element={
+                    <RequireAuth>
+                      <MyPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path={`${ROUTE_SEGMENTS.mypage}/${ROUTE_SEGMENTS.homework}/:id`}
+                  element={
+                    <RequireAuth>
+                      <HomeworkSubmitPage />
                     </RequireAuth>
                   }
                 />

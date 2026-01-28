@@ -38,6 +38,114 @@ const NODE_WIDTH = 260
 const NODE_HEIGHT = 70
 const GRID_GAP_X = 40
 const GRID_GAP_Y = 30
+const GRADE_BAND_GAP_Y = 120
+const DOMAIN_LAYER_GAP_Y = 160
+const DOMAIN_LAYER_ORDER = ['NA', 'RR', 'GM', 'DP'] as const
+const DOMAIN_LAYER_FALLBACK = '__unspecified__'
+
+type DomainLayerCode = (typeof DOMAIN_LAYER_ORDER)[number] | typeof DOMAIN_LAYER_FALLBACK
+
+const DOMAIN_LABEL_DEFAULT: Record<(typeof DOMAIN_LAYER_ORDER)[number], string> = {
+  NA: '수와 연산',
+  RR: '변화와 관계',
+  GM: '도형과 측정',
+  DP: '자료와 가능성'
+}
+
+function normalizeDomainCode(value: unknown): DomainLayerCode {
+  return value === 'NA' || value === 'RR' || value === 'GM' || value === 'DP' ? value : DOMAIN_LAYER_FALLBACK
+}
+
+function domainLayerSortKey(code: DomainLayerCode): number {
+  if (code === DOMAIN_LAYER_FALLBACK) return DOMAIN_LAYER_ORDER.length + 1
+  const index = DOMAIN_LAYER_ORDER.indexOf(code)
+  return index === -1 ? DOMAIN_LAYER_ORDER.length : index
+}
+
+function sortDomainCodes(values: Iterable<DomainLayerCode>): DomainLayerCode[] {
+  const unique = new Set<DomainLayerCode>()
+  for (const value of values) {
+    unique.add(normalizeDomainCode(value))
+  }
+  return Array.from(unique).sort((a, b) => domainLayerSortKey(a) - domainLayerSortKey(b))
+}
+
+function gradeBandSortKey(value: string): number {
+  const match = value.match(/\d+/)
+  if (!match) return Number.POSITIVE_INFINITY
+  return Number(match[0])
+}
+
+function compareGradeBand(a?: string, b?: string): number {
+  if (!a && !b) return 0
+  if (!a) return 1
+  if (!b) return -1
+  const keyDiff = gradeBandSortKey(a) - gradeBandSortKey(b)
+  if (keyDiff !== 0) return keyDiff
+  return a.localeCompare(b)
+}
+
+function computePrereqDepths(nodeIds: string[], edges: PrereqEdge[]): Map<string, number> {
+  const nodeIdSet = new Set(nodeIds)
+  const depth = new Map<string, number>(nodeIds.map((id) => [id, 1]))
+  const indegree = new Map<string, number>(nodeIds.map((id) => [id, 0]))
+  const outgoing = new Map<string, string[]>()
+  const incoming = new Map<string, string[]>()
+
+  for (const edge of edges) {
+    if (!nodeIdSet.has(edge.source) || !nodeIdSet.has(edge.target)) continue
+    const out = outgoing.get(edge.source)
+    if (out) {
+      out.push(edge.target)
+    } else {
+      outgoing.set(edge.source, [edge.target])
+    }
+    const inc = incoming.get(edge.target)
+    if (inc) {
+      inc.push(edge.source)
+    } else {
+      incoming.set(edge.target, [edge.source])
+    }
+    indegree.set(edge.target, (indegree.get(edge.target) ?? 0) + 1)
+  }
+
+  const queue: string[] = []
+  for (const [id, count] of indegree) {
+    if (count === 0) queue.push(id)
+  }
+
+  while (queue.length > 0) {
+    const id = queue.shift()
+    if (!id) break
+    const nextDepth = (depth.get(id) ?? 1) + 1
+    const targets = outgoing.get(id) ?? []
+    for (const target of targets) {
+      if ((depth.get(target) ?? 1) < nextDepth) {
+        depth.set(target, nextDepth)
+      }
+      const nextIndegree = (indegree.get(target) ?? 0) - 1
+      indegree.set(target, nextIndegree)
+      if (nextIndegree === 0) {
+        queue.push(target)
+      }
+    }
+  }
+
+  const baseDepth = new Map(depth)
+  for (const [id, count] of indegree) {
+    if (count <= 0) continue
+    const preds = incoming.get(id) ?? []
+    let maxPredDepth = 0
+    for (const pred of preds) {
+      maxPredDepth = Math.max(maxPredDepth, baseDepth.get(pred) ?? 1)
+    }
+    if (maxPredDepth > 0) {
+      depth.set(id, Math.max(depth.get(id) ?? 1, maxPredDepth + 1))
+    }
+  }
+
+  return depth
+}
 const RESEARCH_TRACKS: ResearchTrack[] = ['T1', 'T2', 'T3']
 
 function getNodeStyle(nodeType: string, proposed?: boolean): CSSProperties {
@@ -63,6 +171,10 @@ export default function AuthorResearchGraphPage() {
   const initialEditorState = useMemo(() => loadResearchEditorState(), [])
   const [state, setState] = useState<LoadState>({ status: 'loading' })
   const [activeTrack, setActiveTrack] = useState<ResearchTrack>(initialEditorState.selectedTrack)
+  const [visibleDomainCodes, setVisibleDomainCodes] = useState<DomainLayerCode[]>([
+    ...DOMAIN_LAYER_ORDER,
+    DOMAIN_LAYER_FALLBACK
+  ])
   const [selectedPrereq, setSelectedPrereq] = useState<PrereqEdgeWithOrigin | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [manualProposedNodes, setManualProposedNodes] = useState<ProposedTextbookUnitNode[]>(
@@ -134,6 +246,50 @@ export default function AuthorResearchGraphPage() {
 
     return () => controller.abort()
   }, [])
+
+  useEffect(() => {
+    const patches = RESEARCH_TRACKS.map((track) => patchesByTrack[track]).filter(
+      (patch): patch is ResearchPatchV1 => Boolean(patch)
+    )
+    if (patches.length === 0) return
+
+    setSuggestionsStore((prev) => {
+      const acceptedNodeIds = new Set(prev.accepted.nodeIds)
+      const acceptedEdgeKeys = new Set(prev.accepted.edgeKeys)
+      const excludedNodeIds = new Set(prev.excluded.nodeIds)
+      const excludedEdgeKeys = new Set(prev.excluded.edgeKeys)
+      let changed = false
+
+      for (const patch of patches) {
+        for (const node of patch.add_nodes) {
+          if (excludedNodeIds.has(node.id)) continue
+          if (acceptedNodeIds.has(node.id)) continue
+          acceptedNodeIds.add(node.id)
+          changed = true
+        }
+        for (const edge of patch.add_edges) {
+          const key = researchEdgeKey(edge)
+          if (excludedEdgeKeys.has(key)) continue
+          if (acceptedEdgeKeys.has(key)) continue
+          acceptedEdgeKeys.add(key)
+          changed = true
+        }
+      }
+
+      if (!changed) return prev
+
+      const next: ResearchSuggestionsStoreV1 = {
+        version: 1,
+        accepted: {
+          nodeIds: Array.from(acceptedNodeIds),
+          edgeKeys: Array.from(acceptedEdgeKeys)
+        },
+        excluded: prev.excluded
+      }
+      saveResearchSuggestionsStore(next)
+      return next
+    })
+  }, [patchesByTrack])
 
   const setSuggestionStatus = useCallback(
     (params: { type: 'node' | 'edge'; key: string; status: 'accepted' | 'excluded' }) => {
@@ -222,24 +378,106 @@ export default function AuthorResearchGraphPage() {
     return map
   }, [proposedNodes, state])
 
-  const currentPrereqEdges = useMemo(() => {
-    if (!editState) return []
-    return listCurrentPrereqEdges(editState).filter(
-      (edge) => nodeTypeById.has(edge.source) && nodeTypeById.has(edge.target)
-    )
-  }, [editState, nodeTypeById])
+  const domainLabelByCode = useMemo(() => {
+    const map = new Map<DomainLayerCode, string>()
+    for (const code of DOMAIN_LAYER_ORDER) {
+      map.set(code, DOMAIN_LABEL_DEFAULT[code])
+    }
+    map.set(DOMAIN_LAYER_FALLBACK, '기타/미분류')
 
-  const prereqCycle = useMemo(() => {
-    const edges = currentPrereqEdges.map((edge) => ({ source: edge.source, target: edge.target }))
-    return detectPrereqCycle(edges)
-  }, [currentPrereqEdges])
+    if (state.status !== 'ready') return map
 
-  const nodes = useMemo((): Node[] => {
+    for (const node of state.graph.nodes) {
+      if (node.nodeType !== 'domain') continue
+      const code = normalizeDomainCode((node as { domainCode?: unknown }).domainCode)
+      if (code === DOMAIN_LAYER_FALLBACK) continue
+      map.set(code, node.label)
+    }
+    return map
+  }, [state])
+
+  const domainCodeById = useMemo(() => {
+    const map = new Map<string, DomainLayerCode>()
+    if (state.status !== 'ready') {
+      for (const node of proposedNodes) {
+        map.set(node.id, normalizeDomainCode((node as { domainCode?: unknown }).domainCode))
+      }
+      return map
+    }
+
+    const idToNode = new Map(state.graph.nodes.map((node) => [node.id, node] as const))
+    for (const node of proposedNodes) {
+      if (!idToNode.has(node.id)) {
+        idToNode.set(node.id, node)
+      }
+    }
+
+    const cache = new Map<string, DomainLayerCode>()
+    const resolveDomainCode = (id: string): DomainLayerCode => {
+      const cached = cache.get(id)
+      if (cached) return cached
+
+      const node = idToNode.get(id)
+      if (!node) {
+        cache.set(id, DOMAIN_LAYER_FALLBACK)
+        return DOMAIN_LAYER_FALLBACK
+      }
+
+      const ownCode = normalizeDomainCode((node as { domainCode?: unknown }).domainCode)
+      if (ownCode !== DOMAIN_LAYER_FALLBACK) {
+        cache.set(id, ownCode)
+        return ownCode
+      }
+
+      const parentId = typeof (node as { parentId?: unknown }).parentId === 'string' ? node.parentId : null
+      const parentCode = parentId ? resolveDomainCode(parentId) : DOMAIN_LAYER_FALLBACK
+      cache.set(id, parentCode)
+      return parentCode
+    }
+
+    for (const id of idToNode.keys()) {
+      map.set(id, resolveDomainCode(id))
+    }
+    return map
+  }, [proposedNodes, state])
+
+  const domainOptions = useMemo(() => {
+    const codes = new Set<DomainLayerCode>([...DOMAIN_LAYER_ORDER, DOMAIN_LAYER_FALLBACK])
+    for (const code of domainCodeById.values()) {
+      codes.add(code)
+    }
+    const orderedCodes = sortDomainCodes(codes)
+    return orderedCodes.map((code) => ({ code, label: domainLabelByCode.get(code) ?? code }))
+  }, [domainCodeById, domainLabelByCode])
+
+  const visibleDomainCodeSet = useMemo(() => {
+    return new Set(visibleDomainCodes.map((code) => normalizeDomainCode(code)))
+  }, [visibleDomainCodes])
+
+  const handleToggleDomainCode = useCallback((code: DomainLayerCode) => {
+    setVisibleDomainCodes((prev) => {
+      const normalized = normalizeDomainCode(code)
+      if (prev.includes(normalized)) {
+        return sortDomainCodes(prev.filter((value) => value !== normalized))
+      }
+      return sortDomainCodes([...prev, normalized])
+    })
+  }, [])
+
+  const handleShowAllDomains = useCallback(() => {
+    setVisibleDomainCodes(sortDomainCodes([...DOMAIN_LAYER_ORDER, DOMAIN_LAYER_FALLBACK]))
+  }, [])
+
+  const handleShowOnlyDomain = useCallback((code: DomainLayerCode) => {
+    setVisibleDomainCodes([normalizeDomainCode(code)])
+  }, [])
+
+  const allNodes = useMemo(() => {
     if (state.status !== 'ready') return []
 
     const nodeMap = new Map<
       string,
-      { id: string; nodeType: string; label: string; proposed?: boolean; note?: string; reason?: string }
+      { id: string; nodeType: string; label: string; proposed?: boolean; note?: string; reason?: string; gradeBand?: string }
     >()
     for (const node of state.graph.nodes) {
       nodeMap.set(node.id, node)
@@ -249,58 +487,253 @@ export default function AuthorResearchGraphPage() {
         nodeMap.set(node.id, node)
       }
     }
+    return Array.from(nodeMap.values())
+  }, [proposedNodes, state])
 
-    const allNodes = Array.from(nodeMap.values())
+  const visibleNodes = useMemo(() => {
+    if (state.status !== 'ready') return []
+    if (visibleDomainCodeSet.size === 0) return []
+    return allNodes.filter((node) => {
+      const domainCode = domainCodeById.get(node.id) ?? DOMAIN_LAYER_FALLBACK
+      return visibleDomainCodeSet.has(domainCode)
+    })
+  }, [allNodes, domainCodeById, state, visibleDomainCodeSet])
 
-    return allNodes.map((node, index) => {
-      const description = node.note ?? node.reason
-      return {
-        id: node.id,
-        position: {
-          x: (index % 4) * (NODE_WIDTH + GRID_GAP_X),
-          y: Math.floor(index / 4) * (NODE_HEIGHT + GRID_GAP_Y)
-        },
+  const visibleNodeIdSet = useMemo(() => {
+    return new Set(visibleNodes.map((node) => node.id))
+  }, [visibleNodes])
+
+  const currentPrereqEdges = useMemo(() => {
+    if (!editState) return []
+    return listCurrentPrereqEdges(editState).filter(
+      (edge) => nodeTypeById.has(edge.source) && nodeTypeById.has(edge.target)
+    )
+  }, [editState, nodeTypeById])
+
+  const depthPrereqEdges = useMemo(() => {
+    const map = new Map<string, PrereqEdge>()
+    for (const edge of currentPrereqEdges) {
+      map.set(`${edge.source}\u0000${edge.target}`, { source: edge.source, target: edge.target })
+    }
+
+    for (const track of RESEARCH_TRACKS) {
+      const patch = patchesByTrack[track]
+      if (!patch) continue
+      for (const edge of patch.add_edges) {
+        if (edge.edgeType && edge.edgeType !== 'prereq') continue
+        const status = getResearchSuggestionStatus({
+          store: suggestionsStore,
+          type: 'edge',
+          key: researchEdgeKey(edge)
+        })
+        if (status === 'excluded') continue
+        map.set(`${edge.source}\u0000${edge.target}`, { source: edge.source, target: edge.target })
+      }
+    }
+
+    return Array.from(map.values()).filter(
+      (edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target)
+    )
+  }, [currentPrereqEdges, patchesByTrack, suggestionsStore, visibleNodeIdSet])
+
+  const prereqCycle = useMemo(() => {
+    const edges = depthPrereqEdges.map((edge) => ({ source: edge.source, target: edge.target }))
+    return detectPrereqCycle(edges)
+  }, [depthPrereqEdges])
+
+  const nodes = useMemo((): Node[] => {
+    if (state.status !== 'ready') return []
+    if (visibleNodes.length === 0) return []
+
+    const depthById = computePrereqDepths(
+      visibleNodes.map((node) => node.id),
+      depthPrereqEdges
+    )
+
+    const nodesByDomain = new Map<DomainLayerCode, typeof visibleNodes>()
+    for (const node of visibleNodes) {
+      const domainCode = domainCodeById.get(node.id) ?? DOMAIN_LAYER_FALLBACK
+      const bucket = nodesByDomain.get(domainCode)
+      if (bucket) {
+        bucket.push(node)
+      } else {
+        nodesByDomain.set(domainCode, [node])
+      }
+    }
+
+    const domainCodes = sortDomainCodes(nodesByDomain.keys())
+    const layeredNodes: Node[] = []
+    const DOMAIN_HEADER_HEIGHT = 36
+    const DOMAIN_HEADER_GAP_Y = 12
+    const DEPTH_HEADER_HEIGHT = 28
+    const DEPTH_HEADER_GAP_Y = 10
+    let yOffset = 0
+
+    for (const domainCode of domainCodes) {
+      const domainNodes = nodesByDomain.get(domainCode)
+      if (!domainNodes || domainNodes.length === 0) continue
+
+      const domainLabel = domainLabelByCode.get(domainCode) ?? domainCode
+      const headerId = `__domain_header_${domainCode}`
+      layeredNodes.push({
+        id: headerId,
+        position: { x: 0, y: yOffset },
         data: {
           label: (
-            <div>
-              <div className="mono" style={{ fontSize: 12, opacity: 0.7 }}>
-                {node.nodeType}
-                {node.proposed ? (
-                  <span className="badge badge-warn" style={{ marginLeft: 6 }}>
-                    proposed
-                  </span>
-                ) : null}
-              </div>
-              <div style={{ fontWeight: 600 }}>{node.label}</div>
-              {description ? (
-                <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  {description}
-                </div>
-              ) : null}
-              <div className="mono" style={{ fontSize: 12, opacity: 0.75 }}>
-                {node.id}
-              </div>
+            <div style={{ fontWeight: 700 }}>
+              {domainLabel} <span className="mono">({domainCode})</span>
             </div>
           )
         },
         style: {
           width: NODE_WIDTH,
+          height: DOMAIN_HEADER_HEIGHT,
           padding: 10,
           borderRadius: 12,
-          color: '#0f172a',
-          ...getNodeStyle(node.nodeType, Boolean(node.proposed))
+          border: '1px solid #0f172a',
+          background: '#0f172a',
+          color: '#f8fafc'
+        },
+        draggable: false,
+        selectable: false,
+        connectable: false
+      })
+
+      const maxDepth = domainNodes.reduce((max, node) => Math.max(max, depthById.get(node.id) ?? 1), 1)
+      const depthHeaderY = yOffset + DOMAIN_HEADER_HEIGHT + DOMAIN_HEADER_GAP_Y
+
+      for (let depth = 1; depth <= maxDepth; depth += 1) {
+        layeredNodes.push({
+          id: `__domain_depth_${domainCode}_${depth}`,
+          position: {
+            x: (depth - 1) * (NODE_WIDTH + GRID_GAP_X),
+            y: depthHeaderY
+          },
+          data: {
+            label: (
+              <div className="mono" style={{ fontWeight: 700 }}>
+                depth {depth}
+              </div>
+            )
+          },
+          style: {
+            width: NODE_WIDTH,
+            height: DEPTH_HEADER_HEIGHT,
+            padding: 8,
+            borderRadius: 10,
+            border: '1px solid #0f172a',
+            background: '#e2e8f0',
+            color: '#0f172a'
+          },
+          draggable: false,
+          selectable: false,
+          connectable: false
+        })
+      }
+
+      let domainYOffset = depthHeaderY + DEPTH_HEADER_HEIGHT + DEPTH_HEADER_GAP_Y
+
+      const groupedByBand = new Map<string, typeof domainNodes>()
+      for (const node of domainNodes) {
+        const band = node.gradeBand ?? '__unspecified__'
+        const bucket = groupedByBand.get(band)
+        if (bucket) {
+          bucket.push(node)
+        } else {
+          groupedByBand.set(band, [node])
         }
       }
-    })
-  }, [proposedNodes, state])
+
+      const bandKeys = Array.from(groupedByBand.keys())
+        .filter((key) => key !== '__unspecified__')
+        .sort(compareGradeBand)
+      if (groupedByBand.has('__unspecified__')) {
+        bandKeys.push('__unspecified__')
+      }
+
+      for (const band of bandKeys) {
+        const bandNodes = groupedByBand.get(band)
+        if (!bandNodes || bandNodes.length === 0) continue
+
+        const ordered = [...bandNodes].sort((a, b) => {
+          const depthDiff = (depthById.get(a.id) ?? 1) - (depthById.get(b.id) ?? 1)
+          if (depthDiff !== 0) return depthDiff
+          return a.id.localeCompare(b.id)
+        })
+
+        ordered.forEach((node, index) => {
+          const depth = depthById.get(node.id) ?? 1
+          const description = node.note ?? node.reason
+
+          layeredNodes.push({
+            id: node.id,
+            position: {
+              x: (depth - 1) * (NODE_WIDTH + GRID_GAP_X),
+              y: domainYOffset + index * (NODE_HEIGHT + GRID_GAP_Y)
+            },
+            data: {
+              label: (
+                <div>
+                  <div className="mono" style={{ fontSize: 12, opacity: 0.7 }}>
+                    {node.nodeType}
+                    <span style={{ marginLeft: 6 }}>depth {depth}</span>
+                    {node.proposed ? (
+                      <span className="badge badge-warn" style={{ marginLeft: 6 }}>
+                        proposed
+                      </span>
+                    ) : null}
+                  </div>
+                  <div style={{ fontWeight: 600 }}>{node.label}</div>
+                  {description ? (
+                    <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+                      {description}
+                    </div>
+                  ) : null}
+                  <div className="mono" style={{ fontSize: 12, opacity: 0.75 }}>
+                    {node.id}
+                  </div>
+                </div>
+              )
+            },
+            style: {
+              width: NODE_WIDTH,
+              padding: 10,
+              borderRadius: 12,
+              color: '#0f172a',
+              ...getNodeStyle(node.nodeType, Boolean(node.proposed))
+            }
+          })
+        })
+
+        domainYOffset += ordered.length * (NODE_HEIGHT + GRID_GAP_Y) + GRADE_BAND_GAP_Y
+      }
+
+      yOffset = domainYOffset + DOMAIN_LAYER_GAP_Y
+    }
+
+    return layeredNodes
+  }, [depthPrereqEdges, domainCodeById, domainLabelByCode, state, visibleNodes])
 
   const edges = useMemo((): Edge[] => {
     if (state.status !== 'ready') return []
 
+    const decorateForDomain = (style: Record<string, unknown>, source: string, target: string) => {
+      const sourceDomain = domainCodeById.get(source) ?? DOMAIN_LAYER_FALLBACK
+      const targetDomain = domainCodeById.get(target) ?? DOMAIN_LAYER_FALLBACK
+      if (sourceDomain === targetDomain) return style
+      return {
+        ...style,
+        strokeDasharray: '6 4',
+        opacity: 0.7
+      }
+    }
+
     const nonPrereq = state.graph.edges
       .filter((edge) => edge.edgeType !== 'prereq')
+      .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
       .map((edge) => {
-        const style = getEdgeStyle(edge.edgeType)
+        const baseStyle = getEdgeStyle(edge.edgeType)
+        const style = decorateForDomain({ ...baseStyle }, edge.source, edge.target)
         return {
           id: edge.id ?? `${edge.edgeType}:${edge.source}->${edge.target}`,
           source: edge.source,
@@ -313,30 +746,34 @@ export default function AuthorResearchGraphPage() {
         }
       })
 
-    const prereq = currentPrereqEdges.map((edge) => {
-      const origin =
-        edge.origin === 'base' ? 'existing' : edge.origin === 'research' ? 'research' : 'manual'
-      const style = getEdgeStyle('prereq', { prereqOrigin: origin })
-      return {
-        id: `prereq:${edge.source}->${edge.target}`,
-        source: edge.source,
-        target: edge.target,
-        type: 'smoothstep',
-        label: 'prereq',
-        data: { edgeType: 'prereq', origin: edge.origin },
-        style,
-        labelStyle: { fill: (style.stroke as string) ?? '#64748b', fontSize: 12 }
-      }
-    })
+    const prereq = currentPrereqEdges
+      .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
+      .map((edge) => {
+        const origin =
+          edge.origin === 'base' ? 'existing' : edge.origin === 'research' ? 'research' : 'manual'
+        const baseStyle = getEdgeStyle('prereq', { prereqOrigin: origin })
+        const style = decorateForDomain({ ...baseStyle }, edge.source, edge.target)
+        return {
+          id: `prereq:${edge.source}->${edge.target}`,
+          source: edge.source,
+          target: edge.target,
+          type: 'smoothstep',
+          label: 'prereq',
+          data: { edgeType: 'prereq', origin: edge.origin },
+          style,
+          labelStyle: { fill: (style.stroke as string) ?? '#64748b', fontSize: 12 }
+        }
+      })
 
     return [...nonPrereq, ...prereq]
-  }, [currentPrereqEdges, state])
+  }, [currentPrereqEdges, domainCodeById, state, visibleNodeIdSet])
 
   const counts = useMemo(() => {
     if (state.status !== 'ready') return null
     const textbookUnitCount =
       state.graph.nodes.filter((node) => node.nodeType === 'textbookUnit').length +
       proposedNodes.filter((node) => node.nodeType === 'textbookUnit').length
+    const visibleTextbookUnitCount = visibleNodes.filter((node) => node.nodeType === 'textbookUnit').length
     const prereqCounts = currentPrereqEdges.reduce(
       (acc, edge) => {
         acc.total += 1
@@ -345,13 +782,27 @@ export default function AuthorResearchGraphPage() {
       },
       { total: 0, base: 0, research: 0, manual: 0 }
     )
+    const visiblePrereqCounts = currentPrereqEdges
+      .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
+      .reduce(
+        (acc, edge) => {
+          acc.total += 1
+          acc[edge.origin] += 1
+          return acc
+        },
+        { total: 0, base: 0, research: 0, manual: 0 }
+      )
     return {
       nodes: state.graph.nodes.length,
+      visibleNodes: visibleNodes.length,
       edges: state.graph.edges.length,
+      visibleEdges: edges.length,
       textbookUnits: textbookUnitCount,
-      prereq: prereqCounts
+      visibleTextbookUnits: visibleTextbookUnitCount,
+      prereq: prereqCounts,
+      visiblePrereq: visiblePrereqCounts
     }
-  }, [currentPrereqEdges, proposedNodes, state])
+  }, [currentPrereqEdges, edges, proposedNodes, state, visibleNodeIdSet, visibleNodes])
 
   const activePatch = patchesByTrack[activeTrack]
   const activePatchError = patchErrorsByTrack[activeTrack]
@@ -416,7 +867,8 @@ export default function AuthorResearchGraphPage() {
 
       {counts ? (
         <p className="muted">
-          nodes: {counts.nodes} / edges: {counts.edges} / textbookUnit: {counts.textbookUnits}
+          nodes: {counts.visibleNodes}/{counts.nodes} · edges: {counts.visibleEdges}/{counts.edges} · textbookUnit:{' '}
+          {counts.visibleTextbookUnits}/{counts.textbookUnits}
         </p>
       ) : null}
 
@@ -433,6 +885,41 @@ export default function AuthorResearchGraphPage() {
               <option value="T3">T3</option>
             </select>
           </label>
+          <div className="graph-control" style={{ minWidth: 320 }}>
+            <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
+              Domain layers
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {domainOptions.map((option) => {
+                const checked = visibleDomainCodeSet.has(option.code)
+                return (
+                  <div key={`domain-${option.code}`} style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                    <label style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => handleToggleDomainCode(option.code)}
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                    <button
+                      type="button"
+                      className="button button-ghost button-small"
+                      onClick={() => handleShowOnlyDomain(option.code)}
+                      title={`${option.label}만 보기`}
+                    >
+                      only
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+            <div style={{ marginTop: 6 }}>
+              <button type="button" className="button button-ghost button-small" onClick={handleShowAllDomains}>
+                all
+              </button>
+            </div>
+          </div>
           <button
             type="button"
             className="button button-ghost"
@@ -447,9 +934,10 @@ export default function AuthorResearchGraphPage() {
             Export JSON
           </button>
           <div className="mono" style={{ fontSize: 12, opacity: 0.85 }}>
-            prereq: {counts?.prereq.total ?? 0} (existing {counts?.prereq.base ?? 0} / research{' '}
-            {counts?.prereq.research ?? 0} / manual {counts?.prereq.manual ?? 0}) | changes: +{editState.added.length}{' '}
-            / -{editState.removed.length}
+            prereq: {counts?.visiblePrereq.total ?? 0}/{counts?.prereq.total ?? 0} (existing{' '}
+            {counts?.visiblePrereq.base ?? 0}/{counts?.prereq.base ?? 0} / research {counts?.visiblePrereq.research ?? 0}/
+            {counts?.prereq.research ?? 0} / manual {counts?.visiblePrereq.manual ?? 0}/{counts?.prereq.manual ?? 0}) |
+            changes: +{editState.added.length} / -{editState.removed.length}
           </div>
         </div>
       ) : null}

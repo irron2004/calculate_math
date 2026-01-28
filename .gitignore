@@ -9,3 +9,4 @@ __cache__
 .npm-cache
 _cacache/
 .playwright-browsers
+*.log

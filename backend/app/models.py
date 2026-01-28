@@ -45,3 +45,73 @@ class ErrorDetail(BaseModel):
 
 class ErrorResponse(BaseModel):
     error: ErrorDetail
+
+
+# ============================================================
+# Homework Models
+# ============================================================
+
+
+class HomeworkProblem(BaseModel):
+    """A single problem in a homework assignment."""
+    id: str
+    type: str  # "objective" or "subjective"
+    question: str
+    options: Optional[List[str]] = None  # For objective (multiple choice)
+    answer: Optional[str] = None  # Correct answer (for grading reference)
+
+
+class HomeworkAssignmentCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    problems: List[HomeworkProblem]
+    dueAt: Optional[str] = None
+    targetStudentIds: List[str]
+
+
+class HomeworkAssignmentCreateResponse(BaseModel):
+    id: str
+    success: bool = True
+
+
+class HomeworkSubmissionFile(BaseModel):
+    id: str
+    originalName: str
+    contentType: str
+    sizeBytes: int
+
+
+class HomeworkSubmissionDetail(BaseModel):
+    id: str
+    answers: Dict[str, str]  # {problemId: answer}
+    submittedAt: str
+    files: List[HomeworkSubmissionFile] = Field(default_factory=list)
+
+
+class HomeworkAssignmentListItem(BaseModel):
+    id: str
+    title: str
+    description: Optional[str] = None
+    problems: List[HomeworkProblem]
+    dueAt: Optional[str] = None
+    createdAt: str
+    submitted: bool
+
+
+class HomeworkAssignmentListResponse(BaseModel):
+    assignments: List[HomeworkAssignmentListItem]
+
+
+class HomeworkAssignmentDetail(BaseModel):
+    id: str
+    title: str
+    description: Optional[str] = None
+    problems: List[HomeworkProblem]
+    dueAt: Optional[str] = None
+    createdAt: str
+    submission: Optional[HomeworkSubmissionDetail] = None
+
+
+class HomeworkSubmitResponse(BaseModel):
+    submissionId: str
+    success: bool = True

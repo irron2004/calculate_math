@@ -124,6 +124,44 @@ def init_db(path: Optional[Path] = None) -> None:
             is_correct INTEGER NOT NULL,
             created_at TEXT NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS homework_assignments (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT,
+            problems_json TEXT NOT NULL,
+            due_at TEXT,
+            created_by TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS homework_assignment_targets (
+            assignment_id TEXT NOT NULL,
+            student_id TEXT NOT NULL,
+            assigned_at TEXT NOT NULL,
+            PRIMARY KEY (assignment_id, student_id),
+            FOREIGN KEY (assignment_id) REFERENCES homework_assignments(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS homework_submissions (
+            id TEXT PRIMARY KEY,
+            assignment_id TEXT NOT NULL,
+            student_id TEXT NOT NULL,
+            answers_json TEXT NOT NULL,
+            submitted_at TEXT NOT NULL,
+            FOREIGN KEY (assignment_id) REFERENCES homework_assignments(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS homework_submission_files (
+            id TEXT PRIMARY KEY,
+            submission_id TEXT NOT NULL,
+            stored_path TEXT NOT NULL,
+            original_name TEXT NOT NULL,
+            content_type TEXT NOT NULL,
+            size_bytes INTEGER NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (submission_id) REFERENCES homework_submissions(id) ON DELETE CASCADE
+        );
         """
     )
     conn.execute(
@@ -530,3 +568,332 @@ def fetch_problems(node_id: str, path: Optional[Path] = None) -> Optional[List[D
         for row in problem_rows
     ]
     return problems
+
+
+# ============================================================
+# Homework Functions
+# ============================================================
+
+
+def create_homework_assignment(
+    title: str,
+    problems: List[Dict[str, Any]],
+    created_by: str,
+    target_student_ids: List[str],
+    description: Optional[str] = None,
+    due_at: Optional[str] = None,
+    path: Optional[Path] = None,
+) -> str:
+    """Create a new homework assignment and assign it to students."""
+    normalized_due_at = due_at.strip() if due_at and due_at.strip() else None
+    normalized_description = description.strip() if description and description.strip() else None
+    normalized_student_ids: List[str] = []
+    seen: set[str] = set()
+    for raw_student_id in target_student_ids:
+        student_id = raw_student_id.strip()
+        if not student_id or student_id in seen:
+            continue
+        normalized_student_ids.append(student_id)
+        seen.add(student_id)
+    if not normalized_student_ids:
+        raise ValueError("No valid student ids provided")
+
+    conn = connect(path)
+    try:
+        assignment_id = str(uuid4())
+        created_at = _now_iso()
+        problems_json = json.dumps(problems, ensure_ascii=False)
+
+        conn.execute(
+            """
+            INSERT INTO homework_assignments (id, title, description, problems_json, due_at, created_by, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (assignment_id, title, normalized_description, problems_json, normalized_due_at, created_by, created_at),
+        )
+
+        for student_id in normalized_student_ids:
+            conn.execute(
+                """
+                INSERT INTO homework_assignment_targets (assignment_id, student_id, assigned_at)
+                VALUES (?, ?, ?)
+                """,
+                (assignment_id, student_id, created_at),
+            )
+
+        conn.commit()
+        return assignment_id
+    finally:
+        conn.close()
+
+
+def list_homework_assignments_for_student(
+    student_id: str, path: Optional[Path] = None
+) -> List[Dict[str, Any]]:
+    """List all homework assignments for a student."""
+    conn = connect(path)
+    try:
+        rows = conn.execute(
+            """
+            SELECT
+                ha.id,
+                ha.title,
+                ha.description,
+                ha.problems_json,
+                ha.due_at,
+                ha.created_at,
+                CASE WHEN hs.id IS NOT NULL THEN 1 ELSE 0 END AS submitted
+            FROM homework_assignments ha
+            INNER JOIN homework_assignment_targets hat ON ha.id = hat.assignment_id
+            LEFT JOIN homework_submissions hs ON ha.id = hs.assignment_id AND hs.student_id = ?
+            WHERE hat.student_id = ?
+            ORDER BY ha.created_at DESC
+            """,
+            (student_id, student_id),
+        ).fetchall()
+
+        return [
+            {
+                "id": row["id"],
+                "title": row["title"],
+                "description": row["description"],
+                "problems": json.loads(row["problems_json"]),
+                "dueAt": row["due_at"],
+                "createdAt": row["created_at"],
+                "submitted": bool(row["submitted"]),
+            }
+            for row in rows
+        ]
+    finally:
+        conn.close()
+
+
+def get_homework_assignment(
+    assignment_id: str, student_id: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
+    """Get a single homework assignment with submission status for a student."""
+    conn = connect(path)
+    try:
+        # Check if student is assigned to this homework
+        target_row = conn.execute(
+            """
+            SELECT 1 FROM homework_assignment_targets
+            WHERE assignment_id = ? AND student_id = ?
+            """,
+            (assignment_id, student_id),
+        ).fetchone()
+
+        if not target_row:
+            return None
+
+        row = conn.execute(
+            """
+            SELECT id, title, description, problems_json, due_at, created_at
+            FROM homework_assignments
+            WHERE id = ?
+            """,
+            (assignment_id,),
+        ).fetchone()
+
+        if not row:
+            return None
+
+        # Check for existing submission
+        submission_row = conn.execute(
+            """
+            SELECT id, answers_json, submitted_at
+            FROM homework_submissions
+            WHERE assignment_id = ? AND student_id = ?
+            """,
+            (assignment_id, student_id),
+        ).fetchone()
+
+        submission = None
+        if submission_row:
+            # Get submission files
+            file_rows = conn.execute(
+                """
+                SELECT id, original_name, content_type, size_bytes
+                FROM homework_submission_files
+                WHERE submission_id = ?
+                """,
+                (submission_row["id"],),
+            ).fetchall()
+
+            submission = {
+                "id": submission_row["id"],
+                "answers": json.loads(submission_row["answers_json"]),
+                "submittedAt": submission_row["submitted_at"],
+                "files": [
+                    {
+                        "id": f["id"],
+                        "originalName": f["original_name"],
+                        "contentType": f["content_type"],
+                        "sizeBytes": f["size_bytes"],
+                    }
+                    for f in file_rows
+                ],
+            }
+
+        return {
+            "id": row["id"],
+            "title": row["title"],
+            "description": row["description"],
+            "problems": json.loads(row["problems_json"]),
+            "dueAt": row["due_at"],
+            "createdAt": row["created_at"],
+            "submission": submission,
+        }
+    finally:
+        conn.close()
+
+
+def check_homework_submission_exists(
+    assignment_id: str, student_id: str, path: Optional[Path] = None
+) -> bool:
+    """Check if a student has already submitted for an assignment."""
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT 1 FROM homework_submissions
+            WHERE assignment_id = ? AND student_id = ?
+            """,
+            (assignment_id, student_id),
+        ).fetchone()
+        return row is not None
+    finally:
+        conn.close()
+
+
+def create_homework_submission(
+    assignment_id: str,
+    student_id: str,
+    answers: Dict[str, str],
+    path: Optional[Path] = None,
+) -> str:
+    """Create a new homework submission."""
+    conn = connect(path)
+    try:
+        submission_id = str(uuid4())
+        submitted_at = _now_iso()
+        answers_json = json.dumps(answers, ensure_ascii=False)
+
+        conn.execute(
+            """
+            INSERT INTO homework_submissions (id, assignment_id, student_id, answers_json, submitted_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (submission_id, assignment_id, student_id, answers_json, submitted_at),
+        )
+
+        conn.commit()
+        return submission_id
+    finally:
+        conn.close()
+
+
+def save_homework_submission_file(
+    submission_id: str,
+    stored_path: str,
+    original_name: str,
+    content_type: str,
+    size_bytes: int,
+    path: Optional[Path] = None,
+) -> str:
+    """Save a file record for a homework submission."""
+    conn = connect(path)
+    try:
+        file_id = str(uuid4())
+        created_at = _now_iso()
+
+        conn.execute(
+            """
+            INSERT INTO homework_submission_files
+            (id, submission_id, stored_path, original_name, content_type, size_bytes, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (file_id, submission_id, stored_path, original_name, content_type, size_bytes, created_at),
+        )
+
+        conn.commit()
+        return file_id
+    finally:
+        conn.close()
+
+
+def get_homework_submission_with_files(
+    submission_id: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
+    """Get a submission with its files for email notification."""
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT
+                hs.id,
+                hs.assignment_id,
+                hs.student_id,
+                hs.answers_json,
+                hs.submitted_at,
+                ha.title AS assignment_title,
+                ha.problems_json
+            FROM homework_submissions hs
+            INNER JOIN homework_assignments ha ON hs.assignment_id = ha.id
+            WHERE hs.id = ?
+            """,
+            (submission_id,),
+        ).fetchone()
+
+        if not row:
+            return None
+
+        file_rows = conn.execute(
+            """
+            SELECT id, stored_path, original_name, content_type, size_bytes
+            FROM homework_submission_files
+            WHERE submission_id = ?
+            """,
+            (submission_id,),
+        ).fetchall()
+
+        return {
+            "id": row["id"],
+            "assignmentId": row["assignment_id"],
+            "studentId": row["student_id"],
+            "answers": json.loads(row["answers_json"]),
+            "problems": json.loads(row["problems_json"]),
+            "submittedAt": row["submitted_at"],
+            "assignmentTitle": row["assignment_title"],
+            "files": [
+                {
+                    "id": f["id"],
+                    "storedPath": f["stored_path"],
+                    "originalName": f["original_name"],
+                    "contentType": f["content_type"],
+                    "sizeBytes": f["size_bytes"],
+                }
+                for f in file_rows
+            ],
+        }
+    finally:
+        conn.close()
+
+
+def list_all_students(path: Optional[Path] = None) -> List[Dict[str, Any]]:
+    """List all students from homework_assignment_targets (unique student_ids)."""
+    # Note: Since we don't have a users table in the backend,
+    # we'll return a list endpoint that the frontend can use
+    # The actual student list comes from the frontend's localStorage user DB
+    # This function is a placeholder for future user table integration
+    conn = connect(path)
+    try:
+        rows = conn.execute(
+            """
+            SELECT DISTINCT student_id FROM homework_assignment_targets
+            ORDER BY student_id
+            """
+        ).fetchall()
+        return [{"id": row["student_id"]} for row in rows]
+    finally:
+        conn.close()

@@ -112,6 +112,13 @@ describe('/author/research-graph', () => {
       const nodeIds = (latestReactFlowProps.nodes ?? []).map((node: any) => node.id)
       expect(nodeIds).toEqual(expect.arrayContaining(['TU1', 'TU2']))
 
+      await waitFor(() => {
+        const hasAcceptedResearchEdge = (latestReactFlowProps.edges ?? []).some(
+          (edge: any) => edge.source === 'TU2' && edge.target === 'TU1'
+        )
+        expect(hasAcceptedResearchEdge).toBe(true)
+      })
+
       const prereqEdge = (latestReactFlowProps.edges ?? []).find((edge: any) => edge.edgeType === 'prereq' || edge.label === 'prereq')
       expect(prereqEdge?.style?.stroke).toBeTruthy()
     } finally {

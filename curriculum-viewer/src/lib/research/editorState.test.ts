@@ -3,18 +3,26 @@ import {
   createDefaultResearchEditorState,
   loadResearchEditorState,
   RESEARCH_EDITOR_STORAGE_KEY,
-  saveResearchEditorState
+  saveResearchEditorState,
+  type ResearchEditorStateV1
 } from './editorState'
 
 describe('research editor state', () => {
   it('round-trips state via localStorage', () => {
     window.localStorage.clear()
 
-    const state = {
-      version: 1 as const,
-      selectedTrack: 'T2' as const,
+    const state: ResearchEditorStateV1 = {
+      version: 1,
+      selectedTrack: 'T2',
       proposedNodes: [
-        { id: 'P_TU_bridge', nodeType: 'textbookUnit' as const, label: 'Bridge', proposed: true, origin: 'manual' as const, note: 'note' }
+        {
+          id: 'P_TU_bridge',
+          nodeType: 'textbookUnit',
+          label: 'Bridge',
+          proposed: true,
+          origin: 'manual',
+          note: 'note'
+        }
       ],
       addedEdges: [{ source: 'A', target: 'B' }],
       removedEdges: [{ source: 'B', target: 'C' }]

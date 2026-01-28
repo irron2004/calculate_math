@@ -46,6 +46,9 @@ export default function AppLayout() {
             <li>
               <NavLink to={ROUTES.preview}>프리뷰</NavLink>
             </li>
+            <li>
+              <NavLink to={ROUTES.mypage}>마이페이지</NavLink>
+            </li>
           </ul>
         </nav>
 

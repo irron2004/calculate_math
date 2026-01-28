@@ -297,3 +297,27 @@ export function useAuth(): AuthContextValue {
 
   return value
 }
+
+export type StudentInfo = {
+  id: string
+  name: string
+  grade: string
+  email: string
+}
+
+export function getAllStudents(): StudentInfo[] {
+  const db = readUserDb()
+  const students: StudentInfo[] = []
+
+  for (const [id, user] of Object.entries(db.usersById)) {
+    if (id === ADMIN_USER_ID) continue
+    students.push({
+      id: user.id,
+      name: user.name,
+      grade: user.grade,
+      email: user.email
+    })
+  }
+
+  return students.sort((a, b) => a.name.localeCompare(b.name))
+}

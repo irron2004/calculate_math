@@ -10,6 +10,8 @@ export const ROUTE_SEGMENTS = {
   learn: 'learn',
   eval: 'eval',
   health: 'health',
+  mypage: 'mypage',
+  homework: 'homework',
   author: 'author',
   authorImport: 'import',
   authorMiniFlow: 'mini',
@@ -17,7 +19,8 @@ export const ROUTE_SEGMENTS = {
   authorResearchGraph: 'research-graph',
   authorValidate: 'validate',
   authorPublish: 'publish',
-  authorHealth: 'health'
+  authorHealth: 'health',
+  authorHomework: 'homework'
 } as const
 
 export const ROUTES = {
@@ -33,6 +36,8 @@ export const ROUTES = {
   learn: `/${ROUTE_SEGMENTS.learn}`,
   eval: `/${ROUTE_SEGMENTS.eval}`,
   health: `/${ROUTE_SEGMENTS.health}`,
+  mypage: `/${ROUTE_SEGMENTS.mypage}`,
+  homeworkSubmit: `/${ROUTE_SEGMENTS.mypage}/${ROUTE_SEGMENTS.homework}/:id`,
   author: `/${ROUTE_SEGMENTS.author}`,
   authorImport: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorImport}`,
   authorMiniFlow: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorMiniFlow}`,
@@ -40,5 +45,6 @@ export const ROUTES = {
   authorResearchGraph: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorResearchGraph}`,
   authorValidate: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorValidate}`,
   authorPublish: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorPublish}`,
-  authorHealth: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorHealth}`
+  authorHealth: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorHealth}`,
+  authorHomework: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorHomework}`
 } as const
