@@ -96,12 +96,13 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user || isAdmin) return
     const controller = new AbortController()
+    const studentId = user.id
 
     async function run() {
       setHomeworkLoading(true)
       setHomeworkError(null)
       try {
-        const data = await listAssignments(user.id, controller.signal)
+        const data = await listAssignments(studentId, controller.signal)
         if (!controller.signal.aborted) {
           setHomeworkAssignments(data)
         }
