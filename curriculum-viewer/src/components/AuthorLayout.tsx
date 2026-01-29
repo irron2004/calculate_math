@@ -7,9 +7,9 @@ export default function AuthorLayout() {
   const navigate = useNavigate()
 
   const userLabel = user
-    ? user.name && user.name !== user.id
-      ? `${user.name} (${user.id})`
-      : user.id
+    ? user.name && user.name !== user.username
+      ? `${user.name} (${user.username})`
+      : user.username
     : null
 
   return (

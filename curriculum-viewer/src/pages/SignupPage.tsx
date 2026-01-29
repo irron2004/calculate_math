@@ -28,6 +28,7 @@ export default function SignupPage() {
 
   const [didSignup, setDidSignup] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   const [userId, setUserId] = useState('')
   const [password, setPassword] = useState('')
@@ -53,19 +54,21 @@ export default function SignupPage() {
       <h1>회원가입</h1>
       <form
         className="login-form"
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault()
           if (!canSubmit) return
 
           setError(null)
 
-          const message = register({
-            id: userId,
+          setSubmitting(true)
+          const message = await register({
+            username: userId,
             password,
             name,
             grade,
             email
           })
+          setSubmitting(false)
 
           if (message) {
             setError(message)
@@ -130,8 +133,8 @@ export default function SignupPage() {
 
         {error ? <p className="error">{error}</p> : null}
 
-        <button type="submit" className="button button-primary" disabled={!canSubmit}>
-          회원가입
+        <button type="submit" className="button button-primary" disabled={!canSubmit || submitting}>
+          {submitting ? '가입 중...' : '회원가입'}
         </button>
       </form>
 

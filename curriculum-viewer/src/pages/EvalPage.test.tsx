@@ -23,11 +23,23 @@ function writeStore(userId: string, store: AttemptSessionStoreV1) {
   window.localStorage.setItem(getAttemptSessionsStorageKey(userId), JSON.stringify(store))
 }
 
+const buildStoredUser = (username = 'demo') => ({
+  id: username,
+  username,
+  name: 'Demo User',
+  grade: '1',
+  email: `${username}@example.com`,
+  role: 'student' as const,
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  lastLoginAt: null
+})
+
 describe('EvalPage route', () => {
   beforeEach(() => {
     window.localStorage.clear()
     window.sessionStorage.clear()
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
   })
 
   it('renders EvalPage at /eval/:sessionId', async () => {

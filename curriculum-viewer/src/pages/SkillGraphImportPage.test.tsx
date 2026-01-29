@@ -16,8 +16,20 @@ vi.mock('reactflow', () => {
   }
 })
 
+const buildStoredUser = (username = 'demo') => ({
+  id: username,
+  username,
+  name: 'Demo User',
+  grade: '1',
+  email: `${username}@example.com`,
+  role: 'admin' as const,
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  lastLoginAt: null
+})
+
 function renderPage() {
-  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
   render(
     <MemoryRouter>
       <AuthProvider>

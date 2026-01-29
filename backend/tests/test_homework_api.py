@@ -8,7 +8,36 @@ from fastapi.testclient import TestClient
 MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
 
 
+def _auth_headers(token: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {token}"}
+
+
+def _register_student(client: TestClient, *, student_id: str) -> str:
+    response = client.post(
+        "/api/auth/register",
+        json={
+            "username": student_id,
+            "password": "password123",
+            "name": f"{student_id} 이름",
+            "grade": "3",
+            "email": f"{student_id}@example.com",
+        },
+    )
+    assert response.status_code == 200, response.text
+    return response.json()["accessToken"]
+
+
+def _login_admin(client: TestClient) -> str:
+    response = client.post(
+        "/api/auth/login",
+        json={"username": "admin", "password": "admin"},
+    )
+    assert response.status_code == 200, response.text
+    return response.json()["accessToken"]
+
+
 def _create_assignment(client: TestClient, *, student_ids: list[str]) -> str:
+    admin_token = _login_admin(client)
     response = client.post(
         "/api/homework/assignments",
         json={
@@ -24,6 +53,7 @@ def _create_assignment(client: TestClient, *, student_ids: list[str]) -> str:
                 }
             ],
         },
+        headers=_auth_headers(admin_token),
     )
     assert response.status_code == 200, response.text
     data = response.json()
@@ -34,9 +64,14 @@ def _create_assignment(client: TestClient, *, student_ids: list[str]) -> str:
 def test_homework_create_list_and_detail(client: tuple[TestClient, Any]) -> None:
     test_client, _db_path = client
 
+    student_token = _register_student(test_client, student_id="student1")
     assignment_id = _create_assignment(test_client, student_ids=["student1"])
 
-    list_response = test_client.get("/api/homework/assignments", params={"studentId": "student1"})
+    list_response = test_client.get(
+        "/api/homework/assignments",
+        params={"studentId": "student1"},
+        headers=_auth_headers(student_token),
+    )
     assert list_response.status_code == 200
     list_data = list_response.json()
     assert list_data["assignments"], "Expected at least one assignment"
@@ -45,6 +80,7 @@ def test_homework_create_list_and_detail(client: tuple[TestClient, Any]) -> None
     detail_response = test_client.get(
         f"/api/homework/assignments/{assignment_id}",
         params={"studentId": "student1"},
+        headers=_auth_headers(student_token),
     )
     assert detail_response.status_code == 200
     detail_data = detail_response.json()
@@ -55,6 +91,7 @@ def test_homework_create_list_and_detail(client: tuple[TestClient, Any]) -> None
 def test_homework_submit_rejects_large_file(client: tuple[TestClient, Any]) -> None:
     test_client, _db_path = client
 
+    student_token = _register_student(test_client, student_id="student2")
     assignment_id = _create_assignment(test_client, student_ids=["student2"])
 
     too_large = b"x" * (MAX_FILE_SIZE_BYTES + 1)
@@ -65,6 +102,7 @@ def test_homework_submit_rejects_large_file(client: tuple[TestClient, Any]) -> N
             "answersJson": json.dumps({"p1": "답안"}),
         },
         files=[("images", ("large.jpg", too_large, "image/jpeg"))],
+        headers=_auth_headers(student_token),
     )
 
     assert response.status_code == 400
@@ -74,6 +112,7 @@ def test_homework_submit_rejects_large_file(client: tuple[TestClient, Any]) -> N
     detail_response = test_client.get(
         f"/api/homework/assignments/{assignment_id}",
         params={"studentId": "student2"},
+        headers=_auth_headers(student_token),
     )
     assert detail_response.status_code == 200
     assert detail_response.json()["submission"] is None
@@ -82,6 +121,7 @@ def test_homework_submit_rejects_large_file(client: tuple[TestClient, Any]) -> N
 def test_homework_submit_rejects_invalid_file_type(client: tuple[TestClient, Any]) -> None:
     test_client, _db_path = client
 
+    student_token = _register_student(test_client, student_id="student3")
     assignment_id = _create_assignment(test_client, student_ids=["student3"])
 
     response = test_client.post(
@@ -91,6 +131,7 @@ def test_homework_submit_rejects_invalid_file_type(client: tuple[TestClient, Any
             "answersJson": json.dumps({"p1": "답안"}),
         },
         files=[("images", ("note.txt", b"hello", "text/plain"))],
+        headers=_auth_headers(student_token),
     )
 
     assert response.status_code == 400
@@ -100,6 +141,7 @@ def test_homework_submit_rejects_invalid_file_type(client: tuple[TestClient, Any
     detail_response = test_client.get(
         f"/api/homework/assignments/{assignment_id}",
         params={"studentId": "student3"},
+        headers=_auth_headers(student_token),
     )
     assert detail_response.status_code == 200
     assert detail_response.json()["submission"] is None

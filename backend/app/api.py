@@ -3,18 +3,34 @@ from __future__ import annotations
 
 import json
 import logging
+import re
+from datetime import datetime, timezone
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 from uuid import uuid4
 
-from fastapi import APIRouter, BackgroundTasks, File, Form, Query, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, Query, Request, UploadFile
 from fastapi.responses import JSONResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
+from .auth import (
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    get_current_user,
+    TokenData,
+    hash_password,
+    hash_token,
+    require_admin,
+    verify_password,
+)
 from .db import (
     check_homework_submission_exists,
     create_homework_assignment,
     create_homework_submission,
+    create_user,
     fetch_latest_graph,
     fetch_problems,
     get_homework_assignment,
@@ -22,18 +38,38 @@ from .db import (
     get_homework_submission_for_review,
     get_homework_submission_with_files,
     get_pending_homework_count,
+    get_refresh_token_by_hash,
+    get_user_by_email,
+    get_user_by_id,
+    get_user_by_username,
     get_submission_admin,
     get_submission_file,
     list_all_homework_assignments_admin,
     list_homework_assignments_for_student,
+    list_users,
+    revoke_all_refresh_tokens,
+    revoke_refresh_token,
     save_homework_submission_file,
+    store_refresh_token,
+    update_user_password,
     update_homework_submission_review,
+    update_last_login,
 )
 from .email_service import send_homework_notification
 from .models import (
     AdminAssignmentDetail,
     AdminAssignmentListResponse,
     AdminSubmissionDetail,
+    AuthChangePasswordRequest,
+    AuthChangePasswordResponse,
+    AuthLoginRequest,
+    AuthLogoutResponse,
+    AuthLogoutRequest,
+    AuthRefreshRequest,
+    AuthRegisterRequest,
+    AuthTokenResponse,
+    AuthUser,
+    AuthUserListResponse,
     ErrorResponse,
     GraphResponse,
     HomeworkAssignmentCreate,
@@ -51,11 +87,259 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api")
 
+# Rate limiter - imported from main to avoid circular import
+limiter = Limiter(key_func=get_remote_address)
+
 
 @router.get("/health")
 def health_check() -> dict:
     """Health check endpoint for container orchestration."""
     return {"status": "ok"}
+
+
+def _build_auth_user(row: dict) -> AuthUser:
+    return AuthUser(
+        id=row["id"],
+        username=row["username"],
+        name=row["name"],
+        grade=row["grade"],
+        email=row["email"],
+        role=row["role"],
+        status=row["status"],
+        createdAt=row["created_at"],
+        lastLoginAt=row.get("last_login_at"),
+    )
+
+
+# Email validation regex pattern (RFC 5322 simplified)
+EMAIL_REGEX = re.compile(
+    r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
+    r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
+)
+
+
+def _is_valid_email(value: str) -> bool:
+    normalized = value.strip().lower()
+    if not normalized or len(normalized) > 254:
+        return False
+    return EMAIL_REGEX.match(normalized) is not None
+
+
+@router.post(
+    "/auth/register",
+    response_model=AuthTokenResponse,
+    responses={400: {"model": ErrorResponse}, 429: {"model": ErrorResponse}},
+)
+@limiter.limit("5/minute")
+def register_user(request: Request, data: AuthRegisterRequest) -> AuthTokenResponse | JSONResponse:
+    username = data.username.strip()
+    password = data.password.strip()
+    name = data.name.strip()
+    grade = data.grade.strip()
+    email = data.email.strip().lower()
+
+    if not username:
+        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_USERNAME", "message": "아이디를 입력하세요."}})
+    if len(username) < 3:
+        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_USERNAME", "message": "아이디는 3자 이상이어야 합니다."}})
+    if not password or len(password) < 8:
+        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_PASSWORD", "message": "비밀번호는 8자 이상이어야 합니다."}})
+    if not name:
+        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_NAME", "message": "이름을 입력하세요."}})
+    if not grade:
+        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_GRADE", "message": "학년을 입력하세요."}})
+    if not _is_valid_email(email):
+        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_EMAIL", "message": "이메일 형식이 올바르지 않습니다."}})
+
+    if get_user_by_username(username):
+        return JSONResponse(status_code=400, content={"error": {"code": "USERNAME_EXISTS", "message": "이미 존재하는 아이디입니다."}})
+    if get_user_by_email(email):
+        return JSONResponse(status_code=400, content={"error": {"code": "EMAIL_EXISTS", "message": "이미 등록된 이메일입니다."}})
+
+    password_hash = hash_password(password)
+    try:
+        user_id = create_user(
+            username=username,
+            email=email,
+            name=name,
+            grade=grade,
+            password_hash=password_hash,
+            role="student",
+            status="active",
+        )
+    except ValueError as exc:
+        code = str(exc)
+        message = "이미 존재하는 계정입니다."
+        if code == "USERNAME_EXISTS":
+            message = "이미 존재하는 아이디입니다."
+        elif code == "EMAIL_EXISTS":
+            message = "이미 등록된 이메일입니다."
+        return JSONResponse(status_code=400, content={"error": {"code": code, "message": message}})
+
+    user = get_user_by_id(user_id)
+    if not user:
+        return JSONResponse(status_code=500, content={"error": {"code": "USER_NOT_FOUND", "message": "사용자 생성에 실패했습니다."}})
+
+    access_token, _ = create_access_token(user_id=user["id"], username=user["username"], role=user["role"])
+    refresh_token, refresh_payload = create_refresh_token(
+        user_id=user["id"], username=user["username"], role=user["role"]
+    )
+    store_refresh_token(
+        user_id=user["id"],
+        token_hash=hash_token(refresh_token),
+        expires_at=datetime.fromtimestamp(refresh_payload["exp"], tz=timezone.utc).isoformat(),
+    )
+    return AuthTokenResponse(accessToken=access_token, refreshToken=refresh_token, user=_build_auth_user(user))
+
+
+@router.post(
+    "/auth/login",
+    response_model=AuthTokenResponse,
+    responses={401: {"model": ErrorResponse}, 429: {"model": ErrorResponse}},
+)
+@limiter.limit("10/minute")
+def login_user(request: Request, data: AuthLoginRequest) -> AuthTokenResponse | JSONResponse:
+    username = data.username.strip()
+    password = data.password.strip()
+    if not username or not password:
+        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_CREDENTIALS", "message": "아이디 또는 비밀번호가 올바르지 않습니다."}})
+
+    user = get_user_by_username(username)
+    if not user or not verify_password(password, user["password_hash"]):
+        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_CREDENTIALS", "message": "아이디 또는 비밀번호가 올바르지 않습니다."}})
+    if user["status"] != "active":
+        return JSONResponse(status_code=403, content={"error": {"code": "ACCOUNT_DISABLED", "message": "계정이 비활성화되었습니다."}})
+
+    update_last_login(user["id"])
+    access_token, _ = create_access_token(user_id=user["id"], username=user["username"], role=user["role"])
+    refresh_token, refresh_payload = create_refresh_token(
+        user_id=user["id"], username=user["username"], role=user["role"]
+    )
+    store_refresh_token(
+        user_id=user["id"],
+        token_hash=hash_token(refresh_token),
+        expires_at=datetime.fromtimestamp(refresh_payload["exp"], tz=timezone.utc).isoformat(),
+    )
+    return AuthTokenResponse(accessToken=access_token, refreshToken=refresh_token, user=_build_auth_user(user))
+
+
+@router.post(
+    "/auth/refresh",
+    response_model=AuthTokenResponse,
+    responses={401: {"model": ErrorResponse}, 429: {"model": ErrorResponse}},
+)
+@limiter.limit("20/minute")
+def refresh_token(request: Request, data: AuthRefreshRequest) -> AuthTokenResponse | JSONResponse:
+    refresh = data.refreshToken.strip()
+    if not refresh:
+        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_REFRESH", "message": "리프레시 토큰이 없습니다."}})
+
+    payload = decode_token(refresh, expected_type="refresh")
+    token_hash_value = hash_token(refresh)
+    record = get_refresh_token_by_hash(token_hash_value)
+    if not record or record.get("revoked_at") is not None:
+        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_REFRESH", "message": "리프레시 토큰이 유효하지 않습니다."}})
+    if record.get("user_id") != payload.get("sub"):
+        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_REFRESH", "message": "리프레시 토큰이 유효하지 않습니다."}})
+
+    user = get_user_by_id(payload["sub"])
+    if not user:
+        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_REFRESH", "message": "사용자를 찾을 수 없습니다."}})
+
+    revoke_refresh_token(token_hash_value)
+    access_token, _ = create_access_token(user_id=user["id"], username=user["username"], role=user["role"])
+    new_refresh_token, new_refresh_payload = create_refresh_token(
+        user_id=user["id"], username=user["username"], role=user["role"]
+    )
+    store_refresh_token(
+        user_id=user["id"],
+        token_hash=hash_token(new_refresh_token),
+        expires_at=datetime.fromtimestamp(new_refresh_payload["exp"], tz=timezone.utc).isoformat(),
+    )
+    return AuthTokenResponse(accessToken=access_token, refreshToken=new_refresh_token, user=_build_auth_user(user))
+
+
+@router.post(
+    "/auth/logout",
+    response_model=AuthLogoutResponse,
+    responses={200: {"model": AuthLogoutResponse}},
+)
+def logout_user(data: AuthLogoutRequest) -> AuthLogoutResponse:
+    refresh = data.refreshToken.strip()
+    if refresh:
+        revoke_refresh_token(hash_token(refresh))
+    return AuthLogoutResponse(success=True)
+
+
+@router.post(
+    "/auth/password",
+    response_model=AuthChangePasswordResponse,
+    responses={400: {"model": ErrorResponse}, 401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}},
+)
+def change_password(
+    data: AuthChangePasswordRequest,
+    user: TokenData = Depends(get_current_user),
+) -> AuthChangePasswordResponse | JSONResponse:
+    current_password = data.currentPassword.strip()
+    new_password = data.newPassword.strip()
+
+    if not current_password or not new_password:
+        return JSONResponse(
+            status_code=400,
+            content={"error": {"code": "INVALID_PASSWORD", "message": "비밀번호를 입력하세요."}},
+        )
+    if len(new_password) < 8:
+        return JSONResponse(
+            status_code=400,
+            content={"error": {"code": "INVALID_PASSWORD", "message": "비밀번호는 8자 이상이어야 합니다."}},
+        )
+    if current_password == new_password:
+        return JSONResponse(
+            status_code=400,
+            content={"error": {"code": "PASSWORD_UNCHANGED", "message": "새 비밀번호를 입력하세요."}},
+        )
+
+    row = get_user_by_id(user.user_id)
+    if not row or not verify_password(current_password, row["password_hash"]):
+        return JSONResponse(
+            status_code=401,
+            content={"error": {"code": "INVALID_CREDENTIALS", "message": "현재 비밀번호가 올바르지 않습니다."}},
+        )
+    if row["status"] != "active":
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "ACCOUNT_DISABLED", "message": "계정이 비활성화되었습니다."}},
+        )
+
+    update_user_password(user.user_id, hash_password(new_password))
+    revoke_all_refresh_tokens(user.user_id)
+    return AuthChangePasswordResponse(success=True)
+
+
+@router.get(
+    "/auth/me",
+    response_model=AuthUser,
+    responses={401: {"model": ErrorResponse}},
+)
+def get_me(user=Depends(get_current_user)) -> AuthUser | JSONResponse:
+    row = get_user_by_id(user.user_id)
+    if not row:
+        return JSONResponse(status_code=401, content={"error": {"code": "USER_NOT_FOUND", "message": "사용자를 찾을 수 없습니다."}})
+    return _build_auth_user(row)
+
+
+@router.get(
+    "/admin/users",
+    response_model=AuthUserListResponse,
+    responses={403: {"model": ErrorResponse}},
+)
+def list_admin_users(
+    role: str | None = Query(None),
+    user=Depends(require_admin),
+) -> AuthUserListResponse:
+    rows = list_users(role=role)
+    users = [_build_auth_user(row) for row in rows]
+    return AuthUserListResponse(users=users)
 
 
 @router.get("/graph/draft", response_model=GraphResponse, responses={404: {"model": ErrorResponse}})
@@ -170,7 +454,10 @@ class ValidatedFile:
     response_model=HomeworkAssignmentCreateResponse,
     responses={400: {"model": ErrorResponse}},
 )
-def create_assignment(data: HomeworkAssignmentCreate) -> HomeworkAssignmentCreateResponse | JSONResponse:
+def create_assignment(
+    data: HomeworkAssignmentCreate,
+    _admin=Depends(require_admin),
+) -> HomeworkAssignmentCreateResponse | JSONResponse:
     """Create a new homework assignment (Admin only)."""
     if not data.title.strip():
         return JSONResponse(
@@ -255,8 +542,14 @@ def create_assignment(data: HomeworkAssignmentCreate) -> HomeworkAssignmentCreat
 )
 def list_assignments(
     studentId: str = Query(..., min_length=1),
+    user=Depends(get_current_user),
 ) -> HomeworkAssignmentListResponse | JSONResponse:
     """List homework assignments for a student."""
+    if user.role != "student" or user.username != studentId:
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
+        )
     assignments = list_homework_assignments_for_student(studentId)
     return HomeworkAssignmentListResponse(assignments=assignments)
 
@@ -269,8 +562,14 @@ def list_assignments(
 def get_assignment(
     assignment_id: str,
     studentId: str = Query(..., min_length=1),
+    user=Depends(get_current_user),
 ) -> HomeworkAssignmentDetail | JSONResponse:
     """Get a single homework assignment detail."""
+    if user.role != "student" or user.username != studentId:
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
+        )
     assignment = get_homework_assignment(assignment_id, studentId)
     if not assignment:
         return JSONResponse(
@@ -296,8 +595,14 @@ async def submit_homework(
     studentId: str = Form(...),
     answersJson: str = Form(...),  # JSON string: {"p1": "answer1", "p2": "answer2"}
     images: List[UploadFile] = File(default=[]),
+    user=Depends(get_current_user),
 ) -> HomeworkSubmitResponse | JSONResponse:
     """Submit homework with answers and optional images."""
+    if user.role != "student" or user.username != studentId:
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
+        )
     # Parse answers JSON
     try:
         answers = json.loads(answersJson)
@@ -471,6 +776,7 @@ async def submit_homework(
 def review_homework_submission(
     submission_id: str,
     data: HomeworkSubmissionReviewRequest,
+    _admin=Depends(require_admin),
 ) -> HomeworkSubmissionReviewResponse | JSONResponse:
     """Review a homework submission (Admin only)."""
     submission = get_homework_submission_for_review(submission_id)
@@ -591,7 +897,7 @@ def review_homework_submission(
     "/homework/admin/assignments",
     response_model=AdminAssignmentListResponse,
 )
-def list_admin_assignments() -> AdminAssignmentListResponse:
+def list_admin_assignments(_admin=Depends(require_admin)) -> AdminAssignmentListResponse:
     """Admin: List all homework assignments with submission statistics."""
     assignments = list_all_homework_assignments_admin()
     return AdminAssignmentListResponse(assignments=assignments)
@@ -602,7 +908,9 @@ def list_admin_assignments() -> AdminAssignmentListResponse:
     response_model=AdminAssignmentDetail,
     responses={404: {"model": ErrorResponse}},
 )
-def get_admin_assignment(assignment_id: str) -> AdminAssignmentDetail | JSONResponse:
+def get_admin_assignment(
+    assignment_id: str, _admin=Depends(require_admin)
+) -> AdminAssignmentDetail | JSONResponse:
     """Admin: Get assignment detail with all student submission summaries."""
     assignment = get_homework_assignment_admin(assignment_id)
     if not assignment:
@@ -623,7 +931,9 @@ def get_admin_assignment(assignment_id: str) -> AdminAssignmentDetail | JSONResp
     response_model=AdminSubmissionDetail,
     responses={404: {"model": ErrorResponse}},
 )
-def get_admin_submission(submission_id: str) -> AdminSubmissionDetail | JSONResponse:
+def get_admin_submission(
+    submission_id: str, _admin=Depends(require_admin)
+) -> AdminSubmissionDetail | JSONResponse:
     """Admin: Get full submission detail for review."""
     submission = get_submission_admin(submission_id)
     if not submission:
@@ -644,7 +954,7 @@ def get_admin_submission(submission_id: str) -> AdminSubmissionDetail | JSONResp
     responses={404: {"model": ErrorResponse}},
 )
 def download_submission_file(
-    submission_id: str, file_id: str
+    submission_id: str, file_id: str, _admin=Depends(require_admin)
 ) -> JSONResponse:
     """Admin: Download a submission file."""
     from fastapi.responses import FileResponse
@@ -673,7 +983,23 @@ def download_submission_file(
             },
         )
 
-    file_path = Path(file_info["storedPath"])
+    file_path = Path(file_info["storedPath"]).resolve()
+
+    # Security: Verify the file is within the allowed upload directory (Path Traversal prevention)
+    try:
+        file_path.relative_to(UPLOAD_BASE_DIR.resolve())
+    except ValueError:
+        logger.warning("Path traversal attempt detected: %s", file_info["storedPath"])
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "FILE_NOT_FOUND",
+                    "message": "File not found",
+                }
+            },
+        )
+
     if not file_path.exists():
         return JSONResponse(
             status_code=404,
@@ -699,7 +1025,13 @@ def download_submission_file(
 )
 def get_homework_pending_count_endpoint(
     studentId: str = Query(..., min_length=1),
-) -> HomeworkPendingCountResponse:
+    user=Depends(get_current_user),
+) -> HomeworkPendingCountResponse | JSONResponse:
     """Get count of homework items by status for a student."""
+    if user.role != "student" or user.username != studentId:
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
+        )
     counts = get_pending_homework_count(studentId)
     return HomeworkPendingCountResponse(**counts)

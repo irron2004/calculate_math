@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { getAllStudents, type StudentInfo } from '../lib/auth/AuthProvider'
+import { listStudents } from '../lib/auth/api'
+import type { StudentInfo } from '../lib/auth/types'
 import {
   getAssignmentAdmin,
   getSubmissionAdmin,
@@ -146,9 +147,17 @@ export default function AuthorHomeworkStatusPage() {
     null
   )
 
-  // Load students from local storage
+  // Load students from server
   useEffect(() => {
-    setStudents(getAllStudents())
+    const controller = new AbortController()
+    listStudents(controller.signal)
+      .then((data) => {
+        if (!controller.signal.aborted) setStudents(data)
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setStudents([])
+      })
+    return () => controller.abort()
   }, [])
 
   // Load all assignments

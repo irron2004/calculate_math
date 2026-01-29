@@ -20,6 +20,10 @@ from app.main import create_app
 def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[Tuple[TestClient, Path], None, None]:
     db_path = tmp_path / "test.db"
     monkeypatch.setenv("DATABASE_PATH", str(db_path))
+    monkeypatch.setenv("JWT_SECRET", "test-secret")
+    monkeypatch.setenv("ADMIN_USERNAME", "admin")
+    monkeypatch.setenv("ADMIN_PASSWORD", "admin")
+    monkeypatch.setenv("ADMIN_AUTH_EMAIL", "admin@example.com")
     app = create_app()
     with TestClient(app) as test_client:
         yield test_client, db_path

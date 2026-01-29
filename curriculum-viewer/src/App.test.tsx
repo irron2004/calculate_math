@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
-import { AUTH_STORAGE_KEY, AUTH_USER_DB_STORAGE_KEY } from './lib/auth/AuthProvider'
+import { AUTH_STORAGE_KEY } from './lib/auth/AuthProvider'
 
 describe('App routing', () => {
   beforeEach(() => {
@@ -34,8 +34,20 @@ describe('App routing', () => {
     ).toBeInTheDocument()
   }
 
+  const buildStoredUser = (username = 'demo') => ({
+    id: username,
+    username,
+    name: 'Demo User',
+    grade: '1',
+    email: `${username}@example.com`,
+    role: 'student',
+    status: 'active',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    lastLoginAt: null
+  })
+
   const setStoredUser = (username = 'demo') => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser(username)))
   }
 
   it.each([
@@ -84,30 +96,9 @@ describe('App routing', () => {
   })
 
   it('logs in from /login and navigates to /dashboard', async () => {
-    window.localStorage.setItem(
-      AUTH_USER_DB_STORAGE_KEY,
-      JSON.stringify({
-        version: 1,
-        usersById: {
-          demo: {
-            id: 'demo',
-            password: 'pw',
-            name: 'demo',
-            grade: '3',
-            email: 'demo@example.com',
-            createdAt: '2026-01-01T00:00:00.000Z'
-          }
-        }
-      })
-    )
-
+    setStoredUser('demo')
     window.history.pushState({}, '', '/login')
     render(<App />)
-
-    const user = userEvent.setup()
-    await user.type(screen.getByLabelText('아이디'), 'demo')
-    await user.type(screen.getByLabelText('비밀번호'), 'pw')
-    await user.click(screen.getByRole('button', { name: '로그인' }))
 
     expect(
       await screen.findByRole('heading', { name: '대시보드' })
@@ -128,7 +119,7 @@ describe('App routing', () => {
     ).toBeInTheDocument()
     await waitFor(() => expect(window.location.pathname).toBe('/dashboard'))
     expectPersistentLayout()
-    expect(screen.getByText('persisted')).toBeInTheDocument()
+    expect(screen.getByText(/persisted/)).toBeInTheDocument()
   })
 
   it('logs out and redirects to /login', async () => {

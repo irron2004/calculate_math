@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getAllStudents, type StudentInfo, useAuth } from '../lib/auth/AuthProvider'
+import { useAuth } from '../lib/auth/AuthProvider'
+import { listStudents } from '../lib/auth/api'
+import type { StudentInfo } from '../lib/auth/types'
 import { createAssignment, HomeworkApiError } from '../lib/homework/api'
 import type { HomeworkProblem, HomeworkProblemType } from '../lib/homework/types'
 import { createEmptyProblem } from '../lib/homework/types'
@@ -205,7 +207,17 @@ export default function AuthorHomeworkPage() {
   const [jsonError, setJsonError] = useState<string | null>(null)
 
   useEffect(() => {
-    setStudents(getAllStudents())
+    const controller = new AbortController()
+    listStudents(controller.signal)
+      .then((data) => {
+        if (!controller.signal.aborted) setStudents(data)
+      })
+      .catch((err) => {
+        if (!controller.signal.aborted) {
+          setMessage({ type: 'error', text: err instanceof Error ? err.message : '학생 목록을 불러올 수 없습니다.' })
+        }
+      })
+    return () => controller.abort()
   }, [])
 
   const handleToggleStudent = useCallback((studentId: string) => {

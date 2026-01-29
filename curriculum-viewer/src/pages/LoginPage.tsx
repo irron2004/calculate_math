@@ -7,6 +7,7 @@ type RedirectState = {
   from?: {
     pathname?: string
   }
+  notice?: string
 }
 
 export default function LoginPage() {
@@ -15,10 +16,12 @@ export default function LoginPage() {
 
   const state = location.state as RedirectState | null
   const fromPathname = state?.from?.pathname ?? ROUTES.dashboard
+  const notice = state?.notice ?? null
 
   const [userId, setUserId] = useState('')
   const [password, setPassword] = useState('')
   const [didLogin, setDidLogin] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   if (isAuthenticated) {
@@ -32,14 +35,16 @@ export default function LoginPage() {
       <h1>로그인</h1>
       <form
         className="login-form"
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault()
           if (submitDisabled) {
             return
           }
 
           setError(null)
-          const message = login(userId, password)
+          setSubmitting(true)
+          const message = await login(userId, password)
+          setSubmitting(false)
           if (message) {
             setError(message)
             return
@@ -47,6 +52,8 @@ export default function LoginPage() {
           setDidLogin(true)
         }}
       >
+        {notice ? <p className="muted">{notice}</p> : null}
+
         <label className="form-field">
           아이디
           <input
@@ -73,9 +80,9 @@ export default function LoginPage() {
         <button
           type="submit"
           className="button button-primary"
-          disabled={submitDisabled}
+          disabled={submitDisabled || submitting}
         >
-          로그인
+          {submitting ? '로그인 중...' : '로그인'}
         </button>
 
         <div className="muted">계정이 없나요?</div>
@@ -92,7 +99,7 @@ export default function LoginPage() {
           관리자 모드로
         </Link>
         <p className="muted" style={{ marginTop: 8 }}>
-          관리자 계정: <span className="mono">admin / admin</span>
+          관리자 계정: <span className="mono">admin / ithing88</span>
         </p>
       </form>
     </section>

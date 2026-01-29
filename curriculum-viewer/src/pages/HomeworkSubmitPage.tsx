@@ -140,7 +140,7 @@ export default function HomeworkSubmitPage() {
       setError(null)
 
       try {
-        const data = await getAssignment(id, user.id, signal)
+        const data = await getAssignment(id, user.username, signal)
         if (!signal.aborted) {
           setAssignment(data)
           // Initialize answers from submission or empty
@@ -202,7 +202,7 @@ export default function HomeworkSubmitPage() {
 
       try {
         await submitHomework(id, {
-          studentId: user.id,
+          studentId: user.username,
           answers,
           images
         })

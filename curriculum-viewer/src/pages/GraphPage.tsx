@@ -54,7 +54,7 @@ export default function GraphPage() {
       return
     }
 
-    const store = repo.readStore(user.id)
+    const store = repo.readStore(user.username)
     const progress = computeNodeProgressV1({ graph: learningGraph, store })
     setProgressByNodeId(progress)
   }, [learningGraph, user])

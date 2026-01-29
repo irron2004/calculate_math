@@ -170,10 +170,41 @@ def init_db(path: Optional[Path] = None) -> None:
             created_at TEXT NOT NULL,
             FOREIGN KEY (submission_id) REFERENCES homework_submissions(id) ON DELETE CASCADE
         );
+
+        CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
+            name TEXT NOT NULL,
+            grade TEXT NOT NULL,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'active',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            last_login_at TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS refresh_tokens (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            token_hash TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            revoked_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username);
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);
+        CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id);
+        CREATE INDEX IF NOT EXISTS idx_refresh_tokens_hash ON refresh_tokens(token_hash);
         """
     )
     _ensure_homework_review_columns(conn)
     _ensure_homework_scheduled_at_column(conn)
+    _ensure_user_columns(conn)
+    _ensure_refresh_token_columns(conn)
     conn.execute(
         """
         INSERT INTO schema_version (id, version, applied_at)
@@ -219,6 +250,49 @@ def _ensure_homework_scheduled_at_column(conn: sqlite3.Connection) -> None:
     columns = _get_table_columns(conn, "homework_assignments")
     if "scheduled_at" not in columns:
         conn.execute("ALTER TABLE homework_assignments ADD COLUMN scheduled_at TEXT")
+
+
+def _ensure_user_columns(conn: sqlite3.Connection) -> None:
+    """Ensure users table has required columns."""
+    columns = _get_table_columns(conn, "users")
+    if not columns:
+        return
+    expected = {
+        "id": "id TEXT PRIMARY KEY",
+        "username": "username TEXT NOT NULL UNIQUE",
+        "email": "email TEXT NOT NULL UNIQUE",
+        "name": "name TEXT NOT NULL",
+        "grade": "grade TEXT NOT NULL",
+        "password_hash": "password_hash TEXT NOT NULL",
+        "role": "role TEXT NOT NULL",
+        "status": "status TEXT NOT NULL DEFAULT 'active'",
+        "created_at": "created_at TEXT NOT NULL",
+        "updated_at": "updated_at TEXT NOT NULL",
+        "last_login_at": "last_login_at TEXT",
+    }
+    for name, definition in expected.items():
+        if name in columns:
+            continue
+        conn.execute(f"ALTER TABLE users ADD COLUMN {definition}")
+
+
+def _ensure_refresh_token_columns(conn: sqlite3.Connection) -> None:
+    """Ensure refresh_tokens table has required columns."""
+    columns = _get_table_columns(conn, "refresh_tokens")
+    if not columns:
+        return
+    expected = {
+        "id": "id TEXT PRIMARY KEY",
+        "user_id": "user_id TEXT NOT NULL",
+        "token_hash": "token_hash TEXT NOT NULL",
+        "expires_at": "expires_at TEXT NOT NULL",
+        "created_at": "created_at TEXT NOT NULL",
+        "revoked_at": "revoked_at TEXT",
+    }
+    for name, definition in expected.items():
+        if name in columns:
+            continue
+        conn.execute(f"ALTER TABLE refresh_tokens ADD COLUMN {definition}")
 
 
 def _resolve_graph_id(payload: Dict[str, Any]) -> str:
@@ -606,6 +680,247 @@ def fetch_problems(node_id: str, path: Optional[Path] = None) -> Optional[List[D
         for row in problem_rows
     ]
     return problems
+
+
+# ============================================================
+# User/Auth Functions
+# ============================================================
+
+
+def create_user(
+    *,
+    username: str,
+    email: str,
+    name: str,
+    grade: str,
+    password_hash: str,
+    role: str = "student",
+    status: str = "active",
+    path: Optional[Path] = None,
+) -> str:
+    conn = connect(path)
+    try:
+        user_id = str(uuid4())
+        now = _now_iso()
+        conn.execute(
+            """
+            INSERT INTO users
+                (id, username, email, name, grade, password_hash, role, status, created_at, updated_at, last_login_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (user_id, username, email, name, grade, password_hash, role, status, now, now, None),
+        )
+        conn.commit()
+        return user_id
+    except sqlite3.IntegrityError as exc:
+        message = str(exc)
+        if "users.username" in message:
+            raise ValueError("USERNAME_EXISTS") from exc
+        if "users.email" in message:
+            raise ValueError("EMAIL_EXISTS") from exc
+        raise
+    finally:
+        conn.close()
+
+
+def get_user_by_username(username: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT id, username, email, name, grade, password_hash, role, status,
+                   created_at, updated_at, last_login_at
+            FROM users
+            WHERE username = ?
+            """,
+            (username,),
+        ).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def get_user_by_email(email: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT id, username, email, name, grade, password_hash, role, status,
+                   created_at, updated_at, last_login_at
+            FROM users
+            WHERE email = ?
+            """,
+            (email,),
+        ).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def get_user_by_id(user_id: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT id, username, email, name, grade, password_hash, role, status,
+                   created_at, updated_at, last_login_at
+            FROM users
+            WHERE id = ?
+            """,
+            (user_id,),
+        ).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def list_users(
+    *,
+    role: Optional[str] = None,
+    status: Optional[str] = None,
+    path: Optional[Path] = None,
+) -> List[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        conditions = []
+        params: list[Any] = []
+        if role:
+            conditions.append("role = ?")
+            params.append(role)
+        if status:
+            conditions.append("status = ?")
+            params.append(status)
+        where_clause = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+        rows = conn.execute(
+            f"""
+            SELECT id, username, email, name, grade, role, status, created_at, updated_at, last_login_at
+            FROM users
+            {where_clause}
+            ORDER BY created_at DESC
+            """,
+            params,
+        ).fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        conn.close()
+
+
+def update_last_login(user_id: str, path: Optional[Path] = None) -> None:
+    conn = connect(path)
+    try:
+        now = _now_iso()
+        conn.execute(
+            "UPDATE users SET last_login_at = ?, updated_at = ? WHERE id = ?",
+            (now, now, user_id),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def update_user_password(user_id: str, password_hash: str, path: Optional[Path] = None) -> bool:
+    conn = connect(path)
+    try:
+        now = _now_iso()
+        result = conn.execute(
+            "UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?",
+            (password_hash, now, user_id),
+        )
+        conn.commit()
+        return result.rowcount > 0
+    finally:
+        conn.close()
+
+
+def store_refresh_token(
+    *,
+    user_id: str,
+    token_hash: str,
+    expires_at: str,
+    path: Optional[Path] = None,
+) -> str:
+    conn = connect(path)
+    try:
+        token_id = str(uuid4())
+        conn.execute(
+            """
+            INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at, created_at, revoked_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (token_id, user_id, token_hash, expires_at, _now_iso(), None),
+        )
+        conn.commit()
+        return token_id
+    finally:
+        conn.close()
+
+
+def get_refresh_token_by_hash(token_hash: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT id, user_id, token_hash, expires_at, created_at, revoked_at
+            FROM refresh_tokens
+            WHERE token_hash = ?
+            """,
+            (token_hash,),
+        ).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def revoke_refresh_token(token_hash: str, path: Optional[Path] = None) -> bool:
+    conn = connect(path)
+    try:
+        result = conn.execute(
+            "UPDATE refresh_tokens SET revoked_at = ? WHERE token_hash = ? AND revoked_at IS NULL",
+            (_now_iso(), token_hash),
+        )
+        conn.commit()
+        return result.rowcount > 0
+    finally:
+        conn.close()
+
+
+def revoke_all_refresh_tokens(user_id: str, path: Optional[Path] = None) -> int:
+    conn = connect(path)
+    try:
+        result = conn.execute(
+            "UPDATE refresh_tokens SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL",
+            (_now_iso(), user_id),
+        )
+        conn.commit()
+        return result.rowcount
+    finally:
+        conn.close()
+
+
+def ensure_admin_user(
+    *,
+    username: str,
+    password_hash: str,
+    email: str,
+    name: str,
+    grade: str,
+    path: Optional[Path] = None,
+) -> bool:
+    """Ensure an admin user exists. Returns True if created."""
+    existing = get_user_by_username(username, path)
+    if existing:
+        return False
+    create_user(
+        username=username,
+        email=email,
+        name=name,
+        grade=grade,
+        password_hash=password_hash,
+        role="admin",
+        status="active",
+        path=path,
+    )
+    return True
 
 
 # ============================================================
@@ -1038,20 +1353,18 @@ def get_homework_submission_with_files(
 
 
 def list_all_students(path: Optional[Path] = None) -> List[Dict[str, Any]]:
-    """List all students from homework_assignment_targets (unique student_ids)."""
-    # Note: Since we don't have a users table in the backend,
-    # we'll return a list endpoint that the frontend can use
-    # The actual student list comes from the frontend's localStorage user DB
-    # This function is a placeholder for future user table integration
+    """List all active students from the users table."""
     conn = connect(path)
     try:
         rows = conn.execute(
             """
-            SELECT DISTINCT student_id FROM homework_assignment_targets
-            ORDER BY student_id
+            SELECT id, username, email, name, grade, role, status, created_at, updated_at, last_login_at
+            FROM users
+            WHERE role = 'student' AND status = 'active'
+            ORDER BY name ASC, username ASC
             """
         ).fetchall()
-        return [{"id": row["student_id"]} for row in rows]
+        return [dict(row) for row in rows]
     finally:
         conn.close()
 

@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth/AuthProvider'
+import { changePassword } from '../lib/auth/api'
 import { listAssignments, HomeworkApiError } from '../lib/homework/api'
 import type { HomeworkAssignment } from '../lib/homework/types'
 import { getHomeworkStatus, isOverdueSoon } from '../lib/homework/types'
+import { ROUTES } from '../routes'
 
 function formatDate(isoString: string): string {
   const date = new Date(isoString)
@@ -114,11 +116,19 @@ function AssignmentCard({ assignment }: AssignmentCardProps) {
 }
 
 export default function MyPage() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
 
   const [assignments, setAssignments] = useState<HomeworkAssignment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null)
+  const [passwordSubmitting, setPasswordSubmitting] = useState(false)
 
   const loadAssignments = useCallback(async (signal: AbortSignal) => {
     if (!user) return
@@ -127,7 +137,7 @@ export default function MyPage() {
     setError(null)
 
     try {
-      const data = await listAssignments(user.id, signal)
+      const data = await listAssignments(user.username, signal)
       if (!signal.aborted) {
         setAssignments(data)
       }
@@ -178,6 +188,90 @@ export default function MyPage() {
     <section>
       <h1>마이 페이지</h1>
       <p className="muted">{user.name}님, 환영합니다.</p>
+
+      <section className="homework-section">
+        <h2>비밀번호 변경</h2>
+        <form
+          className="form"
+          onSubmit={async (event) => {
+            event.preventDefault()
+            setPasswordError(null)
+            setPasswordSuccess(null)
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+              setPasswordError('모든 비밀번호 항목을 입력하세요.')
+              return
+            }
+            if (newPassword.length < 8) {
+              setPasswordError('새 비밀번호는 8자 이상이어야 합니다.')
+              return
+            }
+            if (newPassword !== confirmPassword) {
+              setPasswordError('새 비밀번호가 일치하지 않습니다.')
+              return
+            }
+            if (currentPassword === newPassword) {
+              setPasswordError('현재 비밀번호와 다른 비밀번호를 입력하세요.')
+              return
+            }
+
+            try {
+              setPasswordSubmitting(true)
+              await changePassword(currentPassword, newPassword)
+              setPasswordSuccess('비밀번호가 변경되었습니다. 다시 로그인해 주세요.')
+              setCurrentPassword('')
+              setNewPassword('')
+              setConfirmPassword('')
+              await logout()
+              navigate(ROUTES.login, {
+                replace: true,
+                state: { notice: '비밀번호가 변경되었습니다. 다시 로그인해 주세요.' }
+              })
+            } catch (err) {
+              setPasswordError(err instanceof Error ? err.message : '비밀번호 변경에 실패했습니다.')
+            } finally {
+              setPasswordSubmitting(false)
+            }
+          }}
+        >
+          <label className="form-field">
+            현재 비밀번호
+            <input
+              type="password"
+              autoComplete="current-password"
+              value={currentPassword}
+              onChange={(event) => setCurrentPassword(event.target.value)}
+            />
+          </label>
+          <label className="form-field">
+            새 비밀번호
+            <input
+              type="password"
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+            />
+          </label>
+          <label className="form-field">
+            새 비밀번호 확인
+            <input
+              type="password"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+            />
+          </label>
+          {passwordError ? <p className="error">{passwordError}</p> : null}
+          {passwordSuccess ? <p className="muted">{passwordSuccess}</p> : null}
+          <button
+            type="submit"
+            className="button button-primary"
+            disabled={passwordSubmitting}
+          >
+            {passwordSubmitting ? '변경 중...' : '비밀번호 변경'}
+          </button>
+        </form>
+      </section>
 
       {loading && <p className="muted">숙제 목록을 불러오는 중...</p>}
       {error && (

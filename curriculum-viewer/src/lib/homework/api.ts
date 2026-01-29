@@ -13,6 +13,7 @@ import type {
   HomeworkSubmitData,
   HomeworkSubmissionReviewData,
 } from './types'
+import { authFetch } from '../auth/api'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
@@ -48,7 +49,7 @@ export async function createAssignment(
   data: CreateAssignmentData,
   signal?: AbortSignal
 ): Promise<{ id: string }> {
-  const response = await fetch(`${API_BASE}/homework/assignments`, {
+  const response = await authFetch(`${API_BASE}/homework/assignments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -84,7 +85,7 @@ export async function listAssignments(
   signal?: AbortSignal
 ): Promise<HomeworkAssignment[]> {
   const params = new URLSearchParams({ studentId })
-  const response = await fetch(`${API_BASE}/homework/assignments?${params}`, {
+  const response = await authFetch(`${API_BASE}/homework/assignments?${params}`, {
     signal,
   })
 
@@ -109,7 +110,7 @@ export async function getAssignment(
   signal?: AbortSignal
 ): Promise<HomeworkAssignmentDetail> {
   const params = new URLSearchParams({ studentId })
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE}/homework/assignments/${assignmentId}?${params}`,
     { signal }
   )
@@ -142,7 +143,7 @@ export async function submitHomework(
     formData.append('images', image)
   }
 
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE}/homework/assignments/${assignmentId}/submit`,
     {
       method: 'POST',
@@ -171,7 +172,7 @@ export async function reviewSubmission(
   data: HomeworkSubmissionReviewData,
   signal?: AbortSignal
 ): Promise<void> {
-  const response = await fetch(`${API_BASE}/homework/submissions/${submissionId}/review`, {
+  const response = await authFetch(`${API_BASE}/homework/submissions/${submissionId}/review`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -204,7 +205,7 @@ export async function reviewSubmission(
 export async function listAssignmentsAdmin(
   signal?: AbortSignal
 ): Promise<AdminAssignmentSummary[]> {
-  const response = await fetch(`${API_BASE}/homework/admin/assignments`, { signal })
+  const response = await authFetch(`${API_BASE}/homework/admin/assignments`, { signal })
 
   const json = await response.json()
 
@@ -225,7 +226,7 @@ export async function getAssignmentAdmin(
   assignmentId: string,
   signal?: AbortSignal
 ): Promise<AdminAssignmentDetail> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE}/homework/admin/assignments/${assignmentId}`,
     { signal }
   )
@@ -249,7 +250,7 @@ export async function getSubmissionAdmin(
   submissionId: string,
   signal?: AbortSignal
 ): Promise<AdminSubmissionDetail> {
-  const response = await fetch(
+  const response = await authFetch(
     `${API_BASE}/homework/admin/submissions/${submissionId}`,
     { signal }
   )
@@ -281,7 +282,7 @@ export async function getPendingCount(
   signal?: AbortSignal
 ): Promise<HomeworkPendingCount> {
   const params = new URLSearchParams({ studentId })
-  const response = await fetch(`${API_BASE}/homework/pending-count?${params}`, { signal })
+  const response = await authFetch(`${API_BASE}/homework/pending-count?${params}`, { signal })
 
   const json = await response.json()
 

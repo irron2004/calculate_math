@@ -29,6 +29,18 @@ vi.mock('reactflow', () => {
   }
 })
 
+const buildStoredUser = (username = 'demo') => ({
+  id: username,
+  username,
+  name: 'Demo User',
+  grade: '1',
+  email: `${username}@example.com`,
+  role: 'admin' as const,
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  lastLoginAt: null
+})
+
 function renderPage() {
   render(
     <MemoryRouter>
@@ -49,7 +61,7 @@ describe('AuthorValidatePage', () => {
   })
 
   it('jumps focus when clicking a validation issue', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
 
     const graphId = 'g-cycle'
     setAuthorActiveGraphId(graphId)

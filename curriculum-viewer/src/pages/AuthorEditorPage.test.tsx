@@ -56,6 +56,18 @@ vi.mock('reactflow', async () => {
 
 const graphId = 'author-graph'
 
+const buildStoredUser = (username = 'demo') => ({
+  id: username,
+  username,
+  name: 'Demo User',
+  grade: '1',
+  email: `${username}@example.com`,
+  role: 'admin' as const,
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  lastLoginAt: null
+})
+
 const curriculumLoader = async () => ({
   meta: { version: 1, curriculum_id: graphId },
   nodes: [
@@ -157,7 +169,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('shows startable nodes list with count', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 
@@ -174,7 +186,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('focuses the canvas when a node is clicked from the list', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 
@@ -189,7 +201,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('shows edge edit controls when an edge is selected', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 
@@ -208,7 +220,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('adds an edge with the selected edgeType when connecting nodes', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 
@@ -236,7 +248,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('blocks invalid drag connections and keeps the draft unchanged', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 
@@ -263,7 +275,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('deletes a selected edge via the button', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 
@@ -286,7 +298,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('deletes a selected edge via the Delete key', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 
@@ -310,7 +322,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('updates edge type and saves the draft', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 
@@ -333,7 +345,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('blocks edge type changes that would duplicate an existing edge', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft({
       ...draftGraph,
@@ -367,7 +379,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('creates an edge and saves the draft when clicking a connectable target', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 
@@ -392,7 +404,7 @@ describe('AuthorEditorPage', () => {
   })
 
   it('shows a reason and does not change the graph when clicking a blocked target', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: 'demo' }))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
     setAuthorActiveGraphId(graphId)
     seedDraft(draftGraph)
 

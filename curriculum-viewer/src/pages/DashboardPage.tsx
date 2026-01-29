@@ -62,7 +62,7 @@ export default function DashboardPage() {
   const { user, isAdmin } = useAuth()
   const { index } = useCurriculum()
   const navigate = useNavigate()
-  const userId = user?.id ?? null
+  const userId = user?.username ?? null
 
   const [learningGraph, setLearningGraph] = useState<LearningGraphV1 | null>(null)
   const [graphError, setGraphError] = useState<string | null>(null)
@@ -96,7 +96,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user || isAdmin) return
     const controller = new AbortController()
-    const studentId = user.id
+    const studentId = user.username
 
     async function run() {
       setHomeworkLoading(true)
@@ -192,7 +192,7 @@ export default function DashboardPage() {
     <section className="dashboard">
       <div className="dashboard-welcome">
         <span className="welcome-emoji">👋</span>
-        <h1>안녕, {user?.name ?? user?.id ?? '친구'}!</h1>
+        <h1>안녕, {user?.name ?? user?.username ?? '친구'}!</h1>
         <p>오늘도 함께 수학 모험을 떠나볼까요?</p>
       </div>
 

@@ -48,6 +48,67 @@ class ErrorResponse(BaseModel):
 
 
 # ============================================================
+# Auth Models
+# ============================================================
+
+
+class AuthRegisterRequest(BaseModel):
+    username: str
+    password: str
+    name: str
+    grade: str
+    email: str
+
+
+class AuthLoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class AuthRefreshRequest(BaseModel):
+    refreshToken: str
+
+
+class AuthLogoutRequest(BaseModel):
+    refreshToken: str
+
+
+class AuthChangePasswordRequest(BaseModel):
+    currentPassword: str
+    newPassword: str
+
+
+class AuthUser(BaseModel):
+    id: str
+    username: str
+    name: str
+    grade: str
+    email: str
+    role: str
+    status: str
+    createdAt: str
+    lastLoginAt: Optional[str] = None
+
+
+class AuthTokenResponse(BaseModel):
+    accessToken: str
+    refreshToken: str
+    user: AuthUser
+
+
+class AuthLogoutResponse(BaseModel):
+    success: bool = True
+
+
+class AuthChangePasswordResponse(BaseModel):
+    success: bool = True
+
+
+class AuthUserListResponse(BaseModel):
+    users: List[AuthUser]
+
+
+# ============================================================
 # Homework Models
 # ============================================================
 
