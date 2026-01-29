@@ -98,9 +98,6 @@ export default function LoginPage() {
         <Link to={ROUTES.author} className="button button-ghost">
           관리자 모드로
         </Link>
-        <p className="muted" style={{ marginTop: 8 }}>
-          관리자 계정: <span className="mono">admin / ithing88</span>
-        </p>
       </form>
     </section>
   )

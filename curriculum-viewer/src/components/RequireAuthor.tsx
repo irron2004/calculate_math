@@ -29,7 +29,7 @@ export default function RequireAuthor({ children }: { children: ReactElement }) 
     return (
       <section>
         <h1>관리자 전용 기능</h1>
-        <p className="muted">이 페이지는 관리자 계정(admin/ithing88)에서만 사용할 수 있습니다.</p>
+        <p className="muted">이 페이지는 관리자 계정에서만 사용할 수 있습니다.</p>
         <dl className="detail-dl">
           <dt>현재 계정</dt>
           <dd className="mono">{user.username}</dd>
