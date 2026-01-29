@@ -42,6 +42,18 @@ export class HomeworkApiError extends Error {
   }
 }
 
+function normalizeDateTimeInput(value?: string | null): string | null {
+  if (!value) return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  const normalized = trimmed.includes('T') ? trimmed : trimmed.replace(' ', 'T')
+  const parsed = new Date(normalized)
+  if (Number.isNaN(parsed.getTime())) {
+    return trimmed
+  }
+  return parsed.toISOString()
+}
+
 /**
  * Create a new homework assignment (Admin only)
  */
@@ -49,6 +61,8 @@ export async function createAssignment(
   data: CreateAssignmentData,
   signal?: AbortSignal
 ): Promise<{ id: string }> {
+  const normalizedDueAt = normalizeDateTimeInput(data.dueAt)
+  const normalizedScheduledAt = normalizeDateTimeInput(data.scheduledAt)
   const response = await authFetch(`${API_BASE}/homework/assignments`, {
     method: 'POST',
     headers: {
@@ -58,8 +72,8 @@ export async function createAssignment(
       title: data.title,
       description: data.description || null,
       problems: data.problems,
-      dueAt: data.dueAt || null,
-      scheduledAt: data.scheduledAt || null,
+      dueAt: normalizedDueAt,
+      scheduledAt: normalizedScheduledAt,
       targetStudentIds: data.targetStudentIds,
     }),
     signal,
