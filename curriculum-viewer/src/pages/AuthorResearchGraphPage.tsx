@@ -175,6 +175,7 @@ export default function AuthorResearchGraphPage() {
     ...DOMAIN_LAYER_ORDER,
     DOMAIN_LAYER_FALLBACK
   ])
+  const [visibleDepthRange, setVisibleDepthRange] = useState<{ min: number; max: number }>({ min: 1, max: 99 })
   const [selectedPrereq, setSelectedPrereq] = useState<PrereqEdgeWithOrigin | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [manualProposedNodes, setManualProposedNodes] = useState<ProposedTextbookUnitNode[]>(
@@ -490,19 +491,6 @@ export default function AuthorResearchGraphPage() {
     return Array.from(nodeMap.values())
   }, [proposedNodes, state])
 
-  const visibleNodes = useMemo(() => {
-    if (state.status !== 'ready') return []
-    if (visibleDomainCodeSet.size === 0) return []
-    return allNodes.filter((node) => {
-      const domainCode = domainCodeById.get(node.id) ?? DOMAIN_LAYER_FALLBACK
-      return visibleDomainCodeSet.has(domainCode)
-    })
-  }, [allNodes, domainCodeById, state, visibleDomainCodeSet])
-
-  const visibleNodeIdSet = useMemo(() => {
-    return new Set(visibleNodes.map((node) => node.id))
-  }, [visibleNodes])
-
   const currentPrereqEdges = useMemo(() => {
     if (!editState) return []
     return listCurrentPrereqEdges(editState).filter(
@@ -510,7 +498,8 @@ export default function AuthorResearchGraphPage() {
     )
   }, [editState, nodeTypeById])
 
-  const depthPrereqEdges = useMemo(() => {
+  // Calculate depth for ALL nodes first (before domain filtering)
+  const allPrereqEdgesForDepth = useMemo(() => {
     const map = new Map<string, PrereqEdge>()
     for (const edge of currentPrereqEdges) {
       map.set(`${edge.source}\u0000${edge.target}`, { source: edge.source, target: edge.target })
@@ -531,10 +520,50 @@ export default function AuthorResearchGraphPage() {
       }
     }
 
-    return Array.from(map.values()).filter(
+    return Array.from(map.values())
+  }, [currentPrereqEdges, patchesByTrack, suggestionsStore])
+
+  // Compute depth for all nodes
+  const allNodesDepthById = useMemo(() => {
+    return computePrereqDepths(
+      allNodes.map((node) => node.id),
+      allPrereqEdgesForDepth
+    )
+  }, [allNodes, allPrereqEdgesForDepth])
+
+  // Available depth range
+  const availableDepthRange = useMemo(() => {
+    let min = Infinity
+    let max = 0
+    for (const depth of allNodesDepthById.values()) {
+      if (depth < min) min = depth
+      if (depth > max) max = depth
+    }
+    if (min === Infinity) min = 1
+    if (max === 0) max = 1
+    return { min, max }
+  }, [allNodesDepthById])
+
+  const visibleNodes = useMemo(() => {
+    if (state.status !== 'ready') return []
+    if (visibleDomainCodeSet.size === 0) return []
+    return allNodes.filter((node) => {
+      const domainCode = domainCodeById.get(node.id) ?? DOMAIN_LAYER_FALLBACK
+      if (!visibleDomainCodeSet.has(domainCode)) return false
+      const depth = allNodesDepthById.get(node.id) ?? 1
+      return depth >= visibleDepthRange.min && depth <= visibleDepthRange.max
+    })
+  }, [allNodes, allNodesDepthById, domainCodeById, state, visibleDomainCodeSet, visibleDepthRange])
+
+  const visibleNodeIdSet = useMemo(() => {
+    return new Set(visibleNodes.map((node) => node.id))
+  }, [visibleNodes])
+
+  const depthPrereqEdges = useMemo(() => {
+    return allPrereqEdgesForDepth.filter(
       (edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target)
     )
-  }, [currentPrereqEdges, patchesByTrack, suggestionsStore, visibleNodeIdSet])
+  }, [allPrereqEdgesForDepth, visibleNodeIdSet])
 
   const prereqCycle = useMemo(() => {
     const edges = depthPrereqEdges.map((edge) => ({ source: edge.source, target: edge.target }))
@@ -545,10 +574,8 @@ export default function AuthorResearchGraphPage() {
     if (state.status !== 'ready') return []
     if (visibleNodes.length === 0) return []
 
-    const depthById = computePrereqDepths(
-      visibleNodes.map((node) => node.id),
-      depthPrereqEdges
-    )
+    // Use pre-calculated depth from allNodesDepthById
+    const depthById = allNodesDepthById
 
     const nodesByDomain = new Map<DomainLayerCode, typeof visibleNodes>()
     for (const node of visibleNodes) {
@@ -712,7 +739,7 @@ export default function AuthorResearchGraphPage() {
     }
 
     return layeredNodes
-  }, [depthPrereqEdges, domainCodeById, domainLabelByCode, state, visibleNodes])
+  }, [allNodesDepthById, domainCodeById, domainLabelByCode, state, visibleNodes])
 
   const edges = useMemo((): Edge[] => {
     if (state.status !== 'ready') return []
@@ -918,6 +945,65 @@ export default function AuthorResearchGraphPage() {
               <button type="button" className="button button-ghost button-small" onClick={handleShowAllDomains}>
                 all
               </button>
+            </div>
+          </div>
+          <div className="graph-control" style={{ minWidth: 200 }}>
+            <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
+              Depth filter (1-{availableDepthRange.max})
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <label style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                <span>min</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={availableDepthRange.max}
+                  value={visibleDepthRange.min}
+                  onChange={(e) => {
+                    const val = Math.max(1, Math.min(Number(e.target.value), visibleDepthRange.max))
+                    setVisibleDepthRange((prev) => ({ ...prev, min: val }))
+                  }}
+                  style={{ width: 50 }}
+                />
+              </label>
+              <label style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                <span>max</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={availableDepthRange.max}
+                  value={Math.min(visibleDepthRange.max, availableDepthRange.max)}
+                  onChange={(e) => {
+                    const val = Math.max(visibleDepthRange.min, Math.min(Number(e.target.value), availableDepthRange.max))
+                    setVisibleDepthRange((prev) => ({ ...prev, max: val }))
+                  }}
+                  style={{ width: 50 }}
+                />
+              </label>
+              <button
+                type="button"
+                className="button button-ghost button-small"
+                onClick={() => setVisibleDepthRange({ min: 1, max: availableDepthRange.max })}
+              >
+                reset
+              </button>
+            </div>
+            <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
+              {Array.from({ length: availableDepthRange.max }, (_, i) => i + 1).map((depth) => (
+                <button
+                  key={`depth-${depth}`}
+                  type="button"
+                  className={`button button-small ${
+                    visibleDepthRange.min === depth && visibleDepthRange.max === depth
+                      ? 'button-primary'
+                      : 'button-ghost'
+                  }`}
+                  onClick={() => setVisibleDepthRange({ min: depth, max: depth })}
+                  title={`depth ${depth}만 보기`}
+                >
+                  {depth}
+                </button>
+              ))}
             </div>
           </div>
           <button
