@@ -134,6 +134,7 @@ def init_db(path: Optional[Path] = None) -> None:
             description TEXT,
             problems_json TEXT NOT NULL,
             due_at TEXT,
+            scheduled_at TEXT,
             created_by TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
@@ -152,6 +153,10 @@ def init_db(path: Optional[Path] = None) -> None:
             student_id TEXT NOT NULL,
             answers_json TEXT NOT NULL,
             submitted_at TEXT NOT NULL,
+            review_status TEXT NOT NULL DEFAULT 'pending',
+            reviewed_at TEXT,
+            reviewed_by TEXT,
+            problem_reviews_json TEXT,
             FOREIGN KEY (assignment_id) REFERENCES homework_assignments(id) ON DELETE CASCADE
         );
 
@@ -167,6 +172,8 @@ def init_db(path: Optional[Path] = None) -> None:
         );
         """
     )
+    _ensure_homework_review_columns(conn)
+    _ensure_homework_scheduled_at_column(conn)
     conn.execute(
         """
         INSERT INTO schema_version (id, version, applied_at)
@@ -184,6 +191,34 @@ def _set_schema_version(conn: sqlite3.Connection, version: int) -> None:
         "UPDATE schema_version SET version = ?, applied_at = ? WHERE id = 1",
         (version, _now_iso()),
     )
+
+
+def _get_table_columns(conn: sqlite3.Connection, table_name: str) -> set[str]:
+    rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+    return {row["name"] for row in rows}
+
+
+def _ensure_homework_review_columns(conn: sqlite3.Connection) -> None:
+    """Ensure homework_submissions has review tracking columns."""
+    columns = _get_table_columns(conn, "homework_submissions")
+    expected = {
+        "review_status": "review_status TEXT NOT NULL DEFAULT 'pending'",
+        "reviewed_at": "reviewed_at TEXT",
+        "reviewed_by": "reviewed_by TEXT",
+        "problem_reviews_json": "problem_reviews_json TEXT",
+    }
+    for name, definition in expected.items():
+        if name in columns:
+            continue
+        conn.execute(f"ALTER TABLE homework_submissions ADD COLUMN {definition}")
+    conn.execute("UPDATE homework_submissions SET review_status = 'pending' WHERE review_status IS NULL")
+
+
+def _ensure_homework_scheduled_at_column(conn: sqlite3.Connection) -> None:
+    """Ensure homework_assignments has scheduled_at column."""
+    columns = _get_table_columns(conn, "homework_assignments")
+    if "scheduled_at" not in columns:
+        conn.execute("ALTER TABLE homework_assignments ADD COLUMN scheduled_at TEXT")
 
 
 def _resolve_graph_id(payload: Dict[str, Any]) -> str:
@@ -585,11 +620,13 @@ def create_homework_assignment(
     target_student_ids: List[str],
     description: Optional[str] = None,
     due_at: Optional[str] = None,
+    scheduled_at: Optional[str] = None,
     path: Optional[Path] = None,
 ) -> str:
     """Create a new homework assignment and assign it to students."""
     normalized_due_at = due_at.strip() if due_at and due_at.strip() else None
     normalized_description = description.strip() if description and description.strip() else None
+    normalized_scheduled_at = scheduled_at.strip() if scheduled_at and scheduled_at.strip() else None
     normalized_student_ids: List[str] = []
     seen: set[str] = set()
     for raw_student_id in target_student_ids:
@@ -609,10 +646,10 @@ def create_homework_assignment(
 
         conn.execute(
             """
-            INSERT INTO homework_assignments (id, title, description, problems_json, due_at, created_by, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO homework_assignments (id, title, description, problems_json, due_at, scheduled_at, created_by, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (assignment_id, title, normalized_description, problems_json, normalized_due_at, created_by, created_at),
+            (assignment_id, title, normalized_description, problems_json, normalized_due_at, normalized_scheduled_at, created_by, created_at),
         )
 
         for student_id in normalized_student_ids:
@@ -633,9 +670,15 @@ def create_homework_assignment(
 def list_homework_assignments_for_student(
     student_id: str, path: Optional[Path] = None
 ) -> List[Dict[str, Any]]:
-    """List all homework assignments for a student."""
+    """List all homework assignments for a student.
+
+    Only shows assignments that are either:
+    - Not scheduled (scheduled_at is NULL)
+    - Scheduled time has passed (scheduled_at <= current time)
+    """
     conn = connect(path)
     try:
+        now = _now_iso()
         rows = conn.execute(
             """
             SELECT
@@ -644,15 +687,26 @@ def list_homework_assignments_for_student(
                 ha.description,
                 ha.problems_json,
                 ha.due_at,
+                ha.scheduled_at,
                 ha.created_at,
+                hs.id AS submission_id,
+                hs.submitted_at AS submitted_at,
+                hs.review_status AS review_status,
                 CASE WHEN hs.id IS NOT NULL THEN 1 ELSE 0 END AS submitted
             FROM homework_assignments ha
             INNER JOIN homework_assignment_targets hat ON ha.id = hat.assignment_id
-            LEFT JOIN homework_submissions hs ON ha.id = hs.assignment_id AND hs.student_id = ?
+            LEFT JOIN homework_submissions hs ON hs.id = (
+                SELECT id
+                FROM homework_submissions
+                WHERE assignment_id = ha.id AND student_id = ?
+                ORDER BY submitted_at DESC
+                LIMIT 1
+            )
             WHERE hat.student_id = ?
+              AND (ha.scheduled_at IS NULL OR ha.scheduled_at <= ?)
             ORDER BY ha.created_at DESC
             """,
-            (student_id, student_id),
+            (student_id, student_id, now),
         ).fetchall()
 
         return [
@@ -662,8 +716,12 @@ def list_homework_assignments_for_student(
                 "description": row["description"],
                 "problems": json.loads(row["problems_json"]),
                 "dueAt": row["due_at"],
+                "scheduledAt": row["scheduled_at"],
                 "createdAt": row["created_at"],
                 "submitted": bool(row["submitted"]),
+                "submissionId": row["submission_id"],
+                "submittedAt": row["submitted_at"],
+                "reviewStatus": row["review_status"] or ("pending" if row["submission_id"] else None),
             }
             for row in rows
         ]
@@ -704,9 +762,11 @@ def get_homework_assignment(
         # Check for existing submission
         submission_row = conn.execute(
             """
-            SELECT id, answers_json, submitted_at
+            SELECT id, answers_json, submitted_at, review_status, reviewed_at, reviewed_by, problem_reviews_json
             FROM homework_submissions
             WHERE assignment_id = ? AND student_id = ?
+            ORDER BY submitted_at DESC
+            LIMIT 1
             """,
             (assignment_id, student_id),
         ).fetchone()
@@ -736,6 +796,14 @@ def get_homework_assignment(
                     }
                     for f in file_rows
                 ],
+                "reviewStatus": submission_row["review_status"] or "pending",
+                "reviewedAt": submission_row["reviewed_at"],
+                "reviewedBy": submission_row["reviewed_by"],
+                "problemReviews": (
+                    json.loads(submission_row["problem_reviews_json"])
+                    if submission_row["problem_reviews_json"]
+                    else {}
+                ),
             }
 
         return {
@@ -759,12 +827,18 @@ def check_homework_submission_exists(
     try:
         row = conn.execute(
             """
-            SELECT 1 FROM homework_submissions
+            SELECT review_status
+            FROM homework_submissions
             WHERE assignment_id = ? AND student_id = ?
+            ORDER BY submitted_at DESC
+            LIMIT 1
             """,
             (assignment_id, student_id),
         ).fetchone()
-        return row is not None
+        if row is None:
+            return False
+        review_status = row["review_status"] or "pending"
+        return review_status != "returned"
     finally:
         conn.close()
 
@@ -784,10 +858,11 @@ def create_homework_submission(
 
         conn.execute(
             """
-            INSERT INTO homework_submissions (id, assignment_id, student_id, answers_json, submitted_at)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO homework_submissions
+            (id, assignment_id, student_id, answers_json, submitted_at, review_status)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (submission_id, assignment_id, student_id, answers_json, submitted_at),
+            (submission_id, assignment_id, student_id, answers_json, submitted_at, "pending"),
         )
 
         conn.commit()
@@ -821,6 +896,85 @@ def save_homework_submission_file(
 
         conn.commit()
         return file_id
+    finally:
+        conn.close()
+
+
+def get_homework_submission_for_review(
+    submission_id: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
+    """Get a submission with assignment problems for review validation."""
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT
+                hs.id,
+                hs.assignment_id,
+                hs.student_id,
+                hs.answers_json,
+                hs.submitted_at,
+                hs.review_status,
+                hs.reviewed_at,
+                hs.reviewed_by,
+                hs.problem_reviews_json,
+                ha.title AS assignment_title,
+                ha.problems_json
+            FROM homework_submissions hs
+            INNER JOIN homework_assignments ha ON hs.assignment_id = ha.id
+            WHERE hs.id = ?
+            """,
+            (submission_id,),
+        ).fetchone()
+
+        if not row:
+            return None
+
+        return {
+            "id": row["id"],
+            "assignmentId": row["assignment_id"],
+            "studentId": row["student_id"],
+            "answers": json.loads(row["answers_json"]),
+            "submittedAt": row["submitted_at"],
+            "reviewStatus": row["review_status"] or "pending",
+            "reviewedAt": row["reviewed_at"],
+            "reviewedBy": row["reviewed_by"],
+            "problemReviews": (
+                json.loads(row["problem_reviews_json"])
+                if row["problem_reviews_json"]
+                else {}
+            ),
+            "assignmentTitle": row["assignment_title"],
+            "problems": json.loads(row["problems_json"]),
+        }
+    finally:
+        conn.close()
+
+
+def update_homework_submission_review(
+    submission_id: str,
+    review_status: str,
+    problem_reviews: Dict[str, Any],
+    reviewed_by: str,
+    path: Optional[Path] = None,
+) -> bool:
+    """Update review status and comments for a submission."""
+    conn = connect(path)
+    try:
+        reviewed_at = _now_iso()
+        problem_reviews_json = (
+            json.dumps(problem_reviews, ensure_ascii=False) if problem_reviews else None
+        )
+        result = conn.execute(
+            """
+            UPDATE homework_submissions
+            SET review_status = ?, reviewed_at = ?, reviewed_by = ?, problem_reviews_json = ?
+            WHERE id = ?
+            """,
+            (review_status, reviewed_at, reviewed_by, problem_reviews_json, submission_id),
+        )
+        conn.commit()
+        return result.rowcount > 0
     finally:
         conn.close()
 
@@ -898,5 +1052,319 @@ def list_all_students(path: Optional[Path] = None) -> List[Dict[str, Any]]:
             """
         ).fetchall()
         return [{"id": row["student_id"]} for row in rows]
+    finally:
+        conn.close()
+
+
+# ============================================================
+# Admin Homework Functions
+# ============================================================
+
+
+def list_all_homework_assignments_admin(
+    path: Optional[Path] = None,
+) -> List[Dict[str, Any]]:
+    """Admin: List all homework assignments with submission statistics."""
+    conn = connect(path)
+    try:
+        now = _now_iso()
+        rows = conn.execute(
+            """
+            SELECT
+                ha.id,
+                ha.title,
+                ha.description,
+                ha.problems_json,
+                ha.due_at,
+                ha.scheduled_at,
+                ha.created_by,
+                ha.created_at,
+                (
+                    SELECT COUNT(*)
+                    FROM homework_assignment_targets hat
+                    WHERE hat.assignment_id = ha.id
+                ) AS total_students,
+                (
+                    SELECT COUNT(DISTINCT hs.student_id)
+                    FROM homework_submissions hs
+                    WHERE hs.assignment_id = ha.id
+                ) AS submitted_count,
+                (
+                    SELECT COUNT(DISTINCT hs.student_id)
+                    FROM homework_submissions hs
+                    WHERE hs.assignment_id = ha.id AND hs.review_status = 'pending'
+                ) AS pending_count,
+                (
+                    SELECT COUNT(DISTINCT hs.student_id)
+                    FROM homework_submissions hs
+                    WHERE hs.assignment_id = ha.id AND hs.review_status = 'approved'
+                ) AS approved_count,
+                (
+                    SELECT COUNT(DISTINCT hs.student_id)
+                    FROM homework_submissions hs
+                    WHERE hs.assignment_id = ha.id AND hs.review_status = 'returned'
+                ) AS returned_count,
+                CASE
+                    WHEN ha.scheduled_at IS NOT NULL AND ha.scheduled_at > ? THEN 1
+                    ELSE 0
+                END AS is_scheduled
+            FROM homework_assignments ha
+            ORDER BY ha.created_at DESC
+            """,
+            (now,),
+        ).fetchall()
+
+        return [
+            {
+                "id": row["id"],
+                "title": row["title"],
+                "description": row["description"],
+                "problems": json.loads(row["problems_json"]),
+                "dueAt": row["due_at"],
+                "scheduledAt": row["scheduled_at"],
+                "createdBy": row["created_by"],
+                "createdAt": row["created_at"],
+                "totalStudents": row["total_students"],
+                "submittedCount": row["submitted_count"],
+                "pendingCount": row["pending_count"],
+                "approvedCount": row["approved_count"],
+                "returnedCount": row["returned_count"],
+                "isScheduled": bool(row["is_scheduled"]),
+            }
+            for row in rows
+        ]
+    finally:
+        conn.close()
+
+
+def get_homework_assignment_admin(
+    assignment_id: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
+    """Admin: Get assignment detail with all student submission summaries."""
+    conn = connect(path)
+    try:
+        # Get assignment
+        assignment_row = conn.execute(
+            """
+            SELECT id, title, description, problems_json, due_at, scheduled_at, created_by, created_at
+            FROM homework_assignments
+            WHERE id = ?
+            """,
+            (assignment_id,),
+        ).fetchone()
+
+        if not assignment_row:
+            return None
+
+        # Get all assigned students with their latest submission status
+        student_rows = conn.execute(
+            """
+            SELECT
+                hat.student_id,
+                hat.assigned_at,
+                hs.id AS submission_id,
+                hs.submitted_at,
+                hs.review_status,
+                hs.reviewed_at,
+                hs.reviewed_by
+            FROM homework_assignment_targets hat
+            LEFT JOIN homework_submissions hs ON hs.id = (
+                SELECT id
+                FROM homework_submissions
+                WHERE assignment_id = hat.assignment_id AND student_id = hat.student_id
+                ORDER BY submitted_at DESC
+                LIMIT 1
+            )
+            WHERE hat.assignment_id = ?
+            ORDER BY hat.student_id
+            """,
+            (assignment_id,),
+        ).fetchall()
+
+        students = [
+            {
+                "studentId": row["student_id"],
+                "assignedAt": row["assigned_at"],
+                "submissionId": row["submission_id"],
+                "submittedAt": row["submitted_at"],
+                "reviewStatus": row["review_status"] or (None if not row["submission_id"] else "pending"),
+                "reviewedAt": row["reviewed_at"],
+                "reviewedBy": row["reviewed_by"],
+            }
+            for row in student_rows
+        ]
+
+        return {
+            "id": assignment_row["id"],
+            "title": assignment_row["title"],
+            "description": assignment_row["description"],
+            "problems": json.loads(assignment_row["problems_json"]),
+            "dueAt": assignment_row["due_at"],
+            "scheduledAt": assignment_row["scheduled_at"],
+            "createdBy": assignment_row["created_by"],
+            "createdAt": assignment_row["created_at"],
+            "students": students,
+        }
+    finally:
+        conn.close()
+
+
+def get_submission_admin(
+    submission_id: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
+    """Admin: Get full submission detail including answers, files, and reviews."""
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT
+                hs.id,
+                hs.assignment_id,
+                hs.student_id,
+                hs.answers_json,
+                hs.submitted_at,
+                hs.review_status,
+                hs.reviewed_at,
+                hs.reviewed_by,
+                hs.problem_reviews_json,
+                ha.title AS assignment_title,
+                ha.description AS assignment_description,
+                ha.problems_json,
+                ha.due_at
+            FROM homework_submissions hs
+            INNER JOIN homework_assignments ha ON hs.assignment_id = ha.id
+            WHERE hs.id = ?
+            """,
+            (submission_id,),
+        ).fetchone()
+
+        if not row:
+            return None
+
+        # Get files
+        file_rows = conn.execute(
+            """
+            SELECT id, stored_path, original_name, content_type, size_bytes, created_at
+            FROM homework_submission_files
+            WHERE submission_id = ?
+            ORDER BY created_at
+            """,
+            (submission_id,),
+        ).fetchall()
+
+        files = [
+            {
+                "id": f["id"],
+                "storedPath": f["stored_path"],
+                "originalName": f["original_name"],
+                "contentType": f["content_type"],
+                "sizeBytes": f["size_bytes"],
+                "createdAt": f["created_at"],
+            }
+            for f in file_rows
+        ]
+
+        return {
+            "id": row["id"],
+            "assignmentId": row["assignment_id"],
+            "studentId": row["student_id"],
+            "answers": json.loads(row["answers_json"]),
+            "submittedAt": row["submitted_at"],
+            "reviewStatus": row["review_status"] or "pending",
+            "reviewedAt": row["reviewed_at"],
+            "reviewedBy": row["reviewed_by"],
+            "problemReviews": (
+                json.loads(row["problem_reviews_json"])
+                if row["problem_reviews_json"]
+                else {}
+            ),
+            "assignmentTitle": row["assignment_title"],
+            "assignmentDescription": row["assignment_description"],
+            "problems": json.loads(row["problems_json"]),
+            "dueAt": row["due_at"],
+            "files": files,
+        }
+    finally:
+        conn.close()
+
+
+def get_submission_file(
+    file_id: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
+    """Admin: Get file info for download."""
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT id, submission_id, stored_path, original_name, content_type, size_bytes
+            FROM homework_submission_files
+            WHERE id = ?
+            """,
+            (file_id,),
+        ).fetchone()
+
+        if not row:
+            return None
+
+        return {
+            "id": row["id"],
+            "submissionId": row["submission_id"],
+            "storedPath": row["stored_path"],
+            "originalName": row["original_name"],
+            "contentType": row["content_type"],
+            "sizeBytes": row["size_bytes"],
+        }
+    finally:
+        conn.close()
+
+
+def get_pending_homework_count(
+    student_id: str, path: Optional[Path] = None
+) -> Dict[str, int]:
+    """Get count of actionable homework for a student (not submitted or returned)."""
+    conn = connect(path)
+    try:
+        # Count assignments where student hasn't submitted or submission was returned
+        row = conn.execute(
+            """
+            SELECT
+                COUNT(*) AS total_assigned,
+                SUM(CASE
+                    WHEN hs.id IS NULL THEN 1
+                    ELSE 0
+                END) AS not_submitted,
+                SUM(CASE
+                    WHEN hs.review_status = 'returned' THEN 1
+                    ELSE 0
+                END) AS returned,
+                SUM(CASE
+                    WHEN hs.review_status = 'pending' THEN 1
+                    ELSE 0
+                END) AS pending_review,
+                SUM(CASE
+                    WHEN hs.review_status = 'approved' THEN 1
+                    ELSE 0
+                END) AS approved
+            FROM homework_assignment_targets hat
+            LEFT JOIN homework_submissions hs ON hs.id = (
+                SELECT id
+                FROM homework_submissions
+                WHERE assignment_id = hat.assignment_id AND student_id = hat.student_id
+                ORDER BY submitted_at DESC
+                LIMIT 1
+            )
+            WHERE hat.student_id = ?
+            """,
+            (student_id,),
+        ).fetchone()
+
+        return {
+            "totalAssigned": row["total_assigned"] or 0,
+            "notSubmitted": row["not_submitted"] or 0,
+            "returned": row["returned"] or 0,
+            "pendingReview": row["pending_review"] or 0,
+            "approved": row["approved"] or 0,
+            "actionRequired": (row["not_submitted"] or 0) + (row["returned"] or 0),
+        }
     finally:
         conn.close()

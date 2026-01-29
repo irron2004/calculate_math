@@ -66,6 +66,7 @@ class HomeworkAssignmentCreate(BaseModel):
     description: Optional[str] = None
     problems: List[HomeworkProblem]
     dueAt: Optional[str] = None
+    scheduledAt: Optional[str] = None
     targetStudentIds: List[str]
 
 
@@ -86,6 +87,10 @@ class HomeworkSubmissionDetail(BaseModel):
     answers: Dict[str, str]  # {problemId: answer}
     submittedAt: str
     files: List[HomeworkSubmissionFile] = Field(default_factory=list)
+    reviewStatus: str = "pending"
+    reviewedAt: Optional[str] = None
+    reviewedBy: Optional[str] = None
+    problemReviews: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
 
 
 class HomeworkAssignmentListItem(BaseModel):
@@ -94,8 +99,12 @@ class HomeworkAssignmentListItem(BaseModel):
     description: Optional[str] = None
     problems: List[HomeworkProblem]
     dueAt: Optional[str] = None
+    scheduledAt: Optional[str] = None
     createdAt: str
     submitted: bool
+    submissionId: Optional[str] = None
+    submittedAt: Optional[str] = None
+    reviewStatus: Optional[str] = None
 
 
 class HomeworkAssignmentListResponse(BaseModel):
@@ -115,3 +124,102 @@ class HomeworkAssignmentDetail(BaseModel):
 class HomeworkSubmitResponse(BaseModel):
     submissionId: str
     success: bool = True
+
+
+class HomeworkSubmissionReviewRequest(BaseModel):
+    status: str  # "approved" or "returned"
+    reviewedBy: Optional[str] = None
+    problemReviews: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+
+
+class HomeworkSubmissionReviewResponse(BaseModel):
+    success: bool = True
+
+
+# ============================================================
+# Admin Homework Models
+# ============================================================
+
+
+class AdminAssignmentSummary(BaseModel):
+    """Summary of an assignment for admin list view."""
+    id: str
+    title: str
+    description: Optional[str] = None
+    problems: List[HomeworkProblem]
+    dueAt: Optional[str] = None
+    scheduledAt: Optional[str] = None
+    createdBy: str
+    createdAt: str
+    totalStudents: int
+    submittedCount: int
+    pendingCount: int
+    approvedCount: int
+    returnedCount: int
+    isScheduled: bool = False
+
+
+class AdminAssignmentListResponse(BaseModel):
+    assignments: List[AdminAssignmentSummary]
+
+
+class AdminStudentSubmissionSummary(BaseModel):
+    """Summary of a student's submission status for an assignment."""
+    studentId: str
+    assignedAt: str
+    submissionId: Optional[str] = None
+    submittedAt: Optional[str] = None
+    reviewStatus: Optional[str] = None
+    reviewedAt: Optional[str] = None
+    reviewedBy: Optional[str] = None
+
+
+class AdminAssignmentDetail(BaseModel):
+    """Full assignment detail with student submission summaries."""
+    id: str
+    title: str
+    description: Optional[str] = None
+    problems: List[HomeworkProblem]
+    dueAt: Optional[str] = None
+    scheduledAt: Optional[str] = None
+    createdBy: str
+    createdAt: str
+    students: List[AdminStudentSubmissionSummary]
+
+
+class AdminSubmissionFile(BaseModel):
+    """File info for admin submission view."""
+    id: str
+    storedPath: str
+    originalName: str
+    contentType: str
+    sizeBytes: int
+    createdAt: str
+
+
+class AdminSubmissionDetail(BaseModel):
+    """Full submission detail for admin review."""
+    id: str
+    assignmentId: str
+    studentId: str
+    answers: Dict[str, str]
+    submittedAt: str
+    reviewStatus: str
+    reviewedAt: Optional[str] = None
+    reviewedBy: Optional[str] = None
+    problemReviews: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    assignmentTitle: str
+    assignmentDescription: Optional[str] = None
+    problems: List[HomeworkProblem]
+    dueAt: Optional[str] = None
+    files: List[AdminSubmissionFile] = Field(default_factory=list)
+
+
+class HomeworkPendingCountResponse(BaseModel):
+    """Count of homework items by status for a student."""
+    totalAssigned: int
+    notSubmitted: int
+    returned: int
+    pendingReview: int
+    approved: int
+    actionRequired: int

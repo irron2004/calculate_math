@@ -18,19 +18,32 @@ from .db import (
     fetch_latest_graph,
     fetch_problems,
     get_homework_assignment,
+    get_homework_assignment_admin,
+    get_homework_submission_for_review,
     get_homework_submission_with_files,
+    get_pending_homework_count,
+    get_submission_admin,
+    get_submission_file,
+    list_all_homework_assignments_admin,
     list_homework_assignments_for_student,
     save_homework_submission_file,
+    update_homework_submission_review,
 )
 from .email_service import send_homework_notification
 from .models import (
+    AdminAssignmentDetail,
+    AdminAssignmentListResponse,
+    AdminSubmissionDetail,
     ErrorResponse,
     GraphResponse,
     HomeworkAssignmentCreate,
     HomeworkAssignmentCreateResponse,
     HomeworkAssignmentDetail,
     HomeworkAssignmentListResponse,
+    HomeworkPendingCountResponse,
     HomeworkSubmitResponse,
+    HomeworkSubmissionReviewRequest,
+    HomeworkSubmissionReviewResponse,
     Problem,
 )
 
@@ -217,6 +230,7 @@ def create_assignment(data: HomeworkAssignmentCreate) -> HomeworkAssignmentCreat
         )
 
     due_at = data.dueAt.strip() if data.dueAt and data.dueAt.strip() else None
+    scheduled_at = data.scheduledAt.strip() if data.scheduledAt and data.scheduledAt.strip() else None
 
     # Convert problems to dict for storage
     problems_data = [p.model_dump() for p in data.problems]
@@ -228,6 +242,7 @@ def create_assignment(data: HomeworkAssignmentCreate) -> HomeworkAssignmentCreat
         target_student_ids=normalized_student_ids,
         description=data.description,
         due_at=due_at,
+        scheduled_at=scheduled_at,
     )
 
     return HomeworkAssignmentCreateResponse(id=assignment_id)
@@ -446,3 +461,245 @@ async def submit_homework(
     background_tasks.add_task(_send_notification_task, submission_id)
 
     return HomeworkSubmitResponse(submissionId=submission_id)
+
+
+@router.post(
+    "/homework/submissions/{submission_id}/review",
+    response_model=HomeworkSubmissionReviewResponse,
+    responses={400: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+def review_homework_submission(
+    submission_id: str,
+    data: HomeworkSubmissionReviewRequest,
+) -> HomeworkSubmissionReviewResponse | JSONResponse:
+    """Review a homework submission (Admin only)."""
+    submission = get_homework_submission_for_review(submission_id)
+    if not submission:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "SUBMISSION_NOT_FOUND",
+                    "message": "Submission not found",
+                }
+            },
+        )
+
+    status = (data.status or "").strip().lower()
+    if status not in {"approved", "returned"}:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "INVALID_STATUS",
+                    "message": "Status must be 'approved' or 'returned'",
+                }
+            },
+        )
+
+    problems = submission.get("problems", [])
+    valid_problem_ids = {p["id"] for p in problems if isinstance(p, dict) and "id" in p}
+    incoming_reviews = data.problemReviews or {}
+
+    normalized_reviews: dict[str, dict[str, str | bool]] = {}
+    has_issues = False
+
+    for problem_id, review in incoming_reviews.items():
+        if problem_id not in valid_problem_ids:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": {
+                        "code": "INVALID_PROBLEM",
+                        "message": f"Problem '{problem_id}' is not part of this assignment",
+                    }
+                },
+            )
+        if not isinstance(review, dict):
+            continue
+        comment_raw = review.get("comment")
+        comment = comment_raw.strip() if isinstance(comment_raw, str) else ""
+        needs_revision = bool(review.get("needsRevision")) or bool(comment)
+
+        if needs_revision and not comment:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": {
+                        "code": "MISSING_COMMENT",
+                        "message": f"Problem '{problem_id}' requires a comment when marked for revision",
+                    }
+                },
+            )
+
+        if needs_revision or comment:
+            normalized_reviews[problem_id] = {
+                "needsRevision": needs_revision,
+                "comment": comment,
+            }
+            has_issues = True
+
+    if status == "approved" and has_issues:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "INVALID_REVIEW",
+                    "message": "Cannot approve when there are revision comments",
+                }
+            },
+        )
+
+    if status == "returned" and not has_issues:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "EMPTY_REVIEW",
+                    "message": "Returned status requires at least one revision comment",
+                }
+            },
+        )
+
+    reviewed_by = (data.reviewedBy or "").strip() or "admin"
+    updated = update_homework_submission_review(
+        submission_id=submission_id,
+        review_status=status,
+        problem_reviews=normalized_reviews,
+        reviewed_by=reviewed_by,
+    )
+    if not updated:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "SUBMISSION_NOT_FOUND",
+                    "message": "Submission not found",
+                }
+            },
+        )
+
+    return HomeworkSubmissionReviewResponse()
+
+
+# ============================================================
+# Admin Homework Endpoints
+# ============================================================
+
+
+@router.get(
+    "/homework/admin/assignments",
+    response_model=AdminAssignmentListResponse,
+)
+def list_admin_assignments() -> AdminAssignmentListResponse:
+    """Admin: List all homework assignments with submission statistics."""
+    assignments = list_all_homework_assignments_admin()
+    return AdminAssignmentListResponse(assignments=assignments)
+
+
+@router.get(
+    "/homework/admin/assignments/{assignment_id}",
+    response_model=AdminAssignmentDetail,
+    responses={404: {"model": ErrorResponse}},
+)
+def get_admin_assignment(assignment_id: str) -> AdminAssignmentDetail | JSONResponse:
+    """Admin: Get assignment detail with all student submission summaries."""
+    assignment = get_homework_assignment_admin(assignment_id)
+    if not assignment:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "ASSIGNMENT_NOT_FOUND",
+                    "message": "Assignment not found",
+                }
+            },
+        )
+    return assignment
+
+
+@router.get(
+    "/homework/admin/submissions/{submission_id}",
+    response_model=AdminSubmissionDetail,
+    responses={404: {"model": ErrorResponse}},
+)
+def get_admin_submission(submission_id: str) -> AdminSubmissionDetail | JSONResponse:
+    """Admin: Get full submission detail for review."""
+    submission = get_submission_admin(submission_id)
+    if not submission:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "SUBMISSION_NOT_FOUND",
+                    "message": "Submission not found",
+                }
+            },
+        )
+    return submission
+
+
+@router.get(
+    "/homework/admin/submissions/{submission_id}/files/{file_id}",
+    responses={404: {"model": ErrorResponse}},
+)
+def download_submission_file(
+    submission_id: str, file_id: str
+) -> JSONResponse:
+    """Admin: Download a submission file."""
+    from fastapi.responses import FileResponse
+
+    file_info = get_submission_file(file_id)
+    if not file_info:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "FILE_NOT_FOUND",
+                    "message": "File not found",
+                }
+            },
+        )
+
+    # Verify the file belongs to the specified submission
+    if file_info["submissionId"] != submission_id:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "FILE_NOT_FOUND",
+                    "message": "File not found in this submission",
+                }
+            },
+        )
+
+    file_path = Path(file_info["storedPath"])
+    if not file_path.exists():
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "FILE_MISSING",
+                    "message": "File is missing from storage",
+                }
+            },
+        )
+
+    return FileResponse(
+        path=file_path,
+        filename=file_info["originalName"],
+        media_type=file_info["contentType"],
+    )
+
+
+@router.get(
+    "/homework/pending-count",
+    response_model=HomeworkPendingCountResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def get_homework_pending_count_endpoint(
+    studentId: str = Query(..., min_length=1),
+) -> HomeworkPendingCountResponse:
+    """Get count of homework items by status for a student."""
+    counts = get_pending_homework_count(studentId)
+    return HomeworkPendingCountResponse(**counts)

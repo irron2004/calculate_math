@@ -3,10 +3,15 @@
  */
 
 import type {
+  AdminAssignmentDetail,
+  AdminAssignmentSummary,
+  AdminSubmissionDetail,
   CreateAssignmentData,
   HomeworkAssignment,
   HomeworkAssignmentDetail,
+  HomeworkPendingCount,
   HomeworkSubmitData,
+  HomeworkSubmissionReviewData,
 } from './types'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
@@ -53,6 +58,7 @@ export async function createAssignment(
       description: data.description || null,
       problems: data.problems,
       dueAt: data.dueAt || null,
+      scheduledAt: data.scheduledAt || null,
       targetStudentIds: data.targetStudentIds,
     }),
     signal,
@@ -155,4 +161,136 @@ export async function submitHomework(
   }
 
   return { submissionId: json.submissionId }
+}
+
+/**
+ * Review a homework submission (Admin only)
+ */
+export async function reviewSubmission(
+  submissionId: string,
+  data: HomeworkSubmissionReviewData,
+  signal?: AbortSignal
+): Promise<void> {
+  const response = await fetch(`${API_BASE}/homework/submissions/${submissionId}/review`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      status: data.status,
+      reviewedBy: data.reviewedBy || null,
+      problemReviews: data.problemReviews
+    }),
+    signal
+  })
+
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to review submission')
+  }
+}
+
+// ============================================================
+// Admin API Functions
+// ============================================================
+
+/**
+ * Admin: List all homework assignments with submission statistics
+ */
+export async function listAssignmentsAdmin(
+  signal?: AbortSignal
+): Promise<AdminAssignmentSummary[]> {
+  const response = await fetch(`${API_BASE}/homework/admin/assignments`, { signal })
+
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to list admin assignments')
+  }
+
+  return json.assignments as AdminAssignmentSummary[]
+}
+
+/**
+ * Admin: Get assignment detail with all student submission summaries
+ */
+export async function getAssignmentAdmin(
+  assignmentId: string,
+  signal?: AbortSignal
+): Promise<AdminAssignmentDetail> {
+  const response = await fetch(
+    `${API_BASE}/homework/admin/assignments/${assignmentId}`,
+    { signal }
+  )
+
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to get admin assignment')
+  }
+
+  return json as AdminAssignmentDetail
+}
+
+/**
+ * Admin: Get full submission detail for review
+ */
+export async function getSubmissionAdmin(
+  submissionId: string,
+  signal?: AbortSignal
+): Promise<AdminSubmissionDetail> {
+  const response = await fetch(
+    `${API_BASE}/homework/admin/submissions/${submissionId}`,
+    { signal }
+  )
+
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to get submission')
+  }
+
+  return json as AdminSubmissionDetail
+}
+
+/**
+ * Admin: Get file download URL
+ */
+export function getSubmissionFileUrl(submissionId: string, fileId: string): string {
+  return `${API_BASE}/homework/admin/submissions/${submissionId}/files/${fileId}`
+}
+
+/**
+ * Get count of homework items by status for a student
+ */
+export async function getPendingCount(
+  studentId: string,
+  signal?: AbortSignal
+): Promise<HomeworkPendingCount> {
+  const params = new URLSearchParams({ studentId })
+  const response = await fetch(`${API_BASE}/homework/pending-count?${params}`, { signal })
+
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to get pending count')
+  }
+
+  return json as HomeworkPendingCount
 }

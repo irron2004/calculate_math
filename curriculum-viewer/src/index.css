@@ -762,6 +762,16 @@ body {
   margin-top: 16px;
 }
 
+.dashboard-homework {
+  margin-top: 16px;
+}
+
+.dashboard-homework-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1315,8 +1325,17 @@ body {
   border-left: 4px solid #d97706;
 }
 
+.homework-card--pending {
+  border-left: 4px solid #0ea5e9;
+}
+
+.homework-card--approved,
 .homework-card--submitted {
   border-left: 4px solid #16a34a;
+}
+
+.homework-card--returned {
+  border-left: 4px solid #dc2626;
 }
 
 .homework-card--overdue {
@@ -1369,6 +1388,23 @@ body {
 /* Homework Submit Page */
 .homework-submit-header {
   margin-bottom: 16px;
+}
+
+.homework-review-status {
+  margin: 8px 0 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.homework-returned-note {
+  margin: 8px 0 12px;
+  padding: 10px 12px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  color: #b45309;
+  font-size: 13px;
 }
 
 .homework-due {
@@ -1442,6 +1478,163 @@ body {
   border: 1px solid #fca5a5;
   border-radius: 12px;
   text-align: center;
+}
+
+.problem-review-comment {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+/* Admin Homework Status */
+.author-homework-status {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-homework-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.admin-homework-student {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.admin-homework-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.admin-homework-list,
+.admin-homework-detail {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.admin-homework-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.admin-homework-item {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 12px;
+  background: #f8fafc;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-homework-item strong {
+  display: block;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.admin-homework-item .muted {
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.admin-homework-item.is-active {
+  background: #eef2ff;
+  border-color: #94a3b8;
+}
+
+.admin-homework-summary h3 {
+  margin: 0 0 6px;
+}
+
+.admin-homework-submission {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-homework-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.admin-homework-files ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.admin-homework-problems {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-problem-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  background: #f8fafc;
+  display: grid;
+  gap: 8px;
+}
+
+.admin-problem-answer {
+  font-size: 14px;
+}
+
+.admin-review-controls {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-review-controls textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.admin-review-checkbox {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.admin-review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .admin-homework-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Image Uploader */
@@ -1775,4 +1968,313 @@ body {
   color: #475569;
   font-size: 14px;
   line-height: 1.5;
+}
+
+/* Admin Homework Status - Enhanced */
+.admin-homework-content {
+  margin-top: 16px;
+}
+
+.admin-assignment-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-assignment-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.admin-assignment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-assignment-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.admin-assignment-desc {
+  margin: 8px 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+.admin-assignment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 8px 0 12px;
+}
+
+.admin-assignment-actions {
+  margin-top: 12px;
+}
+
+.submission-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.stat-item {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.stat-not-submitted {
+  background: rgba(234, 179, 8, 0.15);
+  color: #a16207;
+}
+
+.stat-pending {
+  background: rgba(14, 165, 233, 0.15);
+  color: #0369a1;
+}
+
+.stat-returned {
+  background: rgba(220, 38, 38, 0.15);
+  color: #b91c1c;
+}
+
+.stat-approved {
+  background: rgba(22, 163, 74, 0.15);
+  color: #15803d;
+}
+
+.admin-assignment-summary {
+  margin: 16px 0;
+}
+
+.admin-assignment-summary h2 {
+  margin: 0 0 8px;
+}
+
+.admin-students-table-wrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: auto;
+  margin-top: 12px;
+}
+
+.admin-students-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-students-table th,
+.admin-students-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin-students-table th {
+  background: #f1f5f9;
+  color: #334155;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.admin-students-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.admin-students-table .student-name {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.admin-students-table .student-id {
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.admin-submission-header {
+  margin: 16px 0;
+}
+
+.admin-submission-header h2 {
+  margin: 0 0 8px;
+}
+
+.admin-submission-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.admin-submission-info .student-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.admin-submission-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.admin-submission-files {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.admin-submission-files h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.admin-submission-files ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.admin-submission-files li {
+  margin: 6px 0;
+}
+
+.file-link {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.file-link:hover {
+  text-decoration: underline;
+}
+
+.problem-options-display {
+  display: grid;
+  gap: 8px;
+}
+
+.problem-option-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.problem-option-display.selected {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.35);
+}
+
+.problem-option-display .selected-mark {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+  padding: 2px 8px;
+  background: rgba(37, 99, 235, 0.12);
+  border-radius: 4px;
+}
+
+.admin-problem-answer .answer-text {
+  margin-top: 8px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Form Row */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* JSON Import */
+.homework-import-section {
+  margin: 16px 0;
+}
+
+.json-import-panel {
+  margin-top: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.json-import-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.json-import-header h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.json-input {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.json-import-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* Scheduled Badge */
+.badge-scheduled {
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #4338ca;
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* Homework Error Notice */
+.homework-error-notice {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.homework-error-notice p {
+  margin: 4px 0;
 }

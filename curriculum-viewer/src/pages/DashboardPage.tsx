@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
+import { listAssignments, HomeworkApiError } from '../lib/homework/api'
+import { getHomeworkStatus } from '../lib/homework/types'
+import type { HomeworkAssignment } from '../lib/homework/types'
 import { loadLearningGraphV1 } from '../lib/studentLearning/graph'
 import { computeNodeProgressV1, recommendNextNodeIds } from '../lib/studentLearning/progress'
 import type { AttemptSessionStoreV1, LearningGraphV1, NodeProgressV1 } from '../lib/studentLearning/types'
@@ -56,7 +59,7 @@ function computeSummary(progressByNodeId: Record<string, NodeProgressV1>) {
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const { index } = useCurriculum()
   const navigate = useNavigate()
   const userId = user?.id ?? null
@@ -64,6 +67,10 @@ export default function DashboardPage() {
   const [learningGraph, setLearningGraph] = useState<LearningGraphV1 | null>(null)
   const [graphError, setGraphError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+
+  const [homeworkAssignments, setHomeworkAssignments] = useState<HomeworkAssignment[]>([])
+  const [homeworkLoading, setHomeworkLoading] = useState(false)
+  const [homeworkError, setHomeworkError] = useState<string | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -85,6 +92,34 @@ export default function DashboardPage() {
     run()
     return () => controller.abort()
   }, [])
+
+  useEffect(() => {
+    if (!user || isAdmin) return
+    const controller = new AbortController()
+
+    async function run() {
+      setHomeworkLoading(true)
+      setHomeworkError(null)
+      try {
+        const data = await listAssignments(user.id, controller.signal)
+        if (!controller.signal.aborted) {
+          setHomeworkAssignments(data)
+        }
+      } catch (err) {
+        if (controller.signal.aborted) return
+        if (err instanceof HomeworkApiError) {
+          setHomeworkError(err.message)
+        } else {
+          setHomeworkError('숙제 목록을 불러오는 중 오류가 발생했습니다.')
+        }
+      } finally {
+        if (!controller.signal.aborted) setHomeworkLoading(false)
+      }
+    }
+
+    run()
+    return () => controller.abort()
+  }, [isAdmin, user])
 
   const store = useMemo(() => {
     if (!userId) return null
@@ -112,9 +147,26 @@ export default function DashboardPage() {
     return getRecentActivities(store, 5)
   }, [store])
 
+  const actionableHomework = useMemo(() => {
+    return homeworkAssignments.filter((assignment) => {
+      const status = getHomeworkStatus(assignment)
+      return status === 'not_submitted' || status === 'returned'
+    })
+  }, [homeworkAssignments])
+
   const getNodeLabel = (nodeId: string): string => {
     const node = index?.nodeById.get(nodeId)
     return node?.title ?? nodeId
+  }
+
+  const formatDue = (isoString: string): string => {
+    const date = new Date(isoString)
+    return date.toLocaleString('ko-KR', {
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   if (loading) {
@@ -139,6 +191,64 @@ export default function DashboardPage() {
     <section className="dashboard">
       <h1>대시보드</h1>
       <p className="muted">안녕하세요, {user?.name ?? user?.id ?? '학생'}님!</p>
+
+      {!isAdmin && (
+        <div className="dashboard-homework">
+          <h2>숙제 알림</h2>
+          {homeworkLoading && <p className="muted">숙제 목록을 불러오는 중...</p>}
+          {homeworkError && <p className="error">{homeworkError}</p>}
+          {!homeworkLoading && !homeworkError && (
+            <>
+              {homeworkAssignments.length === 0 && (
+                <p className="muted">현재 할당된 숙제가 없습니다.</p>
+              )}
+              {homeworkAssignments.length > 0 && (
+                <>
+                  {actionableHomework.length === 0 ? (
+                    <p className="muted">현재 제출이 필요한 숙제가 없습니다.</p>
+                  ) : (
+                    <div className="homework-list">
+                      {actionableHomework.slice(0, 3).map((assignment) => {
+                        const status = getHomeworkStatus(assignment)
+                        const badgeClass =
+                          status === 'returned' ? 'badge badge-error' : 'badge'
+                        const badgeLabel = status === 'returned' ? '반려' : '미제출'
+                        return (
+                          <div key={assignment.id} className={`homework-card homework-card--${status}`}>
+                            <div className="homework-card-header">
+                              <h3 className="homework-card-title">{assignment.title}</h3>
+                              <span className={badgeClass}>{badgeLabel}</span>
+                            </div>
+                            {assignment.dueAt && (
+                              <div className="homework-card-meta">
+                                <span className="muted">마감: {formatDue(assignment.dueAt)}</span>
+                              </div>
+                            )}
+                            <div className="homework-card-actions">
+                              <Link
+                                to={`/mypage/homework/${assignment.id}`}
+                                className="button button-primary button-small"
+                              >
+                                {status === 'returned' ? '재제출' : '제출하기'}
+                              </Link>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  <div className="dashboard-homework-actions">
+                    <Link to={ROUTES.mypage} className="button button-ghost button-small">
+                      전체 숙제 보기
+                    </Link>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* 학습 현황 요약 */}
       {summary && (

@@ -117,7 +117,7 @@ function ProblemEditor({ problem, index, onChange, onRemove, disabled }: Problem
                   onClick={() => handleRemoveOption(optionIndex)}
                   disabled={disabled}
                 >
-                  ×
+                  x
                 </button>
               )}
             </div>
@@ -151,6 +151,39 @@ function ProblemEditor({ problem, index, onChange, onRemove, disabled }: Problem
   )
 }
 
+type JsonHomeworkData = {
+  title?: string
+  description?: string
+  dueAt?: string
+  scheduledAt?: string
+  problems?: Array<{
+    type?: 'objective' | 'subjective'
+    question?: string
+    options?: string[]
+    answer?: string
+  }>
+}
+
+const JSON_TEMPLATE = `{
+  "title": "숙제 제목",
+  "description": "숙제 설명 (선택)",
+  "dueAt": "2026-02-01T18:00",
+  "scheduledAt": "2026-01-30T09:00",
+  "problems": [
+    {
+      "type": "objective",
+      "question": "다음 중 올바른 것은?",
+      "options": ["보기 1", "보기 2", "보기 3", "보기 4"],
+      "answer": "1"
+    },
+    {
+      "type": "subjective",
+      "question": "다음 문제를 풀이하세요.",
+      "answer": "정답 (선택)"
+    }
+  ]
+}`
+
 export default function AuthorHomeworkPage() {
   const { user } = useAuth()
 
@@ -160,10 +193,16 @@ export default function AuthorHomeworkPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [dueAt, setDueAt] = useState('')
+  const [scheduledAt, setScheduledAt] = useState('')
   const [problems, setProblems] = useState<HomeworkProblem[]>([createEmptyProblem(1)])
 
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  // JSON Import
+  const [showJsonImport, setShowJsonImport] = useState(false)
+  const [jsonInput, setJsonInput] = useState('')
+  const [jsonError, setJsonError] = useState<string | null>(null)
 
   useEffect(() => {
     setStudents(getAllStudents())
@@ -205,6 +244,56 @@ export default function AuthorHomeworkPage() {
     setProblems((prev) => {
       if (prev.length <= 1) return prev
       return prev.filter((_, i) => i !== index)
+    })
+  }, [])
+
+  const handleJsonImport = useCallback(() => {
+    setJsonError(null)
+
+    try {
+      const data = JSON.parse(jsonInput) as JsonHomeworkData
+
+      if (data.title && typeof data.title === 'string') {
+        setTitle(data.title)
+      }
+      if (data.description && typeof data.description === 'string') {
+        setDescription(data.description)
+      }
+      if (data.dueAt && typeof data.dueAt === 'string') {
+        setDueAt(data.dueAt)
+      }
+      if (data.scheduledAt && typeof data.scheduledAt === 'string') {
+        setScheduledAt(data.scheduledAt)
+      }
+
+      if (data.problems && Array.isArray(data.problems) && data.problems.length > 0) {
+        const importedProblems: HomeworkProblem[] = data.problems.map((p, index) => {
+          const type = p.type === 'objective' ? 'objective' : 'subjective'
+          return {
+            id: `p${index + 1}`,
+            type,
+            question: p.question || '',
+            options: type === 'objective' ? (p.options || ['', '']) : undefined,
+            answer: p.answer || undefined
+          }
+        })
+        setProblems(importedProblems)
+      }
+
+      setShowJsonImport(false)
+      setJsonInput('')
+      setMessage({ type: 'success', text: 'JSON 데이터를 가져왔습니다. 학생을 선택한 후 출제하세요.' })
+    } catch {
+      setJsonError('JSON 형식이 올바르지 않습니다.')
+    }
+  }, [jsonInput])
+
+  const handleCopyTemplate = useCallback(() => {
+    navigator.clipboard.writeText(JSON_TEMPLATE).then(() => {
+      setMessage({ type: 'success', text: '템플릿이 클립보드에 복사되었습니다.' })
+    }).catch(() => {
+      // Fallback for older browsers
+      setJsonInput(JSON_TEMPLATE)
     })
   }, [])
 
@@ -262,13 +351,15 @@ export default function AuthorHomeworkPage() {
             answer: p.answer?.trim() || undefined
           })),
           dueAt: dueAt || undefined,
+          scheduledAt: scheduledAt || undefined,
           targetStudentIds: Array.from(selectedStudentIds)
         })
 
-        setMessage({ type: 'success', text: '숙제가 출제되었습니다.' })
+        setMessage({ type: 'success', text: scheduledAt ? '숙제가 예약되었습니다.' : '숙제가 출제되었습니다.' })
         setTitle('')
         setDescription('')
         setDueAt('')
+        setScheduledAt('')
         setProblems([createEmptyProblem(1)])
         setSelectedStudentIds(new Set())
       } catch (err) {
@@ -281,7 +372,7 @@ export default function AuthorHomeworkPage() {
         setSubmitting(false)
       }
     },
-    [description, dueAt, problems, selectedStudentIds, title]
+    [description, dueAt, scheduledAt, problems, selectedStudentIds, title]
   )
 
   if (!user) {
@@ -301,6 +392,60 @@ export default function AuthorHomeworkPage() {
       {message && (
         <p className={message.type === 'success' ? 'success' : 'error'}>{message.text}</p>
       )}
+
+      <div className="homework-import-section">
+        <button
+          type="button"
+          className="button button-ghost"
+          onClick={() => setShowJsonImport(!showJsonImport)}
+        >
+          {showJsonImport ? 'JSON 가져오기 닫기' : 'JSON으로 가져오기'}
+        </button>
+
+        {showJsonImport && (
+          <div className="json-import-panel">
+            <div className="json-import-header">
+              <h3>JSON 가져오기</h3>
+              <button
+                type="button"
+                className="button button-ghost button-small"
+                onClick={handleCopyTemplate}
+              >
+                템플릿 복사
+              </button>
+            </div>
+            <textarea
+              value={jsonInput}
+              onChange={(e) => setJsonInput(e.target.value)}
+              placeholder={JSON_TEMPLATE}
+              rows={12}
+              className="json-input"
+            />
+            {jsonError && <p className="error">{jsonError}</p>}
+            <div className="json-import-actions">
+              <button
+                type="button"
+                className="button button-primary"
+                onClick={handleJsonImport}
+                disabled={!jsonInput.trim()}
+              >
+                가져오기
+              </button>
+              <button
+                type="button"
+                className="button button-ghost"
+                onClick={() => {
+                  setShowJsonImport(false)
+                  setJsonInput('')
+                  setJsonError(null)
+                }}
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <form onSubmit={handleSubmit}>
         <fieldset disabled={submitting}>
@@ -353,14 +498,26 @@ export default function AuthorHomeworkPage() {
             />
           </label>
 
-          <label className="form-field">
-            마감일 (선택)
-            <input
-              type="datetime-local"
-              value={dueAt}
-              onChange={(e) => setDueAt(e.target.value)}
-            />
-          </label>
+          <div className="form-row">
+            <label className="form-field">
+              마감 일시 (선택)
+              <input
+                type="datetime-local"
+                value={dueAt}
+                onChange={(e) => setDueAt(e.target.value)}
+              />
+            </label>
+
+            <label className="form-field">
+              예약 출제 일시 (선택)
+              <input
+                type="datetime-local"
+                value={scheduledAt}
+                onChange={(e) => setScheduledAt(e.target.value)}
+              />
+              <span className="muted">설정 시 해당 시간 이후에 학생에게 표시됩니다.</span>
+            </label>
+          </div>
 
           <h3>문제 ({problems.length}개)</h3>
           <div className="problems-editor">
@@ -391,7 +548,7 @@ export default function AuthorHomeworkPage() {
               className="button button-primary"
               disabled={submitting || selectedStudentIds.size === 0 || problems.length === 0}
             >
-              {submitting ? '출제 중...' : '숙제 출제'}
+              {submitting ? '출제 중...' : scheduledAt ? '숙제 예약' : '숙제 출제'}
             </button>
           </div>
         </fieldset>

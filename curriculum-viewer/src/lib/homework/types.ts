@@ -4,6 +4,13 @@
 
 export type HomeworkProblemType = 'objective' | 'subjective'
 
+export type HomeworkReviewStatus = 'pending' | 'approved' | 'returned'
+
+export type HomeworkProblemReview = {
+  needsRevision?: boolean
+  comment?: string
+}
+
 export type HomeworkProblem = {
   id: string
   type: HomeworkProblemType
@@ -18,8 +25,12 @@ export type HomeworkAssignment = {
   description?: string
   problems: HomeworkProblem[]
   dueAt?: string
+  scheduledAt?: string | null
   createdAt: string
   submitted: boolean
+  submissionId?: string | null
+  submittedAt?: string | null
+  reviewStatus?: HomeworkReviewStatus | null
 }
 
 export type HomeworkAssignmentDetail = {
@@ -44,6 +55,10 @@ export type HomeworkSubmissionInfo = {
   answers: Record<string, string>  // {problemId: answer}
   submittedAt: string
   files: HomeworkSubmissionFile[]
+  reviewStatus: HomeworkReviewStatus
+  reviewedAt?: string | null
+  reviewedBy?: string | null
+  problemReviews: Record<string, HomeworkProblemReview>
 }
 
 export type HomeworkSubmitData = {
@@ -52,19 +67,34 @@ export type HomeworkSubmitData = {
   images: File[]
 }
 
+export type HomeworkSubmissionReviewData = {
+  status: HomeworkReviewStatus
+  reviewedBy?: string
+  problemReviews: Record<string, HomeworkProblemReview>
+}
+
 export type CreateAssignmentData = {
   title: string
   description?: string
   problems: HomeworkProblem[]
   dueAt?: string
+  scheduledAt?: string
   targetStudentIds: string[]
 }
 
-export type HomeworkStatus = 'not_submitted' | 'submitted' | 'overdue'
+export type HomeworkStatus = 'not_submitted' | 'pending' | 'returned' | 'approved' | 'overdue'
 
 export function getHomeworkStatus(assignment: HomeworkAssignment): HomeworkStatus {
-  if (assignment.submitted) {
-    return 'submitted'
+  if (assignment.reviewStatus === 'approved') {
+    return 'approved'
+  }
+
+  if (assignment.reviewStatus === 'returned') {
+    return 'returned'
+  }
+
+  if (assignment.reviewStatus === 'pending' || assignment.submitted) {
+    return 'pending'
   }
 
   if (assignment.dueAt) {
@@ -79,7 +109,7 @@ export function getHomeworkStatus(assignment: HomeworkAssignment): HomeworkStatu
 }
 
 export function isOverdueSoon(assignment: HomeworkAssignment): boolean {
-  if (assignment.submitted || !assignment.dueAt) {
+  if (assignment.submitted || assignment.reviewStatus || !assignment.dueAt) {
     return false
   }
 
@@ -98,4 +128,82 @@ export function createEmptyProblem(index: number): HomeworkProblem {
     options: undefined,
     answer: undefined
   }
+}
+
+// ============================================================
+// Admin Types
+// ============================================================
+
+export type AdminAssignmentSummary = {
+  id: string
+  title: string
+  description?: string | null
+  problems: HomeworkProblem[]
+  dueAt?: string | null
+  scheduledAt?: string | null
+  createdBy: string
+  createdAt: string
+  totalStudents: number
+  submittedCount: number
+  pendingCount: number
+  approvedCount: number
+  returnedCount: number
+  isScheduled: boolean
+}
+
+export type AdminStudentSubmissionSummary = {
+  studentId: string
+  assignedAt: string
+  submissionId?: string | null
+  submittedAt?: string | null
+  reviewStatus?: HomeworkReviewStatus | null
+  reviewedAt?: string | null
+  reviewedBy?: string | null
+}
+
+export type AdminAssignmentDetail = {
+  id: string
+  title: string
+  description?: string | null
+  problems: HomeworkProblem[]
+  dueAt?: string | null
+  scheduledAt?: string | null
+  createdBy: string
+  createdAt: string
+  students: AdminStudentSubmissionSummary[]
+}
+
+export type AdminSubmissionFile = {
+  id: string
+  storedPath: string
+  originalName: string
+  contentType: string
+  sizeBytes: number
+  createdAt: string
+}
+
+export type AdminSubmissionDetail = {
+  id: string
+  assignmentId: string
+  studentId: string
+  answers: Record<string, string>
+  submittedAt: string
+  reviewStatus: HomeworkReviewStatus
+  reviewedAt?: string | null
+  reviewedBy?: string | null
+  problemReviews: Record<string, HomeworkProblemReview>
+  assignmentTitle: string
+  assignmentDescription?: string | null
+  problems: HomeworkProblem[]
+  dueAt?: string | null
+  files: AdminSubmissionFile[]
+}
+
+export type HomeworkPendingCount = {
+  totalAssigned: number
+  notSubmitted: number
+  returned: number
+  pendingReview: number
+  approved: number
+  actionRequired: number
 }

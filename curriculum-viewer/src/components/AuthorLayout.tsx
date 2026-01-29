@@ -48,6 +48,9 @@ export default function AuthorLayout() {
             <li>
               <NavLink to={ROUTES.authorHomework}>숙제</NavLink>
             </li>
+            <li>
+              <NavLink to={ROUTES.authorHomeworkStatus}>숙제 현황</NavLink>
+            </li>
           </ul>
         </nav>
         <div className="app-auth">

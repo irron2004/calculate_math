@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import ImageUploader from '../components/ImageUploader'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { getAssignment, HomeworkApiError, submitHomework } from '../lib/homework/api'
-import type { HomeworkAssignmentDetail, HomeworkProblem } from '../lib/homework/types'
+import type { HomeworkAssignmentDetail, HomeworkProblem, HomeworkProblemReview } from '../lib/homework/types'
 
 function formatDateTime(isoString: string): string {
   const date = new Date(isoString)
@@ -21,10 +21,11 @@ type ProblemViewProps = {
   index: number
   answer: string
   onAnswerChange: (answer: string) => void
+  feedback?: HomeworkProblemReview
   disabled?: boolean
 }
 
-function ProblemView({ problem, index, answer, onAnswerChange, disabled }: ProblemViewProps) {
+function ProblemView({ problem, index, answer, onAnswerChange, feedback, disabled }: ProblemViewProps) {
   return (
     <div className="problem-view">
       <div className="problem-view-header">
@@ -62,6 +63,11 @@ function ProblemView({ problem, index, answer, onAnswerChange, disabled }: Probl
             disabled={disabled}
           />
         </div>
+      )}
+      {feedback?.comment && (
+        <p className="problem-review-comment">
+          <strong>반려 사유:</strong> {feedback.comment}
+        </p>
       )}
     </div>
   )
@@ -249,7 +255,12 @@ export default function HomeworkSubmitPage() {
     )
   }
 
-  const isAlreadySubmitted = Boolean(assignment.submission)
+  const submission = assignment.submission
+  const reviewStatus = submission?.reviewStatus
+  const isReturned = reviewStatus === 'returned'
+  const isPending = reviewStatus === 'pending'
+  const isApproved = reviewStatus === 'approved'
+  const isAlreadySubmitted = Boolean(submission)
   const isOverdue =
     assignment.dueAt && new Date(assignment.dueAt) < new Date() && !isAlreadySubmitted
 
@@ -278,16 +289,24 @@ export default function HomeworkSubmitPage() {
         </p>
       )}
 
+      {submission && (
+        <div className="homework-review-status">
+          {isPending && <span className="badge badge-warn">검토 중</span>}
+          {isApproved && <span className="badge badge-ok">완료 처리됨</span>}
+          {isReturned && <span className="badge badge-error">반려됨</span>}
+        </div>
+      )}
+
       {submitMessage && (
         <p className={submitMessage.type === 'success' ? 'success' : 'error'}>
           {submitMessage.text}
         </p>
       )}
 
-      {isAlreadySubmitted ? (
+      {isAlreadySubmitted && !isReturned ? (
         <div className="homework-submission-view">
           <h3>제출 내용</h3>
-          <p className="muted">제출 시간: {formatDateTime(assignment.submission!.submittedAt)}</p>
+          <p className="muted">제출 시간: {formatDateTime(submission!.submittedAt)}</p>
 
           <div className="problems-list submitted">
             {assignment.problems.map((problem, index) => (
@@ -295,16 +314,16 @@ export default function HomeworkSubmitPage() {
                 key={problem.id}
                 problem={problem}
                 index={index}
-                answer={assignment.submission!.answers[problem.id] || ''}
+                answer={submission!.answers[problem.id] || ''}
               />
             ))}
           </div>
 
-          {assignment.submission!.files.length > 0 && (
+          {submission!.files.length > 0 && (
             <div className="homework-files-view">
-              <h4>첨부 파일 ({assignment.submission!.files.length}개)</h4>
+              <h4>첨부 파일 ({submission!.files.length}개)</h4>
               <ul>
-                {assignment.submission!.files.map((file) => (
+                {submission!.files.map((file) => (
                   <li key={file.id}>{file.originalName}</li>
                 ))}
               </ul>
@@ -318,7 +337,13 @@ export default function HomeworkSubmitPage() {
       ) : (
         <form onSubmit={handleSubmit}>
           <fieldset disabled={submitting}>
-            <h3>문제 ({assignment.problems.length}개)</h3>
+            <h3>{isReturned ? '재제출' : '문제'} ({assignment.problems.length}개)</h3>
+
+            {isReturned && submission && (
+              <p className="homework-returned-note">
+                반려된 문제를 수정해서 다시 제출하세요. 마지막 제출 시간: {formatDateTime(submission.submittedAt)}
+              </p>
+            )}
 
             <div className="problems-list">
               {assignment.problems.map((problem, index) => (
@@ -328,6 +353,7 @@ export default function HomeworkSubmitPage() {
                   index={index}
                   answer={answers[problem.id] || ''}
                   onAnswerChange={(answer) => handleAnswerChange(problem.id, answer)}
+                  feedback={submission?.problemReviews?.[problem.id]}
                   disabled={submitting}
                 />
               ))}
@@ -342,7 +368,7 @@ export default function HomeworkSubmitPage() {
                 className="button button-primary"
                 disabled={submitting || !allAnswersFilled}
               >
-                {submitting ? '제출 중...' : '제출하기'}
+                {submitting ? '제출 중...' : isReturned ? '재제출하기' : '제출하기'}
               </button>
               <Link to="/mypage" className="button button-ghost">
                 취소

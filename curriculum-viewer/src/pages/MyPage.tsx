@@ -33,8 +33,16 @@ function StatusBadge({ assignment }: StatusBadgeProps) {
   const status = getHomeworkStatus(assignment)
   const overdueSoon = isOverdueSoon(assignment)
 
-  if (status === 'submitted') {
-    return <span className="badge badge-ok">제출 완료</span>
+  if (status === 'approved') {
+    return <span className="badge badge-ok">완료</span>
+  }
+
+  if (status === 'pending') {
+    return <span className="badge badge-warn">검토 중</span>
+  }
+
+  if (status === 'returned') {
+    return <span className="badge badge-error">반려</span>
   }
 
   if (status === 'overdue') {
@@ -81,23 +89,23 @@ function AssignmentCard({ assignment }: AssignmentCardProps) {
           <span className="muted">마감: {formatDateTime(assignment.dueAt)}</span>
         )}
       </div>
-      {status !== 'submitted' && status !== 'overdue' && (
+      {(status === 'not_submitted' || status === 'returned') && (
         <div className="homework-card-actions">
           <Link
             to={`/mypage/homework/${assignment.id}`}
             className="button button-primary"
           >
-            제출하기
+            {status === 'returned' ? '재제출' : '제출하기'}
           </Link>
         </div>
       )}
-      {status === 'submitted' && (
+      {(status === 'pending' || status === 'approved') && (
         <div className="homework-card-actions">
           <Link
             to={`/mypage/homework/${assignment.id}`}
             className="button button-ghost"
           >
-            제출 내용 보기
+            {status === 'pending' ? '검토 중 보기' : '제출 내용 보기'}
           </Link>
         </div>
       )}
@@ -152,14 +160,18 @@ export default function MyPage() {
     )
   }
 
-  const pendingAssignments = assignments.filter(
-    (a) => getHomeworkStatus(a) === 'not_submitted'
-  )
+  const pendingAssignments = assignments.filter((a) => {
+    const status = getHomeworkStatus(a)
+    return status === 'not_submitted' || status === 'returned'
+  })
   const overdueAssignments = assignments.filter(
     (a) => getHomeworkStatus(a) === 'overdue'
   )
-  const submittedAssignments = assignments.filter(
-    (a) => getHomeworkStatus(a) === 'submitted'
+  const reviewAssignments = assignments.filter(
+    (a) => getHomeworkStatus(a) === 'pending'
+  )
+  const completedAssignments = assignments.filter(
+    (a) => getHomeworkStatus(a) === 'approved'
   )
 
   return (
@@ -168,7 +180,12 @@ export default function MyPage() {
       <p className="muted">{user.name}님, 환영합니다.</p>
 
       {loading && <p className="muted">숙제 목록을 불러오는 중...</p>}
-      {error && <p className="error">{error}</p>}
+      {error && (
+        <div className="homework-error-notice">
+          <p className="muted">숙제 목록을 불러올 수 없습니다.</p>
+          <p className="muted">할당된 숙제가 없거나 서버 연결에 문제가 있습니다.</p>
+        </div>
+      )}
 
       {!loading && !error && assignments.length === 0 && (
         <p className="muted">할당된 숙제가 없습니다.</p>
@@ -176,7 +193,7 @@ export default function MyPage() {
 
       {pendingAssignments.length > 0 && (
         <>
-          <h2>미제출 숙제 ({pendingAssignments.length})</h2>
+          <h2>제출 필요 ({pendingAssignments.length})</h2>
           <div className="homework-list">
             {pendingAssignments.map((assignment) => (
               <AssignmentCard key={assignment.id} assignment={assignment} />
@@ -196,11 +213,22 @@ export default function MyPage() {
         </>
       )}
 
-      {submittedAssignments.length > 0 && (
+      {reviewAssignments.length > 0 && (
         <>
-          <h2>제출 완료 ({submittedAssignments.length})</h2>
+          <h2>검토 중 ({reviewAssignments.length})</h2>
           <div className="homework-list">
-            {submittedAssignments.map((assignment) => (
+            {reviewAssignments.map((assignment) => (
+              <AssignmentCard key={assignment.id} assignment={assignment} />
+            ))}
+          </div>
+        </>
+      )}
+
+      {completedAssignments.length > 0 && (
+        <>
+          <h2>완료 ({completedAssignments.length})</h2>
+          <div className="homework-list">
+            {completedAssignments.map((assignment) => (
               <AssignmentCard key={assignment.id} assignment={assignment} />
             ))}
           </div>

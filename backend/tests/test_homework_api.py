@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from fastapi.testclient import TestClient
@@ -12,9 +13,16 @@ def _create_assignment(client: TestClient, *, student_ids: list[str]) -> str:
         "/api/homework/assignments",
         json={
             "title": "숙제 테스트",
-            "prompt": "문제를 풀고 제출하세요",
+            "description": "문제를 풀고 제출하세요",
             "dueAt": "2026-02-01T23:59:59",
             "targetStudentIds": student_ids,
+            "problems": [
+                {
+                    "id": "p1",
+                    "type": "subjective",
+                    "question": "문제 1: 답을 작성하세요.",
+                }
+            ],
         },
     )
     assert response.status_code == 200, response.text
@@ -52,7 +60,10 @@ def test_homework_submit_rejects_large_file(client: tuple[TestClient, Any]) -> N
     too_large = b"x" * (MAX_FILE_SIZE_BYTES + 1)
     response = test_client.post(
         f"/api/homework/assignments/{assignment_id}/submit",
-        data={"studentId": "student2", "answerText": "답안"},
+        data={
+            "studentId": "student2",
+            "answersJson": json.dumps({"p1": "답안"}),
+        },
         files=[("images", ("large.jpg", too_large, "image/jpeg"))],
     )
 
@@ -75,7 +86,10 @@ def test_homework_submit_rejects_invalid_file_type(client: tuple[TestClient, Any
 
     response = test_client.post(
         f"/api/homework/assignments/{assignment_id}/submit",
-        data={"studentId": "student3", "answerText": "답안"},
+        data={
+            "studentId": "student3",
+            "answersJson": json.dumps({"p1": "답안"}),
+        },
         files=[("images", ("note.txt", b"hello", "text/plain"))],
     )
 
