@@ -13,6 +13,7 @@ DEFAULT_SCHEMA_VERSION = 1
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "app.db"
 DEFAULT_CURRICULUM_SEED_PATH = REPO_ROOT / "public" / "data" / "curriculum_math_2022.json"
+LOCAL_CURRICULUM_SEED_PATH = Path(__file__).resolve().parent / "data" / "curriculum_math_2022.json"
 FALLBACK_SEED_PATH = Path(__file__).resolve().parent / "data" / "seed.json"
 
 
@@ -32,6 +33,8 @@ def get_seed_path() -> Path:
         return Path(env_path)
     if DEFAULT_CURRICULUM_SEED_PATH.exists():
         return DEFAULT_CURRICULUM_SEED_PATH
+    if LOCAL_CURRICULUM_SEED_PATH.exists():
+        return LOCAL_CURRICULUM_SEED_PATH
     return FALLBACK_SEED_PATH
 
 
