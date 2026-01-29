@@ -1,0 +1,210 @@
+{
+  "title": "항의 개수 세기 (1월 20~24일)",
+  "description": "점프 수와 항의 수 구분, 등차수열 응용",
+  "problems": [
+    {
+      "type": "subjective",
+      "question": "1월 20일-1) 3,5,7, …, 23\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-2) 10,12,14, …, 40\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-3) 4,7,10, …, 34\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-4) 6,11,16, …, 56\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-5) 8,9,10, …, 19\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-6) 15,20,25, …, 60\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-7) 5,8,11, …, 50\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-8) 14,16,18, …, 50\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-9) 1,4,7, …, 43\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-10) 20,25,30, …, 95\n끝-처음, 몇씩, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 20일-설명) 점프 수가 48번이면 왜 항의 수는 49개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-1) 2,5,8, …, 47\n끝-처음, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-2) 9,13,17, …, 49\n끝-처음, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-3) 12,17,22, …, 57\n끝-처음, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-4) 18,24,30, …, 96\n끝-처음, 점프 수, 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-5) 25,30,35, …, 85\n점프 수와 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-6) 14,21,28, …, 77\n점프 수와 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-7) 50,55,60, …, 90\n점프 수와 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-8) 7,9,11, …, 39\n점프 수와 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-9) 3,6,9, …, 41\n마지막 수가 될 수 있나요? (O/X)\nO이면 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 21일-10) 6,10,14, …, 66\n마지막 수가 될 수 있나요? (O/X)\nO이면 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-1) 13,15,17, …, 31\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-2) 7,10,13, …, 58\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-3) 28,32,36, …, 100\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-4) 125,130,135, …, 200\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-5) 18,24,30, …, 90\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-6) 첫 수 11, 2씩 커지고 마지막이 63\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-7) 첫 수 6, 7씩 커지고 마지막이 97\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-8) 달력: 1일,3일,5일, …, 31일 표시\n표시한 날짜는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-9) 5,9,13, …, 50\n마지막 수 가능? (O/X)\nO이면 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 22일-10) 12,15,18, …, 60\n마지막 수 가능? (O/X)\nO이면 항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-1) 첫 수 3, 2씩 커지는 수가 15개\n마지막 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-2) 마지막 수 80, 5씩 커지는 수가 9개\n처음 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-3) 첫 수 12, 4씩 커지는 수가 10개\n마지막 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-4) 마지막 수 95, 5씩 커지는 수가 16개\n처음 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-5) 첫 수 7, 3씩 커지고 마지막이 55\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-6) 첫 수 10, 마지막 70, 5씩 커짐\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-7) 4씩 커지는 수에서 10번째 수가 40\n첫 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-8) 5개의 수: 6, □, □, □, 26 (등차)\n몇씩 커지나요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-9) 0m부터 1800m까지 200m마다 표지판\n표지판은 몇 개?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-10) 첫 수 4, 6씩 커지는 수가 8개일 때\n마지막이 46이다. (O/X)"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-1) 12부터 60까지 3의 배수는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-2) 8부터 96까지 4의 배수는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-3) 14부터 86까지 짝수는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-4) 30부터 150까지 5씩 뛰어 세기\n숫자는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-5) 21,28,35, …, 140 은 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-6) 18,27,36, …, 99 는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-7) 1부터 99까지 홀수는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-8) 6,10,14, …, 65\n마지막 수 가능? (O/X)"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-9) 3씩 커지는 수가 12개, 마지막 수가 74\n첫 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-10) 5씩 커지는 수가 9개, 첫 수가 17\n마지막 수를 구하시오."
+    }
+  ]
+}

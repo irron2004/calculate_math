@@ -7,6 +7,7 @@ import type {
   AdminAssignmentSummary,
   AdminSubmissionDetail,
   CreateAssignmentData,
+  UpdateAssignmentData,
   HomeworkAssignment,
   HomeworkAssignmentDetail,
   HomeworkPendingCount,
@@ -255,6 +256,39 @@ export async function getAssignmentAdmin(
   }
 
   return json as AdminAssignmentDetail
+}
+
+/**
+ * Admin: Update assignment title or due date
+ */
+export async function updateAssignmentAdmin(
+  assignmentId: string,
+  data: UpdateAssignmentData,
+  signal?: AbortSignal
+): Promise<void> {
+  const response = await authFetch(
+    `${API_BASE}/homework/admin/assignments/${assignmentId}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: data.title,
+        dueAt: data.dueAt,
+      }),
+      signal,
+    }
+  )
+
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to update assignment')
+  }
 }
 
 /**

@@ -1,0 +1,46 @@
+{
+  "title": "항의 개수 세기 (01월 23일)",
+  "description": "점프 수와 항의 수 구분, 등차수열 응용",
+  "problems": [
+    {
+      "type": "subjective",
+      "question": "1월 23일-1) 첫 수 3, 2씩 커지는 수가 15개\n마지막 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-2) 마지막 수 80, 5씩 커지는 수가 9개\n처음 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-3) 첫 수 12, 4씩 커지는 수가 10개\n마지막 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-4) 마지막 수 95, 5씩 커지는 수가 16개\n처음 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-5) 첫 수 7, 3씩 커지고 마지막이 55\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-6) 첫 수 10, 마지막 70, 5씩 커짐\n항의 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-7) 4씩 커지는 수에서 10번째 수가 40\n첫 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-8) 5개의 수: 6, □, □, □, 26 (등차)\n몇씩 커지나요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-9) 0m부터 1800m까지 200m마다 표지판\n표지판은 몇 개?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 23일-10) 첫 수 4, 6씩 커지는 수가 8개일 때\n마지막이 46이다. (O/X)"
+    }
+  ]
+}

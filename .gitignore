@@ -10,3 +10,10 @@ __cache__
 _cacache/
 .playwright-browsers
 *.log
+
+# Environment files (sensitive data)
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/.env.local

@@ -6,6 +6,7 @@ import {
   getSubmissionAdmin,
   getSubmissionFileUrl,
   listAssignmentsAdmin,
+  updateAssignmentAdmin,
   reviewSubmission,
   HomeworkApiError
 } from '../lib/homework/api'
@@ -29,6 +30,21 @@ function formatDateTime(isoString: string): string {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+function toDateTimeLocalValue(value?: string | null): string {
+  if (!value) return ''
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+  if (/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(trimmed)) {
+    return trimmed
+  }
+  const date = new Date(trimmed)
+  if (Number.isNaN(date.getTime())) return ''
+  const pad = (num: number) => String(num).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
+    date.getHours()
+  )}:${pad(date.getMinutes())}`
 }
 
 function formatDate(isoString: string): string {
@@ -133,6 +149,12 @@ export default function AuthorHomeworkStatusPage() {
   const [assignmentDetail, setAssignmentDetail] = useState<AdminAssignmentDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDueAt, setEditDueAt] = useState('')
+  const [editSubmitting, setEditSubmitting] = useState(false)
+  const [editMessage, setEditMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(
+    null
+  )
 
   // Selected submission detail
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null)
@@ -218,6 +240,18 @@ export default function AuthorHomeworkStatusPage() {
     return () => controller.abort()
   }, [loadAssignmentDetail, selectedAssignmentId])
 
+  useEffect(() => {
+    if (!assignmentDetail) {
+      setEditTitle('')
+      setEditDueAt('')
+      setEditMessage(null)
+      return
+    }
+    setEditTitle(assignmentDetail.title ?? '')
+    setEditDueAt(toDateTimeLocalValue(assignmentDetail.dueAt ?? null))
+    setEditMessage(null)
+  }, [assignmentDetail])
+
   // Load submission detail
   const loadSubmissionDetail = useCallback(async (submissionId: string, signal: AbortSignal) => {
     setSubmissionLoading(true)
@@ -293,6 +327,38 @@ export default function AuthorHomeworkStatusPage() {
     setSelectedSubmissionId(null)
     setReviewMessage(null)
   }, [])
+
+  const handleAssignmentUpdate = useCallback(async () => {
+    if (!assignmentDetail) return
+    const trimmedTitle = editTitle.trim()
+    if (!trimmedTitle) {
+      setEditMessage({ type: 'error', text: '숙제 이름을 입력하세요.' })
+      return
+    }
+
+    setEditSubmitting(true)
+    setEditMessage(null)
+
+    try {
+      await updateAssignmentAdmin(assignmentDetail.id, {
+        title: trimmedTitle,
+        dueAt: editDueAt.trim() ? editDueAt.trim() : null
+      })
+      setEditMessage({ type: 'success', text: '숙제 정보가 수정되었습니다.' })
+
+      const controller = new AbortController()
+      await loadAssignments(controller.signal)
+      await loadAssignmentDetail(assignmentDetail.id, controller.signal)
+    } catch (err) {
+      if (err instanceof HomeworkApiError) {
+        setEditMessage({ type: 'error', text: err.message })
+      } else {
+        setEditMessage({ type: 'error', text: '숙제 수정 중 오류가 발생했습니다.' })
+      }
+    } finally {
+      setEditSubmitting(false)
+    }
+  }, [assignmentDetail, editDueAt, editTitle, loadAssignmentDetail, loadAssignments])
 
   const handleReviewChange = useCallback(
     (problemId: string, patch: Partial<{ needsRevision: boolean; comment: string }>) => {
@@ -488,6 +554,58 @@ export default function AuthorHomeworkStatusPage() {
             )}
             <span className="muted">출제일: {formatDate(assignmentDetail.createdAt)}</span>
             <span className="muted">문제 수: {assignmentDetail.problems.length}개</span>
+          </div>
+        </div>
+
+        <div className="admin-assignment-edit">
+          <h3>숙제 정보 수정</h3>
+          <div className="admin-assignment-edit-grid">
+            <label className="form-field">
+              숙제 이름
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                disabled={editSubmitting}
+              />
+            </label>
+            <label className="form-field">
+              마감일 (선택)
+              <input
+                type="datetime-local"
+                value={editDueAt}
+                onChange={(e) => setEditDueAt(e.target.value)}
+                disabled={editSubmitting}
+              />
+              <span className="muted">비우면 마감 없음</span>
+            </label>
+          </div>
+          {editMessage && (
+            <p className={editMessage.type === 'success' ? 'success' : 'error'}>
+              {editMessage.text}
+            </p>
+          )}
+          <div className="admin-assignment-edit-actions">
+            <button
+              type="button"
+              className="button button-primary button-small"
+              onClick={handleAssignmentUpdate}
+              disabled={editSubmitting}
+            >
+              저장
+            </button>
+            <button
+              type="button"
+              className="button button-ghost button-small"
+              onClick={() => {
+                setEditTitle(assignmentDetail.title ?? '')
+                setEditDueAt(toDateTimeLocalValue(assignmentDetail.dueAt ?? null))
+                setEditMessage(null)
+              }}
+              disabled={editSubmitting}
+            >
+              되돌리기
+            </button>
           </div>
         </div>
 

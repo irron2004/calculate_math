@@ -3,6 +3,27 @@ import { clearTokens, getAccessToken, getRefreshToken, setTokens } from './token
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
+// Retry configuration for Railway cold start
+const MAX_RETRIES = 2
+const RETRY_DELAY_MS = 1000
+
+async function fetchWithRetry(
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+  retries = MAX_RETRIES
+): Promise<Response> {
+  try {
+    const response = await fetch(input, init)
+    return response
+  } catch (err) {
+    if (retries > 0) {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS))
+      return fetchWithRetry(input, init, retries - 1)
+    }
+    throw err
+  }
+}
+
 type AuthResponse = {
   accessToken: string
   refreshToken: string
@@ -25,7 +46,7 @@ function isApiError(data: unknown): data is ApiError {
 }
 
 export async function registerUser(input: RegisterInput): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE}/auth/register`, {
+  const response = await fetchWithRetry(`${API_BASE}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -43,7 +64,7 @@ export async function registerUser(input: RegisterInput): Promise<AuthResponse> 
 }
 
 export async function loginUser(input: LoginInput): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE}/auth/login`, {
+  const response = await fetchWithRetry(`${API_BASE}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -64,20 +85,25 @@ export async function refreshTokens(): Promise<AuthResponse | null> {
   const refreshToken = getRefreshToken()
   if (!refreshToken) return null
 
-  const response = await fetch(`${API_BASE}/auth/refresh`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken })
-  })
+  try {
+    const response = await fetchWithRetry(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken })
+    })
 
-  if (!response.ok) {
+    if (!response.ok) {
+      clearTokens()
+      return null
+    }
+
+    const data = (await response.json()) as AuthResponse
+    setTokens(data.accessToken, data.refreshToken)
+    return data
+  } catch {
     clearTokens()
     return null
   }
-
-  const data = (await response.json()) as AuthResponse
-  setTokens(data.accessToken, data.refreshToken)
-  return data
 }
 
 export async function fetchMe(): Promise<AuthUser> {
@@ -141,14 +167,14 @@ export async function authFetch(input: RequestInfo | URL, init: RequestInit = {}
     headers.set('Authorization', `Bearer ${accessToken}`)
   }
 
-  let response = await fetch(input, { ...init, headers })
+  let response = await fetchWithRetry(input, { ...init, headers })
 
   if (response.status === 401) {
     const refreshed = await refreshTokens()
     if (refreshed) {
       const retryHeaders = new Headers(init.headers)
       retryHeaders.set('Authorization', `Bearer ${refreshed.accessToken}`)
-      response = await fetch(input, { ...init, headers: retryHeaders })
+      response = await fetchWithRetry(input, { ...init, headers: retryHeaders })
     }
   }
 

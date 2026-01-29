@@ -897,6 +897,25 @@ def revoke_all_refresh_tokens(user_id: str, path: Optional[Path] = None) -> int:
         conn.close()
 
 
+def cleanup_expired_refresh_tokens(path: Optional[Path] = None) -> int:
+    """Delete refresh tokens that have expired or been revoked more than 7 days ago."""
+    conn = connect(path)
+    try:
+        now = _now_iso()
+        result = conn.execute(
+            """
+            DELETE FROM refresh_tokens
+            WHERE expires_at < ?
+               OR (revoked_at IS NOT NULL AND revoked_at < datetime(?, '-7 days'))
+            """,
+            (now, now),
+        )
+        conn.commit()
+        return result.rowcount
+    finally:
+        conn.close()
+
+
 def ensure_admin_user(
     *,
     username: str,
@@ -978,6 +997,48 @@ def create_homework_assignment(
 
         conn.commit()
         return assignment_id
+    finally:
+        conn.close()
+
+
+_MISSING = object()
+
+
+def update_homework_assignment(
+    assignment_id: str,
+    title: Optional[str] | object = _MISSING,
+    due_at: Optional[str] | object = _MISSING,
+    path: Optional[Path] = None,
+) -> bool:
+    """Update homework assignment title and/or due date."""
+    updates: list[str] = []
+    params: list[Any] = []
+
+    if title is not _MISSING:
+        updates.append("title = ?")
+        params.append(title)
+
+    if due_at is not _MISSING:
+        updates.append("due_at = ?")
+        params.append(due_at)
+
+    if not updates:
+        return False
+
+    params.append(assignment_id)
+
+    conn = connect(path)
+    try:
+        result = conn.execute(
+            f"""
+            UPDATE homework_assignments
+            SET {", ".join(updates)}
+            WHERE id = ?
+            """,
+            params,
+        )
+        conn.commit()
+        return result.rowcount > 0
     finally:
         conn.close()
 

@@ -2593,6 +2593,32 @@ body {
   margin: 0 0 8px;
 }
 
+.admin-assignment-edit {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  margin: 16px 0;
+}
+
+.admin-assignment-edit h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.admin-assignment-edit-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.admin-assignment-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 .admin-students-table-wrap {
   background: #ffffff;
   border: 1px solid #e2e8f0;

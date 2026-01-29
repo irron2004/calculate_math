@@ -15,8 +15,8 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from .api import router
-from .auth import hash_password
-from .db import ensure_admin_user, init_db, resolve_database_path, seed_db
+from .auth import hash_password, verify_password
+from .db import cleanup_expired_refresh_tokens, ensure_admin_user, get_user_by_username, init_db, resolve_database_path, seed_db, update_user_password
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +68,16 @@ def _ensure_admin_account(db_path: Path) -> None:
     name = os.getenv("ADMIN_NAME", "Admin").strip() or "Admin"
     grade = os.getenv("ADMIN_GRADE", "admin").strip() or "admin"
     try:
+        # Check if admin already exists
+        existing = get_user_by_username(username, db_path)
+        if existing:
+            # Verify password matches, update if different
+            if not verify_password(password, existing["password_hash"]):
+                update_user_password(existing["id"], hash_password(password), db_path)
+                logger.info("Admin password updated: %s", username)
+            return
+
+        # Create new admin user
         created = ensure_admin_user(
             username=username,
             password_hash=hash_password(password),
@@ -91,6 +101,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     init_db(db_path)
     seed_db(db_path)
     _ensure_admin_account(db_path)
+    # Cleanup expired refresh tokens on startup
+    try:
+        cleaned = cleanup_expired_refresh_tokens(db_path)
+        if cleaned > 0:
+            logger.info("Cleaned up %d expired refresh tokens", cleaned)
+    except Exception as exc:
+        logger.warning("Failed to cleanup expired tokens: %s", exc)
     yield
 
 

@@ -82,6 +82,11 @@ export type CreateAssignmentData = {
   targetStudentIds: string[]
 }
 
+export type UpdateAssignmentData = {
+  title?: string
+  dueAt?: string | null
+}
+
 export type HomeworkStatus = 'not_submitted' | 'pending' | 'returned' | 'approved' | 'overdue'
 
 export function getHomeworkStatus(assignment: HomeworkAssignment): HomeworkStatus {

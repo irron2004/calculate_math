@@ -6,7 +6,7 @@ import re
 from datetime import datetime, timezone
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import Any, List
 from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, File, Form, Query, Request, UploadFile
@@ -50,6 +50,7 @@ from .db import (
     revoke_refresh_token,
     save_homework_submission_file,
     store_refresh_token,
+    update_homework_assignment,
     update_user_password,
     update_homework_submission_review,
     update_last_login,
@@ -75,6 +76,8 @@ from .models import (
     HomeworkAssignmentCreateResponse,
     HomeworkAssignmentDetail,
     HomeworkAssignmentListResponse,
+    HomeworkAssignmentUpdateRequest,
+    HomeworkAssignmentUpdateResponse,
     HomeworkPendingCountResponse,
     HomeworkSubmitResponse,
     HomeworkSubmissionReviewRequest,
@@ -941,6 +944,80 @@ def get_admin_assignment(
             },
         )
     return assignment
+
+
+@router.patch(
+    "/homework/admin/assignments/{assignment_id}",
+    response_model=HomeworkAssignmentUpdateResponse,
+    responses={400: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+def update_admin_assignment(
+    assignment_id: str,
+    data: HomeworkAssignmentUpdateRequest,
+    _admin=Depends(require_admin),
+) -> HomeworkAssignmentUpdateResponse | JSONResponse:
+    """Admin: Update assignment title or due date."""
+    payload = data.model_dump(exclude_unset=True)
+    if not payload:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "NO_UPDATE_FIELDS",
+                    "message": "No update fields provided",
+                }
+            },
+        )
+
+    title = payload.get("title")
+    if "title" in payload:
+        if title is None:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": {
+                        "code": "INVALID_TITLE",
+                        "message": "Title cannot be empty",
+                    }
+                },
+            )
+        title = title.strip()
+        if not title:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": {
+                        "code": "INVALID_TITLE",
+                        "message": "Title cannot be empty",
+                    }
+                },
+            )
+
+    due_at = payload.get("dueAt")
+    if "dueAt" in payload and isinstance(due_at, str):
+        due_at = due_at.strip()
+        if not due_at:
+            due_at = None
+
+    update_kwargs: dict[str, Any] = {"assignment_id": assignment_id}
+    if "title" in payload:
+        update_kwargs["title"] = title
+    if "dueAt" in payload:
+        update_kwargs["due_at"] = due_at
+
+    updated = update_homework_assignment(**update_kwargs)
+    if not updated:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "ASSIGNMENT_NOT_FOUND",
+                    "message": "Assignment not found",
+                }
+            },
+        )
+
+    return HomeworkAssignmentUpdateResponse()
 
 
 @router.get(

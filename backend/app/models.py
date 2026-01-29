@@ -136,6 +136,15 @@ class HomeworkAssignmentCreateResponse(BaseModel):
     success: bool = True
 
 
+class HomeworkAssignmentUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    dueAt: Optional[str] = None
+
+
+class HomeworkAssignmentUpdateResponse(BaseModel):
+    success: bool = True
+
+
 class HomeworkSubmissionFile(BaseModel):
     id: str
     originalName: str

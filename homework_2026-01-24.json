@@ -1,0 +1,46 @@
+{
+  "title": "항의 개수 세기 (01월 24일)",
+  "description": "점프 수와 항의 수 구분, 등차수열 응용",
+  "problems": [
+    {
+      "type": "subjective",
+      "question": "1월 24일-1) 12부터 60까지 3의 배수는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-2) 8부터 96까지 4의 배수는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-3) 14부터 86까지 짝수는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-4) 30부터 150까지 5씩 뛰어 세기\n숫자는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-5) 21,28,35, …, 140 은 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-6) 18,27,36, …, 99 는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-7) 1부터 99까지 홀수는 몇 개인가요?"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-8) 6,10,14, …, 65\n마지막 수 가능? (O/X)"
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-9) 3씩 커지는 수가 12개, 마지막 수가 74\n첫 수를 구하시오."
+    },
+    {
+      "type": "subjective",
+      "question": "1월 24일-10) 5씩 커지는 수가 9개, 첫 수가 17\n마지막 수를 구하시오."
+    }
+  ]
+}
