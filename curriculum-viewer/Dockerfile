@@ -4,7 +4,7 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 # Build arguments for Vite environment variables
-ARG VITE_API_URL
+ARG VITE_API_URL=https://calculatemath-production.up.railway.app/api
 ARG VITE_SKILL_TREE_MODE
 
 # Set environment variables for build
