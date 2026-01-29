@@ -36,7 +36,7 @@ def get_cors_origins() -> list[str]:
 
 def get_allowed_methods() -> list[str]:
     """Return allowed HTTP methods."""
-    return ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    return ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
 
 
 def get_allowed_headers() -> list[str]:
