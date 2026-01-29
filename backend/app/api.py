@@ -1,5 +1,4 @@
 """API routes for graph and problem read endpoints."""
-from __future__ import annotations
 
 import json
 import logging
@@ -10,7 +9,7 @@ from pathlib import Path
 from typing import List
 from uuid import uuid4
 
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, Query, Request, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, File, Form, Query, Request, UploadFile
 from fastapi.responses import JSONResponse
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -131,7 +130,10 @@ def _is_valid_email(value: str) -> bool:
     responses={400: {"model": ErrorResponse}, 429: {"model": ErrorResponse}},
 )
 @limiter.limit("5/minute")
-def register_user(request: Request, data: AuthRegisterRequest) -> AuthTokenResponse | JSONResponse:
+def register_user(
+    request: Request,
+    data: AuthRegisterRequest = Body(...),
+) -> AuthTokenResponse | JSONResponse:
     username = data.username.strip()
     password = data.password.strip()
     name = data.name.strip()
@@ -198,7 +200,10 @@ def register_user(request: Request, data: AuthRegisterRequest) -> AuthTokenRespo
     responses={401: {"model": ErrorResponse}, 429: {"model": ErrorResponse}},
 )
 @limiter.limit("10/minute")
-def login_user(request: Request, data: AuthLoginRequest) -> AuthTokenResponse | JSONResponse:
+def login_user(
+    request: Request,
+    data: AuthLoginRequest = Body(...),
+) -> AuthTokenResponse | JSONResponse:
     username = data.username.strip()
     password = data.password.strip()
     if not username or not password:
@@ -229,7 +234,10 @@ def login_user(request: Request, data: AuthLoginRequest) -> AuthTokenResponse | 
     responses={401: {"model": ErrorResponse}, 429: {"model": ErrorResponse}},
 )
 @limiter.limit("20/minute")
-def refresh_token(request: Request, data: AuthRefreshRequest) -> AuthTokenResponse | JSONResponse:
+def refresh_token(
+    request: Request,
+    data: AuthRefreshRequest = Body(...),
+) -> AuthTokenResponse | JSONResponse:
     refresh = data.refreshToken.strip()
     if not refresh:
         return JSONResponse(status_code=401, content={"error": {"code": "INVALID_REFRESH", "message": "리프레시 토큰이 없습니다."}})
@@ -264,7 +272,9 @@ def refresh_token(request: Request, data: AuthRefreshRequest) -> AuthTokenRespon
     response_model=AuthLogoutResponse,
     responses={200: {"model": AuthLogoutResponse}},
 )
-def logout_user(data: AuthLogoutRequest) -> AuthLogoutResponse:
+def logout_user(
+    data: AuthLogoutRequest = Body(...),
+) -> AuthLogoutResponse:
     refresh = data.refreshToken.strip()
     if refresh:
         revoke_refresh_token(hash_token(refresh))
@@ -274,10 +284,12 @@ def logout_user(data: AuthLogoutRequest) -> AuthLogoutResponse:
 @router.post(
     "/auth/password",
     response_model=AuthChangePasswordResponse,
-    responses={400: {"model": ErrorResponse}, 401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}},
+    responses={400: {"model": ErrorResponse}, 401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}, 429: {"model": ErrorResponse}},
 )
+@limiter.limit("5/minute")
 def change_password(
-    data: AuthChangePasswordRequest,
+    request: Request,
+    data: AuthChangePasswordRequest = Body(...),
     user: TokenData = Depends(get_current_user),
 ) -> AuthChangePasswordResponse | JSONResponse:
     current_password = data.currentPassword.strip()
@@ -311,7 +323,12 @@ def change_password(
             content={"error": {"code": "ACCOUNT_DISABLED", "message": "계정이 비활성화되었습니다."}},
         )
 
-    update_user_password(user.user_id, hash_password(new_password))
+    updated = update_user_password(user.user_id, hash_password(new_password))
+    if not updated:
+        return JSONResponse(
+            status_code=500,
+            content={"error": {"code": "UPDATE_FAILED", "message": "비밀번호 변경에 실패했습니다."}},
+        )
     revoke_all_refresh_tokens(user.user_id)
     return AuthChangePasswordResponse(success=True)
 
