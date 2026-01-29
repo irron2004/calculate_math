@@ -145,6 +145,10 @@ class HomeworkAssignmentUpdateResponse(BaseModel):
     success: bool = True
 
 
+class HomeworkAssignmentDeleteResponse(BaseModel):
+    success: bool = True
+
+
 class HomeworkSubmissionFile(BaseModel):
     id: str
     originalName: str

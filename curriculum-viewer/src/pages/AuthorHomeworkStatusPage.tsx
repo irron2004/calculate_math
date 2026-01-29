@@ -7,6 +7,7 @@ import {
   getSubmissionFileUrl,
   listAssignmentsAdmin,
   updateAssignmentAdmin,
+  deleteAssignmentAdmin,
   reviewSubmission,
   HomeworkApiError
 } from '../lib/homework/api'
@@ -360,6 +361,34 @@ export default function AuthorHomeworkStatusPage() {
     }
   }, [assignmentDetail, editDueAt, editTitle, loadAssignmentDetail, loadAssignments])
 
+  const handleAssignmentDelete = useCallback(
+    async (assignmentId: string) => {
+      const confirmed = window.confirm('이 숙제를 삭제할까요? 제출 기록도 함께 삭제됩니다.')
+      if (!confirmed) return
+
+      setEditMessage(null)
+      setAssignmentsError(null)
+
+      try {
+        await deleteAssignmentAdmin(assignmentId)
+        const controller = new AbortController()
+        await loadAssignments(controller.signal)
+        if (selectedAssignmentId === assignmentId) {
+          handleBackToList()
+        }
+      } catch (err) {
+        const message =
+          err instanceof HomeworkApiError ? err.message : '숙제 삭제 중 오류가 발생했습니다.'
+        if (viewMode === 'assignment') {
+          setEditMessage({ type: 'error', text: message })
+        } else {
+          setAssignmentsError(message)
+        }
+      }
+    },
+    [handleBackToList, loadAssignments, selectedAssignmentId, viewMode]
+  )
+
   const handleReviewChange = useCallback(
     (problemId: string, patch: Partial<{ needsRevision: boolean; comment: string }>) => {
       setReviewState((prev) => {
@@ -517,6 +546,13 @@ export default function AuthorHomeworkStatusPage() {
                 >
                   상세 보기
                 </button>
+                <button
+                  type="button"
+                  className="button button-ghost button-small"
+                  onClick={() => handleAssignmentDelete(assignment.id)}
+                >
+                  삭제
+                </button>
               </div>
             </div>
           ))}
@@ -551,6 +587,9 @@ export default function AuthorHomeworkStatusPage() {
           <div className="admin-assignment-meta">
             {assignmentDetail.dueAt && (
               <span className="muted">마감: {formatDateTime(assignmentDetail.dueAt)}</span>
+            )}
+            {assignmentDetail.scheduledAt && (
+              <span className="muted">예약: {formatDateTime(assignmentDetail.scheduledAt)}</span>
             )}
             <span className="muted">출제일: {formatDate(assignmentDetail.createdAt)}</span>
             <span className="muted">문제 수: {assignmentDetail.problems.length}개</span>
@@ -605,6 +644,14 @@ export default function AuthorHomeworkStatusPage() {
               disabled={editSubmitting}
             >
               되돌리기
+            </button>
+            <button
+              type="button"
+              className="button button-ghost button-small"
+              onClick={() => handleAssignmentDelete(assignmentDetail.id)}
+              disabled={editSubmitting}
+            >
+              삭제
             </button>
           </div>
         </div>

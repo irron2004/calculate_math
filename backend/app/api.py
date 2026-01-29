@@ -30,6 +30,7 @@ from .db import (
     create_homework_assignment,
     create_homework_submission,
     create_user,
+    delete_homework_assignment,
     fetch_latest_graph,
     fetch_problems,
     get_homework_assignment,
@@ -76,6 +77,7 @@ from .models import (
     HomeworkAssignmentCreateResponse,
     HomeworkAssignmentDetail,
     HomeworkAssignmentListResponse,
+    HomeworkAssignmentDeleteResponse,
     HomeworkAssignmentUpdateRequest,
     HomeworkAssignmentUpdateResponse,
     HomeworkPendingCountResponse,
@@ -1018,6 +1020,29 @@ def update_admin_assignment(
         )
 
     return HomeworkAssignmentUpdateResponse()
+
+
+@router.delete(
+    "/homework/admin/assignments/{assignment_id}",
+    response_model=HomeworkAssignmentDeleteResponse,
+    responses={404: {"model": ErrorResponse}},
+)
+def delete_admin_assignment(
+    assignment_id: str, _admin=Depends(require_admin)
+) -> HomeworkAssignmentDeleteResponse | JSONResponse:
+    """Admin: Delete assignment."""
+    deleted = delete_homework_assignment(assignment_id)
+    if not deleted:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "ASSIGNMENT_NOT_FOUND",
+                    "message": "Assignment not found",
+                }
+            },
+        )
+    return HomeworkAssignmentDeleteResponse()
 
 
 @router.get(

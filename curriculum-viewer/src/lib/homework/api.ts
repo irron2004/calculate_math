@@ -292,6 +292,31 @@ export async function updateAssignmentAdmin(
 }
 
 /**
+ * Admin: Delete assignment
+ */
+export async function deleteAssignmentAdmin(
+  assignmentId: string,
+  signal?: AbortSignal
+): Promise<void> {
+  const response = await authFetch(
+    `${API_BASE}/homework/admin/assignments/${assignmentId}`,
+    {
+      method: 'DELETE',
+      signal,
+    }
+  )
+
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to delete assignment')
+  }
+}
+
+/**
  * Admin: Get full submission detail for review
  */
 export async function getSubmissionAdmin(

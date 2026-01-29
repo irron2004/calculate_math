@@ -1043,6 +1043,22 @@ def update_homework_assignment(
         conn.close()
 
 
+def delete_homework_assignment(
+    assignment_id: str, path: Optional[Path] = None
+) -> bool:
+    """Delete a homework assignment and its related records."""
+    conn = connect(path)
+    try:
+        result = conn.execute(
+            "DELETE FROM homework_assignments WHERE id = ?",
+            (assignment_id,),
+        )
+        conn.commit()
+        return result.rowcount > 0
+    finally:
+        conn.close()
+
+
 def list_homework_assignments_for_student(
     student_id: str, path: Optional[Path] = None
 ) -> List[Dict[str, Any]]:
@@ -1125,7 +1141,7 @@ def get_homework_assignment(
 
         row = conn.execute(
             """
-            SELECT id, title, description, problems_json, due_at, created_at
+            SELECT id, title, description, problems_json, due_at, scheduled_at, created_at
             FROM homework_assignments
             WHERE id = ?
             """,
@@ -1134,6 +1150,13 @@ def get_homework_assignment(
 
         if not row:
             return None
+
+        # Hide scheduled assignments until scheduled time
+        scheduled_at = row["scheduled_at"]
+        if scheduled_at:
+            now = _now_iso()
+            if scheduled_at > now:
+                return None
 
         # Check for existing submission
         submission_row = conn.execute(
@@ -1699,6 +1722,7 @@ def get_pending_homework_count(
     conn = connect(path)
     try:
         # Count assignments where student hasn't submitted or submission was returned
+        now = _now_iso()
         row = conn.execute(
             """
             SELECT
@@ -1727,9 +1751,11 @@ def get_pending_homework_count(
                 ORDER BY submitted_at DESC
                 LIMIT 1
             )
+            INNER JOIN homework_assignments ha ON ha.id = hat.assignment_id
             WHERE hat.student_id = ?
+              AND (ha.scheduled_at IS NULL OR ha.scheduled_at <= ?)
             """,
-            (student_id,),
+            (student_id, now),
         ).fetchone()
 
         return {
