@@ -28,17 +28,24 @@ export default function EvalResultList(props: {
 }) {
   return (
     <ol className="problem-list">
-      {Object.entries(props.perProblem).map(([problemId, result]) => {
+      {Object.entries(props.perProblem).map(([problemId, result], index) => {
         const submitted = props.responses?.[problemId]?.inputRaw ?? ''
         const submittedLabel = submitted.trim().length > 0 ? submitted : '-'
         const showExplanation = !result.isCorrect && result.explanation
 
         return (
-          <li key={problemId} className="problem-card">
-            <h3 className="problem-title">{problemId}</h3>
-            <p className="muted">내답: {submittedLabel}</p>
+          <li
+            key={problemId}
+            className={`problem-card ${result.isCorrect ? 'problem-card-correct' : 'problem-card-wrong'}`}
+          >
+            <h3 className="problem-title">
+              <span className="problem-number">{index + 1}</span>
+              {problemId}
+            </h3>
+            <p className="muted">내 답: {submittedLabel}</p>
             <p className={result.isCorrect ? 'problem-result correct' : 'problem-result wrong'}>
-              {result.isCorrect ? '정답' : '오답'}
+              <span className="result-emoji">{result.isCorrect ? '🎉' : '💪'}</span>
+              {result.isCorrect ? '정답이에요!' : '다시 도전해봐요!'}
               {result.expectedAnswer ? ` · 정답: ${result.expectedAnswer}` : null}
             </p>
             {showExplanation && <ExplanationToggle explanation={result.explanation!} />}

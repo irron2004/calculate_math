@@ -190,12 +190,15 @@ export default function DashboardPage() {
 
   return (
     <section className="dashboard">
-      <h1>대시보드</h1>
-      <p className="muted">안녕하세요, {user?.name ?? user?.id ?? '학생'}님!</p>
+      <div className="dashboard-welcome">
+        <span className="welcome-emoji">👋</span>
+        <h1>안녕, {user?.name ?? user?.id ?? '친구'}!</h1>
+        <p>오늘도 함께 수학 모험을 떠나볼까요?</p>
+      </div>
 
       {!isAdmin && (
         <div className="dashboard-homework">
-          <h2>숙제 알림</h2>
+          <h2>📋 숙제 알림</h2>
           {homeworkLoading && <p className="muted">숙제 목록을 불러오는 중...</p>}
           {homeworkError && <p className="error">{homeworkError}</p>}
           {!homeworkLoading && !homeworkError && (
@@ -254,21 +257,25 @@ export default function DashboardPage() {
       {/* 학습 현황 요약 */}
       {summary && (
         <div className="dashboard-summary">
-          <h2>학습 현황</h2>
+          <h2>📊 학습 현황</h2>
           <div className="summary-cards">
             <div className="summary-card">
+              <span className="summary-card-icon">⭐</span>
               <span className="summary-label">완료</span>
               <span className="summary-value">{summary.clearedCount} / {summary.totalCount}</span>
             </div>
             <div className="summary-card">
+              <span className="summary-card-icon">📚</span>
               <span className="summary-label">진행 중</span>
               <span className="summary-value">{summary.inProgressCount}</span>
             </div>
             <div className="summary-card">
+              <span className="summary-card-icon">🚀</span>
               <span className="summary-label">도전 가능</span>
               <span className="summary-value">{summary.availableCount}</span>
             </div>
             <div className="summary-card">
+              <span className="summary-card-icon">🎯</span>
               <span className="summary-label">평균 정답률</span>
               <span className="summary-value">
                 {summary.avgAccuracy !== null ? `${Math.round(summary.avgAccuracy * 100)}%` : '-'}
@@ -281,7 +288,7 @@ export default function DashboardPage() {
       {/* 추천 노드 */}
       {recommendedNodeIds.length > 0 && (
         <div className="dashboard-recommend">
-          <h2>오늘의 추천</h2>
+          <h2>✨ 오늘의 추천</h2>
           <ul className="recommend-list">
             {recommendedNodeIds.map((nodeId) => {
               const progress = progressByNodeId?.[nodeId]
@@ -308,7 +315,7 @@ export default function DashboardPage() {
       {/* 최근 학습 이력 */}
       {recentActivities.length > 0 && (
         <div className="dashboard-recent">
-          <h2>최근 학습</h2>
+          <h2>📝 최근 학습</h2>
           <ul className="recent-list">
             {recentActivities.map((activity) => (
               <li key={activity.sessionId} className="recent-item">

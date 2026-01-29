@@ -55,6 +55,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   )
 }
 
+const TOAST_EMOJI: Record<ToastType, string> = {
+  info: 'ℹ️',
+  success: '🎉',
+  warning: '⚠️',
+  error: '😅'
+}
+
 function ToastContainer({
   toasts,
   onDismiss
@@ -68,6 +75,7 @@ function ToastContainer({
     <div className="toast-container">
       {toasts.map((toast) => (
         <div key={toast.id} className={`toast toast-${toast.type}`}>
+          <span className="toast-icon" aria-hidden="true">{TOAST_EMOJI[toast.type]}</span>
           <span className="toast-message">{toast.message}</span>
           <button
             type="button"

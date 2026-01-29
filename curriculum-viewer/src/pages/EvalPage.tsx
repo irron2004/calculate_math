@@ -71,11 +71,17 @@ export default function EvalPage() {
 
       {grading ? (
         <>
-          <p className="learn-score">
-            정답: {grading.correctCount} / {grading.totalCount} · 정답률:{' '}
-            {Math.round(grading.accuracy * 100)}% ·{' '}
-            {grading.cleared ? 'CLEARED' : 'IN_PROGRESS'}
-          </p>
+          <div className={`eval-result-banner ${grading.cleared ? 'eval-result-cleared' : 'eval-result-progress'}`}>
+            <span className="eval-result-emoji">{grading.cleared ? '🎉' : '💪'}</span>
+            <div className="eval-result-text">
+              <p className="eval-result-main">
+                {grading.cleared ? '축하해요! 완료했어요!' : '조금만 더 힘내요!'}
+              </p>
+              <p className="eval-result-detail">
+                정답: {grading.correctCount} / {grading.totalCount} · 정답률: {Math.round(grading.accuracy * 100)}%
+              </p>
+            </div>
+          </div>
 
           {grading.perTag && grading.perTag.length > 0 && (
             <div className="tag-accuracy-section">
