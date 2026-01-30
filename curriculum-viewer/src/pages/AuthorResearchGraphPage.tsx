@@ -418,10 +418,41 @@ export default function AuthorResearchGraphPage() {
     return map
   }, [proposedNodes, state])
 
+  const mergedNonPrereqEdges = useMemo(() => {
+    const merged = new Map<string, { id?: string; edgeType: string; source: string; target: string }>()
+    if (state.status !== 'ready') return []
+
+    const hasNode = (id: string) => inspectableNodeById.has(id)
+
+    for (const edge of state.graph.edges) {
+      if (edge.edgeType === 'prereq') continue
+      if (!hasNode(edge.source) || !hasNode(edge.target)) continue
+      const key = `${edge.edgeType}\u0000${edge.source}\u0000${edge.target}`
+      merged.set(key, edge)
+    }
+
+    for (const track of RESEARCH_TRACKS) {
+      const patch = patchesByTrack[track]
+      if (!patch) continue
+      for (const edge of patch.add_edges) {
+        if (!edge.edgeType || edge.edgeType === 'prereq') continue
+        if (!hasNode(edge.source) || !hasNode(edge.target)) continue
+
+        const status = getResearchSuggestionStatus({ store: suggestionsStore, type: 'edge', key: researchEdgeKey(edge) })
+        if (status === 'excluded') continue
+
+        const key = `${edge.edgeType}\u0000${edge.source}\u0000${edge.target}`
+        if (merged.has(key)) continue
+        merged.set(key, { edgeType: edge.edgeType, source: edge.source, target: edge.target })
+      }
+    }
+
+    return Array.from(merged.values())
+  }, [inspectableNodeById, patchesByTrack, state, suggestionsStore])
+
   const alignsToBySource = useMemo(() => {
     const map = new Map<string, string[]>()
-    if (state.status !== 'ready') return map
-    for (const edge of state.graph.edges) {
+    for (const edge of mergedNonPrereqEdges) {
       if (edge.edgeType !== 'alignsTo') continue
       const bucket = map.get(edge.source)
       if (bucket) {
@@ -431,7 +462,7 @@ export default function AuthorResearchGraphPage() {
       }
     }
     return map
-  }, [state])
+  }, [mergedNonPrereqEdges])
 
   const nodeTypeById = useMemo(() => {
     const map = new Map<string, string>()
@@ -640,12 +671,9 @@ export default function AuthorResearchGraphPage() {
   }, [visibleNodes])
 
   const hoverEdgeRefs = useMemo((): HoverEdgeRef[] => {
-    if (state.status !== 'ready') return []
-
     const out: HoverEdgeRef[] = []
 
-    for (const edge of state.graph.edges) {
-      if (edge.edgeType === 'prereq') continue
+    for (const edge of mergedNonPrereqEdges) {
       if (!visibleNodeIdSet.has(edge.source) || !visibleNodeIdSet.has(edge.target)) continue
       out.push({
         id: edge.id ?? `${edge.edgeType}:${edge.source}->${edge.target}`,
@@ -664,7 +692,7 @@ export default function AuthorResearchGraphPage() {
     }
 
     return out
-  }, [currentPrereqEdges, state, visibleNodeIdSet])
+  }, [currentPrereqEdges, mergedNonPrereqEdges, visibleNodeIdSet])
 
   const hoverHighlight = useMemo((): HoverHighlight | null => {
     if (!hoveredNodeId) return null
@@ -714,7 +742,7 @@ export default function AuthorResearchGraphPage() {
 
     const alignedAchievements = alignedAchievementIds
       .map((id) => inspectableNodeById.get(id))
-      .filter((item): item is InspectableNode => Boolean(item) && item.nodeType === 'achievement')
+      .filter((item): item is InspectableNode => item !== undefined && item.nodeType === 'achievement')
 
     const goals =
       node.nodeType === 'textbookUnit'
@@ -1014,8 +1042,7 @@ export default function AuthorResearchGraphPage() {
       }
     }
 
-    const nonPrereq = state.graph.edges
-      .filter((edge) => edge.edgeType !== 'prereq')
+    const nonPrereq = mergedNonPrereqEdges
       .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
       .map((edge) => {
         const baseStyle = getEdgeStyle(edge.edgeType)
@@ -1064,7 +1091,7 @@ export default function AuthorResearchGraphPage() {
       })
 
     return [...nonPrereq, ...prereq]
-  }, [currentPrereqEdges, domainCodeById, hoverHighlight, hoveredNodeId, state, visibleNodeIdSet])
+  }, [currentPrereqEdges, domainCodeById, hoverHighlight, hoveredNodeId, mergedNonPrereqEdges, state, visibleNodeIdSet])
 
   const counts = useMemo(() => {
     if (state.status !== 'ready') return null
@@ -1414,8 +1441,13 @@ export default function AuthorResearchGraphPage() {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
                       <div>
-                        <div style={{ fontWeight: 600 }}>
-                          {sourceLabel} → {targetLabel}
+                        <div style={{ fontWeight: 600, display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                          <span className="badge">
+                            <span className="mono">{edge.edgeType}</span>
+                          </span>
+                          <span>
+                            {sourceLabel} → {targetLabel}
+                          </span>
                         </div>
                         <div className="mono" style={{ fontSize: 12, opacity: 0.7 }}>
                           {edge.source} → {edge.target}

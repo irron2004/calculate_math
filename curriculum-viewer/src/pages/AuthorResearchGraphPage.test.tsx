@@ -96,6 +96,87 @@ describe('/author/research-graph', () => {
     }
   }
 
+  function mockFetchWithPatchAlignsTo() {
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input)
+
+      if (url === '/data/curriculum_math_2022.json') {
+        return {
+          ok: true,
+          json: async () => ({
+            meta: { curriculumId: 'KR-MATH-2022' },
+            nodes: [
+              { id: 'ROOT', nodeType: 'root', label: 'Root' },
+              { id: 'BRIDGE', nodeType: 'textbookUnit', label: 'Bridge Unit' },
+              { id: 'ACH1', nodeType: 'achievement', label: 'Achievement 1', text: 'goal text' }
+            ],
+            edges: [{ id: 'contains:ROOT->BRIDGE', edgeType: 'contains', source: 'ROOT', target: 'BRIDGE' }]
+          })
+        }
+      }
+
+      if (url === '/data/problems_2022_v1.json') {
+        return {
+          ok: true,
+          json: async () => ({
+            version: 1,
+            problemsByNodeId: {
+              ACH1: [
+                {
+                  id: 'ach1-1',
+                  type: 'numeric',
+                  prompt: 'example prompt',
+                  answer: '10'
+                }
+              ]
+            }
+          })
+        }
+      }
+
+      if (url === '/data/research/manifest.json') {
+        return {
+          ok: true,
+          json: async () => ({
+            schemaVersion: 'research-manifest-v1',
+            patchByTrack: {
+              T1: '/data/research/patch_T1.json',
+              T2: '/data/research/patch_T2.json',
+              T3: '/data/research/patch_T3.json'
+            }
+          })
+        }
+      }
+
+      if (url === '/data/research/patch_T1.json' || url === '/data/research/patch_T2.json' || url === '/data/research/patch_T3.json') {
+        return {
+          ok: true,
+          json: async () => ({
+            schemaVersion: 'research-patch-v1',
+            add_nodes: [],
+            add_edges: [
+              {
+                source: 'BRIDGE',
+                target: 'ACH1',
+                edgeType: 'alignsTo',
+                confidence: 0.8,
+                rationale: 'maps unit goal'
+              }
+            ],
+            remove_edges: []
+          })
+        }
+      }
+
+      return { ok: false, status: 404 }
+    }) as unknown as typeof fetch
+
+    return () => {
+      globalThis.fetch = originalFetch
+    }
+  }
+
   it('renders the page header and graph canvas', async () => {
     const restoreFetch = mockFetch()
 
@@ -236,6 +317,33 @@ describe('/author/research-graph', () => {
         const tu3 = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
         expect(tu3?.style?.opacity).toBeUndefined()
       })
+    } finally {
+      restoreFetch()
+    }
+  })
+
+  it('shows goals and example prompts using alignsTo edges from patches', async () => {
+    const restoreFetch = mockFetchWithPatchAlignsTo()
+
+    try {
+      render(
+        <MemoryRouter initialEntries={['/author/research-graph']}>
+          <Routes>
+            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
+          </Routes>
+        </MemoryRouter>
+      )
+
+      await screen.findByTestId('reactflow')
+      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
+
+      latestReactFlowProps.onNodeMouseEnter(null, { id: 'BRIDGE' })
+
+      const panel = await screen.findByTestId('research-hover-panel')
+      expect(panel).toHaveTextContent('Bridge Unit')
+
+      await waitFor(() => expect(panel).toHaveTextContent('goal text'))
+      await waitFor(() => expect(panel).toHaveTextContent('example prompt'))
     } finally {
       restoreFetch()
     }

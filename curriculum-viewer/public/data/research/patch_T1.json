@@ -81,6 +81,20 @@
       "edgeType": "prereq",
       "confidence": 0.85,
       "rationale": "6수03-B의 각기둥/각뿔 전개도(6수03-04) 학습을 위한 직접 선수"
+    },
+    {
+      "source": "P_TU_solid_figures_bridge",
+      "target": "6수03-03",
+      "edgeType": "alignsTo",
+      "confidence": 0.75,
+      "rationale": "면·모서리·꼭짓점 등 입체도형 구성 요소 이해를 6수03-03(직육면체·정육면체 특징)의 목표로 명시"
+    },
+    {
+      "source": "P_TU_solid_figures_bridge",
+      "target": "6수03-04",
+      "edgeType": "alignsTo",
+      "confidence": 0.8,
+      "rationale": "전개도 개념을 6수03-04(각기둥/각뿔 특징·전개도)의 목표로 명시"
     }
   ],
   "remove_edges": [],
