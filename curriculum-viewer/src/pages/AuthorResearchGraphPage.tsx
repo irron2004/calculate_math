@@ -28,6 +28,7 @@ import { applyResearchPatch, researchEdgeKey } from '../lib/research/applyResear
 import type { ProposedTextbookUnitNode } from '../lib/curriculum2022/types'
 import { buildPatchExport } from '../lib/research/patchExport'
 import { loadResearchEditorState, saveResearchEditorState } from '../lib/research/editorState'
+import { parseProblemBank, type ProblemBank } from '../lib/learn/problems'
 
 type LoadState =
   | { status: 'loading' }
@@ -43,6 +44,24 @@ type HoverEdgeRef = {
 type HoverHighlight = {
   nodeIds: Set<string>
   edgeIds: Set<string>
+}
+
+type InspectableNode = {
+  id: string
+  nodeType: string
+  label: string
+  gradeBand?: string
+  parentId?: string
+  domainCode?: string
+  text?: string
+  note?: string
+  reason?: string
+  proposed?: boolean
+}
+
+type ExamplePrompt = {
+  nodeId: string
+  prompt: string
 }
 
 const NODE_WIDTH = 260
@@ -189,7 +208,9 @@ export default function AuthorResearchGraphPage() {
   const [visibleDepthRange, setVisibleDepthRange] = useState<{ min: number; max: number }>({ min: 1, max: 99 })
   const [selectedPrereq, setSelectedPrereq] = useState<PrereqEdgeWithOrigin | null>(null)
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
+  const [inspectedNodeId, setInspectedNodeId] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [problemBank2022, setProblemBank2022] = useState<ProblemBank | null>(null)
   const [manualProposedNodes, setManualProposedNodes] = useState<ProposedTextbookUnitNode[]>(
     initialEditorState.proposedNodes
   )
@@ -223,6 +244,25 @@ export default function AuthorResearchGraphPage() {
       .catch((error) => {
         const message = error instanceof Error ? error.message : String(error)
         setState({ status: 'error', message })
+      })
+
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    fetch('/data/problems_2022_v1.json', { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) return
+        const json = (await response.json()) as unknown
+        const parsed = parseProblemBank(json)
+        if (!parsed) return
+        if (controller.signal.aborted) return
+        setProblemBank2022(parsed)
+      })
+      .catch(() => {
+        // ignore (missing file / offline / aborted)
       })
 
     return () => controller.abort()
@@ -364,6 +404,34 @@ export default function AuthorResearchGraphPage() {
 
   const editState = appliedResearchState?.editState ?? null
   const proposedNodes = appliedResearchState?.proposedNodes ?? manualProposedNodes
+
+  const inspectableNodeById = useMemo(() => {
+    const map = new Map<string, InspectableNode>()
+    if (state.status === 'ready') {
+      for (const node of state.graph.nodes) {
+        map.set(node.id, node)
+      }
+    }
+    for (const node of proposedNodes) {
+      map.set(node.id, node)
+    }
+    return map
+  }, [proposedNodes, state])
+
+  const alignsToBySource = useMemo(() => {
+    const map = new Map<string, string[]>()
+    if (state.status !== 'ready') return map
+    for (const edge of state.graph.edges) {
+      if (edge.edgeType !== 'alignsTo') continue
+      const bucket = map.get(edge.source)
+      if (bucket) {
+        bucket.push(edge.target)
+      } else {
+        map.set(edge.source, [edge.target])
+      }
+    }
+    return map
+  }, [state])
 
   const nodeTypeById = useMemo(() => {
     const map = new Map<string, string>()
@@ -621,6 +689,90 @@ export default function AuthorResearchGraphPage() {
       setHoveredNodeId(null)
     }
   }, [hoveredNodeId, visibleNodeIdSet])
+
+  useEffect(() => {
+    if (!inspectedNodeId) return
+    if (!visibleNodeIdSet.has(inspectedNodeId)) {
+      setInspectedNodeId(null)
+    }
+  }, [inspectedNodeId, visibleNodeIdSet])
+
+  const inspectedPanel = useMemo(() => {
+    if (!inspectedNodeId) return null
+    if (!visibleNodeIdSet.has(inspectedNodeId)) return null
+
+    const node = inspectableNodeById.get(inspectedNodeId)
+    if (!node) return null
+
+    const depth = allNodesDepthById.get(inspectedNodeId) ?? null
+    const domainCode = domainCodeById.get(inspectedNodeId) ?? DOMAIN_LAYER_FALLBACK
+    const domainLabel = domainLabelByCode.get(domainCode) ?? domainCode
+    const gradeBand = node.gradeBand ?? null
+
+    const alignedAchievementIds =
+      node.nodeType === 'textbookUnit' ? alignsToBySource.get(inspectedNodeId) ?? [] : []
+
+    const alignedAchievements = alignedAchievementIds
+      .map((id) => inspectableNodeById.get(id))
+      .filter((item): item is InspectableNode => Boolean(item) && item.nodeType === 'achievement')
+
+    const goals =
+      node.nodeType === 'textbookUnit'
+        ? alignedAchievements.map((achievement) => ({
+            id: achievement.id,
+            label: achievement.label,
+            text: achievement.text ?? null
+          }))
+        : node.nodeType === 'achievement'
+          ? [
+              {
+                id: node.id,
+                label: node.label,
+                text: node.text ?? null
+              }
+            ]
+          : []
+
+    const note = node.note ?? node.reason ?? null
+
+    const examplePrompts: ExamplePrompt[] = []
+    if (problemBank2022) {
+      if (node.nodeType === 'achievement') {
+        const problems = problemBank2022.problemsByNodeId[node.id] ?? []
+        for (const problem of problems.slice(0, 2)) {
+          examplePrompts.push({ nodeId: node.id, prompt: problem.prompt })
+        }
+      } else if (node.nodeType === 'textbookUnit') {
+        for (const achievement of alignedAchievements) {
+          const problems = problemBank2022.problemsByNodeId[achievement.id] ?? []
+          if (problems.length === 0) continue
+          examplePrompts.push({ nodeId: achievement.id, prompt: problems[0].prompt })
+          if (examplePrompts.length >= 2) break
+        }
+      }
+    }
+
+    return {
+      node,
+      depth,
+      domainCode,
+      domainLabel,
+      gradeBand,
+      goals,
+      alignedAchievementCount: alignedAchievements.length,
+      note,
+      examplePrompts
+    }
+  }, [
+    alignsToBySource,
+    allNodesDepthById,
+    domainCodeById,
+    domainLabelByCode,
+    inspectableNodeById,
+    inspectedNodeId,
+    problemBank2022,
+    visibleNodeIdSet
+  ])
 
   const depthPrereqEdges = useMemo(() => {
     return allPrereqEdgesForDepth.filter(
@@ -1443,7 +1595,99 @@ export default function AuthorResearchGraphPage() {
         </div>
       ) : null}
 
-      <div className="graph-canvas" aria-label="Research graph canvas">
+      <div className="graph-canvas research-graph-canvas" aria-label="Research graph canvas">
+        {inspectedPanel ? (
+          <aside className="research-hover-panel" data-testid="research-hover-panel">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                  <strong style={{ fontSize: 14, lineHeight: 1.2 }}>{inspectedPanel.node.label}</strong>
+                  {inspectedPanel.node.proposed ? <span className="badge badge-warn">proposed</span> : null}
+                </div>
+                <div className="mono" style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>
+                  {inspectedPanel.node.nodeType}
+                  {inspectedPanel.depth ? ` · depth ${inspectedPanel.depth}` : ''}
+                  {inspectedPanel.gradeBand ? ` · ${inspectedPanel.gradeBand}` : ''}
+                  {inspectedPanel.domainLabel ? ` · ${inspectedPanel.domainLabel}` : ''}
+                </div>
+                <div className="mono" style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>
+                  {inspectedPanel.node.id}
+                </div>
+              </div>
+              <button type="button" className="button button-ghost" onClick={() => setInspectedNodeId(null)}>
+                닫기
+              </button>
+            </div>
+
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 6 }}>
+                  목표
+                  {inspectedPanel.node.nodeType === 'textbookUnit'
+                    ? ` (성취기준 ${inspectedPanel.alignedAchievementCount}개)`
+                    : ''}
+                </div>
+
+                {inspectedPanel.goals.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {inspectedPanel.goals.slice(0, 8).map((goal) => (
+                      <div key={goal.id} style={{ borderLeft: '3px solid #e2e8f0', paddingLeft: 10 }}>
+                        <div style={{ fontWeight: 650, fontSize: 13 }}>{goal.label}</div>
+                        {goal.text ? (
+                          <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                            {goal.text}
+                          </div>
+                        ) : null}
+                        <div className="mono" style={{ fontSize: 11, opacity: 0.75, marginTop: 2 }}>
+                          {goal.id}
+                        </div>
+                      </div>
+                    ))}
+                    {inspectedPanel.goals.length > 8 ? (
+                      <div className="muted" style={{ fontSize: 12 }}>
+                        … +{inspectedPanel.goals.length - 8}개 더 있음
+                      </div>
+                    ) : null}
+                    {inspectedPanel.note ? (
+                      <div className="muted" style={{ fontSize: 12 }}>
+                        메모: {inspectedPanel.note}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : inspectedPanel.note ? (
+                  <div className="muted" style={{ fontSize: 12 }}>{inspectedPanel.note}</div>
+                ) : (
+                  <div className="muted" style={{ fontSize: 12 }}>아직 목표/설명이 없습니다.</div>
+                )}
+              </div>
+
+              <div>
+                <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 6 }}>예시 문제</div>
+
+                {inspectedPanel.examplePrompts.length > 0 ? (
+                  <ol style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {inspectedPanel.examplePrompts.map((item, index) => (
+                      <li key={`${item.nodeId}\u0000${index}`}>
+                        <div className="mono" style={{ fontSize: 11, opacity: 0.75 }}>
+                          {item.nodeId}
+                        </div>
+                        <div style={{ fontSize: 13 }}>{item.prompt}</div>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <div className="muted" style={{ fontSize: 12 }}>
+                    예시 문제가 아직 없습니다.
+                  </div>
+                )}
+
+                <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
+                  정답은 표시하지 않습니다.
+                </div>
+              </div>
+            </div>
+          </aside>
+        ) : null}
         {state.status === 'ready' ? (
           <ReactFlow
 	            nodes={nodes}
@@ -1455,6 +1699,7 @@ export default function AuthorResearchGraphPage() {
 	            onNodeMouseEnter={(_, node) => {
 	              if (node.id.startsWith('__')) return
 	              setHoveredNodeId(node.id)
+	              setInspectedNodeId(node.id)
 	            }}
 	            onNodeMouseLeave={(_, node) => {
 	              if (node.id.startsWith('__')) return

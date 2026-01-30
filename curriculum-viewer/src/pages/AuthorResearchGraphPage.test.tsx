@@ -206,9 +206,13 @@ describe('/author/research-graph', () => {
         expect(typeof latestReactFlowProps.onNodeMouseLeave).toBe('function')
       })
 
+      expect(screen.queryByTestId('research-hover-panel')).toBeNull()
+
       latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
 
       await waitFor(() => {
+        expect(screen.getByTestId('research-hover-panel')).toHaveTextContent('Unit 1')
+
         const tu1 = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU1')
         expect(tu1?.style?.outline).toContain('#f97316')
 

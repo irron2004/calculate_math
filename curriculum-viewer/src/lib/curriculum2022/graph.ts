@@ -5,6 +5,7 @@ export type Curriculum2022Node = {
   gradeBand?: string
   parentId?: string
   domainCode?: string
+  text?: string
   note?: string
   reason?: string
 }
@@ -44,6 +45,7 @@ function parseNode(raw: unknown): Curriculum2022Node | null {
   const gradeBand = asNonEmptyString(raw.gradeBand) ?? undefined
   const parentId = asNonEmptyString(raw.parentId) ?? undefined
   const domainCode = asNonEmptyString(raw.domainCode) ?? undefined
+  const text = asNonEmptyString(raw.text) ?? undefined
   const note = asNonEmptyString(raw.note) ?? undefined
   const reason = asNonEmptyString(raw.reason) ?? undefined
 
@@ -54,6 +56,7 @@ function parseNode(raw: unknown): Curriculum2022Node | null {
     ...(gradeBand ? { gradeBand } : {}),
     ...(parentId ? { parentId } : {}),
     ...(domainCode ? { domainCode } : {}),
+    ...(text ? { text } : {}),
     ...(note ? { note } : {}),
     ...(reason ? { reason } : {})
   }
