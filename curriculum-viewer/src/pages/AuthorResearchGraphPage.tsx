@@ -34,6 +34,17 @@ type LoadState =
   | { status: 'error'; message: string }
   | { status: 'ready'; graph: Awaited<ReturnType<typeof loadCurriculum2022Graph>> }
 
+type HoverEdgeRef = {
+  id: string
+  source: string
+  target: string
+}
+
+type HoverHighlight = {
+  nodeIds: Set<string>
+  edgeIds: Set<string>
+}
+
 const NODE_WIDTH = 260
 const NODE_HEIGHT = 70
 const GRID_GAP_X = 40
@@ -177,6 +188,7 @@ export default function AuthorResearchGraphPage() {
   ])
   const [visibleDepthRange, setVisibleDepthRange] = useState<{ min: number; max: number }>({ min: 1, max: 99 })
   const [selectedPrereq, setSelectedPrereq] = useState<PrereqEdgeWithOrigin | null>(null)
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [manualProposedNodes, setManualProposedNodes] = useState<ProposedTextbookUnitNode[]>(
     initialEditorState.proposedNodes
@@ -559,6 +571,57 @@ export default function AuthorResearchGraphPage() {
     return new Set(visibleNodes.map((node) => node.id))
   }, [visibleNodes])
 
+  const hoverEdgeRefs = useMemo((): HoverEdgeRef[] => {
+    if (state.status !== 'ready') return []
+
+    const out: HoverEdgeRef[] = []
+
+    for (const edge of state.graph.edges) {
+      if (edge.edgeType === 'prereq') continue
+      if (!visibleNodeIdSet.has(edge.source) || !visibleNodeIdSet.has(edge.target)) continue
+      out.push({
+        id: edge.id ?? `${edge.edgeType}:${edge.source}->${edge.target}`,
+        source: edge.source,
+        target: edge.target
+      })
+    }
+
+    for (const edge of currentPrereqEdges) {
+      if (!visibleNodeIdSet.has(edge.source) || !visibleNodeIdSet.has(edge.target)) continue
+      out.push({
+        id: `prereq:${edge.source}->${edge.target}`,
+        source: edge.source,
+        target: edge.target
+      })
+    }
+
+    return out
+  }, [currentPrereqEdges, state, visibleNodeIdSet])
+
+  const hoverHighlight = useMemo((): HoverHighlight | null => {
+    if (!hoveredNodeId) return null
+    if (!visibleNodeIdSet.has(hoveredNodeId)) return null
+
+    const nodeIds = new Set<string>([hoveredNodeId])
+    const edgeIds = new Set<string>()
+
+    for (const edge of hoverEdgeRefs) {
+      if (edge.source !== hoveredNodeId && edge.target !== hoveredNodeId) continue
+      edgeIds.add(edge.id)
+      nodeIds.add(edge.source)
+      nodeIds.add(edge.target)
+    }
+
+    return { nodeIds, edgeIds }
+  }, [hoverEdgeRefs, hoveredNodeId, visibleNodeIdSet])
+
+  useEffect(() => {
+    if (!hoveredNodeId) return
+    if (!visibleNodeIdSet.has(hoveredNodeId)) {
+      setHoveredNodeId(null)
+    }
+  }, [hoveredNodeId, visibleNodeIdSet])
+
   const depthPrereqEdges = useMemo(() => {
     return allPrereqEdgesForDepth.filter(
       (edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target)
@@ -573,6 +636,26 @@ export default function AuthorResearchGraphPage() {
   const nodes = useMemo((): Node[] => {
     if (state.status !== 'ready') return []
     if (visibleNodes.length === 0) return []
+
+    const hoverNodeIds = hoverHighlight?.nodeIds ?? null
+    const hoverActive = Boolean(hoveredNodeId && hoverNodeIds)
+    const decorateNodeStyle = (id: string, style: CSSProperties): CSSProperties => {
+      if (!hoverActive || !hoverNodeIds) return style
+
+      if (!hoverNodeIds.has(id)) {
+        return { ...style, opacity: 0.18 }
+      }
+
+      const isPrimary = id === hoveredNodeId
+      return {
+        ...style,
+        opacity: 1,
+        zIndex: isPrimary ? 10 : 5,
+        outline: isPrimary ? '3px solid #f97316' : '2px solid rgba(249, 115, 22, 0.55)',
+        outlineOffset: 2,
+        ...(isPrimary ? { boxShadow: 'var(--shadow-glow-primary)' } : {})
+      }
+    }
 
     // Use pre-calculated depth from allNodesDepthById
     const depthById = allNodesDepthById
@@ -612,7 +695,7 @@ export default function AuthorResearchGraphPage() {
             </div>
           )
         },
-        style: {
+        style: decorateNodeStyle(headerId, {
           width: NODE_WIDTH,
           height: DOMAIN_HEADER_HEIGHT,
           padding: 10,
@@ -620,7 +703,7 @@ export default function AuthorResearchGraphPage() {
           border: '1px solid #0f172a',
           background: '#0f172a',
           color: '#f8fafc'
-        },
+        }),
         draggable: false,
         selectable: false,
         connectable: false
@@ -643,7 +726,7 @@ export default function AuthorResearchGraphPage() {
               </div>
             )
           },
-          style: {
+          style: decorateNodeStyle(`__domain_depth_${domainCode}_${depth}`, {
             width: NODE_WIDTH,
             height: DEPTH_HEADER_HEIGHT,
             padding: 8,
@@ -651,7 +734,7 @@ export default function AuthorResearchGraphPage() {
             border: '1px solid #0f172a',
             background: '#e2e8f0',
             color: '#0f172a'
-          },
+          }),
           draggable: false,
           selectable: false,
           connectable: false
@@ -722,13 +805,13 @@ export default function AuthorResearchGraphPage() {
                 </div>
               )
             },
-            style: {
+            style: decorateNodeStyle(node.id, {
               width: NODE_WIDTH,
               padding: 10,
               borderRadius: 12,
               color: '#0f172a',
               ...getNodeStyle(node.nodeType, Boolean(node.proposed))
-            }
+            })
           })
         })
 
@@ -739,10 +822,34 @@ export default function AuthorResearchGraphPage() {
     }
 
     return layeredNodes
-  }, [allNodesDepthById, domainCodeById, domainLabelByCode, state, visibleNodes])
+  }, [allNodesDepthById, domainCodeById, domainLabelByCode, hoverHighlight, hoveredNodeId, state, visibleNodes])
 
   const edges = useMemo((): Edge[] => {
     if (state.status !== 'ready') return []
+
+    const hoverEdgeIds = hoverHighlight?.edgeIds ?? null
+    const hoverActive = Boolean(hoveredNodeId && hoverEdgeIds)
+    const decorateEdgeStyle = (edgeId: string, style: CSSProperties): CSSProperties => {
+      if (!hoverActive || !hoverEdgeIds) return style
+
+      const baseOpacity = typeof style.opacity === 'number' ? style.opacity : 1
+      const baseStrokeWidth = typeof style.strokeWidth === 'number' ? style.strokeWidth : 1.5
+
+      if (hoverEdgeIds.has(edgeId)) {
+        return {
+          ...style,
+          opacity: 1,
+          strokeWidth: baseStrokeWidth + 1.5,
+          zIndex: 10
+        }
+      }
+
+      return {
+        ...style,
+        opacity: Math.min(0.08, baseOpacity * 0.12),
+        zIndex: 1
+      }
+    }
 
     const decorateForDomain = (style: Record<string, unknown>, source: string, target: string) => {
       const sourceDomain = domainCodeById.get(source) ?? DOMAIN_LAYER_FALLBACK
@@ -760,16 +867,22 @@ export default function AuthorResearchGraphPage() {
       .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
       .map((edge) => {
         const baseStyle = getEdgeStyle(edge.edgeType)
-        const style = decorateForDomain({ ...baseStyle }, edge.source, edge.target)
+        const domainStyle = decorateForDomain({ ...baseStyle }, edge.source, edge.target) as CSSProperties
+        const id = edge.id ?? `${edge.edgeType}:${edge.source}->${edge.target}`
+        const dimLabel = hoverActive && hoverEdgeIds && !hoverEdgeIds.has(id)
         return {
-          id: edge.id ?? `${edge.edgeType}:${edge.source}->${edge.target}`,
+          id,
           source: edge.source,
           target: edge.target,
           type: 'smoothstep',
           label: edge.edgeType,
           data: { edgeType: edge.edgeType },
-          style,
-          labelStyle: { fill: (style.stroke as string) ?? '#64748b', fontSize: 12 }
+          style: decorateEdgeStyle(id, domainStyle),
+          labelStyle: {
+            fill: (domainStyle.stroke as string) ?? '#64748b',
+            fontSize: 12,
+            ...(dimLabel ? { opacity: 0 } : {})
+          }
         }
       })
 
@@ -779,21 +892,27 @@ export default function AuthorResearchGraphPage() {
         const origin =
           edge.origin === 'base' ? 'existing' : edge.origin === 'research' ? 'research' : 'manual'
         const baseStyle = getEdgeStyle('prereq', { prereqOrigin: origin })
-        const style = decorateForDomain({ ...baseStyle }, edge.source, edge.target)
+        const domainStyle = decorateForDomain({ ...baseStyle }, edge.source, edge.target) as CSSProperties
+        const id = `prereq:${edge.source}->${edge.target}`
+        const dimLabel = hoverActive && hoverEdgeIds && !hoverEdgeIds.has(id)
         return {
-          id: `prereq:${edge.source}->${edge.target}`,
+          id,
           source: edge.source,
           target: edge.target,
           type: 'smoothstep',
           label: 'prereq',
           data: { edgeType: 'prereq', origin: edge.origin },
-          style,
-          labelStyle: { fill: (style.stroke as string) ?? '#64748b', fontSize: 12 }
+          style: decorateEdgeStyle(id, domainStyle),
+          labelStyle: {
+            fill: (domainStyle.stroke as string) ?? '#64748b',
+            fontSize: 12,
+            ...(dimLabel ? { opacity: 0 } : {})
+          }
         }
       })
 
     return [...nonPrereq, ...prereq]
-  }, [currentPrereqEdges, domainCodeById, state, visibleNodeIdSet])
+  }, [currentPrereqEdges, domainCodeById, hoverHighlight, hoveredNodeId, state, visibleNodeIdSet])
 
   const counts = useMemo(() => {
     if (state.status !== 'ready') return null
@@ -1327,14 +1446,22 @@ export default function AuthorResearchGraphPage() {
       <div className="graph-canvas" aria-label="Research graph canvas">
         {state.status === 'ready' ? (
           <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            fitView
-            nodesDraggable={false}
-            nodesConnectable
-            deleteKeyCode={null}
-            onConnect={(connection: Connection) => {
-              if (!editState) return
+	            nodes={nodes}
+	            edges={edges}
+	            fitView
+	            nodesDraggable={false}
+	            nodesConnectable
+	            deleteKeyCode={null}
+	            onNodeMouseEnter={(_, node) => {
+	              if (node.id.startsWith('__')) return
+	              setHoveredNodeId(node.id)
+	            }}
+	            onNodeMouseLeave={(_, node) => {
+	              if (node.id.startsWith('__')) return
+	              setHoveredNodeId((prev) => (prev === node.id ? null : prev))
+	            }}
+	            onConnect={(connection: Connection) => {
+	              if (!editState) return
 
               const source = connection.source
               const target = connection.target

@@ -39,11 +39,14 @@ describe('/author/research-graph', () => {
             nodes: [
               { id: 'ROOT', nodeType: 'root', label: 'Root' },
               { id: 'TU1', nodeType: 'textbookUnit', label: 'Unit 1' },
-              { id: 'TU2', nodeType: 'textbookUnit', label: 'Unit 2' }
+              { id: 'TU2', nodeType: 'textbookUnit', label: 'Unit 2' },
+              { id: 'TU3', nodeType: 'textbookUnit', label: 'Unit 3' },
+              { id: 'TU4', nodeType: 'textbookUnit', label: 'Unit 4' }
             ],
             edges: [
               { id: 'contains:ROOT->TU1', edgeType: 'contains', source: 'ROOT', target: 'TU1' },
-              { id: 'prereq:TU1->TU2', edgeType: 'prereq', source: 'TU1', target: 'TU2' }
+              { id: 'prereq:TU1->TU2', edgeType: 'prereq', source: 'TU1', target: 'TU2' },
+              { id: 'prereq:TU3->TU4', edgeType: 'prereq', source: 'TU3', target: 'TU4' }
             ]
           })
         }
@@ -178,6 +181,57 @@ describe('/author/research-graph', () => {
 
       const nodeIds = (latestReactFlowProps.nodes ?? []).map((node: any) => node.id)
       expect(nodeIds.some((id: string) => id.startsWith('P_TU_'))).toBe(false)
+    } finally {
+      restoreFetch()
+    }
+  })
+
+  it('highlights connected nodes/edges on hover and dims the rest', async () => {
+    const restoreFetch = mockFetch()
+
+    try {
+      render(
+        <MemoryRouter initialEntries={['/author/research-graph']}>
+          <Routes>
+            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
+          </Routes>
+        </MemoryRouter>
+      )
+
+      await screen.findByTestId('reactflow')
+      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
+
+      await waitFor(() => {
+        expect(typeof latestReactFlowProps.onNodeMouseEnter).toBe('function')
+        expect(typeof latestReactFlowProps.onNodeMouseLeave).toBe('function')
+      })
+
+      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+
+      await waitFor(() => {
+        const tu1 = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU1')
+        expect(tu1?.style?.outline).toContain('#f97316')
+
+        const tu3 = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
+        expect(tu3?.style?.opacity).toBeLessThan(1)
+
+        const connected = (latestReactFlowProps.edges ?? []).find(
+          (edge: any) => edge.source === 'TU1' && edge.target === 'TU2'
+        )
+        expect(connected?.style?.opacity).toBeGreaterThan(0.8)
+
+        const disconnected = (latestReactFlowProps.edges ?? []).find(
+          (edge: any) => edge.source === 'TU3' && edge.target === 'TU4'
+        )
+        expect(disconnected?.style?.opacity).toBeLessThan(0.2)
+      })
+
+      latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+
+      await waitFor(() => {
+        const tu3 = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
+        expect(tu3?.style?.opacity).toBeUndefined()
+      })
     } finally {
       restoreFetch()
     }
