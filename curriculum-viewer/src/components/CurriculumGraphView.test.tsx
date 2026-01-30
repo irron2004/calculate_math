@@ -67,8 +67,8 @@ describe('CurriculumGraphView learning overlays', () => {
       />
     )
 
-    expect(screen.getByText('AVAILABLE')).toBeInTheDocument()
-    expect(screen.getByText('LOCKED')).toBeInTheDocument()
+    expect(screen.getByText('도전 가능')).toBeInTheDocument()
+    expect(screen.getByText('잠금')).toBeInTheDocument()
     expect(screen.getByText('Subject')).toBeInTheDocument()
     expect(screen.getByText('Domain 1')).toBeInTheDocument()
   })

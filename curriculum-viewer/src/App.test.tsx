@@ -40,7 +40,7 @@ describe('App routing', () => {
     name: 'Demo User',
     grade: '1',
     email: `${username}@example.com`,
-    role: 'student',
+    role: username === 'admin' ? 'admin' : 'student',
     status: 'active',
     createdAt: '2026-01-01T00:00:00.000Z',
     lastLoginAt: null

@@ -95,7 +95,7 @@ describe('LearningNodeDetailPanel', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('LOCKED')).toBeInTheDocument()
+    expect(screen.getByText('잠금')).toBeInTheDocument()
     expect(screen.getByText(/잠김:/)).toBeInTheDocument()
     expect(screen.getByText('Node 1')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '도전하기' })).not.toBeInTheDocument()

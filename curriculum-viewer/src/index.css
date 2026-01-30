@@ -1781,6 +1781,31 @@ body {
   color: #15803d;
 }
 
+/* === 마이 페이지 === */
+.mypage-account-section {
+  margin: var(--space-6) 0;
+  background: var(--color-neutral-100);
+  border: 3px solid var(--color-neutral-200);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.mypage-account-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.mypage-account-header h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-neutral-800);
+}
+
 /* === 숙제 리스트 (아동 친화적) === */
 .homework-list {
   display: grid;
