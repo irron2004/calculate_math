@@ -1,0 +1,70 @@
+{
+  "targetFiles": [
+    "public/data/curriculum_math_2022.json",
+    "curriculum-viewer/public/data/curriculum_math_2022.json"
+  ],
+  "addNodes": [
+    {
+      "id": "P_TU_solid_figures_bridge",
+      "nodeType": "textbookUnit",
+      "label": "입체도형의 구성 요소와 전개도",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 9,
+      "tags": ["초등", "3-4", "도형과 측정"]
+    }
+  ],
+  "addEdges": [
+    {
+      "id": "prereq:2수01-A->4수01-B",
+      "edgeType": "prereq",
+      "source": "2수01-A",
+      "target": "4수01-B",
+      "note": "수 개념 → 분수"
+    },
+    {
+      "id": "prereq:2수01-A->4수01-C",
+      "edgeType": "prereq",
+      "source": "2수01-A",
+      "target": "4수01-C",
+      "note": "수 개념 → 소수"
+    },
+    {
+      "id": "prereq:4수04-A->4수04-C",
+      "edgeType": "prereq",
+      "source": "4수04-A",
+      "target": "4수04-C",
+      "note": "막대그래프 → 평균"
+    },
+    {
+      "id": "prereq:2수03-A->P_TU_solid_figures_bridge",
+      "edgeType": "prereq",
+      "source": "2수03-A",
+      "target": "P_TU_solid_figures_bridge",
+      "note": "입체도형 모양 → 입체도형의 구성 요소와 전개도"
+    },
+    {
+      "id": "prereq:P_TU_solid_figures_bridge->6수03-B",
+      "edgeType": "prereq",
+      "source": "P_TU_solid_figures_bridge",
+      "target": "6수03-B",
+      "note": "입체도형의 구성 요소와 전개도 → 입체도형"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->P_TU_solid_figures_bridge",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "P_TU_solid_figures_bridge"
+    }
+  ],
+  "removeEdges": [
+    {
+      "id": "prereq:2수03-A->6수03-B",
+      "edgeType": "prereq",
+      "source": "2수03-A",
+      "target": "6수03-B"
+    }
+  ]
+}
+

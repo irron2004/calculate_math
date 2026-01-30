@@ -1296,6 +1296,20 @@
       "text": "각도의 단위(°)를 알고, 각도기로 각의 크기를 측정할 수 있다"
     },
     {
+      "id": "P_TU_solid_figures_bridge",
+      "nodeType": "textbookUnit",
+      "label": "입체도형의 구성 요소와 전개도",
+      "parentId": "KR-MATH-2022-E-3-4-GM",
+      "gradeBand": "3-4",
+      "domainCode": "GM",
+      "order": 9,
+      "tags": [
+        "초등",
+        "3-4",
+        "도형과 측정"
+      ]
+    },
+    {
       "id": "KR-MATH-2022-E-3-4-DP",
       "nodeType": "domain",
       "label": "자료와 가능성",
@@ -2636,6 +2650,8 @@
     {"id": "prereq:2수01-B->2수01-C", "edgeType": "prereq", "source": "2수01-B", "target": "2수01-C", "note": "덧셈/뺄셈 → 곱셈"},
     {"id": "prereq:2수01-A->2수04-A", "edgeType": "prereq", "source": "2수01-A", "target": "2수04-A", "note": "기초 수 개념 → 자료 분류/세기"},
     {"id": "prereq:2수01-A->4수01-A", "edgeType": "prereq", "source": "2수01-A", "target": "4수01-A", "note": "네 자리 이하 수 → 다섯 자리 이상 수"},
+    {"id": "prereq:2수01-A->4수01-B", "edgeType": "prereq", "source": "2수01-A", "target": "4수01-B", "note": "수 개념 → 분수"},
+    {"id": "prereq:2수01-A->4수01-C", "edgeType": "prereq", "source": "2수01-A", "target": "4수01-C", "note": "수 개념 → 소수"},
     {"id": "prereq:2수01-B->4수01-D", "edgeType": "prereq", "source": "2수01-B", "target": "4수01-D", "note": "두 자리 덧셈/뺄셈 → 세 자리 덧셈/뺄셈"},
     {"id": "prereq:2수01-C->4수01-E", "edgeType": "prereq", "source": "2수01-C", "target": "4수01-E", "note": "한 자리 곱셈 → 자연수 곱셈/나눗셈"},
     {"id": "prereq:4수01-A->4수01-D", "edgeType": "prereq", "source": "4수01-A", "target": "4수01-D", "note": "큰 수 이해 → 세 자리 덧셈/뺄셈"},
@@ -2676,7 +2692,8 @@
     {"id": "prereq:4수03-D->4수03-E", "edgeType": "prereq", "source": "4수03-D", "target": "4수03-E", "note": "사각형 → 다각형"},
     {"id": "prereq:4수03-E->4수03-F", "edgeType": "prereq", "source": "4수03-E", "target": "4수03-F", "note": "다각형 → 평면도형의 이동"},
     {"id": "prereq:4수03-F->6수03-A", "edgeType": "prereq", "source": "4수03-F", "target": "6수03-A", "note": "평면도형 이동 → 합동과 대칭"},
-    {"id": "prereq:2수03-A->6수03-B", "edgeType": "prereq", "source": "2수03-A", "target": "6수03-B", "note": "입체도형 모양 → 입체도형"},
+    {"id": "prereq:2수03-A->P_TU_solid_figures_bridge", "edgeType": "prereq", "source": "2수03-A", "target": "P_TU_solid_figures_bridge", "note": "입체도형 모양 → 입체도형의 구성 요소와 전개도"},
+    {"id": "prereq:P_TU_solid_figures_bridge->6수03-B", "edgeType": "prereq", "source": "P_TU_solid_figures_bridge", "target": "6수03-B", "note": "입체도형의 구성 요소와 전개도 → 입체도형"},
     {"id": "prereq:4수03-B->6수03-C", "edgeType": "prereq", "source": "4수03-B", "target": "6수03-C", "note": "원의 구성 요소 → 도형의 측정 (원)"},
     {"id": "prereq:4수03-E->6수03-C", "edgeType": "prereq", "source": "4수03-E", "target": "6수03-C", "note": "다각형 → 도형의 측정"},
     {"id": "prereq:4수03-H->6수03-C", "edgeType": "prereq", "source": "4수03-H", "target": "6수03-C", "note": "측정 → 도형의 측정"},
@@ -2689,6 +2706,7 @@
     {"id": "prereq:2수04-A->2수04-B", "edgeType": "prereq", "source": "2수04-A", "target": "2수04-B", "note": "자료 분류 → 표와 그림그래프"},
     {"id": "prereq:2수04-B->4수04-A", "edgeType": "prereq", "source": "2수04-B", "target": "4수04-A", "note": "표와 그림그래프 → 막대그래프"},
     {"id": "prereq:4수04-A->4수04-B", "edgeType": "prereq", "source": "4수04-A", "target": "4수04-B", "note": "막대그래프 → 꺾은선그래프"},
+    {"id": "prereq:4수04-A->4수04-C", "edgeType": "prereq", "source": "4수04-A", "target": "4수04-C", "note": "막대그래프 → 평균"},
     {"id": "prereq:4수04-B->6수04-A", "edgeType": "prereq", "source": "4수04-B", "target": "6수04-A", "note": "꺾은선그래프 → 띠그래프와 원그래프"},
     {"id": "prereq:4수04-C->6수04-B", "edgeType": "prereq", "source": "4수04-C", "target": "6수04-B", "note": "평균 → 가능성"},
 
@@ -3183,6 +3201,12 @@
       "edgeType": "contains",
       "source": "KR-MATH-2022-E-3-4-GM",
       "target": "4수03-10"
+    },
+    {
+      "id": "contains:KR-MATH-2022-E-3-4-GM->P_TU_solid_figures_bridge",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-E-3-4-GM",
+      "target": "P_TU_solid_figures_bridge"
     },
     {
       "id": "contains:KR-MATH-2022-E-3-4->KR-MATH-2022-E-3-4-DP",
