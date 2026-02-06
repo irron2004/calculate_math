@@ -21,6 +21,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[Tuple[T
     db_path = tmp_path / "test.db"
     monkeypatch.setenv("DATABASE_PATH", str(db_path))
     monkeypatch.setenv("JWT_SECRET", "test-secret")
+    monkeypatch.setenv("DISABLE_RATE_LIMITS", "1")
     monkeypatch.setenv("ADMIN_USERNAME", "admin")
     monkeypatch.setenv("ADMIN_PASSWORD", "admin")
     monkeypatch.setenv("ADMIN_AUTH_EMAIL", "admin@example.com")

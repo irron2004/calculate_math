@@ -28,4 +28,12 @@ export type StudentInfo = {
   name: string
   grade: string
   email: string
+  profile?: StudentProfileSummary | null
+}
+
+export type StudentProfileSummary = {
+  estimatedLevel: string | null
+  weakTagsTop3: string[]
+  createdAt: string | null
+  updatedAt: string | null
 }

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import ImageUploader from '../components/ImageUploader'
+import Scratchpad, { type ScratchpadHandle } from '../components/Scratchpad'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { getAssignment, HomeworkApiError, submitHomework } from '../lib/homework/api'
 import type { HomeworkAssignmentDetail, HomeworkProblem, HomeworkProblemReview } from '../lib/homework/types'
@@ -73,6 +74,19 @@ function ProblemView({ problem, index, answer, onAnswerChange, feedback, disable
   )
 }
 
+function getLocalStorage(): Storage | null {
+  if (typeof window === 'undefined') return null
+  try {
+    return window.localStorage
+  } catch {
+    return null
+  }
+}
+
+function makeScratchpadKey(studentId: string, assignmentId: string, problemId: string): string {
+  return `homework:scratchpad:${studentId}:${assignmentId}:${problemId}`
+}
+
 type ProblemSubmissionViewProps = {
   problem: HomeworkProblem
   index: number
@@ -119,6 +133,7 @@ export default function HomeworkSubmitPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const scratchpadRef = useRef<ScratchpadHandle>(null)
 
   const [assignment, setAssignment] = useState<HomeworkAssignmentDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -126,6 +141,7 @@ export default function HomeworkSubmitPage() {
 
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [images, setImages] = useState<File[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState<{
     type: 'success' | 'error'
@@ -145,13 +161,29 @@ export default function HomeworkSubmitPage() {
           setAssignment(data)
           // Initialize answers from submission or empty
           if (data.submission) {
-            setAnswers(data.submission.answers)
+            const nextAnswers = data.submission.answers
+            setAnswers(nextAnswers)
+
+            // Start from first revision-needed or unanswered problem
+            const firstNeedsRevision = data.problems.findIndex((problem) => {
+              const review = data.submission?.problemReviews?.[problem.id]
+              return Boolean(review?.needsRevision || review?.comment)
+            })
+            if (firstNeedsRevision >= 0) {
+              setCurrentIndex(firstNeedsRevision)
+              return
+            }
+            const firstUnanswered = data.problems.findIndex(
+              (problem) => !nextAnswers[problem.id]?.trim()
+            )
+            setCurrentIndex(firstUnanswered >= 0 ? firstUnanswered : 0)
           } else {
             const initialAnswers: Record<string, string> = {}
             for (const problem of data.problems) {
               initialAnswers[problem.id] = ''
             }
             setAnswers(initialAnswers)
+            setCurrentIndex(0)
           }
         }
       } catch (err) {
@@ -180,6 +212,30 @@ export default function HomeworkSubmitPage() {
     setAnswers((prev) => ({ ...prev, [problemId]: answer }))
   }, [])
 
+  const totalCount = assignment?.problems.length ?? 0
+
+  const answeredCount = useMemo(() => {
+    if (!assignment) return 0
+    return assignment.problems.filter((problem) => answers[problem.id]?.trim()).length
+  }, [answers, assignment])
+
+  const currentProblem = assignment?.problems[currentIndex] ?? null
+  const currentReview = assignment?.submission?.problemReviews?.[currentProblem?.id ?? ''] ?? null
+
+  const scratchpadStorageKey = useMemo(() => {
+    if (!user || !assignment || !currentProblem) return null
+    return makeScratchpadKey(user.username, assignment.id, currentProblem.id)
+  }, [assignment, currentProblem, user])
+
+  useEffect(() => {
+    const storage = getLocalStorage()
+    if (!storage) return
+    if (!scratchpadStorageKey) return
+
+    const json = storage.getItem(scratchpadStorageKey)
+    scratchpadRef.current?.loadStrokesJson(json)
+  }, [scratchpadStorageKey])
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault()
@@ -187,11 +243,13 @@ export default function HomeworkSubmitPage() {
       if (!user || !id || !assignment) return
 
       // Validate all answers are filled
-      for (const problem of assignment.problems) {
+      for (let i = 0; i < assignment.problems.length; i++) {
+        const problem = assignment.problems[i]
         if (!answers[problem.id]?.trim()) {
+          setCurrentIndex(i)
           setSubmitMessage({
             type: 'error',
-            text: `문제 ${assignment.problems.indexOf(problem) + 1}의 답안을 입력하세요.`
+            text: `문제 ${i + 1}의 답안을 입력하세요.`
           })
           return
         }
@@ -210,7 +268,7 @@ export default function HomeworkSubmitPage() {
         setSubmitMessage({ type: 'success', text: '숙제가 제출되었습니다!' })
 
         setTimeout(() => {
-          navigate('/mypage')
+          navigate('/dashboard')
         }, 1500)
       } catch (err) {
         if (err instanceof HomeworkApiError) {
@@ -267,6 +325,8 @@ export default function HomeworkSubmitPage() {
   const allAnswersFilled = assignment.problems.every(
     (problem) => answers[problem.id]?.trim()
   )
+
+  const progressPercent = totalCount > 0 ? Math.round(((currentIndex + 1) / totalCount) * 100) : 0
 
   return (
     <section>
@@ -336,44 +396,99 @@ export default function HomeworkSubmitPage() {
         </div>
       ) : (
         <form onSubmit={handleSubmit}>
-          <fieldset disabled={submitting}>
-            <h3>{isReturned ? '재제출' : '문제'} ({assignment.problems.length}개)</h3>
+          <fieldset disabled={submitting} className="homework-player">
+            <div className="homework-player-top">
+              <div className="homework-player-progress">
+                <div className="homework-player-progress-meta">
+                  <span className="badge">
+                    {currentIndex + 1} / {totalCount}
+                  </span>
+                  <span className="muted">
+                    완료 {answeredCount}/{totalCount}
+                  </span>
+                </div>
+                <div className="homework-player-progress-bar" aria-hidden="true">
+                  <div
+                    className="homework-player-progress-fill"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </div>
 
-            {isReturned && submission && (
-              <p className="homework-returned-note">
-                반려된 문제를 수정해서 다시 제출하세요. 마지막 제출 시간: {formatDateTime(submission.submittedAt)}
-              </p>
-            )}
+              {isReturned && submission ? (
+                <p className="homework-returned-note">
+                  반려된 문제를 수정해서 다시 제출하세요. 마지막 제출 시간: {formatDateTime(submission.submittedAt)}
+                </p>
+              ) : null}
+            </div>
 
-            <div className="problems-list">
-              {assignment.problems.map((problem, index) => (
-                <ProblemView
-                  key={problem.id}
-                  problem={problem}
-                  index={index}
-                  answer={answers[problem.id] || ''}
-                  onAnswerChange={(answer) => handleAnswerChange(problem.id, answer)}
-                  feedback={submission?.problemReviews?.[problem.id]}
-                  disabled={submitting}
+            <div className="homework-player-body">
+              <div className="homework-player-stage">
+                {currentProblem ? (
+                  <ProblemView
+                    problem={currentProblem}
+                    index={currentIndex}
+                    answer={answers[currentProblem.id] || ''}
+                    onAnswerChange={(answer) => handleAnswerChange(currentProblem.id, answer)}
+                    feedback={currentReview ?? undefined}
+                    disabled={submitting}
+                  />
+                ) : (
+                  <p className="muted">문제를 불러올 수 없습니다.</p>
+                )}
+              </div>
+
+              <div className="homework-player-scratchpad">
+                <Scratchpad
+                  ref={scratchpadRef}
+                  problemNumber={currentProblem ? currentIndex + 1 : null}
+                  onStrokesChange={(strokesJson) => {
+                    const storage = getLocalStorage()
+                    if (!storage) return
+                    if (!scratchpadStorageKey) return
+                    storage.setItem(scratchpadStorageKey, strokesJson)
+                  }}
                 />
-              ))}
+              </div>
             </div>
 
-            <h3>첨부 파일 (선택)</h3>
-            <ImageUploader value={images} onChange={setImages} disabled={submitting} />
-
-            <div className="node-actions" style={{ marginTop: '1.5rem' }}>
+            <div className="homework-player-nav">
               <button
-                type="submit"
-                className="button button-primary"
-                disabled={submitting || !allAnswersFilled}
+                type="button"
+                className="button button-ghost"
+                onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}
+                disabled={currentIndex === 0}
               >
-                {submitting ? '제출 중...' : isReturned ? '재제출하기' : '제출하기'}
+                이전
               </button>
-              <Link to="/mypage" className="button button-ghost">
-                취소
-              </Link>
+
+              <div className="homework-player-nav-right">
+                <button
+                  type="button"
+                  className="button button-ghost"
+                  onClick={() => setCurrentIndex((prev) => Math.min(prev + 1, totalCount - 1))}
+                  disabled={totalCount === 0 || currentIndex >= totalCount - 1}
+                >
+                  다음
+                </button>
+                <button
+                  type="submit"
+                  className="button button-primary"
+                  disabled={submitting || !allAnswersFilled}
+                >
+                  {submitting ? '제출 중...' : isReturned ? '재제출하기' : '제출하기'}
+                </button>
+              </div>
             </div>
+
+            <details className="homework-player-attachments">
+              <summary className="homework-player-attachments-summary">
+                첨부 파일 (선택)
+              </summary>
+              <div className="homework-player-attachments-body">
+                <ImageUploader value={images} onChange={setImages} disabled={submitting} />
+              </div>
+            </details>
           </fieldset>
         </form>
       )}

@@ -1,0 +1,13 @@
+{
+  "task_md": "/mnt/c/Users/irron/Desktop/my/web_service_new/calculate_math/tasks/20260130_research_graph_tracks_content_v1/task.md",
+  "task_hash": "78440cbb37cf4a4979b45700cea30a74b91dad4cf7c2cd13dcf74dafce22dff8",
+  "task_spec": {
+    "graph_profile": null,
+    "ticket_roles": null,
+    "default_verify": [],
+    "max_tickets": null,
+    "max_attempts": null,
+    "notes": null
+  },
+  "warnings": []
+}

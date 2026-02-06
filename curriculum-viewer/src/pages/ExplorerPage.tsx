@@ -32,7 +32,7 @@ export default function ExplorerPage() {
     setDetail(
       <div>
         <h2>상세</h2>
-        <p>대시보드에서 노드를 선택하면 상세가 표시됩니다.</p>
+        <p className="muted">노드를 선택하면 상세가 표시됩니다.</p>
       </div>
     )
   }, [focusNodeId, setDetail])

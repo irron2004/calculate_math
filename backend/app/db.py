@@ -195,10 +195,36 @@ def init_db(path: Optional[Path] = None) -> None:
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
 
+        CREATE TABLE IF NOT EXISTS student_profiles (
+            student_id TEXT PRIMARY KEY,
+            survey_json TEXT,
+            placement_json TEXT,
+            estimated_level TEXT,
+            weak_tags_json TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (student_id) REFERENCES users(username) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS praise_stickers (
+            id TEXT PRIMARY KEY,
+            student_id TEXT NOT NULL,
+            count INTEGER NOT NULL,
+            reason TEXT NOT NULL,
+            reason_type TEXT NOT NULL,
+            homework_id TEXT,
+            granted_by TEXT,
+            granted_at TEXT NOT NULL,
+            FOREIGN KEY (student_id) REFERENCES users(username) ON DELETE CASCADE
+        );
+
         CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username);
         CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);
         CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id);
         CREATE INDEX IF NOT EXISTS idx_refresh_tokens_hash ON refresh_tokens(token_hash);
+        CREATE INDEX IF NOT EXISTS idx_student_profiles_student_id ON student_profiles(student_id);
+        CREATE INDEX IF NOT EXISTS idx_praise_stickers_student_id ON praise_stickers(student_id);
+        CREATE INDEX IF NOT EXISTS idx_praise_stickers_student_granted_at ON praise_stickers(student_id, granted_at);
         """
     )
     _ensure_homework_review_columns(conn)
@@ -943,6 +969,267 @@ def ensure_admin_user(
 
 
 # ============================================================
+# Student Profile Functions
+# ============================================================
+
+
+def get_student_profile(student_id: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT student_id, survey_json, placement_json, estimated_level, weak_tags_json, created_at, updated_at
+            FROM student_profiles
+            WHERE student_id = ?
+            """,
+            (student_id,),
+        ).fetchone()
+        if not row:
+            return None
+
+        survey = json.loads(row["survey_json"]) if row["survey_json"] else None
+        placement = json.loads(row["placement_json"]) if row["placement_json"] else None
+        weak_tags = json.loads(row["weak_tags_json"]) if row["weak_tags_json"] else []
+
+        if not isinstance(weak_tags, list):
+            weak_tags = []
+
+        return {
+            "studentId": row["student_id"],
+            "survey": survey or {},
+            "placement": placement or {},
+            "estimatedLevel": row["estimated_level"],
+            "weakTagsTop3": weak_tags[:3],
+            "createdAt": row["created_at"],
+            "updatedAt": row["updated_at"],
+        }
+    finally:
+        conn.close()
+
+
+def upsert_student_profile(
+    *,
+    student_id: str,
+    survey: Dict[str, Any],
+    placement: Dict[str, Any],
+    estimated_level: str,
+    weak_tags_top3: List[str],
+    path: Optional[Path] = None,
+) -> None:
+    conn = connect(path)
+    try:
+        now = _now_iso()
+        existing = conn.execute(
+            "SELECT 1 FROM student_profiles WHERE student_id = ?",
+            (student_id,),
+        ).fetchone()
+
+        survey_json = json.dumps(survey or {}, ensure_ascii=False)
+        placement_json = json.dumps(placement or {}, ensure_ascii=False)
+        weak_tags_json = json.dumps(list(weak_tags_top3 or [])[:3], ensure_ascii=False)
+
+        if existing:
+            conn.execute(
+                """
+                UPDATE student_profiles
+                SET survey_json = ?, placement_json = ?, estimated_level = ?, weak_tags_json = ?, updated_at = ?
+                WHERE student_id = ?
+                """,
+                (survey_json, placement_json, estimated_level, weak_tags_json, now, student_id),
+            )
+        else:
+            conn.execute(
+                """
+                INSERT INTO student_profiles
+                    (student_id, survey_json, placement_json, estimated_level, weak_tags_json, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (student_id, survey_json, placement_json, estimated_level, weak_tags_json, now, now),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def list_students_with_profiles(path: Optional[Path] = None) -> List[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        rows = conn.execute(
+            """
+            SELECT
+                u.username,
+                u.name,
+                u.grade,
+                u.email,
+                sp.estimated_level,
+                sp.weak_tags_json,
+                sp.created_at AS profile_created_at,
+                sp.updated_at AS profile_updated_at
+            FROM users u
+            LEFT JOIN student_profiles sp ON sp.student_id = u.username
+            WHERE u.role = 'student' AND u.status = 'active'
+            ORDER BY u.created_at DESC
+            """
+        ).fetchall()
+
+        results: List[Dict[str, Any]] = []
+        for row in rows:
+            profile = None
+            if row["profile_updated_at"]:
+                weak_tags = json.loads(row["weak_tags_json"]) if row["weak_tags_json"] else []
+                if not isinstance(weak_tags, list):
+                    weak_tags = []
+                profile = {
+                    "estimatedLevel": row["estimated_level"],
+                    "weakTagsTop3": weak_tags[:3],
+                    "createdAt": row["profile_created_at"],
+                    "updatedAt": row["profile_updated_at"],
+                }
+
+            results.append(
+                {
+                    "id": row["username"],
+                    "name": row["name"],
+                    "grade": row["grade"],
+                    "email": row["email"],
+                    "profile": profile,
+                }
+            )
+
+        return results
+    finally:
+        conn.close()
+
+
+# ============================================================
+# Praise Sticker Functions
+# ============================================================
+
+
+def _row_to_praise_sticker(row: sqlite3.Row) -> Dict[str, Any]:
+    return {
+        "id": row["id"],
+        "studentId": row["student_id"],
+        "count": row["count"],
+        "reason": row["reason"],
+        "reasonType": row["reason_type"],
+        "homeworkId": row["homework_id"],
+        "grantedBy": row["granted_by"],
+        "grantedAt": row["granted_at"],
+    }
+
+
+def create_praise_sticker(
+    *,
+    student_id: str,
+    count: int,
+    reason: str,
+    reason_type: str,
+    homework_id: Optional[str] = None,
+    granted_by: Optional[str] = None,
+    granted_at: Optional[str] = None,
+    path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    conn = connect(path)
+    try:
+        sticker_id = str(uuid4())
+        granted_at_value = granted_at or _now_iso()
+        conn.execute(
+            """
+            INSERT INTO praise_stickers (
+                id,
+                student_id,
+                count,
+                reason,
+                reason_type,
+                homework_id,
+                granted_by,
+                granted_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (sticker_id, student_id, count, reason, reason_type, homework_id, granted_by, granted_at_value),
+        )
+        conn.commit()
+        return {
+            "id": sticker_id,
+            "studentId": student_id,
+            "count": count,
+            "reason": reason,
+            "reasonType": reason_type,
+            "homeworkId": homework_id,
+            "grantedBy": granted_by,
+            "grantedAt": granted_at_value,
+        }
+    finally:
+        conn.close()
+
+
+def list_praise_stickers(student_id: str, path: Optional[Path] = None) -> List[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        rows = conn.execute(
+            """
+            SELECT id, student_id, count, reason, reason_type, homework_id, granted_by, granted_at
+            FROM praise_stickers
+            WHERE student_id = ?
+            ORDER BY granted_at DESC, id DESC
+            """,
+            (student_id,),
+        ).fetchall()
+        return [_row_to_praise_sticker(row) for row in rows]
+    finally:
+        conn.close()
+
+
+def get_praise_sticker_summary(
+    student_id: str,
+    *,
+    path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    conn = connect(path)
+    try:
+        recent_rows = conn.execute(
+            """
+            SELECT id, student_id, count, reason, reason_type, homework_id, granted_by, granted_at
+            FROM praise_stickers
+            WHERE student_id = ?
+            ORDER BY granted_at DESC, id DESC
+            """,
+            (student_id,),
+        ).fetchall()
+        total_count = sum(row["count"] for row in recent_rows)
+        return {
+            "totalCount": total_count,
+            "recent": [_row_to_praise_sticker(row) for row in recent_rows],
+        }
+    finally:
+        conn.close()
+
+
+def has_praise_sticker_for_homework(
+    student_id: str,
+    homework_id: str,
+    *,
+    reason_type: str = "homework_excellent",
+    path: Optional[Path] = None,
+) -> bool:
+    conn = connect(path)
+    try:
+        row = conn.execute(
+            """
+            SELECT 1
+            FROM praise_stickers
+            WHERE student_id = ? AND homework_id = ? AND reason_type = ?
+            LIMIT 1
+            """,
+            (student_id, homework_id, reason_type),
+        ).fetchone()
+        return row is not None
+    finally:
+        conn.close()
+
+
+# ============================================================
 # Homework Functions
 # ============================================================
 
@@ -1318,7 +1605,8 @@ def get_homework_submission_for_review(
                 hs.reviewed_by,
                 hs.problem_reviews_json,
                 ha.title AS assignment_title,
-                ha.problems_json
+                ha.problems_json,
+                ha.due_at
             FROM homework_submissions hs
             INNER JOIN homework_assignments ha ON hs.assignment_id = ha.id
             WHERE hs.id = ?
@@ -1345,6 +1633,7 @@ def get_homework_submission_for_review(
             ),
             "assignmentTitle": row["assignment_title"],
             "problems": json.loads(row["problems_json"]),
+            "dueAt": row["due_at"],
         }
     finally:
         conn.close()

@@ -1,5 +1,6 @@
-import { type ReactNode, useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { type ReactNode, useMemo, useState } from 'react'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { ClipboardList, Home, Map as MapIcon } from 'lucide-react'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { useFocusNodeId } from '../lib/routing/useFocusNodeId'
 import { ROUTES } from '../routes'
@@ -11,6 +12,7 @@ export type DetailPanelContext = {
 export default function AppLayout() {
   const { isAuthenticated, isAdmin, user, logout, setMode } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const { focusNodeId } = useFocusNodeId()
 
   const focusQuery = focusNodeId ? `?focus=${encodeURIComponent(focusNodeId)}` : ''
@@ -27,6 +29,17 @@ export default function AppLayout() {
 
   const outletContext: DetailPanelContext = { setDetail }
 
+  const showDetailPanel = useMemo(() => {
+    const path = location.pathname
+    return (
+      path.startsWith(ROUTES.graph) ||
+      path.startsWith(ROUTES.map) ||
+      path.startsWith(ROUTES.tree) ||
+      path.startsWith(ROUTES.learn) ||
+      path.startsWith(ROUTES.report)
+    )
+  }, [location.pathname])
+
   return (
     <div className="app">
       <header className="app-header">
@@ -34,20 +47,24 @@ export default function AppLayout() {
           <ul className="app-nav">
             <li>
               <NavLink to={ROUTES.dashboard} end>
-                대시보드
+                <Home aria-hidden="true" size={18} />
+                <span>홈</span>
               </NavLink>
             </li>
             <li>
-              <NavLink to={`${ROUTES.map}${focusQuery}`}>지도</NavLink>
+              <NavLink to={ROUTES.mypage}>
+                <ClipboardList aria-hidden="true" size={18} />
+                <span>숙제</span>
+              </NavLink>
             </li>
             <li>
-              <NavLink to={ROUTES.report}>리포트</NavLink>
-            </li>
-            <li>
-              <NavLink to={ROUTES.preview}>프리뷰</NavLink>
-            </li>
-            <li>
-              <NavLink to={ROUTES.mypage}>마이페이지</NavLink>
+              <NavLink to={`${ROUTES.map}${focusQuery}`}>
+                <MapIcon aria-hidden="true" size={18} />
+                <span>지도</span>
+                <span className="nav-badge" aria-label="Beta">
+                  Beta
+                </span>
+              </NavLink>
             </li>
           </ul>
         </nav>
@@ -86,13 +103,15 @@ export default function AppLayout() {
           )}
         </div>
       </header>
-      <main className="app-main">
+      <main className={`app-main ${showDetailPanel ? 'app-main--with-detail' : 'app-main--single'}`}>
         <div className="app-content">
           <Outlet context={outletContext} />
         </div>
-        <aside className="app-detail" aria-label="Detail panel">
-          {detail}
-        </aside>
+        {showDetailPanel ? (
+          <aside className="app-detail" aria-label="Detail panel">
+            {detail}
+          </aside>
+        ) : null}
       </main>
     </div>
   )

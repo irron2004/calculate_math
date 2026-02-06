@@ -1,0 +1,110 @@
+.scratchpad {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 320px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.scratchpad-header {
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.scratchpad-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.scratchpad-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  gap: 8px;
+}
+
+.scratchpad-pen-sizes {
+  display: flex;
+  gap: 4px;
+}
+
+.scratchpad-pen-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.scratchpad-pen-btn:hover {
+  background: #f0f0f0;
+}
+
+.scratchpad-pen-btn.active {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.scratchpad-pen-dot {
+  background: #222;
+  border-radius: 50%;
+}
+
+.scratchpad-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.scratchpad-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scratchpad-btn:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+.scratchpad-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scratchpad-btn-danger {
+  color: #d32f2f;
+  border-color: #ffcdd2;
+}
+
+.scratchpad-btn-danger:hover:not(:disabled) {
+  background: #ffebee;
+}
+
+.scratchpad-canvas {
+  flex: 1;
+  width: 100%;
+  touch-action: none;
+  cursor: crosshair;
+  background: #fff;
+}
+
+.scratchpad.readonly .scratchpad-canvas {
+  touch-action: auto;
+  cursor: default;
+}

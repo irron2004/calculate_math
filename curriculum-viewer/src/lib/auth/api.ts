@@ -146,17 +146,18 @@ export async function changePassword(
 }
 
 export async function listStudents(signal?: AbortSignal): Promise<StudentInfo[]> {
-  const response = await authFetch(`${API_BASE}/admin/users?role=student`, { signal })
+  const response = await authFetch(`${API_BASE}/admin/students`, { signal })
   const json = await response.json()
   if (!response.ok) {
     throw new Error(isApiError(json) ? json.error.message : '학생 목록을 가져올 수 없습니다.')
   }
-  const users = (json as { users: AuthUser[] }).users
-  return users.map((user) => ({
-    id: user.username,
-    name: user.name,
-    grade: user.grade,
-    email: user.email
+  const students = (json as { students: StudentInfo[] }).students
+  return students.map((student) => ({
+    id: student.id,
+    name: student.name,
+    grade: student.grade,
+    email: student.email,
+    profile: student.profile ?? null
   }))
 }
 

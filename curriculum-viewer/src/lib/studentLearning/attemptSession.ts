@@ -75,14 +75,26 @@ export function updateDraftResponse(params: {
   problemId: string
   inputRaw: string
   now: string
+  // 레벨 2 필드 (선택)
+  timeSpentMs?: number
+  answerEditCount?: number
+  scratchpadStrokesJson?: string | null
 }): AttemptSessionStoreV1 {
   const session = params.store.sessionsById[params.sessionId]
   if (!session || session.status !== 'DRAFT') return params.store
 
+  // 기존 response가 있으면 레벨2 값 유지
+  const existing = session.responses[params.problemId]
+
   const response: AttemptResponse = {
     problemId: params.problemId,
     inputRaw: params.inputRaw,
-    updatedAt: params.now
+    updatedAt: params.now,
+    timeSpentMs: params.timeSpentMs ?? existing?.timeSpentMs ?? 0,
+    answerEditCount: params.answerEditCount ?? existing?.answerEditCount ?? 0,
+    scratchpadStrokesJson: params.scratchpadStrokesJson !== undefined
+      ? params.scratchpadStrokesJson
+      : (existing?.scratchpadStrokesJson ?? null)
   }
 
   const nextSession: AttemptSessionV1 = {
@@ -121,7 +133,11 @@ export function gradeResponses(params: {
     perProblem[problem.id] = {
       isCorrect: graded.isCorrect,
       expectedAnswer: problem.answer,
-      explanation: problem.explanation
+      explanation: problem.explanation,
+      // 레벨 2: 풀이 과정 기록 (평가 화면에서 확인용)
+      timeSpentMs: response?.timeSpentMs ?? 0,
+      answerEditCount: response?.answerEditCount ?? 0,
+      scratchpadStrokesJson: response?.scratchpadStrokesJson ?? null
     }
 
     // 태그별 통계 계산
@@ -188,4 +204,3 @@ export function submitAttemptSession(params: {
     draftSessionIdByNodeId: nextDraftMap
   }
 }
-

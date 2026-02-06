@@ -140,7 +140,7 @@ export default function EvalPage() {
           지도로 돌아가기
         </Link>
         <Link to={ROUTES.dashboard} className="button button-ghost">
-          대시보드
+          홈
         </Link>
       </div>
     </section>

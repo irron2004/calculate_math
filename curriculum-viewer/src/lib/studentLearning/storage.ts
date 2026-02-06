@@ -25,7 +25,20 @@ function parseAttemptResponse(raw: unknown): AttemptResponse | null {
   const inputRaw = asString(raw.inputRaw)
   const updatedAt = asString(raw.updatedAt)
   if (!problemId || inputRaw === null || !isIsoDateString(updatedAt)) return null
-  return { problemId, inputRaw, updatedAt }
+
+  // 레벨 2 필드 (기본값으로 fallback)
+  const timeSpentMs = asNumber(raw.timeSpentMs) ?? 0
+  const answerEditCount = asNumber(raw.answerEditCount) ?? 0
+  const scratchpadStrokesJson = asString(raw.scratchpadStrokesJson) ?? null
+
+  return {
+    problemId,
+    inputRaw,
+    updatedAt,
+    timeSpentMs,
+    answerEditCount,
+    scratchpadStrokesJson
+  }
 }
 
 function parseGradingResultV1(raw: unknown): GradingResultV1 | null {
@@ -44,8 +57,22 @@ function parseGradingResultV1(raw: unknown): GradingResultV1 | null {
     if (!isRecord(item)) continue
     const isCorrect = typeof item.isCorrect === 'boolean' ? item.isCorrect : null
     if (isCorrect === null) continue
-    const expectedAnswer = typeof item.expectedAnswer === 'string' ? item.expectedAnswer : undefined
-    parsedPerProblem[problemId] = expectedAnswer ? { isCorrect, expectedAnswer } : { isCorrect }
+    const expectedAnswer = asString(item.expectedAnswer) ?? undefined
+    const explanation = asString(item.explanation) ?? undefined
+    const timeSpentMs = asNumber(item.timeSpentMs) ?? 0
+    const answerEditCount = asNumber(item.answerEditCount) ?? 0
+    const scratchpadStrokesJson = item.scratchpadStrokesJson === null
+      ? null
+      : (asString(item.scratchpadStrokesJson) ?? null)
+
+    parsedPerProblem[problemId] = {
+      isCorrect,
+      ...(expectedAnswer ? { expectedAnswer } : {}),
+      ...(explanation ? { explanation } : {}),
+      timeSpentMs,
+      answerEditCount,
+      scratchpadStrokesJson
+    }
   }
 
   return { totalCount, correctCount, accuracy, cleared, perProblem: parsedPerProblem }

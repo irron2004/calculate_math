@@ -17,6 +17,9 @@ import HomeworkSubmitPage from './pages/HomeworkSubmitPage'
 import LearnPage from './pages/LearnPage'
 import LoginPage from './pages/LoginPage'
 import MyPage from './pages/MyPage'
+import OnboardingSurveyPage from './pages/OnboardingSurveyPage'
+import PlacementTestPage from './pages/PlacementTestPage'
+import PlacementResultPage from './pages/PlacementResultPage'
 import StudentReportPage from './pages/StudentReportPage'
 import AuthorHomePage from './pages/AuthorHomePage'
 import AuthorEditorPage from './pages/AuthorEditorPage'
@@ -141,6 +144,30 @@ export default function App() {
                   element={
                     <RequireAuth>
                       <MyPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path={ROUTE_SEGMENTS.onboarding}
+                  element={
+                    <RequireAuth>
+                      <OnboardingSurveyPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path={`${ROUTE_SEGMENTS.onboarding}/${ROUTE_SEGMENTS.placement}`}
+                  element={
+                    <RequireAuth>
+                      <PlacementTestPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path={`${ROUTE_SEGMENTS.onboarding}/${ROUTE_SEGMENTS.onboardingResult}`}
+                  element={
+                    <RequireAuth>
+                      <PlacementResultPage />
                     </RequireAuth>
                   }
                 />

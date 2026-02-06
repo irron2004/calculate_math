@@ -117,4 +117,36 @@ describe('AttemptSession storage adapter', () => {
       draftSessionIdByNodeId: {}
     })
   })
+
+  it('fills level2 defaults when fields are missing', () => {
+    const raw = JSON.stringify({
+      version: 1,
+      sessionsById: {
+        s1: {
+          nodeId: 'A',
+          sessionId: 's1',
+          status: 'DRAFT',
+          responses: {
+            p1: {
+              problemId: 'p1',
+              inputRaw: '2',
+              updatedAt: '2026-01-15T00:00:00.000Z'
+            }
+          },
+          createdAt: '2026-01-15T00:00:00.000Z',
+          updatedAt: '2026-01-15T00:00:00.000Z'
+        }
+      },
+      draftSessionIdByNodeId: {
+        A: 's1'
+      }
+    })
+
+    const parsed = parseAttemptSessionStoreV1(raw)
+    expect(parsed?.sessionsById.s1.responses.p1).toMatchObject({
+      timeSpentMs: 0,
+      answerEditCount: 0,
+      scratchpadStrokesJson: null
+    })
+  })
 })

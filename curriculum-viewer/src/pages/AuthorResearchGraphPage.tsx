@@ -206,6 +206,7 @@ export default function AuthorResearchGraphPage() {
     DOMAIN_LAYER_FALLBACK
   ])
   const [visibleDepthRange, setVisibleDepthRange] = useState<{ min: number; max: number }>({ min: 1, max: 99 })
+  const [visibleGradeBands, setVisibleGradeBands] = useState<string[]>([]) // empty means all visible
   const [selectedPrereq, setSelectedPrereq] = useState<PrereqEdgeWithOrigin | null>(null)
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
   const [inspectedNodeId, setInspectedNodeId] = useState<string | null>(null)
@@ -584,6 +585,28 @@ export default function AuthorResearchGraphPage() {
     setVisibleDomainCodes([normalizeDomainCode(code)])
   }, [])
 
+  const handleToggleGradeBand = useCallback((band: string) => {
+    setVisibleGradeBands((prev) => {
+      if (prev.length === 0) {
+        // Currently showing all, switch to showing all except this one
+        return [] // This case is handled differently - we'll show only this one
+      }
+      if (prev.includes(band)) {
+        const next = prev.filter((b) => b !== band)
+        return next.length === 0 ? [] : next
+      }
+      return [...prev, band].sort(compareGradeBand)
+    })
+  }, [])
+
+  const handleShowAllGradeBands = useCallback(() => {
+    setVisibleGradeBands([])
+  }, [])
+
+  const handleShowOnlyGradeBand = useCallback((band: string) => {
+    setVisibleGradeBands([band])
+  }, [])
+
   const allNodes = useMemo(() => {
     if (state.status !== 'ready') return []
 
@@ -601,6 +624,22 @@ export default function AuthorResearchGraphPage() {
     }
     return Array.from(nodeMap.values())
   }, [proposedNodes, state])
+
+  const gradeBandOptions = useMemo(() => {
+    const bands = new Set<string>()
+    for (const node of allNodes) {
+      if (node.gradeBand) {
+        bands.add(node.gradeBand)
+      }
+    }
+    return Array.from(bands).sort(compareGradeBand)
+  }, [allNodes])
+
+  const visibleGradeBandSet = useMemo(() => {
+    // Empty array means all visible
+    if (visibleGradeBands.length === 0) return null
+    return new Set(visibleGradeBands)
+  }, [visibleGradeBands])
 
   const currentPrereqEdges = useMemo(() => {
     if (!editState) return []
@@ -662,9 +701,20 @@ export default function AuthorResearchGraphPage() {
       const domainCode = domainCodeById.get(node.id) ?? DOMAIN_LAYER_FALLBACK
       if (!visibleDomainCodeSet.has(domainCode)) return false
       const depth = allNodesDepthById.get(node.id) ?? 1
-      return depth >= visibleDepthRange.min && depth <= visibleDepthRange.max
+      if (depth < visibleDepthRange.min || depth > visibleDepthRange.max) return false
+      // Grade band filter (null means all visible)
+      if (visibleGradeBandSet !== null) {
+        const gradeBand = node.gradeBand ?? '__unspecified__'
+        if (!visibleGradeBandSet.has(gradeBand) && !visibleGradeBandSet.has('__unspecified__')) {
+          // If no gradeBand and __unspecified__ is not selected, hide
+          if (!node.gradeBand) return false
+          // If has gradeBand but not in the set, hide
+          if (!visibleGradeBandSet.has(gradeBand)) return false
+        }
+      }
+      return true
     })
-  }, [allNodes, allNodesDepthById, domainCodeById, state, visibleDomainCodeSet, visibleDepthRange])
+  }, [allNodes, allNodesDepthById, domainCodeById, state, visibleDomainCodeSet, visibleDepthRange, visibleGradeBandSet])
 
   const visibleNodeIdSet = useMemo(() => {
     return new Set(visibleNodes.map((node) => node.id))
@@ -1304,6 +1354,51 @@ export default function AuthorResearchGraphPage() {
               ))}
             </div>
           </div>
+          {gradeBandOptions.length > 0 ? (
+            <div className="graph-control" style={{ minWidth: 200 }}>
+              <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
+                학년 필터
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {gradeBandOptions.map((band) => {
+                  const isAllVisible = visibleGradeBands.length === 0
+                  const checked = isAllVisible || visibleGradeBands.includes(band)
+                  return (
+                    <div key={`grade-${band}`} style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <label style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => {
+                            if (isAllVisible) {
+                              // Currently all visible, switch to only this one
+                              handleShowOnlyGradeBand(band)
+                            } else {
+                              handleToggleGradeBand(band)
+                            }
+                          }}
+                        />
+                        <span>{band}</span>
+                      </label>
+                      <button
+                        type="button"
+                        className="button button-ghost button-small"
+                        onClick={() => handleShowOnlyGradeBand(band)}
+                        title={`${band}만 보기`}
+                      >
+                        only
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+              <div style={{ marginTop: 6 }}>
+                <button type="button" className="button button-ghost button-small" onClick={handleShowAllGradeBands}>
+                  all
+                </button>
+              </div>
+            </div>
+          ) : null}
           <button
             type="button"
             className="button button-ghost"

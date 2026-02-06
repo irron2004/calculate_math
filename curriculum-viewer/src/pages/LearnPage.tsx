@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import NodeDetail from '../components/NodeDetail'
+import Scratchpad, { type ScratchpadHandle } from '../components/Scratchpad'
 import type { DetailPanelContext } from '../components/AppLayout'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
@@ -16,6 +17,7 @@ import {
 import type { AttemptSessionStoreV1 } from '../lib/studentLearning/types'
 import { createBrowserSessionRepository } from '../lib/repository/sessionRepository'
 import { ROUTES } from '../routes'
+import './LearnPage.css'
 
 const AUTO_SAVE_MS = 500
 
@@ -51,6 +53,19 @@ export default function LearnPage() {
 
   const pendingByProblemIdRef = useRef<Record<string, string>>({})
   const autoSaveTimerRef = useRef<number | null>(null)
+
+  // 레벨 2: 풀이 과정 기록
+  const [activeProblemId, setActiveProblemId] = useState<string | null>(null)
+  const activeProblemIdRef = useRef<string | null>(null)
+  const activeStartedAtRef = useRef<number>(Date.now())
+  const isTimingPausedRef = useRef(false)
+  const timeSpentByProblemIdRef = useRef<Record<string, number>>({})
+  const editCountByProblemIdRef = useRef<Record<string, number>>({})
+  const valueAtFocusRef = useRef<Record<string, string>>({})
+  const scratchpadByProblemIdRef = useRef<Record<string, string | null>>({})
+  const pendingProcessProblemIdsRef = useRef<Set<string>>(new Set())
+  const isLoadingScratchpadRef = useRef(false)
+  const scratchpadRef = useRef<ScratchpadHandle>(null)
 
   const problems = useMemo(() => {
     if (!nodeId) return []
@@ -94,6 +109,19 @@ export default function LearnPage() {
   }, [nodeId, setDetail])
 
   useEffect(() => {
+    // node/user 변경 시 레벨2 상태 초기화 (mixing 방지)
+    setActiveProblemId(null)
+    activeProblemIdRef.current = null
+    activeStartedAtRef.current = Date.now()
+    isTimingPausedRef.current = false
+    timeSpentByProblemIdRef.current = {}
+    editCountByProblemIdRef.current = {}
+    valueAtFocusRef.current = {}
+    scratchpadByProblemIdRef.current = {}
+    pendingProcessProblemIdsRef.current.clear()
+    isLoadingScratchpadRef.current = false
+    scratchpadRef.current?.clear()
+
     if (!nodeId || !userId) {
       setAnswerByProblemId({})
       setSessionId(null)
@@ -118,11 +146,20 @@ export default function LearnPage() {
     setSessionId(session.sessionId)
 
     const nextAnswers: Record<string, string> = {}
+    const nextTimeSpent: Record<string, number> = {}
+    const nextEditCounts: Record<string, number> = {}
+    const nextScratchpads: Record<string, string | null> = {}
     for (const [problemId, response] of Object.entries(session.responses)) {
       nextAnswers[problemId] = response.inputRaw
+      nextTimeSpent[problemId] = response.timeSpentMs ?? 0
+      nextEditCounts[problemId] = response.answerEditCount ?? 0
+      nextScratchpads[problemId] = response.scratchpadStrokesJson ?? null
     }
 
     setAnswerByProblemId(nextAnswers)
+    timeSpentByProblemIdRef.current = nextTimeSpent
+    editCountByProblemIdRef.current = nextEditCounts
+    scratchpadByProblemIdRef.current = nextScratchpads
   }, [nodeId, userId])
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -170,26 +207,45 @@ export default function LearnPage() {
 
   const flushPendingAutoSave = useCallback(() => {
     if (!nodeId || !userId) return
-    const pending = pendingByProblemIdRef.current
-    const keys = Object.keys(pending)
-    if (keys.length === 0) return
+    const pendingAnswers = pendingByProblemIdRef.current
+    const pendingProcess = pendingProcessProblemIdsRef.current
+    const keys = new Set<string>([
+      ...Object.keys(pendingAnswers),
+      ...Array.from(pendingProcess)
+    ])
+    if (keys.size === 0) return
 
     const draft = ensureDraftSession(nodeId)
     if (!draft) return
 
     let nextStore = draft.store
-    const now = new Date().toISOString()
+    const nowMs = Date.now()
+    const now = new Date(nowMs).toISOString()
     for (const problemId of keys) {
+      const existingInputRaw =
+        nextStore.sessionsById[draft.sessionId]?.responses[problemId]?.inputRaw ?? ''
+      const inputRaw = pendingAnswers[problemId] ?? existingInputRaw
+
+      const baseTimeSpentMs = timeSpentByProblemIdRef.current[problemId] ?? 0
+      const isActive = activeProblemIdRef.current === problemId
+      const timeSpentMs = isActive && !document.hidden && !isTimingPausedRef.current
+        ? baseTimeSpentMs + Math.max(0, nowMs - activeStartedAtRef.current)
+        : baseTimeSpentMs
+
       nextStore = updateDraftResponse({
         store: nextStore,
         sessionId: draft.sessionId,
         problemId,
-        inputRaw: pending[problemId] ?? '',
-        now
+        inputRaw,
+        now,
+        timeSpentMs,
+        answerEditCount: editCountByProblemIdRef.current[problemId] ?? 0,
+        scratchpadStrokesJson: scratchpadByProblemIdRef.current[problemId] ?? null
       })
     }
 
     pendingByProblemIdRef.current = {}
+    pendingProcessProblemIdsRef.current.clear()
     storeRef.current = nextStore
     createBrowserSessionRepository()?.writeStore(userId, nextStore)
   }, [ensureDraftSession, nodeId, userId])
@@ -215,6 +271,120 @@ export default function LearnPage() {
     }, AUTO_SAVE_MS)
   }, [flushPendingAutoSave])
 
+  // 문항 전환 함수
+  const switchActiveProblem = useCallback((newProblemId: string) => {
+    const prevProblemId = activeProblemIdRef.current
+    if (prevProblemId === newProblemId) return
+
+    const nowMs = Date.now()
+
+    if (prevProblemId) {
+      // 이전 문항 시간 누적
+      if (!document.hidden && !isTimingPausedRef.current) {
+        const elapsed = Math.max(0, nowMs - activeStartedAtRef.current)
+        timeSpentByProblemIdRef.current[prevProblemId] =
+          (timeSpentByProblemIdRef.current[prevProblemId] ?? 0) + elapsed
+      }
+
+      // 이전 문항 스크래치패드 저장
+      if (scratchpadRef.current) {
+        scratchpadByProblemIdRef.current[prevProblemId] = scratchpadRef.current.getStrokesJson()
+      }
+
+      pendingProcessProblemIdsRef.current.add(prevProblemId)
+      scheduleAutoSave()
+    }
+
+    activeProblemIdRef.current = newProblemId
+    setActiveProblemId(newProblemId)
+    activeStartedAtRef.current = nowMs
+    isTimingPausedRef.current = document.hidden
+
+    // 새 문항 스크래치패드 로드
+    if (scratchpadRef.current) {
+      isLoadingScratchpadRef.current = true
+      scratchpadRef.current.loadStrokesJson(scratchpadByProblemIdRef.current[newProblemId] ?? null)
+    }
+  }, [scheduleAutoSave])
+
+  // 입력 focus 시 현재값 기록
+  const handleInputFocus = useCallback((problemId: string, currentValue: string) => {
+    valueAtFocusRef.current[problemId] = currentValue
+    switchActiveProblem(problemId)
+  }, [switchActiveProblem])
+
+  // 입력 blur 시 수정 횟수 카운트
+  const handleInputBlur = useCallback((problemId: string, currentValue: string) => {
+    const prevValue = valueAtFocusRef.current[problemId] ?? ''
+    if (normalizeNumericInput(currentValue) !== normalizeNumericInput(prevValue)) {
+      editCountByProblemIdRef.current[problemId] =
+        (editCountByProblemIdRef.current[problemId] ?? 0) + 1
+      pendingProcessProblemIdsRef.current.add(problemId)
+      scheduleAutoSave()
+    }
+  }, [scheduleAutoSave])
+
+  // visibilitychange 이벤트: 탭 전환 시 시간 측정 일시정지/재개
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const activeId = activeProblemIdRef.current
+      const nowMs = Date.now()
+
+      if (document.hidden) {
+        // 탭 숨김: 현재 문항 시간 누적
+        if (activeId && !isTimingPausedRef.current) {
+          const elapsed = Math.max(0, nowMs - activeStartedAtRef.current)
+          timeSpentByProblemIdRef.current[activeId] =
+            (timeSpentByProblemIdRef.current[activeId] ?? 0) + elapsed
+          pendingProcessProblemIdsRef.current.add(activeId)
+          scheduleAutoSave()
+        }
+        isTimingPausedRef.current = true
+        activeStartedAtRef.current = nowMs
+      } else {
+        // 탭 복귀: 타이머 리셋
+        isTimingPausedRef.current = false
+        activeStartedAtRef.current = nowMs
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [scheduleAutoSave])
+
+  // 첫 로드 시 1번 문항 active
+  useEffect(() => {
+    if (problems.length === 0) return
+    const activeId = activeProblemIdRef.current
+    if (activeId && problems.some((p) => p.id === activeId)) return
+    switchActiveProblem(problems[0].id)
+  }, [problems, switchActiveProblem])
+
+  const activeProblemNumber = useMemo(() => {
+    if (!activeProblemId) return null
+    const idx = problems.findIndex((p) => p.id === activeProblemId)
+    return idx >= 0 ? idx + 1 : null
+  }, [activeProblemId, problems])
+
+  const handleScratchpadStrokeStart = useCallback(() => {
+    // pen stroke는 active 전환 트리거이므로, 혹시 active가 없다면 1번을 선택
+    if (activeProblemIdRef.current) return
+    if (problems.length === 0) return
+    switchActiveProblem(problems[0].id)
+  }, [problems, switchActiveProblem])
+
+  const handleScratchpadStrokesChange = useCallback((strokesJson: string) => {
+    const activeId = activeProblemIdRef.current
+    if (!activeId) return
+    scratchpadByProblemIdRef.current[activeId] = strokesJson
+    if (isLoadingScratchpadRef.current) {
+      isLoadingScratchpadRef.current = false
+      return
+    }
+    pendingProcessProblemIdsRef.current.add(activeId)
+    scheduleAutoSave()
+  }, [scheduleAutoSave])
+
   const handleSubmitClick = () => {
     if (!nodeId || !userId || problems.length === 0) return
     if (!allAnswered) return
@@ -232,6 +402,22 @@ export default function LearnPage() {
       autoSaveTimerRef.current = null
     }
     pendingByProblemIdRef.current = {}
+    pendingProcessProblemIdsRef.current.clear()
+
+    // 현재 활성 문항의 시간 및 스크래치패드 최종 저장
+    const activeId = activeProblemIdRef.current
+    if (activeId) {
+      const nowMs = Date.now()
+      if (!document.hidden && !isTimingPausedRef.current) {
+        const elapsed = Math.max(0, nowMs - activeStartedAtRef.current)
+        timeSpentByProblemIdRef.current[activeId] =
+          (timeSpentByProblemIdRef.current[activeId] ?? 0) + elapsed
+      }
+
+      if (scratchpadRef.current) {
+        scratchpadByProblemIdRef.current[activeId] = scratchpadRef.current.getStrokesJson()
+      }
+    }
 
     const draft = ensureDraftSession(nodeId)
     if (!draft) return
@@ -245,7 +431,11 @@ export default function LearnPage() {
         sessionId: draft.sessionId,
         problemId: problem.id,
         inputRaw: answerByProblemId[problem.id] ?? '',
-        now
+        now,
+        // 레벨 2 데이터 포함
+        timeSpentMs: timeSpentByProblemIdRef.current[problem.id] ?? 0,
+        answerEditCount: editCountByProblemIdRef.current[problem.id] ?? 0,
+        scratchpadStrokesJson: scratchpadByProblemIdRef.current[problem.id] ?? null
       })
     }
 
@@ -267,6 +457,21 @@ export default function LearnPage() {
 
   const resetAttempt = () => {
     setAnswerByProblemId({})
+
+    // 레벨 2 데이터 초기화
+    setActiveProblemId(null)
+    activeProblemIdRef.current = null
+    activeStartedAtRef.current = Date.now()
+    isTimingPausedRef.current = false
+    timeSpentByProblemIdRef.current = {}
+    editCountByProblemIdRef.current = {}
+    valueAtFocusRef.current = {}
+    scratchpadByProblemIdRef.current = {}
+    pendingProcessProblemIdsRef.current.clear()
+    isLoadingScratchpadRef.current = false
+    if (scratchpadRef.current) {
+      scratchpadRef.current.clear()
+    }
 
     if (!nodeId || !userId) return
     pendingByProblemIdRef.current = {}
@@ -351,25 +556,45 @@ export default function LearnPage() {
             {!allAnswered ? <span className="muted">모든 문제에 답을 입력하면 제출할 수 있어요.</span> : null}
           </div>
 
-          <ol className="problem-list">
-            {problems.map((problem, idx) => {
-              const isUnanswered = unansweredIndices.includes(idx + 1)
-              return (
-                <li key={problem.id} className={`problem-card ${isUnanswered ? 'problem-unanswered' : ''}`}>
-                  <h3 className="problem-title">
-                    <span className="problem-number">{idx + 1}.</span> {problem.prompt}
-                  </h3>
-                  <div className="problem-answer">
-                    <input
-                      value={answerByProblemId[problem.id] ?? ''}
-                      onChange={(event) => handleAnswerChange(problem.id, event.target.value)}
-                      placeholder="정답 입력"
-                    />
-                  </div>
-                </li>
-              )
-            })}
-          </ol>
+          <div className="learn-split-container">
+            <div className="learn-split-left">
+              <ol className="problem-list">
+                {problems.map((problem, idx) => {
+                  const isUnanswered = unansweredIndices.includes(idx + 1)
+                  const isActive = activeProblemId === problem.id
+                  return (
+                    <li
+                      key={problem.id}
+                      className={`problem-card ${isUnanswered ? 'problem-unanswered' : ''} ${isActive ? 'problem-active' : ''}`}
+                      onClick={() => switchActiveProblem(problem.id)}
+                    >
+                      <h3 className="problem-title">
+                        <span className="problem-number">{idx + 1}.</span> {problem.prompt}
+                      </h3>
+                      <div className="problem-answer">
+                        <input
+                          value={answerByProblemId[problem.id] ?? ''}
+                          onChange={(event) => handleAnswerChange(problem.id, event.target.value)}
+                          onFocus={() => handleInputFocus(problem.id, answerByProblemId[problem.id] ?? '')}
+                          onBlur={(event) => handleInputBlur(problem.id, event.target.value)}
+                          placeholder="정답 입력"
+                        />
+                      </div>
+                    </li>
+                  )
+                })}
+              </ol>
+            </div>
+
+            <div className="learn-split-right">
+              <Scratchpad
+                ref={scratchpadRef}
+                problemNumber={activeProblemNumber}
+                onStrokeStart={handleScratchpadStrokeStart}
+                onStrokesChange={handleScratchpadStrokesChange}
+              />
+            </div>
+          </div>
 
           {showConfirmModal ? (
             <div className="modal-overlay" onClick={cancelSubmit}>

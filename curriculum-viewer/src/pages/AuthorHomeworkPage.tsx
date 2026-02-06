@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { listStudents } from '../lib/auth/api'
 import type { StudentInfo } from '../lib/auth/types'
+import { formatTagKo } from '../lib/diagnostic/tags'
 import { createAssignment, HomeworkApiError } from '../lib/homework/api'
+import { recommendHomeworkProblems } from '../lib/homework/recommendation'
 import type { HomeworkProblem, HomeworkProblemType } from '../lib/homework/types'
 import { createEmptyProblem } from '../lib/homework/types'
 
@@ -206,6 +208,12 @@ export default function AuthorHomeworkPage() {
   const [jsonInput, setJsonInput] = useState('')
   const [jsonError, setJsonError] = useState<string | null>(null)
 
+  const selectedSingleStudent = useMemo(() => {
+    if (selectedStudentIds.size !== 1) return null
+    const studentId = Array.from(selectedStudentIds)[0]
+    return students.find((s) => s.id === studentId) ?? null
+  }, [selectedStudentIds, students])
+
   useEffect(() => {
     const controller = new AbortController()
     listStudents(controller.signal)
@@ -239,6 +247,19 @@ export default function AuthorHomeworkPage() {
       setSelectedStudentIds(new Set(students.map((s) => s.id)))
     }
   }, [selectedStudentIds.size, students])
+
+  const handleLoadRecommended = useCallback(() => {
+    if (!selectedSingleStudent?.profile) {
+      setMessage({ type: 'error', text: '추천 숙제를 만들려면 학생 진단이 필요합니다.' })
+      return
+    }
+    const recommended = recommendHomeworkProblems(selectedSingleStudent.profile, 10)
+    setProblems(recommended)
+    if (!title.trim()) {
+      setTitle(`${selectedSingleStudent.name} 맞춤 숙제`)
+    }
+    setMessage({ type: 'success', text: '추천 숙제 세트를 불러왔습니다. 필요하면 수정해서 출제하세요.' })
+  }, [selectedSingleStudent, title])
 
   const handleAddProblem = useCallback(() => {
     setProblems((prev) => [...prev, createEmptyProblem(prev.length + 1)])
@@ -482,11 +503,56 @@ export default function AuthorHomeworkPage() {
                     />
                     <span className="student-name">{student.name}</span>
                     <span className="student-grade muted">({student.grade})</span>
+                    <span className="student-profile">
+                      {student.profile ? (
+                        <>
+                          <span className="badge badge-ok">{student.profile.estimatedLevel ?? '레벨'}</span>
+                          {student.profile.weakTagsTop3.slice(0, 2).map((tag) => (
+                            <span key={tag} className="tag-chip">
+                              {formatTagKo(tag)}
+                            </span>
+                          ))}
+                        </>
+                      ) : (
+                        <span className="badge badge-warn">진단 필요</span>
+                      )}
+                    </span>
                   </label>
                 ))}
               </div>
             </>
           )}
+
+          {selectedSingleStudent ? (
+            <div className="recommended-panel">
+              <div className="recommended-panel-title">
+                선택된 학생: <strong>{selectedSingleStudent.name}</strong>
+                {selectedSingleStudent.profile?.estimatedLevel ? (
+                  <span className="badge badge-ok" style={{ marginLeft: 8 }}>
+                    {selectedSingleStudent.profile.estimatedLevel}
+                  </span>
+                ) : (
+                  <span className="badge badge-warn" style={{ marginLeft: 8 }}>
+                    진단 필요
+                  </span>
+                )}
+              </div>
+              <p className="muted" style={{ margin: '6px 0 0' }}>
+                약점: {selectedSingleStudent.profile?.weakTagsTop3?.length ? selectedSingleStudent.profile.weakTagsTop3.map(formatTagKo).join(', ') : '아직 없어요'}
+              </p>
+              <div className="node-actions" style={{ marginTop: 10 }}>
+                <button
+                  type="button"
+                  className="button button-primary"
+                  onClick={handleLoadRecommended}
+                  disabled={!selectedSingleStudent.profile}
+                >
+                  추천 숙제 만들기
+                </button>
+                <span className="muted">학생 1명을 선택했을 때만 추천을 만들 수 있어요.</span>
+              </div>
+            </div>
+          ) : null}
 
           <h3>숙제 정보</h3>
           <label className="form-field">

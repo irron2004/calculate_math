@@ -10,18 +10,15 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 
+from .api import limiter as api_limiter
 from .api import router
 from .auth import hash_password, verify_password
 from .db import cleanup_expired_refresh_tokens, ensure_admin_user, get_user_by_username, init_db, resolve_database_path, seed_db, update_user_password
 
 logger = logging.getLogger(__name__)
-
-# Rate limiter instance
-limiter = Limiter(key_func=get_remote_address)
 
 
 def get_cors_origins() -> list[str]:
@@ -115,7 +112,9 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Math Knowledge Graph API", lifespan=lifespan)
 
     # Rate limiting
-    app.state.limiter = limiter
+    if os.getenv("DISABLE_RATE_LIMITS", "").strip().lower() in {"1", "true", "yes"}:
+        api_limiter.enabled = False
+    app.state.limiter = api_limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
     app.add_middleware(
@@ -132,7 +131,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-
-# Export limiter for use in api.py
-def get_limiter() -> Limiter:
-    return limiter

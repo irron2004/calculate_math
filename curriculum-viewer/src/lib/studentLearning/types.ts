@@ -6,6 +6,10 @@ export type AttemptResponse = {
   problemId: string
   inputRaw: string
   updatedAt: string // ISO8601
+  // 레벨 2: 풀이 과정 기록
+  timeSpentMs: number
+  answerEditCount: number
+  scratchpadStrokesJson: string | null
 }
 
 export type TagAccuracy = {
@@ -15,12 +19,22 @@ export type TagAccuracy = {
   accuracy: number
 }
 
+export type PerProblemGradingV1 = {
+  isCorrect: boolean
+  expectedAnswer?: string
+  explanation?: string
+  // 레벨 2: 풀이 과정 기록 (Eval에서 확인용)
+  timeSpentMs?: number
+  answerEditCount?: number
+  scratchpadStrokesJson?: string | null
+}
+
 export type GradingResultV1 = {
   totalCount: number
   correctCount: number
   accuracy: number // correctCount/totalCount (0~1)
   cleared: boolean // accuracy >= CLEAR_THRESHOLD
-  perProblem: Record<string, { isCorrect: boolean; expectedAnswer?: string; explanation?: string }>
+  perProblem: Record<string, PerProblemGradingV1>
   perTag?: TagAccuracy[] // 태그별 정답률 (태그가 있는 경우에만)
 }
 
@@ -67,4 +81,3 @@ export type LearningGraphV1 = {
   nodes: LearningGraphNode[]
   edges: LearningGraphEdge[]
 }
-

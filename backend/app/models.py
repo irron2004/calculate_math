@@ -47,6 +47,11 @@ class ErrorResponse(BaseModel):
     error: ErrorDetail
 
 
+class TestStatusResponse(BaseModel):
+    status: str
+    message: str
+
+
 # ============================================================
 # Auth Models
 # ============================================================
@@ -106,6 +111,81 @@ class AuthChangePasswordResponse(BaseModel):
 
 class AuthUserListResponse(BaseModel):
     users: List[AuthUser]
+
+
+# ============================================================
+# Student Profile Models
+# ============================================================
+
+
+class StudentProfile(BaseModel):
+    studentId: str
+    survey: Dict[str, Any] = Field(default_factory=dict)
+    placement: Dict[str, Any] = Field(default_factory=dict)
+    estimatedLevel: str
+    weakTagsTop3: List[str] = Field(default_factory=list)
+    createdAt: str
+    updatedAt: str
+
+
+class StudentProfileGetResponse(BaseModel):
+    profile: Optional[StudentProfile] = None
+
+
+class StudentProfileUpsertRequest(BaseModel):
+    survey: Dict[str, Any] = Field(default_factory=dict)
+    placement: Dict[str, Any] = Field(default_factory=dict)
+    estimatedLevel: str
+    weakTagsTop3: List[str] = Field(default_factory=list)
+
+
+class AdminStudentProfileSummary(BaseModel):
+    estimatedLevel: Optional[str] = None
+    weakTagsTop3: List[str] = Field(default_factory=list)
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+
+
+class AdminStudentInfo(BaseModel):
+    id: str
+    name: str
+    grade: str
+    email: str
+    profile: Optional[AdminStudentProfileSummary] = None
+
+
+class AdminStudentListResponse(BaseModel):
+    students: List[AdminStudentInfo]
+
+
+# ============================================================
+# Praise Sticker Models
+# ============================================================
+
+
+class PraiseSticker(BaseModel):
+    id: str
+    studentId: str
+    count: int
+    reason: str
+    reasonType: str
+    homeworkId: Optional[str] = None
+    grantedBy: Optional[str] = None
+    grantedAt: str
+
+
+class PraiseStickerCreateRequest(BaseModel):
+    count: int
+    reason: str
+
+
+class PraiseStickerListResponse(BaseModel):
+    stickers: List[PraiseSticker]
+
+
+class PraiseStickerSummaryResponse(BaseModel):
+    totalCount: int
+    recent: List[PraiseSticker]
 
 
 # ============================================================

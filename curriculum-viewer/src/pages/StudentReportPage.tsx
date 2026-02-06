@@ -169,7 +169,7 @@ export default function StudentReportPage() {
         <p className="muted">나의 학습 현황과 약점을 분석합니다.</p>
         <div className="node-actions" style={{ marginTop: 16 }}>
           <Link to={ROUTES.dashboard} className="button button-ghost">
-            대시보드
+            홈
           </Link>
           <Link to={ROUTES.map} className="button button-ghost">
             지도

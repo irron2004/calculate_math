@@ -1,10 +1,14 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import StickerDisplay from '../components/StickerDisplay'
+import StickerHistory from '../components/StickerHistory'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { changePassword } from '../lib/auth/api'
 import { listAssignments, HomeworkApiError } from '../lib/homework/api'
 import type { HomeworkAssignment } from '../lib/homework/types'
 import { getHomeworkStatus, isOverdueSoon } from '../lib/homework/types'
+import { getStickerSummary, listStickers, StickerApiError } from '../lib/sticker/api'
+import type { PraiseSticker, StickerSummary } from '../lib/sticker/types'
 import { ROUTES } from '../routes'
 
 function formatDate(isoString: string): string {
@@ -123,6 +127,11 @@ export default function MyPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const [stickerSummary, setStickerSummary] = useState<StickerSummary | null>(null)
+  const [stickerHistory, setStickerHistory] = useState<PraiseSticker[]>([])
+  const [stickerLoading, setStickerLoading] = useState(false)
+  const [stickerError, setStickerError] = useState<string | null>(null)
+
   const [passwordFormOpen, setPasswordFormOpen] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -170,10 +179,67 @@ export default function MyPage() {
     return () => controller.abort()
   }, [loadAssignments])
 
+  const isDemoMode =
+    user !== null && (user.username === 'demo' || import.meta.env.VITE_DEMO_MODE === 'true')
+
+  const loadStickers = useCallback(async (signal: AbortSignal) => {
+    if (!user) return
+
+    setStickerLoading(true)
+    setStickerError(null)
+
+    try {
+      const [summary, history] = await Promise.all([
+        getStickerSummary(user.username, signal),
+        listStickers(user.username, signal)
+      ])
+
+      if (!signal.aborted) {
+        setStickerSummary(summary)
+        setStickerHistory(history)
+      }
+    } catch (err) {
+      if (signal.aborted) return
+      if (err instanceof StickerApiError) {
+        setStickerError(err.message)
+      } else {
+        setStickerError('스티커 정보를 불러오는 중 오류가 발생했습니다.')
+      }
+    } finally {
+      if (!signal.aborted) {
+        setStickerLoading(false)
+      }
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (!isDemoMode) {
+      setStickerSummary(null)
+      setStickerHistory([])
+      setStickerError(null)
+      setStickerLoading(false)
+      return
+    }
+
+    const controller = new AbortController()
+    loadStickers(controller.signal)
+    return () => controller.abort()
+  }, [isDemoMode, loadStickers])
+
+  const latestStickerReason = useMemo(() => {
+    if (stickerHistory.length === 0) return null
+    const sorted = [...stickerHistory].sort((a, b) => {
+      const aTime = new Date(a.grantedAt).getTime()
+      const bTime = new Date(b.grantedAt).getTime()
+      return bTime - aTime
+    })
+    return sorted[0]?.reason ?? null
+  }, [stickerHistory])
+
   if (!user) {
     return (
       <section>
-        <h1>마이 페이지</h1>
+        <h1>숙제</h1>
         <p className="error">로그인이 필요합니다.</p>
       </section>
     )
@@ -195,8 +261,86 @@ export default function MyPage() {
 
   return (
     <section>
-      <h1>마이 페이지</h1>
-      <p className="muted">{user.name}님, 환영합니다.</p>
+      <h1>숙제</h1>
+      <p className="muted">{user.name}님, 할당된 숙제를 확인하고 제출해요.</p>
+
+      {isDemoMode ? (
+        <section className="mypage-sticker-section">
+          <div className="mypage-sticker-header">
+            <h2>칭찬 스티커</h2>
+            <p className="muted">Demo 모드에서만 확인할 수 있어요.</p>
+          </div>
+          {stickerLoading ? (
+            <p className="muted">스티커 정보를 불러오는 중...</p>
+          ) : stickerError ? (
+            <div className="sticker-error-notice">
+              <p className="muted">스티커 정보를 불러올 수 없습니다.</p>
+              <p className="muted">{stickerError}</p>
+            </div>
+          ) : (
+            <>
+              <StickerDisplay totalCount={stickerSummary?.totalCount ?? 0} latestReason={latestStickerReason} />
+              <StickerHistory stickers={stickerHistory} />
+            </>
+          )}
+        </section>
+      ) : null}
+
+      {loading && <p className="muted">숙제 목록을 불러오는 중...</p>}
+      {error && (
+        <div className="homework-error-notice">
+          <p className="muted">숙제 목록을 불러올 수 없습니다.</p>
+          <p className="muted">할당된 숙제가 없거나 서버 연결에 문제가 있습니다.</p>
+        </div>
+      )}
+
+      {!loading && !error && assignments.length === 0 && (
+        <p className="muted">할당된 숙제가 없습니다.</p>
+      )}
+
+      {pendingAssignments.length > 0 && (
+        <>
+          <h2>제출 필요 ({pendingAssignments.length})</h2>
+          <div className="homework-list">
+            {pendingAssignments.map((assignment) => (
+              <AssignmentCard key={assignment.id} assignment={assignment} />
+            ))}
+          </div>
+        </>
+      )}
+
+      {overdueAssignments.length > 0 && (
+        <>
+          <h2>마감된 숙제 ({overdueAssignments.length})</h2>
+          <div className="homework-list">
+            {overdueAssignments.map((assignment) => (
+              <AssignmentCard key={assignment.id} assignment={assignment} />
+            ))}
+          </div>
+        </>
+      )}
+
+      {reviewAssignments.length > 0 && (
+        <>
+          <h2>검토 중 ({reviewAssignments.length})</h2>
+          <div className="homework-list">
+            {reviewAssignments.map((assignment) => (
+              <AssignmentCard key={assignment.id} assignment={assignment} />
+            ))}
+          </div>
+        </>
+      )}
+
+      {completedAssignments.length > 0 && (
+        <>
+          <h2>완료 ({completedAssignments.length})</h2>
+          <div className="homework-list">
+            {completedAssignments.map((assignment) => (
+              <AssignmentCard key={assignment.id} assignment={assignment} />
+            ))}
+          </div>
+        </>
+      )}
 
       <section className="mypage-account-section">
         <div className="mypage-account-header">
@@ -303,62 +447,6 @@ export default function MyPage() {
           </form>
         ) : null}
       </section>
-
-      {loading && <p className="muted">숙제 목록을 불러오는 중...</p>}
-      {error && (
-        <div className="homework-error-notice">
-          <p className="muted">숙제 목록을 불러올 수 없습니다.</p>
-          <p className="muted">할당된 숙제가 없거나 서버 연결에 문제가 있습니다.</p>
-        </div>
-      )}
-
-      {!loading && !error && assignments.length === 0 && (
-        <p className="muted">할당된 숙제가 없습니다.</p>
-      )}
-
-      {pendingAssignments.length > 0 && (
-        <>
-          <h2>제출 필요 ({pendingAssignments.length})</h2>
-          <div className="homework-list">
-            {pendingAssignments.map((assignment) => (
-              <AssignmentCard key={assignment.id} assignment={assignment} />
-            ))}
-          </div>
-        </>
-      )}
-
-      {overdueAssignments.length > 0 && (
-        <>
-          <h2>마감된 숙제 ({overdueAssignments.length})</h2>
-          <div className="homework-list">
-            {overdueAssignments.map((assignment) => (
-              <AssignmentCard key={assignment.id} assignment={assignment} />
-            ))}
-          </div>
-        </>
-      )}
-
-      {reviewAssignments.length > 0 && (
-        <>
-          <h2>검토 중 ({reviewAssignments.length})</h2>
-          <div className="homework-list">
-            {reviewAssignments.map((assignment) => (
-              <AssignmentCard key={assignment.id} assignment={assignment} />
-            ))}
-          </div>
-        </>
-      )}
-
-      {completedAssignments.length > 0 && (
-        <>
-          <h2>완료 ({completedAssignments.length})</h2>
-          <div className="homework-list">
-            {completedAssignments.map((assignment) => (
-              <AssignmentCard key={assignment.id} assignment={assignment} />
-            ))}
-          </div>
-        </>
-      )}
     </section>
   )
 }

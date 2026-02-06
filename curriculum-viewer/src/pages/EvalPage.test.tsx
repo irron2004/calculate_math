@@ -51,7 +51,14 @@ describe('EvalPage route', () => {
           sessionId: 's1',
           status: 'SUBMITTED',
           responses: {
-            p1: { problemId: 'p1', inputRaw: '2', updatedAt: '2026-01-15T00:00:00.000Z' }
+            p1: {
+              problemId: 'p1',
+              inputRaw: '2',
+              updatedAt: '2026-01-15T00:00:00.000Z',
+              timeSpentMs: 0,
+              answerEditCount: 0,
+              scratchpadStrokesJson: null
+            }
           },
           grading: {
             totalCount: 1,

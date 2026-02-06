@@ -1,0 +1,48 @@
+/* LearnPage 2-split layout */
+
+.learn-split-container {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  min-height: 500px;
+}
+
+.learn-split-left {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.learn-split-right {
+  flex: 1;
+  min-width: 0;
+  position: sticky;
+  top: 16px;
+  height: calc(100vh - 200px);
+  min-height: 400px;
+  max-height: 700px;
+}
+
+/* Active problem highlighting */
+.problem-card.problem-active {
+  border-color: var(--color-primary-500);
+  background: linear-gradient(135deg, var(--color-primary-50) 0%, #ffffff 100%);
+  box-shadow: var(--shadow-md);
+}
+
+.problem-card {
+  cursor: pointer;
+}
+
+/* Responsive: stack on smaller screens */
+@media (max-width: 768px) {
+  .learn-split-container {
+    flex-direction: column;
+  }
+
+  .learn-split-right {
+    position: static;
+    height: 400px;
+    max-height: none;
+  }
+}

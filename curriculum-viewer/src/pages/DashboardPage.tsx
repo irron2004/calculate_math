@@ -5,6 +5,9 @@ import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
 import { listAssignments, HomeworkApiError } from '../lib/homework/api'
 import { getHomeworkStatus } from '../lib/homework/types'
 import type { HomeworkAssignment } from '../lib/homework/types'
+import { formatTagKo } from '../lib/diagnostic/tags'
+import { getMyStudentProfile } from '../lib/studentProfile/api'
+import type { StudentProfile } from '../lib/studentProfile/types'
 import { loadLearningGraphV1 } from '../lib/studentLearning/graph'
 import { computeNodeProgressV1, recommendNextNodeIds } from '../lib/studentLearning/progress'
 import type { AttemptSessionStoreV1, LearningGraphV1, NodeProgressV1 } from '../lib/studentLearning/types'
@@ -72,6 +75,10 @@ export default function DashboardPage() {
   const [homeworkLoading, setHomeworkLoading] = useState(false)
   const [homeworkError, setHomeworkError] = useState<string | null>(null)
 
+  const [profile, setProfile] = useState<StudentProfile | null>(null)
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [profileError, setProfileError] = useState<string | null>(null)
+
   useEffect(() => {
     const controller = new AbortController()
 
@@ -92,6 +99,28 @@ export default function DashboardPage() {
     run()
     return () => controller.abort()
   }, [])
+
+  useEffect(() => {
+    if (!user || isAdmin) return
+    const controller = new AbortController()
+
+    async function run() {
+      setProfileLoading(true)
+      setProfileError(null)
+      try {
+        const data = await getMyStudentProfile(controller.signal)
+        if (!controller.signal.aborted) setProfile(data)
+      } catch (err) {
+        if (controller.signal.aborted) return
+        setProfileError(err instanceof Error ? err.message : '진단 정보를 불러올 수 없습니다.')
+      } finally {
+        if (!controller.signal.aborted) setProfileLoading(false)
+      }
+    }
+
+    run()
+    return () => controller.abort()
+  }, [isAdmin, user])
 
   useEffect(() => {
     if (!user || isAdmin) return
@@ -155,6 +184,25 @@ export default function DashboardPage() {
     })
   }, [homeworkAssignments])
 
+  const nextHomework = useMemo(() => {
+    if (actionableHomework.length === 0) return null
+
+    const toComparableTime = (isoString: string | null | undefined): number => {
+      if (!isoString) return Number.POSITIVE_INFINITY
+      const time = new Date(isoString).getTime()
+      return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time
+    }
+
+    const sorted = [...actionableHomework].sort((a, b) => {
+      const aDue = toComparableTime(a.dueAt)
+      const bDue = toComparableTime(b.dueAt)
+      if (aDue !== bDue) return aDue - bDue
+      return a.createdAt > b.createdAt ? -1 : 1
+    })
+
+    return sorted[0]
+  }, [actionableHomework])
+
   const getNodeLabel = (nodeId: string): string => {
     const node = index?.nodeById.get(nodeId)
     return node?.title ?? nodeId
@@ -173,7 +221,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <section className="dashboard">
-        <h1>대시보드</h1>
+        <h1>홈</h1>
         <p className="muted">로딩 중...</p>
       </section>
     )
@@ -182,7 +230,7 @@ export default function DashboardPage() {
   if (graphError) {
     return (
       <section className="dashboard">
-        <h1>대시보드</h1>
+        <h1>홈</h1>
         <p className="error">그래프 로딩 실패: {graphError}</p>
       </section>
     )
@@ -197,58 +245,116 @@ export default function DashboardPage() {
       </div>
 
       {!isAdmin && (
+        <>
+          {!profileLoading && !profile && (
+            <div className="dashboard-onboarding">
+              <h2>🧭 4분 진단으로 시작점 잡기</h2>
+              <p className="muted" style={{ marginTop: 6 }}>
+                맞춤 숙제를 더 잘 받으려면, 1분 설문 + 3~5분 진단을 해보세요.
+              </p>
+              {profileError ? (
+                <p className="error" style={{ marginTop: 8 }}>
+                  {profileError}
+                </p>
+              ) : null}
+              <div className="node-actions" style={{ marginTop: 12 }}>
+                <Link to={ROUTES.onboarding} className="button button-primary">
+                  진단 시작
+                </Link>
+                <Link to={ROUTES.mypage} className="button button-ghost">
+                  일단 숙제하기
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {profile ? (
+            <div className="dashboard-profile">
+              <span className="badge badge-ok">레벨 {profile.estimatedLevel}</span>
+              {profile.weakTagsTop3.length > 0 ? (
+                <span className="muted">
+                  약점: {profile.weakTagsTop3.map(formatTagKo).join(', ')}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+        </>
+      )}
+
+      {!isAdmin && (
         <div className="dashboard-homework">
-          <h2>📋 숙제 알림</h2>
+          <h2>🎯 오늘의 숙제</h2>
           {homeworkLoading && <p className="muted">숙제 목록을 불러오는 중...</p>}
           {homeworkError && <p className="error">{homeworkError}</p>}
           {!homeworkLoading && !homeworkError && (
             <>
-              {homeworkAssignments.length === 0 && (
-                <p className="muted">현재 할당된 숙제가 없습니다.</p>
-              )}
-              {homeworkAssignments.length > 0 && (
-                <>
-                  {actionableHomework.length === 0 ? (
-                    <p className="muted">현재 제출이 필요한 숙제가 없습니다.</p>
-                  ) : (
-                    <div className="homework-list">
-                      {actionableHomework.slice(0, 3).map((assignment) => {
-                        const status = getHomeworkStatus(assignment)
-                        const badgeClass =
-                          status === 'returned' ? 'badge badge-error' : 'badge'
-                        const badgeLabel = status === 'returned' ? '반려' : '미제출'
-                        return (
-                          <div key={assignment.id} className={`homework-card homework-card--${status}`}>
-                            <div className="homework-card-header">
-                              <h3 className="homework-card-title">{assignment.title}</h3>
-                              <span className={badgeClass}>{badgeLabel}</span>
-                            </div>
-                            {assignment.dueAt && (
-                              <div className="homework-card-meta">
-                                <span className="muted">마감: {formatDue(assignment.dueAt)}</span>
-                              </div>
-                            )}
-                            <div className="homework-card-actions">
-                              <Link
-                                to={`/mypage/homework/${assignment.id}`}
-                                className="button button-primary button-small"
-                              >
-                                {status === 'returned' ? '재제출' : '제출하기'}
-                              </Link>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-
-                  <div className="dashboard-homework-actions">
-                    <Link to={ROUTES.mypage} className="button button-ghost button-small">
-                      전체 숙제 보기
+              {nextHomework ? (
+                <div className="dashboard-mission-card">
+                  <div className="dashboard-mission-meta">
+                    <div className="dashboard-mission-title">{nextHomework.title}</div>
+                    {nextHomework.dueAt ? (
+                      <div className="muted">마감: {formatDue(nextHomework.dueAt)}</div>
+                    ) : (
+                      <div className="muted">마감: 없음</div>
+                    )}
+                  </div>
+                  <div className="dashboard-mission-actions">
+                    <Link
+                      to={`/mypage/homework/${nextHomework.id}`}
+                      className="button button-primary"
+                    >
+                      지금 숙제 풀기
+                    </Link>
+                    <Link to={ROUTES.mypage} className="button button-ghost">
+                      전체 숙제
                     </Link>
                   </div>
-                </>
+                </div>
+              ) : (
+                <div className="dashboard-mission-card dashboard-mission-card--empty">
+                  <p className="muted">지금 해야 할 숙제가 없어요.</p>
+                  <div className="dashboard-mission-actions">
+                    <Link to={ROUTES.mypage} className="button button-ghost">
+                      숙제 확인하기
+                    </Link>
+                  </div>
+                </div>
               )}
+
+              {actionableHomework.length > 1 ? (
+                <div className="homework-list">
+                  {actionableHomework
+                    .filter((assignment) => assignment.id !== nextHomework?.id)
+                    .slice(0, 2)
+                    .map((assignment) => {
+                      const status = getHomeworkStatus(assignment)
+                      const badgeClass =
+                        status === 'returned' ? 'badge badge-error' : 'badge'
+                      const badgeLabel = status === 'returned' ? '반려' : '미제출'
+                      return (
+                        <div key={assignment.id} className={`homework-card homework-card--${status}`}>
+                          <div className="homework-card-header">
+                            <h3 className="homework-card-title">{assignment.title}</h3>
+                            <span className={badgeClass}>{badgeLabel}</span>
+                          </div>
+                          {assignment.dueAt && (
+                            <div className="homework-card-meta">
+                              <span className="muted">마감: {formatDue(assignment.dueAt)}</span>
+                            </div>
+                          )}
+                          <div className="homework-card-actions">
+                            <Link
+                              to={`/mypage/homework/${assignment.id}`}
+                              className="button button-primary button-small"
+                            >
+                              {status === 'returned' ? '재제출' : '제출하기'}
+                            </Link>
+                          </div>
+                        </div>
+                      )
+                    })}
+                </div>
+              ) : null}
             </>
           )}
         </div>
@@ -338,8 +444,8 @@ export default function DashboardPage() {
 
       {/* 빠른 이동 */}
       <div className="dashboard-actions">
-        <Link to={ROUTES.map} className="button button-primary">
-          지도 보기
+        <Link to={ROUTES.map} className="button button-ghost">
+          지도 보기 (Beta)
         </Link>
       </div>
     </section>

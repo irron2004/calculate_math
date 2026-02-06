@@ -2,9 +2,10 @@
 
 import json
 import logging
+import os
 import re
-from datetime import datetime, timezone
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, List
 from uuid import uuid4
@@ -30,22 +31,28 @@ from .db import (
     create_homework_assignment,
     create_homework_submission,
     create_user,
+    create_praise_sticker,
     delete_homework_assignment,
     fetch_latest_graph,
     fetch_problems,
+    get_praise_sticker_summary,
     get_homework_assignment,
     get_homework_assignment_admin,
     get_homework_submission_for_review,
     get_homework_submission_with_files,
     get_pending_homework_count,
     get_refresh_token_by_hash,
+    get_student_profile,
     get_user_by_email,
     get_user_by_id,
     get_user_by_username,
     get_submission_admin,
     get_submission_file,
+    has_praise_sticker_for_homework,
     list_all_homework_assignments_admin,
     list_homework_assignments_for_student,
+    list_praise_stickers,
+    list_students_with_profiles,
     list_users,
     revoke_all_refresh_tokens,
     revoke_refresh_token,
@@ -53,11 +60,15 @@ from .db import (
     store_refresh_token,
     update_homework_assignment,
     update_user_password,
+    upsert_student_profile,
     update_homework_submission_review,
     update_last_login,
 )
 from .email_service import send_homework_notification
 from .models import (
+    AdminStudentListResponse,
+    StudentProfileGetResponse,
+    StudentProfileUpsertRequest,
     AdminAssignmentDetail,
     AdminAssignmentListResponse,
     AdminSubmissionDetail,
@@ -85,6 +96,12 @@ from .models import (
     HomeworkSubmissionReviewRequest,
     HomeworkSubmissionReviewResponse,
     Problem,
+    PraiseSticker,
+    PraiseStickerCreateRequest,
+    PraiseStickerListResponse,
+    PraiseStickerSummaryResponse,
+    StudentProfile,
+    TestStatusResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -94,11 +111,19 @@ router = APIRouter(prefix="/api")
 # Rate limiter - imported from main to avoid circular import
 limiter = Limiter(key_func=get_remote_address)
 
+TEST_ENDPOINT_RESPONSE = {"status": "OK", "message": "PM intake test endpoint is active."}
+
 
 @router.get("/health")
 def health_check() -> dict:
     """Health check endpoint for container orchestration."""
     return {"status": "ok"}
+
+
+@router.get("/test", response_model=TestStatusResponse)
+def test_endpoint() -> TestStatusResponse:
+    """PM Intake test endpoint: returns a fixed OK response."""
+    return TestStatusResponse(**TEST_ENDPOINT_RESPONSE)
 
 
 def _build_auth_user(row: dict) -> AuthUser:
@@ -127,6 +152,46 @@ def _is_valid_email(value: str) -> bool:
     if not normalized or len(normalized) > 254:
         return False
     return EMAIL_REGEX.match(normalized) is not None
+
+
+DEMO_MODE_VALUES = {"1", "true", "yes", "on"}
+AUTO_STICKER_REASON = "숙제 우수"
+
+
+def _is_demo_mode() -> bool:
+    return os.getenv("DEMO_MODE", "").strip().lower() in DEMO_MODE_VALUES
+
+
+def _require_demo_mode() -> JSONResponse | None:
+    if not _is_demo_mode():
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "DEMO_ONLY", "message": "Demo mode only"}},
+        )
+    return None
+
+
+def _parse_iso_datetime(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value)
+    except ValueError:
+        return None
+
+
+def _normalize_datetime(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
+
+
+def _is_on_time(submitted_at: str | None, due_at: str | None) -> bool:
+    submitted_dt = _parse_iso_datetime(submitted_at)
+    due_dt = _parse_iso_datetime(due_at)
+    if not submitted_dt or not due_dt:
+        return False
+    return _normalize_datetime(submitted_dt) <= _normalize_datetime(due_dt)
 
 
 @router.post(
@@ -362,6 +427,154 @@ def list_admin_users(
     rows = list_users(role=role)
     users = [_build_auth_user(row) for row in rows]
     return AuthUserListResponse(users=users)
+
+
+# ============================================================
+# Student Profile Endpoints
+# ============================================================
+
+
+@router.get(
+    "/student/profile",
+    response_model=StudentProfileGetResponse,
+    responses={401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}},
+)
+def get_student_profile_me(user=Depends(get_current_user)) -> StudentProfileGetResponse | JSONResponse:
+    if user.role != "student":
+        return JSONResponse(status_code=403, content={"error": {"code": "STUDENT_ONLY", "message": "학생 전용 기능입니다."}})
+
+    profile = get_student_profile(user.username)
+    if not profile:
+        return StudentProfileGetResponse(profile=None)
+
+    return StudentProfileGetResponse(profile=StudentProfile(**profile))
+
+
+@router.post(
+    "/student/profile",
+    response_model=StudentProfileGetResponse,
+    responses={401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}},
+)
+def upsert_student_profile_me(
+    data: StudentProfileUpsertRequest = Body(...),
+    user=Depends(get_current_user),
+) -> StudentProfileGetResponse | JSONResponse:
+    if user.role != "student":
+        return JSONResponse(status_code=403, content={"error": {"code": "STUDENT_ONLY", "message": "학생 전용 기능입니다."}})
+
+    upsert_student_profile(
+        student_id=user.username,
+        survey=data.survey,
+        placement=data.placement,
+        estimated_level=data.estimatedLevel,
+        weak_tags_top3=data.weakTagsTop3,
+    )
+    profile = get_student_profile(user.username)
+    if not profile:
+        return StudentProfileGetResponse(profile=None)
+    return StudentProfileGetResponse(profile=StudentProfile(**profile))
+
+
+@router.get(
+    "/admin/students",
+    response_model=AdminStudentListResponse,
+    responses={403: {"model": ErrorResponse}},
+)
+def list_students_admin(user=Depends(require_admin)) -> AdminStudentListResponse:
+    students = list_students_with_profiles()
+    return AdminStudentListResponse(students=students)
+
+
+# ============================================================
+# Praise Sticker Endpoints
+# ============================================================
+
+
+@router.get(
+    "/students/{student_id}/stickers",
+    response_model=PraiseStickerListResponse,
+    responses={403: {"model": ErrorResponse}},
+)
+def list_student_stickers(
+    student_id: str,
+    user=Depends(get_current_user),
+) -> PraiseStickerListResponse | JSONResponse:
+    demo_guard = _require_demo_mode()
+    if demo_guard:
+        return demo_guard
+    if user.role != "student" or user.username != student_id:
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
+        )
+    stickers = list_praise_stickers(student_id)
+    return PraiseStickerListResponse(stickers=stickers)
+
+
+@router.get(
+    "/students/{student_id}/sticker-summary",
+    response_model=PraiseStickerSummaryResponse,
+    responses={403: {"model": ErrorResponse}},
+)
+def get_student_sticker_summary(
+    student_id: str,
+    user=Depends(get_current_user),
+) -> PraiseStickerSummaryResponse | JSONResponse:
+    demo_guard = _require_demo_mode()
+    if demo_guard:
+        return demo_guard
+    if user.role != "student" or user.username != student_id:
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
+        )
+    summary = get_praise_sticker_summary(student_id)
+    return PraiseStickerSummaryResponse(**summary)
+
+
+@router.post(
+    "/students/{student_id}/stickers",
+    response_model=PraiseSticker,
+    responses={400: {"model": ErrorResponse}, 403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+def grant_bonus_sticker(
+    student_id: str,
+    data: PraiseStickerCreateRequest = Body(...),
+    admin=Depends(require_admin),
+) -> PraiseSticker | JSONResponse:
+    demo_guard = _require_demo_mode()
+    if demo_guard:
+        return demo_guard
+
+    if data.count <= 0:
+        return JSONResponse(
+            status_code=400,
+            content={"error": {"code": "INVALID_COUNT", "message": "count must be positive"}},
+        )
+
+    reason = data.reason.strip()
+    if not reason:
+        return JSONResponse(
+            status_code=400,
+            content={"error": {"code": "INVALID_REASON", "message": "reason cannot be empty"}},
+        )
+
+    target = get_user_by_username(student_id)
+    if not target or target.get("role") != "student":
+        return JSONResponse(
+            status_code=404,
+            content={"error": {"code": "STUDENT_NOT_FOUND", "message": "학생을 찾을 수 없습니다."}},
+        )
+
+    sticker = create_praise_sticker(
+        student_id=student_id,
+        count=data.count,
+        reason=reason,
+        reason_type="bonus",
+        homework_id=None,
+        granted_by=admin.username,
+    )
+    return PraiseSticker(**sticker)
 
 
 @router.get("/graph/draft", response_model=GraphResponse, responses={404: {"model": ErrorResponse}})
@@ -906,6 +1119,30 @@ def review_homework_submission(
                 }
             },
         )
+
+    if (
+        status == "approved"
+        and submission.get("reviewStatus") != "approved"
+        and _is_demo_mode()
+        and _is_on_time(submission.get("submittedAt"), submission.get("dueAt"))
+    ):
+        homework_id = submission.get("assignmentId")
+        student_id = submission.get("studentId")
+        if homework_id and student_id:
+            already_granted = has_praise_sticker_for_homework(
+                student_id=student_id,
+                homework_id=homework_id,
+                reason_type="homework_excellent",
+            )
+            if not already_granted:
+                create_praise_sticker(
+                    student_id=student_id,
+                    count=2,
+                    reason=AUTO_STICKER_REASON,
+                    reason_type="homework_excellent",
+                    homework_id=homework_id,
+                    granted_by=None,
+                )
 
     return HomeworkSubmissionReviewResponse()
 
