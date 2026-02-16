@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import StickerDisplay from '../components/StickerDisplay'
 import StickerHistory from '../components/StickerHistory'
 import { useAuth } from '../lib/auth/AuthProvider'
-import { changePassword } from '../lib/auth/api'
+import { changePassword, fetchMe } from '../lib/auth/api'
 import { listAssignments, HomeworkApiError } from '../lib/homework/api'
 import type { HomeworkAssignment } from '../lib/homework/types'
 import { getHomeworkStatus, isOverdueSoon } from '../lib/homework/types'
@@ -131,6 +131,7 @@ export default function MyPage() {
   const [stickerHistory, setStickerHistory] = useState<PraiseSticker[]>([])
   const [stickerLoading, setStickerLoading] = useState(false)
   const [stickerError, setStickerError] = useState<string | null>(null)
+  const [stickerFeatureEnabled, setStickerFeatureEnabled] = useState(false)
 
   const [passwordFormOpen, setPasswordFormOpen] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
@@ -179,8 +180,30 @@ export default function MyPage() {
     return () => controller.abort()
   }, [loadAssignments])
 
-  const isStickerFeatureEnabled =
-    user !== null && user.role === 'student' && Boolean(user.praiseStickerEnabled)
+  useEffect(() => {
+    if (!user || user.role !== 'student') {
+      setStickerFeatureEnabled(false)
+      return
+    }
+
+    setStickerFeatureEnabled(Boolean(user.praiseStickerEnabled))
+
+    const controller = new AbortController()
+    fetchMe()
+      .then((me) => {
+        if (controller.signal.aborted) return
+        if (me.role === 'student') {
+          setStickerFeatureEnabled(Boolean(me.praiseStickerEnabled))
+        }
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return
+      })
+
+    return () => controller.abort()
+  }, [user])
+
+  const isStickerFeatureEnabled = user !== null && user.role === 'student' && stickerFeatureEnabled
 
   const loadStickers = useCallback(async (signal: AbortSignal) => {
     if (!user) return
