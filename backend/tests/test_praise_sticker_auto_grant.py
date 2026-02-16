@@ -92,11 +92,16 @@ def _review_submission(
 
 def test_auto_grant_on_approved_on_time(client: tuple[TestClient, object], monkeypatch) -> None:
     test_client, _db_path = client
-    monkeypatch.setenv("DEMO_MODE", "1")
 
     student_id = "sticker_auto_on_time"
     student_token = _register_student(test_client, username=student_id)
     admin_token = _login_admin(test_client)
+    enable_response = test_client.patch(
+        f"/api/admin/students/{student_id}/features",
+        json={"praiseStickerEnabled": True},
+        headers=_auth_headers(admin_token),
+    )
+    assert enable_response.status_code == 200, enable_response.text
 
     assignment_id = _create_assignment(
         test_client,
@@ -132,11 +137,16 @@ def test_auto_grant_on_approved_on_time(client: tuple[TestClient, object], monke
 
 def test_no_grant_when_late(client: tuple[TestClient, object], monkeypatch) -> None:
     test_client, _db_path = client
-    monkeypatch.setenv("DEMO_MODE", "1")
 
     student_id = "sticker_auto_late"
     student_token = _register_student(test_client, username=student_id)
     admin_token = _login_admin(test_client)
+    enable_response = test_client.patch(
+        f"/api/admin/students/{student_id}/features",
+        json={"praiseStickerEnabled": True},
+        headers=_auth_headers(admin_token),
+    )
+    assert enable_response.status_code == 200, enable_response.text
 
     assignment_id = _create_assignment(
         test_client,
@@ -167,11 +177,16 @@ def test_no_grant_when_late(client: tuple[TestClient, object], monkeypatch) -> N
 
 def test_no_grant_when_not_approved(client: tuple[TestClient, object], monkeypatch) -> None:
     test_client, _db_path = client
-    monkeypatch.setenv("DEMO_MODE", "1")
 
     student_id = "sticker_auto_returned"
     student_token = _register_student(test_client, username=student_id)
     admin_token = _login_admin(test_client)
+    enable_response = test_client.patch(
+        f"/api/admin/students/{student_id}/features",
+        json={"praiseStickerEnabled": True},
+        headers=_auth_headers(admin_token),
+    )
+    assert enable_response.status_code == 200, enable_response.text
 
     assignment_id = _create_assignment(
         test_client,
@@ -201,9 +216,8 @@ def test_no_grant_when_not_approved(client: tuple[TestClient, object], monkeypat
     assert list_response.json()["stickers"] == []
 
 
-def test_no_grant_when_demo_mode_off(client: tuple[TestClient, Any], monkeypatch) -> None:
+def test_no_grant_when_sticker_feature_disabled(client: tuple[TestClient, Any], monkeypatch) -> None:
     test_client, db_path = client
-    monkeypatch.delenv("DEMO_MODE", raising=False)
 
     student_id = "sticker_auto_demo_off"
     student_token = _register_student(test_client, username=student_id)
@@ -233,11 +247,16 @@ def test_no_grant_when_demo_mode_off(client: tuple[TestClient, Any], monkeypatch
 
 def test_auto_grant_prevents_duplicates(client: tuple[TestClient, object], monkeypatch) -> None:
     test_client, _db_path = client
-    monkeypatch.setenv("DEMO_MODE", "1")
 
     student_id = "sticker_auto_dup"
     student_token = _register_student(test_client, username=student_id)
     admin_token = _login_admin(test_client)
+    enable_response = test_client.patch(
+        f"/api/admin/students/{student_id}/features",
+        json={"praiseStickerEnabled": True},
+        headers=_auth_headers(admin_token),
+    )
+    assert enable_response.status_code == 200, enable_response.text
 
     assignment_id = _create_assignment(
         test_client,

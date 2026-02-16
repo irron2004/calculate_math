@@ -2,7 +2,6 @@
 
 import json
 import logging
-import os
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -60,6 +59,7 @@ from .db import (
     store_refresh_token,
     update_homework_assignment,
     update_user_password,
+    update_user_praise_sticker_enabled,
     upsert_student_profile,
     update_homework_submission_review,
     update_last_login,
@@ -67,6 +67,8 @@ from .db import (
 from .email_service import send_homework_notification
 from .models import (
     AdminStudentListResponse,
+    AdminStudentFeaturesUpdateRequest,
+    AdminStudentFeaturesUpdateResponse,
     StudentProfileGetResponse,
     StudentProfileUpsertRequest,
     AdminAssignmentDetail,
@@ -135,6 +137,7 @@ def _build_auth_user(row: dict) -> AuthUser:
         email=row["email"],
         role=row["role"],
         status=row["status"],
+        praiseStickerEnabled=bool(row.get("praise_sticker_enabled")),
         createdAt=row["created_at"],
         lastLoginAt=row.get("last_login_at"),
     )
@@ -154,21 +157,21 @@ def _is_valid_email(value: str) -> bool:
     return EMAIL_REGEX.match(normalized) is not None
 
 
-DEMO_MODE_VALUES = {"1", "true", "yes", "on"}
 AUTO_STICKER_REASON = "숙제 우수"
 
 
-def _is_demo_mode() -> bool:
-    return os.getenv("DEMO_MODE", "").strip().lower() in DEMO_MODE_VALUES
-
-
-def _require_demo_mode() -> JSONResponse | None:
-    if not _is_demo_mode():
-        return JSONResponse(
-            status_code=403,
-            content={"error": {"code": "DEMO_ONLY", "message": "Demo mode only"}},
-        )
-    return None
+def _require_praise_sticker_enabled(user_row: dict) -> JSONResponse | None:
+    if bool(user_row.get("praise_sticker_enabled")):
+        return None
+    return JSONResponse(
+        status_code=403,
+        content={
+            "error": {
+                "code": "FEATURE_DISABLED",
+                "message": "칭찬 스티커 기능이 비활성화되었습니다.",
+            }
+        },
+    )
 
 
 def _parse_iso_datetime(value: str | None) -> datetime | None:
@@ -485,6 +488,48 @@ def list_students_admin(user=Depends(require_admin)) -> AdminStudentListResponse
     return AdminStudentListResponse(students=students)
 
 
+@router.patch(
+    "/admin/students/{student_id}/features",
+    response_model=AdminStudentFeaturesUpdateResponse,
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+def update_student_features(
+    student_id: str,
+    data: AdminStudentFeaturesUpdateRequest,
+    _admin=Depends(require_admin),
+) -> AdminStudentFeaturesUpdateResponse | JSONResponse:
+    target = get_user_by_username(student_id)
+    if not target or target.get("role") != "student":
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "STUDENT_NOT_FOUND",
+                    "message": "학생을 찾을 수 없습니다.",
+                }
+            },
+        )
+
+    updated = update_user_praise_sticker_enabled(
+        student_id,
+        enabled=data.praiseStickerEnabled,
+    )
+    if not updated:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "STUDENT_NOT_FOUND",
+                    "message": "학생을 찾을 수 없습니다.",
+                }
+            },
+        )
+
+    return AdminStudentFeaturesUpdateResponse(
+        praiseStickerEnabled=data.praiseStickerEnabled,
+    )
+
+
 # ============================================================
 # Praise Sticker Endpoints
 # ============================================================
@@ -499,14 +544,20 @@ def list_student_stickers(
     student_id: str,
     user=Depends(get_current_user),
 ) -> PraiseStickerListResponse | JSONResponse:
-    demo_guard = _require_demo_mode()
-    if demo_guard:
-        return demo_guard
     if user.role != "student" or user.username != student_id:
         return JSONResponse(
             status_code=403,
             content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
         )
+    user_row = get_user_by_id(user.user_id)
+    if not user_row:
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
+        )
+    feature_guard = _require_praise_sticker_enabled(user_row)
+    if feature_guard:
+        return feature_guard
     stickers = list_praise_stickers(student_id)
     return PraiseStickerListResponse(stickers=stickers)
 
@@ -520,14 +571,20 @@ def get_student_sticker_summary(
     student_id: str,
     user=Depends(get_current_user),
 ) -> PraiseStickerSummaryResponse | JSONResponse:
-    demo_guard = _require_demo_mode()
-    if demo_guard:
-        return demo_guard
     if user.role != "student" or user.username != student_id:
         return JSONResponse(
             status_code=403,
             content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
         )
+    user_row = get_user_by_id(user.user_id)
+    if not user_row:
+        return JSONResponse(
+            status_code=403,
+            content={"error": {"code": "FORBIDDEN", "message": "권한이 없습니다."}},
+        )
+    feature_guard = _require_praise_sticker_enabled(user_row)
+    if feature_guard:
+        return feature_guard
     summary = get_praise_sticker_summary(student_id)
     return PraiseStickerSummaryResponse(**summary)
 
@@ -542,10 +599,6 @@ def grant_bonus_sticker(
     data: PraiseStickerCreateRequest = Body(...),
     admin=Depends(require_admin),
 ) -> PraiseSticker | JSONResponse:
-    demo_guard = _require_demo_mode()
-    if demo_guard:
-        return demo_guard
-
     if data.count <= 0:
         return JSONResponse(
             status_code=400,
@@ -565,6 +618,9 @@ def grant_bonus_sticker(
             status_code=404,
             content={"error": {"code": "STUDENT_NOT_FOUND", "message": "학생을 찾을 수 없습니다."}},
         )
+    feature_guard = _require_praise_sticker_enabled(target)
+    if feature_guard:
+        return feature_guard
 
     sticker = create_praise_sticker(
         student_id=student_id,
@@ -1123,12 +1179,14 @@ def review_homework_submission(
     if (
         status == "approved"
         and submission.get("reviewStatus") != "approved"
-        and _is_demo_mode()
         and _is_on_time(submission.get("submittedAt"), submission.get("dueAt"))
     ):
         homework_id = submission.get("assignmentId")
         student_id = submission.get("studentId")
         if homework_id and student_id:
+            target = get_user_by_username(student_id)
+            if not target or not bool(target.get("praise_sticker_enabled")):
+                return HomeworkSubmissionReviewResponse()
             already_granted = has_praise_sticker_for_homework(
                 student_id=student_id,
                 homework_id=homework_id,

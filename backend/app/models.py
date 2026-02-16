@@ -91,6 +91,7 @@ class AuthUser(BaseModel):
     email: str
     role: str
     status: str
+    praiseStickerEnabled: bool = False
     createdAt: str
     lastLoginAt: Optional[str] = None
 
@@ -152,10 +153,20 @@ class AdminStudentInfo(BaseModel):
     grade: str
     email: str
     profile: Optional[AdminStudentProfileSummary] = None
+    praiseStickerEnabled: bool = False
 
 
 class AdminStudentListResponse(BaseModel):
     students: List[AdminStudentInfo]
+
+
+class AdminStudentFeaturesUpdateRequest(BaseModel):
+    praiseStickerEnabled: bool
+
+
+class AdminStudentFeaturesUpdateResponse(BaseModel):
+    success: bool = True
+    praiseStickerEnabled: bool
 
 
 # ============================================================

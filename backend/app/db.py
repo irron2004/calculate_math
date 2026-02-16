@@ -180,6 +180,7 @@ def init_db(path: Optional[Path] = None) -> None:
             password_hash TEXT NOT NULL,
             role TEXT NOT NULL,
             status TEXT NOT NULL DEFAULT 'active',
+            praise_sticker_enabled INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
             last_login_at TEXT
@@ -292,6 +293,7 @@ def _ensure_user_columns(conn: sqlite3.Connection) -> None:
         "password_hash": "password_hash TEXT NOT NULL",
         "role": "role TEXT NOT NULL",
         "status": "status TEXT NOT NULL DEFAULT 'active'",
+        "praise_sticker_enabled": "praise_sticker_enabled INTEGER NOT NULL DEFAULT 0",
         "created_at": "created_at TEXT NOT NULL",
         "updated_at": "updated_at TEXT NOT NULL",
         "last_login_at": "last_login_at TEXT",
@@ -754,7 +756,7 @@ def get_user_by_username(username: str, path: Optional[Path] = None) -> Optional
     try:
         row = conn.execute(
             """
-            SELECT id, username, email, name, grade, password_hash, role, status,
+            SELECT id, username, email, name, grade, password_hash, role, status, praise_sticker_enabled,
                    created_at, updated_at, last_login_at
             FROM users
             WHERE username = ?
@@ -771,7 +773,7 @@ def get_user_by_email(email: str, path: Optional[Path] = None) -> Optional[Dict[
     try:
         row = conn.execute(
             """
-            SELECT id, username, email, name, grade, password_hash, role, status,
+            SELECT id, username, email, name, grade, password_hash, role, status, praise_sticker_enabled,
                    created_at, updated_at, last_login_at
             FROM users
             WHERE email = ?
@@ -788,7 +790,7 @@ def get_user_by_id(user_id: str, path: Optional[Path] = None) -> Optional[Dict[s
     try:
         row = conn.execute(
             """
-            SELECT id, username, email, name, grade, password_hash, role, status,
+            SELECT id, username, email, name, grade, password_hash, role, status, praise_sticker_enabled,
                    created_at, updated_at, last_login_at
             FROM users
             WHERE id = ?
@@ -819,7 +821,8 @@ def list_users(
         where_clause = f"WHERE {' AND '.join(conditions)}" if conditions else ""
         rows = conn.execute(
             f"""
-            SELECT id, username, email, name, grade, role, status, created_at, updated_at, last_login_at
+            SELECT id, username, email, name, grade, role, status, praise_sticker_enabled,
+                   created_at, updated_at, last_login_at
             FROM users
             {where_clause}
             ORDER BY created_at DESC
@@ -827,6 +830,25 @@ def list_users(
             params,
         ).fetchall()
         return [dict(row) for row in rows]
+    finally:
+        conn.close()
+
+
+def update_user_praise_sticker_enabled(
+    username: str,
+    *,
+    enabled: bool,
+    path: Optional[Path] = None,
+) -> bool:
+    conn = connect(path)
+    try:
+        now = _now_iso()
+        result = conn.execute(
+            "UPDATE users SET praise_sticker_enabled = ?, updated_at = ? WHERE username = ?",
+            (1 if enabled else 0, now, username),
+        )
+        conn.commit()
+        return result.rowcount > 0
     finally:
         conn.close()
 
@@ -1061,6 +1083,7 @@ def list_students_with_profiles(path: Optional[Path] = None) -> List[Dict[str, A
                 u.name,
                 u.grade,
                 u.email,
+                u.praise_sticker_enabled,
                 sp.estimated_level,
                 sp.weak_tags_json,
                 sp.created_at AS profile_created_at,
@@ -1093,6 +1116,7 @@ def list_students_with_profiles(path: Optional[Path] = None) -> List[Dict[str, A
                     "grade": row["grade"],
                     "email": row["email"],
                     "profile": profile,
+                    "praiseStickerEnabled": bool(row["praise_sticker_enabled"]),
                 }
             )
 

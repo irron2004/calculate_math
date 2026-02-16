@@ -30,10 +30,16 @@ def _login_admin(client: TestClient) -> str:
 
 def test_stickers_empty_list(client: tuple[TestClient, object], monkeypatch) -> None:
     test_client, _db_path = client
-    monkeypatch.setenv("DEMO_MODE", "1")
 
     student_id = "sticker_student_empty"
     token = _register_student(test_client, username=student_id)
+    admin_token = _login_admin(test_client)
+    enable_response = test_client.patch(
+        f"/api/admin/students/{student_id}/features",
+        json={"praiseStickerEnabled": True},
+        headers=_auth_headers(admin_token),
+    )
+    assert enable_response.status_code == 200, enable_response.text
 
     response = test_client.get(
         f"/api/students/{student_id}/stickers",
@@ -45,11 +51,16 @@ def test_stickers_empty_list(client: tuple[TestClient, object], monkeypatch) -> 
 
 def test_bonus_sticker_create_and_list(client: tuple[TestClient, object], monkeypatch) -> None:
     test_client, _db_path = client
-    monkeypatch.setenv("DEMO_MODE", "1")
 
     student_id = "sticker_student_bonus"
     student_token = _register_student(test_client, username=student_id)
     admin_token = _login_admin(test_client)
+    enable_response = test_client.patch(
+        f"/api/admin/students/{student_id}/features",
+        json={"praiseStickerEnabled": True},
+        headers=_auth_headers(admin_token),
+    )
+    assert enable_response.status_code == 200, enable_response.text
 
     create_response = test_client.post(
         f"/api/students/{student_id}/stickers",
@@ -77,11 +88,16 @@ def test_bonus_sticker_create_and_list(client: tuple[TestClient, object], monkey
 
 def test_sticker_summary_returns_total_and_recent(client: tuple[TestClient, object], monkeypatch) -> None:
     test_client, _db_path = client
-    monkeypatch.setenv("DEMO_MODE", "1")
 
     student_id = "sticker_student_summary"
     student_token = _register_student(test_client, username=student_id)
     admin_token = _login_admin(test_client)
+    enable_response = test_client.patch(
+        f"/api/admin/students/{student_id}/features",
+        json={"praiseStickerEnabled": True},
+        headers=_auth_headers(admin_token),
+    )
+    assert enable_response.status_code == 200, enable_response.text
 
     test_client.post(
         f"/api/students/{student_id}/stickers",
@@ -108,7 +124,6 @@ def test_sticker_summary_returns_total_and_recent(client: tuple[TestClient, obje
 
 def test_sticker_validation_errors(client: tuple[TestClient, object], monkeypatch) -> None:
     test_client, _db_path = client
-    monkeypatch.setenv("DEMO_MODE", "1")
 
     student_id = "sticker_student_invalid"
     _register_student(test_client, username=student_id)
@@ -131,9 +146,8 @@ def test_sticker_validation_errors(client: tuple[TestClient, object], monkeypatc
     assert reason_response.json()["error"]["code"] == "INVALID_REASON"
 
 
-def test_sticker_endpoints_blocked_without_demo_mode(client: tuple[TestClient, object], monkeypatch) -> None:
+def test_sticker_endpoints_blocked_when_feature_disabled(client: tuple[TestClient, object], monkeypatch) -> None:
     test_client, _db_path = client
-    monkeypatch.delenv("DEMO_MODE", raising=False)
 
     student_id = "sticker_student_blocked"
     token = _register_student(test_client, username=student_id)
@@ -143,4 +157,4 @@ def test_sticker_endpoints_blocked_without_demo_mode(client: tuple[TestClient, o
         headers=_auth_headers(token),
     )
     assert response.status_code == 403, response.text
-    assert response.json()["error"]["code"] == "DEMO_ONLY"
+    assert response.json()["error"]["code"] == "FEATURE_DISABLED"
