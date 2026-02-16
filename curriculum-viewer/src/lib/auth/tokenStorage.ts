@@ -4,7 +4,7 @@ const REFRESH_TOKEN_KEY = 'curriculum-viewer:auth:refresh'
 function getStorage(): Storage | null {
   if (typeof window === 'undefined') return null
   try {
-    return window.localStorage
+    return window.sessionStorage
   } catch {
     return null
   }

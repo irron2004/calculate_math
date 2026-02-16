@@ -22,7 +22,7 @@ function getLocalStorage(): Storage | null {
   if (typeof window === 'undefined') return null
 
   try {
-    return window.localStorage
+    return window.sessionStorage
   } catch {
     return null
   }
@@ -50,6 +50,8 @@ function readStoredUser(): AuthUser | null {
     const email = typeof parsed.email === 'string' ? parsed.email : ''
     const role = typeof parsed.role === 'string' ? parsed.role : 'student'
     const status = typeof parsed.status === 'string' ? parsed.status : 'active'
+    const praiseStickerEnabled =
+      typeof parsed.praiseStickerEnabled === 'boolean' ? parsed.praiseStickerEnabled : false
     const createdAt = typeof parsed.createdAt === 'string' ? parsed.createdAt : ''
     const lastLoginAt = typeof parsed.lastLoginAt === 'string' ? parsed.lastLoginAt : null
 
@@ -63,6 +65,7 @@ function readStoredUser(): AuthUser | null {
       email,
       role: role === 'admin' ? 'admin' : 'student',
       status,
+      praiseStickerEnabled,
       createdAt,
       lastLoginAt
     }
@@ -86,17 +89,25 @@ function writeStoredUser(user: AuthUser | null): void {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => readStoredUser())
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [mode, setMode] = useState<AppMode>('student')
   const isAdmin = user?.role === 'admin'
 
   useEffect(() => {
     let cancelled = false
 
+    try {
+      window.localStorage.removeItem(AUTH_STORAGE_KEY)
+    } catch {
+    }
+
     async function bootstrap() {
       const accessToken = getAccessToken()
       const refreshToken = getRefreshToken()
-      if (!accessToken && !refreshToken) return
+      if (!accessToken && !refreshToken) {
+        writeStoredUser(null)
+        return
+      }
 
       try {
         const me = await fetchMe()
