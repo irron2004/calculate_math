@@ -2,7 +2,11 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
 import { createBrowserSessionRepository } from '../lib/repository/sessionRepository'
-import { buildStudentStageMapModel, type StageNodeViewModel } from '../lib/studentMap/stageMap'
+import {
+  buildStudentStageMapModel,
+  type LargeCategoryId,
+  type StageNodeViewModel
+} from '../lib/studentMap/stageMap'
 import { loadLearningGraphV1 } from '../lib/studentLearning/graph'
 import { computeNodeProgressV1 } from '../lib/studentLearning/progress'
 import type { AttemptSessionStoreV1, LearningGraphV1 } from '../lib/studentLearning/types'
@@ -14,6 +18,8 @@ const EMPTY_STORE: AttemptSessionStoreV1 = {
   sessionsById: {},
   draftSessionIdByNodeId: {}
 }
+
+const CATEGORY_UNLOCK_STORAGE_KEY = 'student-map-unlocked-categories-v1'
 
 function statusLabel(status: StageNodeViewModel['status']): string {
   if (status === 'CLEARED') return '완료'
@@ -61,6 +67,7 @@ export default function StudentStageMapPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const selectedCategoryQuery = searchParams.get('category')
   const selectedDomainQuery = searchParams.get('domain')
   const focusNodeId = searchParams.get('focusNodeId') ?? searchParams.get('focus')
 
@@ -69,6 +76,7 @@ export default function StudentStageMapPage() {
   const [graphLoading, setGraphLoading] = useState(true)
   const [reloadToken, setReloadToken] = useState(0)
   const [selectedStage, setSelectedStage] = useState<StageNodeViewModel | null>(null)
+  const [unlockMessage, setUnlockMessage] = useState<string | null>(null)
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   useEffect(() => {
@@ -109,9 +117,10 @@ export default function StudentStageMapPage() {
       curriculumNodes: data.nodes,
       learningGraph,
       progressByNodeId,
+      selectedCategoryId: selectedCategoryQuery as LargeCategoryId | null,
       selectedDomainId: selectedDomainQuery
     })
-  }, [data, learningGraph, progressByNodeId, selectedDomainQuery])
+  }, [data, learningGraph, progressByNodeId, selectedCategoryQuery, selectedDomainQuery])
 
   const allVisibleStages = useMemo(() => {
     if (!model) return []
@@ -140,6 +149,36 @@ export default function StudentStageMapPage() {
       target.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [model, allVisibleStages, focusNodeId])
+
+  useEffect(() => {
+    if (!model || !user) return
+    const storageKey = `${CATEGORY_UNLOCK_STORAGE_KEY}:${user.username}`
+    const raw = window.localStorage.getItem(storageKey)
+    let seen = new Set<string>()
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as unknown
+        if (Array.isArray(parsed)) {
+          seen = new Set(parsed.filter((value): value is string => typeof value === 'string'))
+        }
+      } catch {
+        seen = new Set<string>()
+      }
+    }
+
+    const unlocked = model.categories.filter((category) => category.unlocked)
+    const newlyUnlocked = unlocked.filter((category) => !seen.has(category.id))
+
+    if (newlyUnlocked.length > 0) {
+      const latest = newlyUnlocked[0]
+      setUnlockMessage(`${latest.label}이 열렸습니다!`)
+    }
+
+    for (const category of unlocked) {
+      seen.add(category.id)
+    }
+    window.localStorage.setItem(storageKey, JSON.stringify(Array.from(seen)))
+  }, [model, user])
 
   if (loading || graphLoading) {
     return (
@@ -171,6 +210,27 @@ export default function StudentStageMapPage() {
     <section className="student-stage-map-page">
       <header className="student-stage-map-header">
         <h1>지도(내 성장)</h1>
+        <div className="student-category-chips" role="tablist" aria-label="큰 분류 선택">
+          {model.categories.map((category) => (
+            <button
+              key={category.id}
+              type="button"
+              className={
+                category.id === model.selectedCategoryId
+                  ? 'student-category-chip student-category-chip--active'
+                  : 'student-category-chip'
+              }
+              onClick={() => {
+                const next = new URLSearchParams(searchParams)
+                next.set('category', category.id)
+                next.delete('domain')
+                setSearchParams(next)
+              }}
+            >
+              {category.label}
+            </button>
+          ))}
+        </div>
         <div className="student-domain-chips" role="tablist" aria-label="도메인 선택">
           {model.domains.map((domain) => (
             <button
@@ -183,6 +243,7 @@ export default function StudentStageMapPage() {
               }
               onClick={() => {
                 const next = new URLSearchParams(searchParams)
+                next.set('category', model.selectedCategoryId)
                 next.set('domain', domain.id)
                 setSearchParams(next)
               }}
@@ -194,6 +255,7 @@ export default function StudentStageMapPage() {
         <p className="muted">
           이번 영역 진행률 {selectedDomain?.clearedCount ?? 0}/{selectedDomain?.totalCount ?? 0}
         </p>
+        {unlockMessage ? <p className="student-category-unlock-banner">{unlockMessage}</p> : null}
       </header>
 
       <section className="student-next-actions" aria-label="지금 할 것">
