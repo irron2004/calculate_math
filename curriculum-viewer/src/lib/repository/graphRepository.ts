@@ -51,6 +51,8 @@ export type GraphRepository = {
   loadStudentGraph: () => SkillGraphPublishedSnapshotV1 | null
 }
 
+export const SKILL_GRAPH_DRAFT_UPDATED_EVENT = 'curriculum-viewer:skill-graph:draft-updated'
+
 function getDraftKey(userId: string, graphId: string): string {
   return getSkillGraphDraftKey(userId, graphId)
 }
@@ -151,6 +153,19 @@ function parsePublishedStore(raw: string): SkillGraphPublishedStoreV1 | null {
 }
 
 export function createGraphRepository(storage: Storage): GraphRepository {
+  const dispatchDraftUpdated = (params: { userId: string; graphId: string; updatedAt: string }) => {
+    if (typeof window === 'undefined') return
+    if (typeof window.dispatchEvent !== 'function') return
+    try {
+      window.dispatchEvent(
+        new CustomEvent(SKILL_GRAPH_DRAFT_UPDATED_EVENT, {
+          detail: { userId: params.userId, graphId: params.graphId, updatedAt: params.updatedAt }
+        })
+      )
+    } catch {
+    }
+  }
+
   const loadDraft: GraphRepository['loadDraft'] = ({ userId, graphId }) => {
     const key = getDraftKey(userId, graphId)
     const raw = safeGetItem(storage, key)
@@ -178,6 +193,7 @@ export function createGraphRepository(storage: Storage): GraphRepository {
     }
 
     safeSetItem(storage, key, JSON.stringify(store))
+    dispatchDraftUpdated({ userId, graphId: graph.graphId, updatedAt: normalizedNow })
     return store
   }
 

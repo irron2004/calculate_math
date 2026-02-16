@@ -1,21 +1,22 @@
-:root {
-  /* === 색상 팔레트 (오렌지/코랄 테마) === */
-  --color-primary-50: #fff7ed;
-  --color-primary-100: #ffedd5;
-  --color-primary-200: #fed7aa;
-  --color-primary-300: #fdba74;
-  --color-primary-400: #fb923c;
-  --color-primary-500: #f97316;
-  --color-primary-600: #ea580c;
-  --color-primary-700: #c2410c;
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@600;700&display=swap');
 
-  --color-secondary-50: #eff6ff;
-  --color-secondary-100: #dbeafe;
-  --color-secondary-200: #bfdbfe;
-  --color-secondary-300: #93c5fd;
-  --color-secondary-400: #60a5fa;
-  --color-secondary-500: #3b82f6;
-  --color-secondary-600: #2563eb;
+:root {
+  --color-primary-50: #f4effb;
+  --color-primary-100: #ece5f8;
+  --color-primary-200: #ded2f1;
+  --color-primary-300: #cbb9e7;
+  --color-primary-400: #b39ad8;
+  --color-primary-500: #9b7dc8;
+  --color-primary-600: #7d62a9;
+  --color-primary-700: #5f4a86;
+
+  --color-secondary-50: #f7f1ec;
+  --color-secondary-100: #f0e6dc;
+  --color-secondary-200: #e6d8cb;
+  --color-secondary-300: #d9c8b7;
+  --color-secondary-400: #c5b29d;
+  --color-secondary-500: #a99278;
+  --color-secondary-600: #85715c;
 
   --color-success-50: #ecfdf5;
   --color-success-100: #d1fae5;
@@ -33,20 +34,19 @@
   --color-error-500: #ef4444;
   --color-error-600: #dc2626;
 
-  /* 중립 색상 (크림/베이지 계열) */
-  --color-neutral-50: #fefdfb;
-  --color-neutral-100: #faf8f5;
-  --color-neutral-200: #f5f0e8;
-  --color-neutral-300: #e8e0d5;
-  --color-neutral-400: #c9bfb0;
-  --color-neutral-500: #a69a88;
-  --color-neutral-600: #7a6f5f;
-  --color-neutral-700: #5c5347;
-  --color-neutral-800: #4a3f30;
+  --color-neutral-50: #f8f4ef;
+  --color-neutral-100: #f2ece7;
+  --color-neutral-200: #e8dfd6;
+  --color-neutral-300: #d8cdc2;
+  --color-neutral-400: #b7a99a;
+  --color-neutral-500: #91806f;
+  --color-neutral-600: #6f5f50;
+  --color-neutral-700: #4e4136;
+  --color-neutral-800: #1f1f26;
 
   /* === 타이포그래피 === */
-  --font-family-display: 'Gmarket Sans', 'Pretendard Variable', system-ui, sans-serif;
-  --font-family-body: 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  --font-family-display: 'Noto Serif KR', serif;
+  --font-family-body: 'Noto Sans KR', sans-serif;
 
   --font-size-xs: 12px;
   --font-size-sm: 14px;
@@ -91,7 +91,7 @@
   line-height: 1.6;
   font-weight: 400;
   color: var(--color-neutral-800);
-  background-color: var(--color-neutral-50);
+  background-color: var(--color-neutral-100);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -99,17 +99,23 @@
 
 body {
   margin: 0;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(214, 204, 242, 0.38), transparent 40%),
+    radial-gradient(circle at 88% 8%, rgba(197, 184, 224, 0.28), transparent 36%),
+    linear-gradient(180deg, #f5efe9 0%, var(--color-neutral-100) 100%);
 }
 
-/* === 헤더 (그라데이션) === */
+/* === 헤더 (ruahverce tone) === */
 .app-header {
-  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-secondary-500) 100%);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--color-neutral-800);
   padding: var(--space-4) var(--space-5);
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  box-shadow: var(--shadow-md);
+  border-bottom: 1px solid rgba(31, 31, 38, 0.12);
+  box-shadow: 0 12px 22px rgba(105, 88, 143, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .app-header nav {
@@ -128,35 +134,38 @@ body {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(31, 31, 38, 0.74);
   text-decoration: none;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: var(--font-size-sm);
   transition: all var(--transition-fast);
+  border: 1px solid transparent;
 }
 
 .nav-badge {
   margin-left: var(--space-1);
   padding: 2px 8px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: rgba(255, 255, 255, 0.95);
+  background: rgba(214, 204, 242, 0.6);
+  border: 1px solid rgba(95, 74, 134, 0.2);
+  color: #5f4a86;
   font-size: 11px;
   font-weight: 700;
   line-height: 1.2;
 }
 
 .app-nav a:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(214, 204, 242, 0.22);
+  border-color: rgba(95, 74, 134, 0.18);
   transform: translateY(-1px);
 }
 
 .app-nav a.active {
-  color: var(--color-primary-600);
-  background: #ffffff;
+  color: #5f4a86;
+  background: rgba(214, 204, 242, 0.52);
+  border-color: rgba(95, 74, 134, 0.22);
   box-shadow: var(--shadow-sm);
 }
 
@@ -168,7 +177,7 @@ body {
 
 .app-auth-user {
   font-size: var(--font-size-sm);
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(31, 31, 38, 0.72);
   font-weight: 500;
 }
 
@@ -237,13 +246,13 @@ body {
 }
 
 .app-header .button-ghost {
-  color: rgba(255, 255, 255, 0.95);
-  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(31, 31, 38, 0.75);
+  border-color: rgba(31, 31, 38, 0.18);
 }
 
 .app-header .button-ghost:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(95, 74, 134, 0.22);
 }
 
 /* === 폼 필드 (아동 친화적) === */
@@ -739,6 +748,17 @@ body {
 .legend-line.contains,
 .legend-inline.contains {
   border-top-color: #94a3b8;
+}
+
+.legend-line.alignsTo,
+.legend-inline.alignsTo {
+  border-top-color: #0ea5e9;
+  border-top-style: dashed;
+}
+
+.legend-line.prereq,
+.legend-inline.prereq {
+  border-top-color: #ef4444;
 }
 
 .graph-canvas {

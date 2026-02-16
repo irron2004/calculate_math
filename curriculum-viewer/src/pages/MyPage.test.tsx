@@ -5,7 +5,7 @@ import { vi } from 'vitest'
 import { AuthProvider, AUTH_STORAGE_KEY } from '../lib/auth/AuthProvider'
 import MyPage from './MyPage'
 
-const buildStoredUser = (username = 'demo') => ({
+const buildStoredUser = (username = 'demo', praiseStickerEnabled = true) => ({
   id: username,
   username,
   name: 'Demo User',
@@ -13,6 +13,7 @@ const buildStoredUser = (username = 'demo') => ({
   email: `${username}@example.com`,
   role: 'student' as const,
   status: 'active',
+  praiseStickerEnabled,
   createdAt: '2026-01-01T00:00:00.000Z',
   lastLoginAt: null
 })
@@ -93,8 +94,8 @@ describe('MyPage stickers', () => {
     window.sessionStorage.clear()
   })
 
-  it('renders sticker summary and history in demo mode', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
+  it('renders sticker summary and history when sticker feature enabled', async () => {
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo', true)))
     const { restore } = mockFetch()
 
     try {
@@ -119,7 +120,7 @@ describe('MyPage stickers', () => {
   })
 
   it('shows reason tooltip when hovering the sticker icon', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo', true)))
     const { restore } = mockFetch()
 
     try {
@@ -146,8 +147,8 @@ describe('MyPage stickers', () => {
     }
   })
 
-  it('does not show sticker UI when not in demo mode', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('student-1')))
+  it('does not show sticker UI when sticker feature disabled', async () => {
+    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('student-1', false)))
     const { fetchMock, restore } = mockFetch()
 
     try {

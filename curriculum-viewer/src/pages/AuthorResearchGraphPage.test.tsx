@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import AuthorResearchGraphPage from './AuthorResearchGraphPage'
@@ -177,6 +177,10 @@ describe('/author/research-graph', () => {
     }
   }
 
+  async function sleep(ms: number) {
+    await new Promise((resolve) => setTimeout(resolve, ms))
+  }
+
   it('renders the page header and graph canvas', async () => {
     const restoreFetch = mockFetch()
 
@@ -317,6 +321,115 @@ describe('/author/research-graph', () => {
         const tu3 = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
         expect(tu3?.style?.opacity).toBeUndefined()
       })
+    } finally {
+      restoreFetch()
+    }
+  })
+
+  it('keeps hover highlight briefly after node leave before clearing state', async () => {
+    const restoreFetch = mockFetch()
+
+    try {
+      render(
+        <MemoryRouter initialEntries={['/author/research-graph']}>
+          <Routes>
+            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
+          </Routes>
+        </MemoryRouter>
+      )
+
+      await screen.findByTestId('reactflow')
+      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
+
+      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      await waitFor(() => expect(screen.getByTestId('research-hover-panel')).toHaveTextContent('Unit 1'))
+
+      latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+
+      expect(screen.getByTestId('research-hover-panel')).toHaveTextContent('Unit 1')
+      const tu3WhileDebounced = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
+      expect(tu3WhileDebounced?.style?.opacity).toBeLessThan(1)
+
+      await waitFor(() => expect(screen.queryByTestId('research-hover-panel')).toBeNull())
+      await waitFor(() => {
+        const tu3AfterClear = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
+        expect(tu3AfterClear?.style?.opacity).toBeUndefined()
+      })
+    } finally {
+      restoreFetch()
+    }
+  })
+
+  it('keeps hover state while pointer is in panel and clears after panel leave', async () => {
+    const restoreFetch = mockFetch()
+
+    try {
+      render(
+        <MemoryRouter initialEntries={['/author/research-graph']}>
+          <Routes>
+            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
+          </Routes>
+        </MemoryRouter>
+      )
+
+      await screen.findByTestId('reactflow')
+      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
+
+      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      const panel = await screen.findByTestId('research-hover-panel')
+
+      latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+      fireEvent.mouseEnter(panel)
+
+      await sleep(180)
+
+      expect(screen.getByTestId('research-hover-panel')).toHaveTextContent('Unit 1')
+      const tu3WhilePanelHovered = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
+      expect(tu3WhilePanelHovered?.style?.opacity).toBeLessThan(1)
+
+      fireEvent.mouseLeave(screen.getByTestId('research-hover-panel'))
+
+      await waitFor(() => expect(screen.queryByTestId('research-hover-panel')).toBeNull())
+      await waitFor(() => {
+        const tu3AfterPanelLeave = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
+        expect(tu3AfterPanelLeave?.style?.opacity).toBeUndefined()
+      })
+    } finally {
+      restoreFetch()
+    }
+  })
+
+  it('cancels pending hover clear when re-entering another node quickly', async () => {
+    const restoreFetch = mockFetch()
+
+    try {
+      render(
+        <MemoryRouter initialEntries={['/author/research-graph']}>
+          <Routes>
+            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
+          </Routes>
+        </MemoryRouter>
+      )
+
+      await screen.findByTestId('reactflow')
+      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
+
+      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      await screen.findByTestId('research-hover-panel')
+
+      latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU2' })
+
+      await sleep(180)
+
+      const panel = screen.getByTestId('research-hover-panel')
+      expect(panel).toHaveTextContent('Unit 2')
+
+      const tu2 = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU2')
+      expect(tu2?.style?.outline).toContain('#f97316')
+
+      const tu4 = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU4')
+      expect(tu4?.style?.opacity).toBeLessThan(1)
     } finally {
       restoreFetch()
     }

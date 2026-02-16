@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import ReactFlow, { Background, Controls, MiniMap, type Connection, type Edge, type Node } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { loadCurriculum2022Graph } from '../lib/curriculum2022/graph'
@@ -72,6 +72,7 @@ const GRADE_BAND_GAP_Y = 120
 const DOMAIN_LAYER_GAP_Y = 160
 const DOMAIN_LAYER_ORDER = ['NA', 'RR', 'GM', 'DP'] as const
 const DOMAIN_LAYER_FALLBACK = '__unspecified__'
+const HOVER_LEAVE_DEBOUNCE_MS = 120
 
 type DomainLayerCode = (typeof DOMAIN_LAYER_ORDER)[number] | typeof DOMAIN_LAYER_FALLBACK
 
@@ -104,6 +105,30 @@ function gradeBandSortKey(value: string): number {
   const match = value.match(/\d+/)
   if (!match) return Number.POSITIVE_INFINITY
   return Number(match[0])
+}
+
+function gradeBandSchoolLevel(band: string): 'E' | 'M' | 'H' | 'U' {
+  const match = band.match(/^(\d+)(?:\D+(\d+))?$/)
+  if (!match) return 'U'
+  const start = Number(match[1])
+  if (!Number.isFinite(start)) return 'U'
+  if (start <= 6) return 'E'
+  if (start <= 9) return 'M'
+  return 'H'
+}
+
+function formatGradeBandLabel(band: string): string {
+  const level = gradeBandSchoolLevel(band)
+  switch (level) {
+    case 'E':
+      return `초 ${band}`
+    case 'M':
+      return `중 ${band}`
+    case 'H':
+      return `고 ${band}`
+    default:
+      return band
+  }
 }
 
 function compareGradeBand(a?: string, b?: string): number {
@@ -207,6 +232,7 @@ export default function AuthorResearchGraphPage() {
   ])
   const [visibleDepthRange, setVisibleDepthRange] = useState<{ min: number; max: number }>({ min: 1, max: 99 })
   const [visibleGradeBands, setVisibleGradeBands] = useState<string[]>([]) // empty means all visible
+  const [visibleEdgeTypes, setVisibleEdgeTypes] = useState<string[]>(['contains', 'alignsTo', 'prereq'])
   const [selectedPrereq, setSelectedPrereq] = useState<PrereqEdgeWithOrigin | null>(null)
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
   const [inspectedNodeId, setInspectedNodeId] = useState<string | null>(null)
@@ -226,6 +252,64 @@ export default function AuthorResearchGraphPage() {
   const [patchErrorsByTrack, setPatchErrorsByTrack] = useState<Partial<Record<ResearchTrack, string>>>({})
   const [patchLoading, setPatchLoading] = useState(false)
   const [exportJson, setExportJson] = useState<string | null>(null)
+  const hoverLeaveTimerRef = useRef<number | null>(null)
+  const hoverPanelActiveRef = useRef(false)
+
+  const cancelHoverLeaveTimer = useCallback(() => {
+    if (hoverLeaveTimerRef.current === null) return
+    window.clearTimeout(hoverLeaveTimerRef.current)
+    hoverLeaveTimerRef.current = null
+  }, [])
+
+  const clearHoverState = useCallback(() => {
+    setHoveredNodeId(null)
+    setInspectedNodeId(null)
+  }, [])
+
+  const scheduleHoverLeave = useCallback(() => {
+    cancelHoverLeaveTimer()
+    hoverLeaveTimerRef.current = window.setTimeout(() => {
+      hoverLeaveTimerRef.current = null
+      if (hoverPanelActiveRef.current) return
+      clearHoverState()
+    }, HOVER_LEAVE_DEBOUNCE_MS)
+  }, [cancelHoverLeaveTimer, clearHoverState])
+
+  const handleNodeMouseEnter = useCallback(
+    (_: unknown, node: Node) => {
+      if (node.id.startsWith('__')) return
+      hoverPanelActiveRef.current = false
+      cancelHoverLeaveTimer()
+      setHoveredNodeId(node.id)
+      setInspectedNodeId(node.id)
+    },
+    [cancelHoverLeaveTimer]
+  )
+
+  const handleNodeMouseLeave = useCallback(
+    (_: unknown, node: Node) => {
+      if (node.id.startsWith('__')) return
+      if (hoveredNodeId !== node.id) return
+      scheduleHoverLeave()
+    },
+    [hoveredNodeId, scheduleHoverLeave]
+  )
+
+  const handleHoverPanelMouseEnter = useCallback(() => {
+    hoverPanelActiveRef.current = true
+    cancelHoverLeaveTimer()
+  }, [cancelHoverLeaveTimer])
+
+  const handleHoverPanelMouseLeave = useCallback(() => {
+    hoverPanelActiveRef.current = false
+    scheduleHoverLeave()
+  }, [scheduleHoverLeave])
+
+  useEffect(() => {
+    return () => {
+      cancelHoverLeaveTimer()
+    }
+  }, [cancelHoverLeaveTimer])
 
   useEffect(() => {
     saveResearchEditorState({
@@ -607,6 +691,21 @@ export default function AuthorResearchGraphPage() {
     setVisibleGradeBands([band])
   }, [])
 
+  const handleToggleEdgeType = useCallback((edgeType: string) => {
+    setVisibleEdgeTypes((prev) => {
+      if (prev.includes(edgeType)) return prev.filter((t) => t !== edgeType)
+      return [...prev, edgeType]
+    })
+  }, [])
+
+  const handleShowOnlyEdgeType = useCallback((edgeType: string) => {
+    setVisibleEdgeTypes([edgeType])
+  }, [])
+
+  const handleShowAllEdgeTypes = useCallback(() => {
+    setVisibleEdgeTypes(['contains', 'alignsTo', 'prereq'])
+  }, [])
+
   const allNodes = useMemo(() => {
     if (state.status !== 'ready') return []
 
@@ -635,11 +734,23 @@ export default function AuthorResearchGraphPage() {
     return Array.from(bands).sort(compareGradeBand)
   }, [allNodes])
 
+  const handleShowSchoolLevel = useCallback(
+    (level: 'E' | 'M' | 'H') => {
+      const bands = gradeBandOptions.filter((band) => gradeBandSchoolLevel(band) === level)
+      setVisibleGradeBands(bands)
+    },
+    [gradeBandOptions]
+  )
+
   const visibleGradeBandSet = useMemo(() => {
     // Empty array means all visible
     if (visibleGradeBands.length === 0) return null
     return new Set(visibleGradeBands)
   }, [visibleGradeBands])
+
+  const visibleEdgeTypeSet = useMemo(() => {
+    return new Set(visibleEdgeTypes)
+  }, [visibleEdgeTypes])
 
   const currentPrereqEdges = useMemo(() => {
     if (!editState) return []
@@ -724,6 +835,9 @@ export default function AuthorResearchGraphPage() {
     const out: HoverEdgeRef[] = []
 
     for (const edge of mergedNonPrereqEdges) {
+      if (edge.edgeType === 'contains' || edge.edgeType === 'alignsTo') {
+        if (!visibleEdgeTypeSet.has(edge.edgeType)) continue
+      }
       if (!visibleNodeIdSet.has(edge.source) || !visibleNodeIdSet.has(edge.target)) continue
       out.push({
         id: edge.id ?? `${edge.edgeType}:${edge.source}->${edge.target}`,
@@ -732,17 +846,19 @@ export default function AuthorResearchGraphPage() {
       })
     }
 
-    for (const edge of currentPrereqEdges) {
-      if (!visibleNodeIdSet.has(edge.source) || !visibleNodeIdSet.has(edge.target)) continue
-      out.push({
-        id: `prereq:${edge.source}->${edge.target}`,
-        source: edge.source,
-        target: edge.target
-      })
+    if (visibleEdgeTypeSet.has('prereq')) {
+      for (const edge of currentPrereqEdges) {
+        if (!visibleNodeIdSet.has(edge.source) || !visibleNodeIdSet.has(edge.target)) continue
+        out.push({
+          id: `prereq:${edge.source}->${edge.target}`,
+          source: edge.source,
+          target: edge.target
+        })
+      }
     }
 
     return out
-  }, [currentPrereqEdges, mergedNonPrereqEdges, visibleNodeIdSet])
+  }, [currentPrereqEdges, mergedNonPrereqEdges, visibleEdgeTypeSet, visibleNodeIdSet])
 
   const hoverHighlight = useMemo((): HoverHighlight | null => {
     if (!hoveredNodeId) return null
@@ -774,6 +890,12 @@ export default function AuthorResearchGraphPage() {
       setInspectedNodeId(null)
     }
   }, [inspectedNodeId, visibleNodeIdSet])
+
+  useEffect(() => {
+    if (!inspectedNodeId) {
+      hoverPanelActiveRef.current = false
+    }
+  }, [inspectedNodeId])
 
   const inspectedPanel = useMemo(() => {
     if (!inspectedNodeId) return null
@@ -1092,8 +1214,16 @@ export default function AuthorResearchGraphPage() {
       }
     }
 
+    const shouldShowNonPrereqEdge = (edgeType: string) => {
+      if (edgeType === 'contains' || edgeType === 'alignsTo') {
+        return visibleEdgeTypeSet.has(edgeType)
+      }
+      return true
+    }
+
     const nonPrereq = mergedNonPrereqEdges
       .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
+      .filter((edge) => shouldShowNonPrereqEdge(edge.edgeType))
       .map((edge) => {
         const baseStyle = getEdgeStyle(edge.edgeType)
         const domainStyle = decorateForDomain({ ...baseStyle }, edge.source, edge.target) as CSSProperties
@@ -1115,33 +1245,35 @@ export default function AuthorResearchGraphPage() {
         }
       })
 
-    const prereq = currentPrereqEdges
-      .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
-      .map((edge) => {
-        const origin =
-          edge.origin === 'base' ? 'existing' : edge.origin === 'research' ? 'research' : 'manual'
-        const baseStyle = getEdgeStyle('prereq', { prereqOrigin: origin })
-        const domainStyle = decorateForDomain({ ...baseStyle }, edge.source, edge.target) as CSSProperties
-        const id = `prereq:${edge.source}->${edge.target}`
-        const dimLabel = hoverActive && hoverEdgeIds && !hoverEdgeIds.has(id)
-        return {
-          id,
-          source: edge.source,
-          target: edge.target,
-          type: 'smoothstep',
-          label: 'prereq',
-          data: { edgeType: 'prereq', origin: edge.origin },
-          style: decorateEdgeStyle(id, domainStyle),
-          labelStyle: {
-            fill: (domainStyle.stroke as string) ?? '#64748b',
-            fontSize: 12,
-            ...(dimLabel ? { opacity: 0 } : {})
-          }
-        }
-      })
+    const prereq = visibleEdgeTypeSet.has('prereq')
+      ? currentPrereqEdges
+          .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
+          .map((edge) => {
+            const origin =
+              edge.origin === 'base' ? 'existing' : edge.origin === 'research' ? 'research' : 'manual'
+            const baseStyle = getEdgeStyle('prereq', { prereqOrigin: origin })
+            const domainStyle = decorateForDomain({ ...baseStyle }, edge.source, edge.target) as CSSProperties
+            const id = `prereq:${edge.source}->${edge.target}`
+            const dimLabel = hoverActive && hoverEdgeIds && !hoverEdgeIds.has(id)
+            return {
+              id,
+              source: edge.source,
+              target: edge.target,
+              type: 'smoothstep',
+              label: 'prereq',
+              data: { edgeType: 'prereq', origin: edge.origin },
+              style: decorateEdgeStyle(id, domainStyle),
+              labelStyle: {
+                fill: (domainStyle.stroke as string) ?? '#64748b',
+                fontSize: 12,
+                ...(dimLabel ? { opacity: 0 } : {})
+              }
+            }
+          })
+      : []
 
     return [...nonPrereq, ...prereq]
-  }, [currentPrereqEdges, domainCodeById, hoverHighlight, hoveredNodeId, mergedNonPrereqEdges, state, visibleNodeIdSet])
+  }, [currentPrereqEdges, domainCodeById, hoverHighlight, hoveredNodeId, mergedNonPrereqEdges, state, visibleEdgeTypeSet, visibleNodeIdSet])
 
   const counts = useMemo(() => {
     if (state.status !== 'ready') return null
@@ -1359,10 +1491,45 @@ export default function AuthorResearchGraphPage() {
               <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
                 학년 필터
               </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                <button
+                  type="button"
+                  className="button button-ghost button-small"
+                  onClick={() => handleShowSchoolLevel('E')}
+                  title="초등 학년군만 보기"
+                >
+                  초등
+                </button>
+                <button
+                  type="button"
+                  className="button button-ghost button-small"
+                  onClick={() => handleShowSchoolLevel('M')}
+                  title="중등 학년군만 보기"
+                >
+                  중등
+                </button>
+                <button
+                  type="button"
+                  className="button button-ghost button-small"
+                  onClick={() => handleShowSchoolLevel('H')}
+                  title="고등 학년군만 보기"
+                >
+                  고등
+                </button>
+                <button
+                  type="button"
+                  className="button button-ghost button-small"
+                  onClick={handleShowAllGradeBands}
+                  title="전체 학년군 보기"
+                >
+                  all
+                </button>
+              </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {gradeBandOptions.map((band) => {
                   const isAllVisible = visibleGradeBands.length === 0
                   const checked = isAllVisible || visibleGradeBands.includes(band)
+                  const label = formatGradeBandLabel(band)
                   return (
                     <div key={`grade-${band}`} style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                       <label style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
@@ -1378,13 +1545,13 @@ export default function AuthorResearchGraphPage() {
                             }
                           }}
                         />
-                        <span>{band}</span>
+                        <span title={band}>{label}</span>
                       </label>
                       <button
                         type="button"
                         className="button button-ghost button-small"
                         onClick={() => handleShowOnlyGradeBand(band)}
-                        title={`${band}만 보기`}
+                        title={`${label}만 보기`}
                       >
                         only
                       </button>
@@ -1392,13 +1559,63 @@ export default function AuthorResearchGraphPage() {
                   )
                 })}
               </div>
-              <div style={{ marginTop: 6 }}>
-                <button type="button" className="button button-ghost button-small" onClick={handleShowAllGradeBands}>
-                  all
-                </button>
-              </div>
             </div>
           ) : null}
+          <div className="graph-control" style={{ minWidth: 260 }}>
+            <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
+              Edge filter
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  checked={visibleEdgeTypeSet.has('contains')}
+                  onChange={() => handleToggleEdgeType('contains')}
+                />
+                <span className="legend-item" title="구조(소속/포함) 관계">
+                  <span className="legend-inline contains" /> contains
+                </span>
+              </label>
+              <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  checked={visibleEdgeTypeSet.has('alignsTo')}
+                  onChange={() => handleToggleEdgeType('alignsTo')}
+                />
+                <span className="legend-item" title="단원 ↔ 성취기준 연결">
+                  <span className="legend-inline alignsTo" /> alignsTo
+                </span>
+              </label>
+              <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input
+                  type="checkbox"
+                  checked={visibleEdgeTypeSet.has('prereq')}
+                  onChange={() => handleToggleEdgeType('prereq')}
+                />
+                <span className="legend-item" title="선수(선행학습) 관계">
+                  <span className="legend-inline prereq" /> prereq
+                </span>
+              </label>
+            </div>
+            <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="button button-ghost button-small"
+                onClick={() => handleShowOnlyEdgeType('prereq')}
+                title="prereq만 보기"
+              >
+                prereq only
+              </button>
+              <button
+                type="button"
+                className="button button-ghost button-small"
+                onClick={handleShowAllEdgeTypes}
+                title="전체 엣지 보기"
+              >
+                all
+              </button>
+            </div>
+          </div>
           <button
             type="button"
             className="button button-ghost"
@@ -1724,7 +1941,12 @@ export default function AuthorResearchGraphPage() {
 
       <div className="graph-canvas research-graph-canvas" aria-label="Research graph canvas">
         {inspectedPanel ? (
-          <aside className="research-hover-panel" data-testid="research-hover-panel">
+          <aside
+            className="research-hover-panel"
+            data-testid="research-hover-panel"
+            onMouseEnter={handleHoverPanelMouseEnter}
+            onMouseLeave={handleHoverPanelMouseLeave}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
               <div style={{ minWidth: 0 }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
@@ -1734,14 +1956,22 @@ export default function AuthorResearchGraphPage() {
                 <div className="mono" style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>
                   {inspectedPanel.node.nodeType}
                   {inspectedPanel.depth ? ` · depth ${inspectedPanel.depth}` : ''}
-                  {inspectedPanel.gradeBand ? ` · ${inspectedPanel.gradeBand}` : ''}
+                  {inspectedPanel.gradeBand ? ` · ${formatGradeBandLabel(inspectedPanel.gradeBand)}` : ''}
                   {inspectedPanel.domainLabel ? ` · ${inspectedPanel.domainLabel}` : ''}
                 </div>
                 <div className="mono" style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>
                   {inspectedPanel.node.id}
                 </div>
               </div>
-              <button type="button" className="button button-ghost" onClick={() => setInspectedNodeId(null)}>
+              <button
+                type="button"
+                className="button button-ghost"
+                onClick={() => {
+                  hoverPanelActiveRef.current = false
+                  cancelHoverLeaveTimer()
+                  clearHoverState()
+                }}
+              >
                 닫기
               </button>
             </div>
@@ -1817,23 +2047,16 @@ export default function AuthorResearchGraphPage() {
         ) : null}
         {state.status === 'ready' ? (
           <ReactFlow
-	            nodes={nodes}
-	            edges={edges}
-	            fitView
-	            nodesDraggable={false}
-	            nodesConnectable
-	            deleteKeyCode={null}
-	            onNodeMouseEnter={(_, node) => {
-	              if (node.id.startsWith('__')) return
-	              setHoveredNodeId(node.id)
-	              setInspectedNodeId(node.id)
-	            }}
-	            onNodeMouseLeave={(_, node) => {
-	              if (node.id.startsWith('__')) return
-	              setHoveredNodeId((prev) => (prev === node.id ? null : prev))
-	            }}
-	            onConnect={(connection: Connection) => {
-	              if (!editState) return
+            nodes={nodes}
+            edges={edges}
+            fitView
+            nodesDraggable={false}
+            nodesConnectable
+            deleteKeyCode={null}
+            onNodeMouseEnter={handleNodeMouseEnter}
+            onNodeMouseLeave={handleNodeMouseLeave}
+            onConnect={(connection: Connection) => {
+              if (!editState) return
 
               const source = connection.source
               const target = connection.target

@@ -3859,6 +3859,1406 @@
       "domainCode": "GM",
       "parentId": "KR-MATH-2022-M-7-9-GM",
       "description": "중학교(7~9학년군) 삼각비 단원. 직각삼각형에서 삼각비의 뜻을 이해하고, 길이와 각을 구하는 문제에 적용한다."
+    },
+    {
+      "id": "CSAT2025-COMMON",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 수학 공통(1-22)",
+      "parentId": "KR-MATH-2022-H-10-12",
+      "gradeBand": "10-12",
+      "order": 900,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 수학 공통 문항 노드 모음"
+    },
+    {
+      "id": "CSAT2025-PS",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 확률과 통계(23-30)",
+      "parentId": "KR-MATH-2022-H-10-12",
+      "gradeBand": "10-12",
+      "order": 901,
+      "tags": [
+        "수능",
+        "2025",
+        "확률과통계"
+      ],
+      "descShort": "2025 수능 확률과 통계 문항 노드 모음"
+    },
+    {
+      "id": "CSAT2025-CA",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 미적분(23-30)",
+      "parentId": "KR-MATH-2022-H-10-12",
+      "gradeBand": "10-12",
+      "order": 902,
+      "tags": [
+        "수능",
+        "2025",
+        "미적분"
+      ],
+      "descShort": "2025 수능 미적분 문항 노드 모음"
+    },
+    {
+      "id": "CSAT2025-GE",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 기하(23-30)",
+      "parentId": "KR-MATH-2022-H-10-12",
+      "gradeBand": "10-12",
+      "order": 903,
+      "tags": [
+        "수능",
+        "2025",
+        "기하"
+      ],
+      "descShort": "2025 수능 기하 문항 노드 모음"
+    },
+    {
+      "id": "CSAT2025-C-01",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 1번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1000,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 1번 문항"
+    },
+    {
+      "id": "CSAT2025-C-02",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 2번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1001,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 2번 문항"
+    },
+    {
+      "id": "CSAT2025-C-03",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 3번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1002,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 3번 문항"
+    },
+    {
+      "id": "CSAT2025-C-04",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 4번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1003,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 4번 문항"
+    },
+    {
+      "id": "CSAT2025-C-05",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 5번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1004,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 5번 문항"
+    },
+    {
+      "id": "CSAT2025-C-06",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 6번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1005,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 6번 문항"
+    },
+    {
+      "id": "CSAT2025-C-07",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 7번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1006,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 7번 문항"
+    },
+    {
+      "id": "CSAT2025-C-08",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 8번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1007,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 8번 문항"
+    },
+    {
+      "id": "CSAT2025-C-09",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 9번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1008,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 9번 문항"
+    },
+    {
+      "id": "CSAT2025-C-10",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 10번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1009,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 10번 문항"
+    },
+    {
+      "id": "CSAT2025-C-11",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 11번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1010,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 11번 문항"
+    },
+    {
+      "id": "CSAT2025-C-12",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 12번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1011,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 12번 문항"
+    },
+    {
+      "id": "CSAT2025-C-13",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 13번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1012,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 13번 문항"
+    },
+    {
+      "id": "CSAT2025-C-14",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 14번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1013,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 14번 문항"
+    },
+    {
+      "id": "CSAT2025-C-15",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 15번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1014,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 15번 문항"
+    },
+    {
+      "id": "CSAT2025-C-16",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 16번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1015,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 16번 문항"
+    },
+    {
+      "id": "CSAT2025-C-17",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 17번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1016,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 17번 문항"
+    },
+    {
+      "id": "CSAT2025-C-18",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 18번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1017,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 18번 문항"
+    },
+    {
+      "id": "CSAT2025-C-19",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 19번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1018,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 19번 문항"
+    },
+    {
+      "id": "CSAT2025-C-20",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 20번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1019,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 20번 문항"
+    },
+    {
+      "id": "CSAT2025-C-21",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 21번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1020,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 21번 문항"
+    },
+    {
+      "id": "CSAT2025-C-22",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 공통 22번",
+      "parentId": "CSAT2025-COMMON",
+      "gradeBand": "10-12",
+      "order": 1021,
+      "tags": [
+        "수능",
+        "2025",
+        "공통"
+      ],
+      "descShort": "2025 수능 공통 22번 문항"
+    },
+    {
+      "id": "CSAT2025-PS-23",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 확률과통계 23번",
+      "parentId": "CSAT2025-PS",
+      "gradeBand": "10-12",
+      "order": 1100,
+      "tags": [
+        "수능",
+        "2025",
+        "확률과통계"
+      ],
+      "descShort": "2025 수능 확률과통계 23번 문항"
+    },
+    {
+      "id": "CSAT2025-PS-24",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 확률과통계 24번",
+      "parentId": "CSAT2025-PS",
+      "gradeBand": "10-12",
+      "order": 1101,
+      "tags": [
+        "수능",
+        "2025",
+        "확률과통계"
+      ],
+      "descShort": "2025 수능 확률과통계 24번 문항"
+    },
+    {
+      "id": "CSAT2025-PS-25",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 확률과통계 25번",
+      "parentId": "CSAT2025-PS",
+      "gradeBand": "10-12",
+      "order": 1102,
+      "tags": [
+        "수능",
+        "2025",
+        "확률과통계"
+      ],
+      "descShort": "2025 수능 확률과통계 25번 문항"
+    },
+    {
+      "id": "CSAT2025-PS-26",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 확률과통계 26번",
+      "parentId": "CSAT2025-PS",
+      "gradeBand": "10-12",
+      "order": 1103,
+      "tags": [
+        "수능",
+        "2025",
+        "확률과통계"
+      ],
+      "descShort": "2025 수능 확률과통계 26번 문항"
+    },
+    {
+      "id": "CSAT2025-PS-27",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 확률과통계 27번",
+      "parentId": "CSAT2025-PS",
+      "gradeBand": "10-12",
+      "order": 1104,
+      "tags": [
+        "수능",
+        "2025",
+        "확률과통계"
+      ],
+      "descShort": "2025 수능 확률과통계 27번 문항"
+    },
+    {
+      "id": "CSAT2025-PS-28",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 확률과통계 28번",
+      "parentId": "CSAT2025-PS",
+      "gradeBand": "10-12",
+      "order": 1105,
+      "tags": [
+        "수능",
+        "2025",
+        "확률과통계"
+      ],
+      "descShort": "2025 수능 확률과통계 28번 문항"
+    },
+    {
+      "id": "CSAT2025-PS-29",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 확률과통계 29번",
+      "parentId": "CSAT2025-PS",
+      "gradeBand": "10-12",
+      "order": 1106,
+      "tags": [
+        "수능",
+        "2025",
+        "확률과통계"
+      ],
+      "descShort": "2025 수능 확률과통계 29번 문항"
+    },
+    {
+      "id": "CSAT2025-PS-30",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 확률과통계 30번",
+      "parentId": "CSAT2025-PS",
+      "gradeBand": "10-12",
+      "order": 1107,
+      "tags": [
+        "수능",
+        "2025",
+        "확률과통계"
+      ],
+      "descShort": "2025 수능 확률과통계 30번 문항"
+    },
+    {
+      "id": "CSAT2025-CA-23",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 미적분 23번",
+      "parentId": "CSAT2025-CA",
+      "gradeBand": "10-12",
+      "order": 1200,
+      "tags": [
+        "수능",
+        "2025",
+        "미적분"
+      ],
+      "descShort": "2025 수능 미적분 23번 문항"
+    },
+    {
+      "id": "CSAT2025-CA-24",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 미적분 24번",
+      "parentId": "CSAT2025-CA",
+      "gradeBand": "10-12",
+      "order": 1201,
+      "tags": [
+        "수능",
+        "2025",
+        "미적분"
+      ],
+      "descShort": "2025 수능 미적분 24번 문항"
+    },
+    {
+      "id": "CSAT2025-CA-25",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 미적분 25번",
+      "parentId": "CSAT2025-CA",
+      "gradeBand": "10-12",
+      "order": 1202,
+      "tags": [
+        "수능",
+        "2025",
+        "미적분"
+      ],
+      "descShort": "2025 수능 미적분 25번 문항"
+    },
+    {
+      "id": "CSAT2025-CA-26",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 미적분 26번",
+      "parentId": "CSAT2025-CA",
+      "gradeBand": "10-12",
+      "order": 1203,
+      "tags": [
+        "수능",
+        "2025",
+        "미적분"
+      ],
+      "descShort": "2025 수능 미적분 26번 문항"
+    },
+    {
+      "id": "CSAT2025-CA-27",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 미적분 27번",
+      "parentId": "CSAT2025-CA",
+      "gradeBand": "10-12",
+      "order": 1204,
+      "tags": [
+        "수능",
+        "2025",
+        "미적분"
+      ],
+      "descShort": "2025 수능 미적분 27번 문항"
+    },
+    {
+      "id": "CSAT2025-CA-28",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 미적분 28번",
+      "parentId": "CSAT2025-CA",
+      "gradeBand": "10-12",
+      "order": 1205,
+      "tags": [
+        "수능",
+        "2025",
+        "미적분"
+      ],
+      "descShort": "2025 수능 미적분 28번 문항"
+    },
+    {
+      "id": "CSAT2025-CA-29",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 미적분 29번",
+      "parentId": "CSAT2025-CA",
+      "gradeBand": "10-12",
+      "order": 1206,
+      "tags": [
+        "수능",
+        "2025",
+        "미적분"
+      ],
+      "descShort": "2025 수능 미적분 29번 문항"
+    },
+    {
+      "id": "CSAT2025-CA-30",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 미적분 30번",
+      "parentId": "CSAT2025-CA",
+      "gradeBand": "10-12",
+      "order": 1207,
+      "tags": [
+        "수능",
+        "2025",
+        "미적분"
+      ],
+      "descShort": "2025 수능 미적분 30번 문항"
+    },
+    {
+      "id": "CSAT2025-GE-23",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 기하 23번",
+      "parentId": "CSAT2025-GE",
+      "gradeBand": "10-12",
+      "order": 1300,
+      "tags": [
+        "수능",
+        "2025",
+        "기하"
+      ],
+      "descShort": "2025 수능 기하 23번 문항"
+    },
+    {
+      "id": "CSAT2025-GE-24",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 기하 24번",
+      "parentId": "CSAT2025-GE",
+      "gradeBand": "10-12",
+      "order": 1301,
+      "tags": [
+        "수능",
+        "2025",
+        "기하"
+      ],
+      "descShort": "2025 수능 기하 24번 문항"
+    },
+    {
+      "id": "CSAT2025-GE-25",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 기하 25번",
+      "parentId": "CSAT2025-GE",
+      "gradeBand": "10-12",
+      "order": 1302,
+      "tags": [
+        "수능",
+        "2025",
+        "기하"
+      ],
+      "descShort": "2025 수능 기하 25번 문항"
+    },
+    {
+      "id": "CSAT2025-GE-26",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 기하 26번",
+      "parentId": "CSAT2025-GE",
+      "gradeBand": "10-12",
+      "order": 1303,
+      "tags": [
+        "수능",
+        "2025",
+        "기하"
+      ],
+      "descShort": "2025 수능 기하 26번 문항"
+    },
+    {
+      "id": "CSAT2025-GE-27",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 기하 27번",
+      "parentId": "CSAT2025-GE",
+      "gradeBand": "10-12",
+      "order": 1304,
+      "tags": [
+        "수능",
+        "2025",
+        "기하"
+      ],
+      "descShort": "2025 수능 기하 27번 문항"
+    },
+    {
+      "id": "CSAT2025-GE-28",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 기하 28번",
+      "parentId": "CSAT2025-GE",
+      "gradeBand": "10-12",
+      "order": 1305,
+      "tags": [
+        "수능",
+        "2025",
+        "기하"
+      ],
+      "descShort": "2025 수능 기하 28번 문항"
+    },
+    {
+      "id": "CSAT2025-GE-29",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 기하 29번",
+      "parentId": "CSAT2025-GE",
+      "gradeBand": "10-12",
+      "order": 1306,
+      "tags": [
+        "수능",
+        "2025",
+        "기하"
+      ],
+      "descShort": "2025 수능 기하 29번 문항"
+    },
+    {
+      "id": "CSAT2025-GE-30",
+      "nodeType": "textbookUnit",
+      "label": "2025 수능 기하 30번",
+      "parentId": "CSAT2025-GE",
+      "gradeBand": "10-12",
+      "order": 1307,
+      "tags": [
+        "수능",
+        "2025",
+        "기하"
+      ],
+      "descShort": "2025 수능 기하 30번 문항"
+    },
+    {
+      "id": "CSAT2023-COMMON",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 수학 공통(1-22)",
+      "parentId": "KR-MATH-2022-H-10-12",
+      "gradeBand": "10-12",
+      "order": 1400,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 수학 공통 문항 노드 모음"
+    },
+    {
+      "id": "CSAT2023-PS",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 확률과 통계(23-30)",
+      "parentId": "KR-MATH-2022-H-10-12",
+      "gradeBand": "10-12",
+      "order": 1401,
+      "tags": [
+        "수능",
+        "2023",
+        "확률과통계"
+      ],
+      "descShort": "2023 수능 확률과 통계 문항 노드 모음"
+    },
+    {
+      "id": "CSAT2023-CA",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 미적분(23-30)",
+      "parentId": "KR-MATH-2022-H-10-12",
+      "gradeBand": "10-12",
+      "order": 1402,
+      "tags": [
+        "수능",
+        "2023",
+        "미적분"
+      ],
+      "descShort": "2023 수능 미적분 문항 노드 모음"
+    },
+    {
+      "id": "CSAT2023-GE",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 기하(23-30)",
+      "parentId": "KR-MATH-2022-H-10-12",
+      "gradeBand": "10-12",
+      "order": 1403,
+      "tags": [
+        "수능",
+        "2023",
+        "기하"
+      ],
+      "descShort": "2023 수능 기하 문항 노드 모음"
+    },
+    {
+      "id": "CSAT2023-C-01",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 1번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1500,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 1번 문항"
+    },
+    {
+      "id": "CSAT2023-C-02",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 2번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1501,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 2번 문항"
+    },
+    {
+      "id": "CSAT2023-C-03",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 3번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1502,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 3번 문항"
+    },
+    {
+      "id": "CSAT2023-C-04",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 4번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1503,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 4번 문항"
+    },
+    {
+      "id": "CSAT2023-C-05",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 5번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1504,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 5번 문항"
+    },
+    {
+      "id": "CSAT2023-C-06",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 6번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1505,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 6번 문항"
+    },
+    {
+      "id": "CSAT2023-C-07",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 7번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1506,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 7번 문항"
+    },
+    {
+      "id": "CSAT2023-C-08",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 8번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1507,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 8번 문항"
+    },
+    {
+      "id": "CSAT2023-C-09",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 9번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1508,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 9번 문항"
+    },
+    {
+      "id": "CSAT2023-C-10",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 10번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1509,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 10번 문항"
+    },
+    {
+      "id": "CSAT2023-C-11",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 11번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1510,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 11번 문항"
+    },
+    {
+      "id": "CSAT2023-C-12",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 12번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1511,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 12번 문항"
+    },
+    {
+      "id": "CSAT2023-C-13",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 13번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1512,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 13번 문항"
+    },
+    {
+      "id": "CSAT2023-C-14",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 14번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1513,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 14번 문항"
+    },
+    {
+      "id": "CSAT2023-C-15",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 15번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1514,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 15번 문항"
+    },
+    {
+      "id": "CSAT2023-C-16",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 16번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1515,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 16번 문항"
+    },
+    {
+      "id": "CSAT2023-C-17",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 17번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1516,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 17번 문항"
+    },
+    {
+      "id": "CSAT2023-C-18",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 18번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1517,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 18번 문항"
+    },
+    {
+      "id": "CSAT2023-C-19",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 19번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1518,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 19번 문항"
+    },
+    {
+      "id": "CSAT2023-C-20",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 20번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1519,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 20번 문항"
+    },
+    {
+      "id": "CSAT2023-C-21",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 21번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1520,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 21번 문항"
+    },
+    {
+      "id": "CSAT2023-C-22",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 공통 22번",
+      "parentId": "CSAT2023-COMMON",
+      "gradeBand": "10-12",
+      "order": 1521,
+      "tags": [
+        "수능",
+        "2023",
+        "공통"
+      ],
+      "descShort": "2023 수능 공통 22번 문항"
+    },
+    {
+      "id": "CSAT2023-PS-23",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 확률과통계 23번",
+      "parentId": "CSAT2023-PS",
+      "gradeBand": "10-12",
+      "order": 1600,
+      "tags": [
+        "수능",
+        "2023",
+        "확률과통계"
+      ],
+      "descShort": "2023 수능 확률과통계 23번 문항"
+    },
+    {
+      "id": "CSAT2023-CA-23",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 미적분 23번",
+      "parentId": "CSAT2023-CA",
+      "gradeBand": "10-12",
+      "order": 1700,
+      "tags": [
+        "수능",
+        "2023",
+        "미적분"
+      ],
+      "descShort": "2023 수능 미적분 23번 문항"
+    },
+    {
+      "id": "CSAT2023-GE-23",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 기하 23번",
+      "parentId": "CSAT2023-GE",
+      "gradeBand": "10-12",
+      "order": 1800,
+      "tags": [
+        "수능",
+        "2023",
+        "기하"
+      ],
+      "descShort": "2023 수능 기하 23번 문항"
+    },
+    {
+      "id": "CSAT2023-PS-24",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 확률과통계 24번",
+      "parentId": "CSAT2023-PS",
+      "gradeBand": "10-12",
+      "order": 1601,
+      "tags": [
+        "수능",
+        "2023",
+        "확률과통계"
+      ],
+      "descShort": "2023 수능 확률과통계 24번 문항"
+    },
+    {
+      "id": "CSAT2023-CA-24",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 미적분 24번",
+      "parentId": "CSAT2023-CA",
+      "gradeBand": "10-12",
+      "order": 1701,
+      "tags": [
+        "수능",
+        "2023",
+        "미적분"
+      ],
+      "descShort": "2023 수능 미적분 24번 문항"
+    },
+    {
+      "id": "CSAT2023-GE-24",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 기하 24번",
+      "parentId": "CSAT2023-GE",
+      "gradeBand": "10-12",
+      "order": 1801,
+      "tags": [
+        "수능",
+        "2023",
+        "기하"
+      ],
+      "descShort": "2023 수능 기하 24번 문항"
+    },
+    {
+      "id": "CSAT2023-PS-25",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 확률과통계 25번",
+      "parentId": "CSAT2023-PS",
+      "gradeBand": "10-12",
+      "order": 1602,
+      "tags": [
+        "수능",
+        "2023",
+        "확률과통계"
+      ],
+      "descShort": "2023 수능 확률과통계 25번 문항"
+    },
+    {
+      "id": "CSAT2023-CA-25",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 미적분 25번",
+      "parentId": "CSAT2023-CA",
+      "gradeBand": "10-12",
+      "order": 1702,
+      "tags": [
+        "수능",
+        "2023",
+        "미적분"
+      ],
+      "descShort": "2023 수능 미적분 25번 문항"
+    },
+    {
+      "id": "CSAT2023-GE-25",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 기하 25번",
+      "parentId": "CSAT2023-GE",
+      "gradeBand": "10-12",
+      "order": 1802,
+      "tags": [
+        "수능",
+        "2023",
+        "기하"
+      ],
+      "descShort": "2023 수능 기하 25번 문항"
+    },
+    {
+      "id": "CSAT2023-PS-26",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 확률과통계 26번",
+      "parentId": "CSAT2023-PS",
+      "gradeBand": "10-12",
+      "order": 1603,
+      "tags": [
+        "수능",
+        "2023",
+        "확률과통계"
+      ],
+      "descShort": "2023 수능 확률과통계 26번 문항"
+    },
+    {
+      "id": "CSAT2023-CA-26",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 미적분 26번",
+      "parentId": "CSAT2023-CA",
+      "gradeBand": "10-12",
+      "order": 1703,
+      "tags": [
+        "수능",
+        "2023",
+        "미적분"
+      ],
+      "descShort": "2023 수능 미적분 26번 문항"
+    },
+    {
+      "id": "CSAT2023-GE-26",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 기하 26번",
+      "parentId": "CSAT2023-GE",
+      "gradeBand": "10-12",
+      "order": 1803,
+      "tags": [
+        "수능",
+        "2023",
+        "기하"
+      ],
+      "descShort": "2023 수능 기하 26번 문항"
+    },
+    {
+      "id": "CSAT2023-PS-27",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 확률과통계 27번",
+      "parentId": "CSAT2023-PS",
+      "gradeBand": "10-12",
+      "order": 1604,
+      "tags": [
+        "수능",
+        "2023",
+        "확률과통계"
+      ],
+      "descShort": "2023 수능 확률과통계 27번 문항"
+    },
+    {
+      "id": "CSAT2023-CA-27",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 미적분 27번",
+      "parentId": "CSAT2023-CA",
+      "gradeBand": "10-12",
+      "order": 1704,
+      "tags": [
+        "수능",
+        "2023",
+        "미적분"
+      ],
+      "descShort": "2023 수능 미적분 27번 문항"
+    },
+    {
+      "id": "CSAT2023-GE-27",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 기하 27번",
+      "parentId": "CSAT2023-GE",
+      "gradeBand": "10-12",
+      "order": 1804,
+      "tags": [
+        "수능",
+        "2023",
+        "기하"
+      ],
+      "descShort": "2023 수능 기하 27번 문항"
+    },
+    {
+      "id": "CSAT2023-PS-28",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 확률과통계 28번",
+      "parentId": "CSAT2023-PS",
+      "gradeBand": "10-12",
+      "order": 1605,
+      "tags": [
+        "수능",
+        "2023",
+        "확률과통계"
+      ],
+      "descShort": "2023 수능 확률과통계 28번 문항"
+    },
+    {
+      "id": "CSAT2023-CA-28",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 미적분 28번",
+      "parentId": "CSAT2023-CA",
+      "gradeBand": "10-12",
+      "order": 1705,
+      "tags": [
+        "수능",
+        "2023",
+        "미적분"
+      ],
+      "descShort": "2023 수능 미적분 28번 문항"
+    },
+    {
+      "id": "CSAT2023-GE-28",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 기하 28번",
+      "parentId": "CSAT2023-GE",
+      "gradeBand": "10-12",
+      "order": 1805,
+      "tags": [
+        "수능",
+        "2023",
+        "기하"
+      ],
+      "descShort": "2023 수능 기하 28번 문항"
+    },
+    {
+      "id": "CSAT2023-PS-29",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 확률과통계 29번",
+      "parentId": "CSAT2023-PS",
+      "gradeBand": "10-12",
+      "order": 1606,
+      "tags": [
+        "수능",
+        "2023",
+        "확률과통계"
+      ],
+      "descShort": "2023 수능 확률과통계 29번 문항"
+    },
+    {
+      "id": "CSAT2023-CA-29",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 미적분 29번",
+      "parentId": "CSAT2023-CA",
+      "gradeBand": "10-12",
+      "order": 1706,
+      "tags": [
+        "수능",
+        "2023",
+        "미적분"
+      ],
+      "descShort": "2023 수능 미적분 29번 문항"
+    },
+    {
+      "id": "CSAT2023-GE-29",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 기하 29번",
+      "parentId": "CSAT2023-GE",
+      "gradeBand": "10-12",
+      "order": 1806,
+      "tags": [
+        "수능",
+        "2023",
+        "기하"
+      ],
+      "descShort": "2023 수능 기하 29번 문항"
+    },
+    {
+      "id": "CSAT2023-PS-30",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 확률과통계 30번",
+      "parentId": "CSAT2023-PS",
+      "gradeBand": "10-12",
+      "order": 1607,
+      "tags": [
+        "수능",
+        "2023",
+        "확률과통계"
+      ],
+      "descShort": "2023 수능 확률과통계 30번 문항"
+    },
+    {
+      "id": "CSAT2023-CA-30",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 미적분 30번",
+      "parentId": "CSAT2023-CA",
+      "gradeBand": "10-12",
+      "order": 1707,
+      "tags": [
+        "수능",
+        "2023",
+        "미적분"
+      ],
+      "descShort": "2023 수능 미적분 30번 문항"
+    },
+    {
+      "id": "CSAT2023-GE-30",
+      "nodeType": "textbookUnit",
+      "label": "2023 수능 기하 30번",
+      "parentId": "CSAT2023-GE",
+      "gradeBand": "10-12",
+      "order": 1807,
+      "tags": [
+        "수능",
+        "2023",
+        "기하"
+      ],
+      "descShort": "2023 수능 기하 30번 문항"
     }
   ],
   "edges": [
@@ -6604,6 +8004,1467 @@
       "edgeType": "contains",
       "source": "KR-MATH-2022-M-7-9-GM",
       "target": "9수03-J"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12->CSAT2025-COMMON",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12",
+      "target": "CSAT2025-COMMON"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12->CSAT2025-PS",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12",
+      "target": "CSAT2025-PS"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12->CSAT2025-CA",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12",
+      "target": "CSAT2025-CA"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12->CSAT2025-GE",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12",
+      "target": "CSAT2025-GE"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-01",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-01"
+    },
+    {
+      "id": "prereq:P_TU_EXP_LAWS_REVIEW->CSAT2025-C-01",
+      "edgeType": "prereq",
+      "source": "P_TU_EXP_LAWS_REVIEW",
+      "target": "CSAT2025-C-01",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-02",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-02"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->CSAT2025-C-02",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIVATIVE",
+      "target": "CSAT2025-C-02",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-03",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-03"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_GEOM->CSAT2025-C-03",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_GEOM",
+      "target": "CSAT2025-C-03",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-04",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-04"
+    },
+    {
+      "id": "prereq:P_TU_LIMIT->CSAT2025-C-04",
+      "edgeType": "prereq",
+      "source": "P_TU_LIMIT",
+      "target": "CSAT2025-C-04",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-05",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-05"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->CSAT2025-C-05",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIVATIVE",
+      "target": "CSAT2025-C-05",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-06",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-06"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_FUNC->CSAT2025-C-06",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "CSAT2025-C-06",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-07",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-07"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL->CSAT2025-C-07",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL",
+      "target": "CSAT2025-C-07",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-08",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-08"
+    },
+    {
+      "id": "prereq:P_TU_LOG_PROPERTIES->CSAT2025-C-08",
+      "edgeType": "prereq",
+      "source": "P_TU_LOG_PROPERTIES",
+      "target": "CSAT2025-C-08",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-09",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-09"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL->CSAT2025-C-09",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL",
+      "target": "CSAT2025-C-09",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-10",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-10"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_FUNC->CSAT2025-C-10",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "CSAT2025-C-10",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-11",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-11"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_APP->CSAT2025-C-11",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_APP",
+      "target": "CSAT2025-C-11",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-12",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-12"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_ARITH->CSAT2025-C-12",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_ARITH",
+      "target": "CSAT2025-C-12",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_SUM->CSAT2025-C-12",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_SUM",
+      "target": "CSAT2025-C-12",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-13",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-13"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_APP->CSAT2025-C-13",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_APP",
+      "target": "CSAT2025-C-13",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL_APP->CSAT2025-C-13",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL_APP",
+      "target": "CSAT2025-C-13",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-14",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-14"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_LAW->CSAT2025-C-14",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_LAW",
+      "target": "CSAT2025-C-14",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-15",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-15"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->CSAT2025-C-15",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIVATIVE",
+      "target": "CSAT2025-C-15",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_QUADRATIC_FUNCTION->CSAT2025-C-15",
+      "edgeType": "prereq",
+      "source": "P_TU_QUADRATIC_FUNCTION",
+      "target": "CSAT2025-C-15",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-16",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-16"
+    },
+    {
+      "id": "prereq:P_TU_LOG_PROPERTIES->CSAT2025-C-16",
+      "edgeType": "prereq",
+      "source": "P_TU_LOG_PROPERTIES",
+      "target": "CSAT2025-C-16",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-17",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-17"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->CSAT2025-C-17",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIVATIVE",
+      "target": "CSAT2025-C-17",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-18",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-18"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_ARITH->CSAT2025-C-18",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_ARITH",
+      "target": "CSAT2025-C-18",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-19",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-19"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_APP->CSAT2025-C-19",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_APP",
+      "target": "CSAT2025-C-19",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-20",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-20"
+    },
+    {
+      "id": "prereq:P_TU_FUNCTION->CSAT2025-C-20",
+      "edgeType": "prereq",
+      "source": "P_TU_FUNCTION",
+      "target": "CSAT2025-C-20",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_EXP_FUNC->CSAT2025-C-20",
+      "edgeType": "prereq",
+      "source": "P_TU_EXP_FUNC",
+      "target": "CSAT2025-C-20",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-21",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-21"
+    },
+    {
+      "id": "prereq:P_TU_POLYNOMIAL->CSAT2025-C-21",
+      "edgeType": "prereq",
+      "source": "P_TU_POLYNOMIAL",
+      "target": "CSAT2025-C-21",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_LIMIT->CSAT2025-C-21",
+      "edgeType": "prereq",
+      "source": "P_TU_LIMIT",
+      "target": "CSAT2025-C-21",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-COMMON->CSAT2025-C-22",
+      "edgeType": "contains",
+      "source": "CSAT2025-COMMON",
+      "target": "CSAT2025-C-22"
+    },
+    {
+      "id": "prereq:P_TU_INDUCTION->CSAT2025-C-22",
+      "edgeType": "prereq",
+      "source": "P_TU_INDUCTION",
+      "target": "CSAT2025-C-22",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-PS->CSAT2025-PS-23",
+      "edgeType": "contains",
+      "source": "CSAT2025-PS",
+      "target": "CSAT2025-PS-23"
+    },
+    {
+      "id": "prereq:P_TU_BINOMIAL_THM->CSAT2025-PS-23",
+      "edgeType": "prereq",
+      "source": "P_TU_BINOMIAL_THM",
+      "target": "CSAT2025-PS-23",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-PS->CSAT2025-PS-24",
+      "edgeType": "contains",
+      "source": "CSAT2025-PS",
+      "target": "CSAT2025-PS-24"
+    },
+    {
+      "id": "prereq:P_TU_COND_PROB->CSAT2025-PS-24",
+      "edgeType": "prereq",
+      "source": "P_TU_COND_PROB",
+      "target": "CSAT2025-PS-24",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-PS->CSAT2025-PS-25",
+      "edgeType": "contains",
+      "source": "CSAT2025-PS",
+      "target": "CSAT2025-PS-25"
+    },
+    {
+      "id": "prereq:P_TU_STAT_INFER->CSAT2025-PS-25",
+      "edgeType": "prereq",
+      "source": "P_TU_STAT_INFER",
+      "target": "CSAT2025-PS-25",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-PS->CSAT2025-PS-26",
+      "edgeType": "contains",
+      "source": "CSAT2025-PS",
+      "target": "CSAT2025-PS-26"
+    },
+    {
+      "id": "prereq:P_TU_PROBABILITY->CSAT2025-PS-26",
+      "edgeType": "prereq",
+      "source": "P_TU_PROBABILITY",
+      "target": "CSAT2025-PS-26",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_COMBINATORICS->CSAT2025-PS-26",
+      "edgeType": "prereq",
+      "source": "P_TU_COMBINATORICS",
+      "target": "CSAT2025-PS-26",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-PS->CSAT2025-PS-27",
+      "edgeType": "contains",
+      "source": "CSAT2025-PS",
+      "target": "CSAT2025-PS-27"
+    },
+    {
+      "id": "prereq:P_TU_PROB_DIST->CSAT2025-PS-27",
+      "edgeType": "prereq",
+      "source": "P_TU_PROB_DIST",
+      "target": "CSAT2025-PS-27",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-PS->CSAT2025-PS-28",
+      "edgeType": "contains",
+      "source": "CSAT2025-PS",
+      "target": "CSAT2025-PS-28"
+    },
+    {
+      "id": "prereq:P_TU_COMBINATORICS->CSAT2025-PS-28",
+      "edgeType": "prereq",
+      "source": "P_TU_COMBINATORICS",
+      "target": "CSAT2025-PS-28",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-PS->CSAT2025-PS-29",
+      "edgeType": "contains",
+      "source": "CSAT2025-PS",
+      "target": "CSAT2025-PS-29"
+    },
+    {
+      "id": "prereq:P_TU_PROB_DIST->CSAT2025-PS-29",
+      "edgeType": "prereq",
+      "source": "P_TU_PROB_DIST",
+      "target": "CSAT2025-PS-29",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-PS->CSAT2025-PS-30",
+      "edgeType": "contains",
+      "source": "CSAT2025-PS",
+      "target": "CSAT2025-PS-30"
+    },
+    {
+      "id": "prereq:P_TU_PROBABILITY->CSAT2025-PS-30",
+      "edgeType": "prereq",
+      "source": "P_TU_PROBABILITY",
+      "target": "CSAT2025-PS-30",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_COMBINATORICS->CSAT2025-PS-30",
+      "edgeType": "prereq",
+      "source": "P_TU_COMBINATORICS",
+      "target": "CSAT2025-PS-30",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-CA->CSAT2025-CA-23",
+      "edgeType": "contains",
+      "source": "CSAT2025-CA",
+      "target": "CSAT2025-CA-23"
+    },
+    {
+      "id": "prereq:P_TU_LIMIT->CSAT2025-CA-23",
+      "edgeType": "prereq",
+      "source": "P_TU_LIMIT",
+      "target": "CSAT2025-CA-23",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_FUNC->CSAT2025-CA-23",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "CSAT2025-CA-23",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-CA->CSAT2025-CA-24",
+      "edgeType": "contains",
+      "source": "CSAT2025-CA",
+      "target": "CSAT2025-CA-24"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL->CSAT2025-CA-24",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL",
+      "target": "CSAT2025-CA-24",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-CA->CSAT2025-CA-25",
+      "edgeType": "contains",
+      "source": "CSAT2025-CA",
+      "target": "CSAT2025-CA-25"
+    },
+    {
+      "id": "prereq:P_TU_SEQ_LIMIT_SERIES->CSAT2025-CA-25",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQ_LIMIT_SERIES",
+      "target": "CSAT2025-CA-25",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-CA->CSAT2025-CA-26",
+      "edgeType": "contains",
+      "source": "CSAT2025-CA",
+      "target": "CSAT2025-CA-26"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL_APP->CSAT2025-CA-26",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL_APP",
+      "target": "CSAT2025-CA-26",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-CA->CSAT2025-CA-27",
+      "edgeType": "contains",
+      "source": "CSAT2025-CA",
+      "target": "CSAT2025-CA-27"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_ADV->CSAT2025-CA-27",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_ADV",
+      "target": "CSAT2025-CA-27",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_FUNCTION->CSAT2025-CA-27",
+      "edgeType": "prereq",
+      "source": "P_TU_FUNCTION",
+      "target": "CSAT2025-CA-27",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_EXP_FUNC->CSAT2025-CA-27",
+      "edgeType": "prereq",
+      "source": "P_TU_EXP_FUNC",
+      "target": "CSAT2025-CA-27",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-CA->CSAT2025-CA-28",
+      "edgeType": "contains",
+      "source": "CSAT2025-CA",
+      "target": "CSAT2025-CA-28"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_APP->CSAT2025-CA-28",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_APP",
+      "target": "CSAT2025-CA-28",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL_APP->CSAT2025-CA-28",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL_APP",
+      "target": "CSAT2025-CA-28",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_ADV->CSAT2025-CA-28",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_ADV",
+      "target": "CSAT2025-CA-28",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-CA->CSAT2025-CA-29",
+      "edgeType": "contains",
+      "source": "CSAT2025-CA",
+      "target": "CSAT2025-CA-29"
+    },
+    {
+      "id": "prereq:P_TU_SEQ_LIMIT_SERIES->CSAT2025-CA-29",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQ_LIMIT_SERIES",
+      "target": "CSAT2025-CA-29",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_GEOM->CSAT2025-CA-29",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_GEOM",
+      "target": "CSAT2025-CA-29",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-CA->CSAT2025-CA-30",
+      "edgeType": "contains",
+      "source": "CSAT2025-CA",
+      "target": "CSAT2025-CA-30"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_FUNC->CSAT2025-CA-30",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "CSAT2025-CA-30",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_ADV->CSAT2025-CA-30",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_ADV",
+      "target": "CSAT2025-CA-30",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-GE->CSAT2025-GE-23",
+      "edgeType": "contains",
+      "source": "CSAT2025-GE",
+      "target": "CSAT2025-GE-23"
+    },
+    {
+      "id": "prereq:P_TU_VECTOR->CSAT2025-GE-23",
+      "edgeType": "prereq",
+      "source": "P_TU_VECTOR",
+      "target": "CSAT2025-GE-23",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-GE->CSAT2025-GE-24",
+      "edgeType": "contains",
+      "source": "CSAT2025-GE",
+      "target": "CSAT2025-GE-24"
+    },
+    {
+      "id": "prereq:P_TU_CONIC_SECTION->CSAT2025-GE-24",
+      "edgeType": "prereq",
+      "source": "P_TU_CONIC_SECTION",
+      "target": "CSAT2025-GE-24",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-GE->CSAT2025-GE-25",
+      "edgeType": "contains",
+      "source": "CSAT2025-GE",
+      "target": "CSAT2025-GE-25"
+    },
+    {
+      "id": "prereq:P_TU_3D_COORD->CSAT2025-GE-25",
+      "edgeType": "prereq",
+      "source": "P_TU_3D_COORD",
+      "target": "CSAT2025-GE-25",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-GE->CSAT2025-GE-26",
+      "edgeType": "contains",
+      "source": "CSAT2025-GE",
+      "target": "CSAT2025-GE-26"
+    },
+    {
+      "id": "prereq:P_TU_CONIC_SECTION->CSAT2025-GE-26",
+      "edgeType": "prereq",
+      "source": "P_TU_CONIC_SECTION",
+      "target": "CSAT2025-GE-26",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-GE->CSAT2025-GE-27",
+      "edgeType": "contains",
+      "source": "CSAT2025-GE",
+      "target": "CSAT2025-GE-27"
+    },
+    {
+      "id": "prereq:P_TU_3D_COORD->CSAT2025-GE-27",
+      "edgeType": "prereq",
+      "source": "P_TU_3D_COORD",
+      "target": "CSAT2025-GE-27",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_VECTOR_DOT->CSAT2025-GE-27",
+      "edgeType": "prereq",
+      "source": "P_TU_VECTOR_DOT",
+      "target": "CSAT2025-GE-27",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-GE->CSAT2025-GE-28",
+      "edgeType": "contains",
+      "source": "CSAT2025-GE",
+      "target": "CSAT2025-GE-28"
+    },
+    {
+      "id": "prereq:P_TU_3D_COORD->CSAT2025-GE-28",
+      "edgeType": "prereq",
+      "source": "P_TU_3D_COORD",
+      "target": "CSAT2025-GE-28",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_VECTOR_DOT->CSAT2025-GE-28",
+      "edgeType": "prereq",
+      "source": "P_TU_VECTOR_DOT",
+      "target": "CSAT2025-GE-28",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-GE->CSAT2025-GE-29",
+      "edgeType": "contains",
+      "source": "CSAT2025-GE",
+      "target": "CSAT2025-GE-29"
+    },
+    {
+      "id": "prereq:P_TU_CONIC_SECTION->CSAT2025-GE-29",
+      "edgeType": "prereq",
+      "source": "P_TU_CONIC_SECTION",
+      "target": "CSAT2025-GE-29",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:CSAT2025-GE->CSAT2025-GE-30",
+      "edgeType": "contains",
+      "source": "CSAT2025-GE",
+      "target": "CSAT2025-GE-30"
+    },
+    {
+      "id": "prereq:P_TU_VECTOR_DOT->CSAT2025-GE-30",
+      "edgeType": "prereq",
+      "source": "P_TU_VECTOR_DOT",
+      "target": "CSAT2025-GE-30",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_COORD_GEOM->CSAT2025-GE-30",
+      "edgeType": "prereq",
+      "source": "P_TU_COORD_GEOM",
+      "target": "CSAT2025-GE-30",
+      "note": "2025 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12->CSAT2023-COMMON",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12",
+      "target": "CSAT2023-COMMON"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12->CSAT2023-PS",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12",
+      "target": "CSAT2023-PS"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12->CSAT2023-CA",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12",
+      "target": "CSAT2023-CA"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12->CSAT2023-GE",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12",
+      "target": "CSAT2023-GE"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-01",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-01"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-02",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-02"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-03",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-03"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-04",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-04"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-05",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-05"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-06",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-06"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-07",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-07"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-08",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-08"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-09",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-09"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-10",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-10"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-11",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-11"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-12",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-12"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-13",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-13"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-14",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-14"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-15",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-15"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-16",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-16"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-17",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-17"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-18",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-18"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-19",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-19"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-20",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-20"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-21",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-21"
+    },
+    {
+      "id": "contains:CSAT2023-COMMON->CSAT2023-C-22",
+      "edgeType": "contains",
+      "source": "CSAT2023-COMMON",
+      "target": "CSAT2023-C-22"
+    },
+    {
+      "id": "contains:CSAT2023-PS->CSAT2023-PS-23",
+      "edgeType": "contains",
+      "source": "CSAT2023-PS",
+      "target": "CSAT2023-PS-23"
+    },
+    {
+      "id": "contains:CSAT2023-PS->CSAT2023-PS-24",
+      "edgeType": "contains",
+      "source": "CSAT2023-PS",
+      "target": "CSAT2023-PS-24"
+    },
+    {
+      "id": "contains:CSAT2023-PS->CSAT2023-PS-25",
+      "edgeType": "contains",
+      "source": "CSAT2023-PS",
+      "target": "CSAT2023-PS-25"
+    },
+    {
+      "id": "contains:CSAT2023-PS->CSAT2023-PS-26",
+      "edgeType": "contains",
+      "source": "CSAT2023-PS",
+      "target": "CSAT2023-PS-26"
+    },
+    {
+      "id": "contains:CSAT2023-PS->CSAT2023-PS-27",
+      "edgeType": "contains",
+      "source": "CSAT2023-PS",
+      "target": "CSAT2023-PS-27"
+    },
+    {
+      "id": "contains:CSAT2023-PS->CSAT2023-PS-28",
+      "edgeType": "contains",
+      "source": "CSAT2023-PS",
+      "target": "CSAT2023-PS-28"
+    },
+    {
+      "id": "contains:CSAT2023-PS->CSAT2023-PS-29",
+      "edgeType": "contains",
+      "source": "CSAT2023-PS",
+      "target": "CSAT2023-PS-29"
+    },
+    {
+      "id": "contains:CSAT2023-PS->CSAT2023-PS-30",
+      "edgeType": "contains",
+      "source": "CSAT2023-PS",
+      "target": "CSAT2023-PS-30"
+    },
+    {
+      "id": "contains:CSAT2023-CA->CSAT2023-CA-23",
+      "edgeType": "contains",
+      "source": "CSAT2023-CA",
+      "target": "CSAT2023-CA-23"
+    },
+    {
+      "id": "contains:CSAT2023-CA->CSAT2023-CA-24",
+      "edgeType": "contains",
+      "source": "CSAT2023-CA",
+      "target": "CSAT2023-CA-24"
+    },
+    {
+      "id": "contains:CSAT2023-CA->CSAT2023-CA-25",
+      "edgeType": "contains",
+      "source": "CSAT2023-CA",
+      "target": "CSAT2023-CA-25"
+    },
+    {
+      "id": "contains:CSAT2023-CA->CSAT2023-CA-26",
+      "edgeType": "contains",
+      "source": "CSAT2023-CA",
+      "target": "CSAT2023-CA-26"
+    },
+    {
+      "id": "contains:CSAT2023-CA->CSAT2023-CA-27",
+      "edgeType": "contains",
+      "source": "CSAT2023-CA",
+      "target": "CSAT2023-CA-27"
+    },
+    {
+      "id": "contains:CSAT2023-CA->CSAT2023-CA-28",
+      "edgeType": "contains",
+      "source": "CSAT2023-CA",
+      "target": "CSAT2023-CA-28"
+    },
+    {
+      "id": "contains:CSAT2023-CA->CSAT2023-CA-29",
+      "edgeType": "contains",
+      "source": "CSAT2023-CA",
+      "target": "CSAT2023-CA-29"
+    },
+    {
+      "id": "contains:CSAT2023-CA->CSAT2023-CA-30",
+      "edgeType": "contains",
+      "source": "CSAT2023-CA",
+      "target": "CSAT2023-CA-30"
+    },
+    {
+      "id": "contains:CSAT2023-GE->CSAT2023-GE-23",
+      "edgeType": "contains",
+      "source": "CSAT2023-GE",
+      "target": "CSAT2023-GE-23"
+    },
+    {
+      "id": "contains:CSAT2023-GE->CSAT2023-GE-24",
+      "edgeType": "contains",
+      "source": "CSAT2023-GE",
+      "target": "CSAT2023-GE-24"
+    },
+    {
+      "id": "contains:CSAT2023-GE->CSAT2023-GE-25",
+      "edgeType": "contains",
+      "source": "CSAT2023-GE",
+      "target": "CSAT2023-GE-25"
+    },
+    {
+      "id": "contains:CSAT2023-GE->CSAT2023-GE-26",
+      "edgeType": "contains",
+      "source": "CSAT2023-GE",
+      "target": "CSAT2023-GE-26"
+    },
+    {
+      "id": "contains:CSAT2023-GE->CSAT2023-GE-27",
+      "edgeType": "contains",
+      "source": "CSAT2023-GE",
+      "target": "CSAT2023-GE-27"
+    },
+    {
+      "id": "contains:CSAT2023-GE->CSAT2023-GE-28",
+      "edgeType": "contains",
+      "source": "CSAT2023-GE",
+      "target": "CSAT2023-GE-28"
+    },
+    {
+      "id": "contains:CSAT2023-GE->CSAT2023-GE-29",
+      "edgeType": "contains",
+      "source": "CSAT2023-GE",
+      "target": "CSAT2023-GE-29"
+    },
+    {
+      "id": "contains:CSAT2023-GE->CSAT2023-GE-30",
+      "edgeType": "contains",
+      "source": "CSAT2023-GE",
+      "target": "CSAT2023-GE-30"
+    },
+    {
+      "id": "prereq:P_TU_EXP_LAWS_REVIEW->CSAT2023-C-01",
+      "edgeType": "prereq",
+      "source": "P_TU_EXP_LAWS_REVIEW",
+      "target": "CSAT2023-C-01",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_LIMIT->CSAT2023-C-02",
+      "edgeType": "prereq",
+      "source": "P_TU_LIMIT",
+      "target": "CSAT2023-C-02",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_GEOM->CSAT2023-C-03",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_GEOM",
+      "target": "CSAT2023-C-03",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->CSAT2023-C-04",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIVATIVE",
+      "target": "CSAT2023-C-04",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_FUNC->CSAT2023-C-05",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "CSAT2023-C-05",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->CSAT2023-C-06",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIVATIVE",
+      "target": "CSAT2023-C-06",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_ARITH->CSAT2023-C-07",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_ARITH",
+      "target": "CSAT2023-C-07",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_SUM->CSAT2023-C-07",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_SUM",
+      "target": "CSAT2023-C-07",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->CSAT2023-C-08",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIVATIVE",
+      "target": "CSAT2023-C-08",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_FUNC->CSAT2023-C-09",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "CSAT2023-C-09",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL_APP->CSAT2023-C-10",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL_APP",
+      "target": "CSAT2023-C-10",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_LAW->CSAT2023-C-11",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_LAW",
+      "target": "CSAT2023-C-11",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL_APP->CSAT2023-C-12",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL_APP",
+      "target": "CSAT2023-C-12",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_COMBINATORICS->CSAT2023-C-13",
+      "edgeType": "prereq",
+      "source": "P_TU_COMBINATORICS",
+      "target": "CSAT2023-C-13",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_LIMIT->CSAT2023-C-14",
+      "edgeType": "prereq",
+      "source": "P_TU_LIMIT",
+      "target": "CSAT2023-C-14",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_FUNCTION->CSAT2023-C-14",
+      "edgeType": "prereq",
+      "source": "P_TU_FUNCTION",
+      "target": "CSAT2023-C-14",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_INDUCTION->CSAT2023-C-15",
+      "edgeType": "prereq",
+      "source": "P_TU_INDUCTION",
+      "target": "CSAT2023-C-15",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_LOG_PROPERTIES->CSAT2023-C-16",
+      "edgeType": "prereq",
+      "source": "P_TU_LOG_PROPERTIES",
+      "target": "CSAT2023-C-16",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->CSAT2023-C-17",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIVATIVE",
+      "target": "CSAT2023-C-17",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_SUM->CSAT2023-C-18",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_SUM",
+      "target": "CSAT2023-C-18",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_APP->CSAT2023-C-19",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_APP",
+      "target": "CSAT2023-C-19",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_APP->CSAT2023-C-20",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_APP",
+      "target": "CSAT2023-C-20",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL_APP->CSAT2023-C-20",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL_APP",
+      "target": "CSAT2023-C-20",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_FUNCTION->CSAT2023-C-21",
+      "edgeType": "prereq",
+      "source": "P_TU_FUNCTION",
+      "target": "CSAT2023-C-21",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_LOG_FUNCTION->CSAT2023-C-21",
+      "edgeType": "prereq",
+      "source": "P_TU_LOG_FUNCTION",
+      "target": "CSAT2023-C-21",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_ADV->CSAT2023-C-22",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_ADV",
+      "target": "CSAT2023-C-22",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_FUNCTION->CSAT2023-C-22",
+      "edgeType": "prereq",
+      "source": "P_TU_FUNCTION",
+      "target": "CSAT2023-C-22",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_BINOMIAL_THM->CSAT2023-PS-23",
+      "edgeType": "prereq",
+      "source": "P_TU_BINOMIAL_THM",
+      "target": "CSAT2023-PS-23",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_COMBINATORICS->CSAT2023-PS-24",
+      "edgeType": "prereq",
+      "source": "P_TU_COMBINATORICS",
+      "target": "CSAT2023-PS-24",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_PROBABILITY->CSAT2023-PS-25",
+      "edgeType": "prereq",
+      "source": "P_TU_PROBABILITY",
+      "target": "CSAT2023-PS-25",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_PROBABILITY->CSAT2023-PS-26",
+      "edgeType": "prereq",
+      "source": "P_TU_PROBABILITY",
+      "target": "CSAT2023-PS-26",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_COMBINATORICS->CSAT2023-PS-26",
+      "edgeType": "prereq",
+      "source": "P_TU_COMBINATORICS",
+      "target": "CSAT2023-PS-26",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_STAT_INFER->CSAT2023-PS-27",
+      "edgeType": "prereq",
+      "source": "P_TU_STAT_INFER",
+      "target": "CSAT2023-PS-27",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_PROB_DIST->CSAT2023-PS-28",
+      "edgeType": "prereq",
+      "source": "P_TU_PROB_DIST",
+      "target": "CSAT2023-PS-28",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_COND_PROB->CSAT2023-PS-29",
+      "edgeType": "prereq",
+      "source": "P_TU_COND_PROB",
+      "target": "CSAT2023-PS-29",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_COMBINATORICS->CSAT2023-PS-29",
+      "edgeType": "prereq",
+      "source": "P_TU_COMBINATORICS",
+      "target": "CSAT2023-PS-29",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_COMBINATORICS->CSAT2023-PS-30",
+      "edgeType": "prereq",
+      "source": "P_TU_COMBINATORICS",
+      "target": "CSAT2023-PS-30",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_LIMIT->CSAT2023-CA-23",
+      "edgeType": "prereq",
+      "source": "P_TU_LIMIT",
+      "target": "CSAT2023-CA-23",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL->CSAT2023-CA-24",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL",
+      "target": "CSAT2023-CA-24",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_GEOM->CSAT2023-CA-25",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_GEOM",
+      "target": "CSAT2023-CA-25",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL_APP->CSAT2023-CA-26",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL_APP",
+      "target": "CSAT2023-CA-26",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_FUNC->CSAT2023-CA-26",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "CSAT2023-CA-26",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_SEQ_LIMIT_SERIES->CSAT2023-CA-27",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQ_LIMIT_SERIES",
+      "target": "CSAT2023-CA-27",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_LIMIT->CSAT2023-CA-28",
+      "edgeType": "prereq",
+      "source": "P_TU_LIMIT",
+      "target": "CSAT2023-CA-28",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_TRIG_FUNC->CSAT2023-CA-28",
+      "edgeType": "prereq",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "CSAT2023-CA-28",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_EXP_FUNC->CSAT2023-CA-29",
+      "edgeType": "prereq",
+      "source": "P_TU_EXP_FUNC",
+      "target": "CSAT2023-CA-29",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL_ADV->CSAT2023-CA-29",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL_ADV",
+      "target": "CSAT2023-CA-29",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_ADV->CSAT2023-CA-30",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_ADV",
+      "target": "CSAT2023-CA-30",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_EXP_FUNC->CSAT2023-CA-30",
+      "edgeType": "prereq",
+      "source": "P_TU_EXP_FUNC",
+      "target": "CSAT2023-CA-30",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_FUNCTION->CSAT2023-CA-30",
+      "edgeType": "prereq",
+      "source": "P_TU_FUNCTION",
+      "target": "CSAT2023-CA-30",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_3D_COORD->CSAT2023-GE-23",
+      "edgeType": "prereq",
+      "source": "P_TU_3D_COORD",
+      "target": "CSAT2023-GE-23",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_CONIC_SECTION->CSAT2023-GE-24",
+      "edgeType": "prereq",
+      "source": "P_TU_CONIC_SECTION",
+      "target": "CSAT2023-GE-24",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_CONIC_SECTION->CSAT2023-GE-25",
+      "edgeType": "prereq",
+      "source": "P_TU_CONIC_SECTION",
+      "target": "CSAT2023-GE-25",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_VECTOR->CSAT2023-GE-26",
+      "edgeType": "prereq",
+      "source": "P_TU_VECTOR",
+      "target": "CSAT2023-GE-26",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_VECTOR_DOT->CSAT2023-GE-26",
+      "edgeType": "prereq",
+      "source": "P_TU_VECTOR_DOT",
+      "target": "CSAT2023-GE-26",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_3D_COORD->CSAT2023-GE-27",
+      "edgeType": "prereq",
+      "source": "P_TU_3D_COORD",
+      "target": "CSAT2023-GE-27",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_CONIC_SECTION->CSAT2023-GE-28",
+      "edgeType": "prereq",
+      "source": "P_TU_CONIC_SECTION",
+      "target": "CSAT2023-GE-28",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_VECTOR_DOT->CSAT2023-GE-29",
+      "edgeType": "prereq",
+      "source": "P_TU_VECTOR_DOT",
+      "target": "CSAT2023-GE-29",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_3D_COORD->CSAT2023-GE-30",
+      "edgeType": "prereq",
+      "source": "P_TU_3D_COORD",
+      "target": "CSAT2023-GE-30",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "prereq:P_TU_VECTOR_DOT->CSAT2023-GE-30",
+      "edgeType": "prereq",
+      "source": "P_TU_VECTOR_DOT",
+      "target": "CSAT2023-GE-30",
+      "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
     }
   ]
 }

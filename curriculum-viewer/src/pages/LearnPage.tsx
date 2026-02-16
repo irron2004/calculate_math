@@ -10,6 +10,7 @@ import type { Problem } from '../lib/learn/problems'
 import { loadProblemBank } from '../lib/learn/problems'
 import {
   createEmptyAttemptSessionStoreV1,
+  getDraftAttemptSession,
   submitAttemptSession,
   upsertDraftAttemptSession,
   updateDraftResponse
@@ -50,6 +51,9 @@ export default function LearnPage() {
 
   const storeRef = useRef<AttemptSessionStoreV1>(createEmptyAttemptSessionStoreV1())
   const [sessionId, setSessionId] = useState<string | null>(null)
+
+  const [showResumeModal, setShowResumeModal] = useState(false)
+  const [resumeAnsweredCount, setResumeAnsweredCount] = useState(0)
 
   const pendingByProblemIdRef = useRef<Record<string, string>>({})
   const autoSaveTimerRef = useRef<number | null>(null)
@@ -122,6 +126,9 @@ export default function LearnPage() {
     isLoadingScratchpadRef.current = false
     scratchpadRef.current?.clear()
 
+    setShowResumeModal(false)
+    setResumeAnsweredCount(0)
+
     if (!nodeId || !userId) {
       setAnswerByProblemId({})
       setSessionId(null)
@@ -131,6 +138,7 @@ export default function LearnPage() {
 
     const repo = createBrowserSessionRepository()
     const store = repo ? repo.readStore(userId) : createEmptyAttemptSessionStoreV1()
+    const existingDraft = getDraftAttemptSession(store, nodeId)
     const { store: nextStore, session } = upsertDraftAttemptSession({
       store,
       nodeId,
@@ -160,6 +168,16 @@ export default function LearnPage() {
     timeSpentByProblemIdRef.current = nextTimeSpent
     editCountByProblemIdRef.current = nextEditCounts
     scratchpadByProblemIdRef.current = nextScratchpads
+
+    if (existingDraft && Object.keys(existingDraft.responses).length > 0) {
+      const answeredCount = Object.values(existingDraft.responses).reduce((acc, response) => {
+        return normalizeNumericInput(response.inputRaw).length > 0 ? acc + 1 : acc
+      }, 0)
+      if (answeredCount > 0) {
+        setResumeAnsweredCount(answeredCount)
+        setShowResumeModal(true)
+      }
+    }
   }, [nodeId, userId])
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -393,6 +411,7 @@ export default function LearnPage() {
 
   const confirmSubmit = () => {
     setShowConfirmModal(false)
+    setShowResumeModal(false)
 
     if (!nodeId || !userId || problems.length === 0) return
     if (!allAnswered) return
@@ -456,6 +475,7 @@ export default function LearnPage() {
   }
 
   const resetAttempt = () => {
+    setShowResumeModal(false)
     setAnswerByProblemId({})
 
     // 레벨 2 데이터 초기화
@@ -595,6 +615,34 @@ export default function LearnPage() {
               />
             </div>
           </div>
+
+          {showResumeModal ? (
+            <div
+              className="modal-overlay"
+              onClick={() => setShowResumeModal(false)}
+            >
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <h2>이어서 풀기</h2>
+                <p>이전 답안이 있습니다.</p>
+                <p className="muted">입력된 문항: {resumeAnsweredCount}개</p>
+                <div className="modal-actions">
+                  <button type="button" className="button button-primary" onClick={() => setShowResumeModal(false)}>
+                    이어서 하기
+                  </button>
+                  <button
+                    type="button"
+                    className="button button-ghost"
+                    onClick={() => {
+                      setShowResumeModal(false)
+                      resetAttempt()
+                    }}
+                  >
+                    처음부터
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           {showConfirmModal ? (
             <div className="modal-overlay" onClick={cancelSubmit}>

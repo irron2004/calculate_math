@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "skill-graph-v1",
+  "graphId": "MS_MATH_SEQ_ADD_MUL_V1",
+  "title": "덧셈/곱셈 기반 수열 연결(샘플)",
+  "nodes": [
+    { "id": "ADDITION", "nodeCategory": "core", "label": "덧셈", "start": true, "order": 10 },
+    { "id": "MULTIPLICATION", "nodeCategory": "core", "label": "곱셈", "start": true, "order": 20 },
+    { "id": "PATTERN_FINDING", "nodeCategory": "core", "label": "규칙 찾기", "order": 30 },
+    { "id": "ARITHMETIC_SEQUENCE", "nodeCategory": "core", "label": "등차수열", "order": 40 },
+    { "id": "GEOMETRIC_SEQUENCE", "nodeCategory": "core", "label": "등비수열", "order": 50 }
+  ],
+  "edges": [
+    { "edgeType": "requires", "source": "ADDITION", "target": "PATTERN_FINDING" },
+    { "edgeType": "requires", "source": "PATTERN_FINDING", "target": "ARITHMETIC_SEQUENCE" },
+    { "edgeType": "requires", "source": "MULTIPLICATION", "target": "GEOMETRIC_SEQUENCE" }
+  ],
+  "meta": {
+    "note": "요청 연결: 덧셈 -> 규칙 찾기 -> 등차수열, 곱셈 -> 등비수열"
+  }
+}

@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import SkillGraphPreview from '../components/SkillGraphPreview'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { useRepositories } from '../lib/repository/RepositoryProvider'
+import { SKILL_GRAPH_DRAFT_UPDATED_EVENT } from '../lib/repository/graphRepository'
 import { getAuthorActiveGraphId } from '../lib/skillGraph/authorState'
 import { validateSkillGraphV1Rules } from '../lib/skillGraph/validate'
 
@@ -12,11 +13,31 @@ export default function AuthorValidatePage() {
 
   const [focusNodeId, setFocusNodeId] = useState<string | null>(null)
 
-  const graphId = useMemo(() => getAuthorActiveGraphId(), [])
+  const [draftRevision, setDraftRevision] = useState(0)
+
+  const graphId = getAuthorActiveGraphId()
   const draft = useMemo(() => {
     if (!userId || !graphId) return null
     return graphRepository.loadDraft({ userId, graphId })?.draft ?? null
-  }, [graphId, graphRepository, userId])
+  }, [draftRevision, graphId, graphRepository, userId])
+
+  useEffect(() => {
+    if (!userId || !graphId) return
+
+    const handler = (event: Event) => {
+      if (!(event instanceof CustomEvent)) return
+      const detail = event.detail
+      if (!detail || typeof detail !== 'object') return
+      const nextUserId = (detail as { userId?: unknown }).userId
+      const nextGraphId = (detail as { graphId?: unknown }).graphId
+      if (nextUserId !== userId) return
+      if (nextGraphId !== graphId) return
+      setDraftRevision((prev) => prev + 1)
+    }
+
+    window.addEventListener(SKILL_GRAPH_DRAFT_UPDATED_EVENT, handler)
+    return () => window.removeEventListener(SKILL_GRAPH_DRAFT_UPDATED_EVENT, handler)
+  }, [graphId, userId])
 
   const issues = useMemo(() => (draft ? validateSkillGraphV1Rules(draft) : []), [draft])
   const errorCount = issues.filter((issue) => issue.level === 'error').length

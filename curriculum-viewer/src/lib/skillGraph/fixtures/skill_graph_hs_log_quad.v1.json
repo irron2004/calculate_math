@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "skill-graph-v1",
+  "graphId": "HS_MATH_LOG_QUAD_V1",
+  "title": "함수·이차·로그 연결(샘플)",
+  "nodes": [
+    { "id": "FUNC", "nodeCategory": "core", "label": "함수", "start": true, "order": 10 },
+    { "id": "INEQ", "nodeCategory": "core", "label": "부등식", "start": true, "order": 20 },
+    { "id": "QUAD_EQ", "nodeCategory": "core", "label": "이차방정식", "start": true, "order": 30 },
+    { "id": "LOG_CONCEPT", "nodeCategory": "core", "label": "로그(개념)", "start": true, "order": 40 },
+    { "id": "EXP_FUNC", "nodeCategory": "core", "label": "지수함수", "start": true, "order": 50 },
+    { "id": "QUAD_FUNC", "nodeCategory": "core", "label": "이차함수", "order": 60 },
+    { "id": "QUAD_INEQ", "nodeCategory": "core", "label": "이차부등식", "order": 70 },
+    { "id": "LOG_FUNC", "nodeCategory": "core", "label": "로그함수", "order": 80 },
+    { "id": "FUNC_COMPOSITION", "nodeCategory": "formal", "label": "합성함수", "order": 90 },
+    { "id": "INVERSE_FUNC", "nodeCategory": "formal", "label": "역함수", "order": 100 },
+    { "id": "MONOTONICITY", "nodeCategory": "formal", "label": "단조성", "order": 110 },
+    { "id": "LOG_EQ", "nodeCategory": "core", "label": "로그방정식", "order": 120 },
+    { "id": "LOG_INEQ", "nodeCategory": "core", "label": "로그부등식", "order": 130 }
+  ],
+  "edges": [
+    { "edgeType": "requires", "source": "LOG_CONCEPT", "target": "LOG_FUNC" },
+    { "edgeType": "requires", "source": "FUNC", "target": "LOG_FUNC" },
+    { "edgeType": "related", "source": "EXP_FUNC", "target": "LOG_FUNC" },
+    { "edgeType": "related", "source": "LOG_FUNC", "target": "EXP_FUNC" },
+
+    { "edgeType": "requires", "source": "FUNC", "target": "QUAD_FUNC" },
+    { "edgeType": "requires", "source": "QUAD_EQ", "target": "QUAD_FUNC" },
+
+    { "edgeType": "requires", "source": "INEQ", "target": "QUAD_INEQ" },
+    { "edgeType": "requires", "source": "QUAD_EQ", "target": "QUAD_INEQ" },
+    { "edgeType": "requires", "source": "QUAD_FUNC", "target": "QUAD_INEQ" },
+
+    { "edgeType": "requires", "source": "FUNC", "target": "FUNC_COMPOSITION" },
+    { "edgeType": "requires", "source": "FUNC", "target": "INVERSE_FUNC" },
+    { "edgeType": "requires", "source": "FUNC", "target": "MONOTONICITY" },
+
+    { "edgeType": "requires", "source": "LOG_FUNC", "target": "LOG_EQ" },
+    { "edgeType": "requires", "source": "LOG_FUNC", "target": "LOG_INEQ" },
+
+    { "edgeType": "prepares_for", "source": "FUNC_COMPOSITION", "target": "LOG_EQ" },
+    { "edgeType": "prepares_for", "source": "INVERSE_FUNC", "target": "LOG_EQ" },
+    { "edgeType": "prepares_for", "source": "MONOTONICITY", "target": "LOG_INEQ" }
+  ],
+  "meta": {
+    "note": "요청 연결: (로그->로그함수), (함수->로그함수), (이차방정식->이차함수), (함수->이차함수), (부등식->이차부등식), (이차방정식->이차부등식), (이차함수->이차부등식) + 추가: 지수함수<->로그함수(related), 합성/역함수/단조성->로그방정식/로그부등식(prepares_for)"
+  }
+}

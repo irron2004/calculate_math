@@ -179,8 +179,8 @@ export default function MyPage() {
     return () => controller.abort()
   }, [loadAssignments])
 
-  const isDemoMode =
-    user !== null && (user.username === 'demo' || import.meta.env.VITE_DEMO_MODE === 'true')
+  const isStickerFeatureEnabled =
+    user !== null && user.role === 'student' && Boolean(user.praiseStickerEnabled)
 
   const loadStickers = useCallback(async (signal: AbortSignal) => {
     if (!user) return
@@ -213,7 +213,7 @@ export default function MyPage() {
   }, [user])
 
   useEffect(() => {
-    if (!isDemoMode) {
+    if (!isStickerFeatureEnabled) {
       setStickerSummary(null)
       setStickerHistory([])
       setStickerError(null)
@@ -224,7 +224,7 @@ export default function MyPage() {
     const controller = new AbortController()
     loadStickers(controller.signal)
     return () => controller.abort()
-  }, [isDemoMode, loadStickers])
+  }, [isStickerFeatureEnabled, loadStickers])
 
   const latestStickerReason = useMemo(() => {
     if (stickerHistory.length === 0) return null
@@ -264,11 +264,11 @@ export default function MyPage() {
       <h1>숙제</h1>
       <p className="muted">{user.name}님, 할당된 숙제를 확인하고 제출해요.</p>
 
-      {isDemoMode ? (
+      {isStickerFeatureEnabled ? (
         <section className="mypage-sticker-section">
           <div className="mypage-sticker-header">
             <h2>칭찬 스티커</h2>
-            <p className="muted">Demo 모드에서만 확인할 수 있어요.</p>
+            <p className="muted">받은 스티커 내역을 확인해요.</p>
           </div>
           {stickerLoading ? (
             <p className="muted">스티커 정보를 불러오는 중...</p>
