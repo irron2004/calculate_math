@@ -6,6 +6,7 @@ export type AuthUser = {
   email: string
   role: 'student' | 'admin'
   status: 'active' | 'disabled' | string
+  praiseStickerEnabled?: boolean
   createdAt: string
   lastLoginAt?: string | null
 }
@@ -29,6 +30,7 @@ export type StudentInfo = {
   grade: string
   email: string
   profile?: StudentProfileSummary | null
+  praiseStickerEnabled?: boolean
 }
 
 export type StudentProfileSummary = {

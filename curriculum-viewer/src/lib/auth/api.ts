@@ -1,7 +1,8 @@
 import type { AuthUser, LoginInput, RegisterInput, StudentInfo } from './types'
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from './tokenStorage'
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+const apiBaseFromEnv = import.meta.env.VITE_API_URL
+const API_BASE = import.meta.env.DEV ? '/api' : (apiBaseFromEnv || '/api')
 
 // Retry configuration for Railway cold start
 const MAX_RETRIES = 2
@@ -157,8 +158,31 @@ export async function listStudents(signal?: AbortSignal): Promise<StudentInfo[]>
     name: student.name,
     grade: student.grade,
     email: student.email,
-    profile: student.profile ?? null
+    profile: student.profile ?? null,
+    praiseStickerEnabled: Boolean(student.praiseStickerEnabled)
   }))
+}
+
+type AdminStudentFeaturesUpdateResponse = {
+  success: boolean
+  praiseStickerEnabled: boolean
+}
+
+export async function updateStudentFeatures(
+  studentId: string,
+  features: { praiseStickerEnabled: boolean }
+): Promise<AdminStudentFeaturesUpdateResponse> {
+  const encodedId = encodeURIComponent(studentId)
+  const response = await authFetch(`${API_BASE}/admin/students/${encodedId}/features`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(features)
+  })
+  const json = await response.json()
+  if (!response.ok) {
+    throw new Error(isApiError(json) ? json.error.message : '학생 설정을 변경할 수 없습니다.')
+  }
+  return json as AdminStudentFeaturesUpdateResponse
 }
 
 export async function authFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
