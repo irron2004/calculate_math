@@ -22,7 +22,7 @@ describe('App routing', () => {
     expect(mapLink).toHaveAttribute('href', '/map')
     expect(mapLink).toHaveTextContent(/beta/i)
 
-    const showDetailPanel = ['/graph', '/map', '/tree', '/learn', '/report'].some((prefix) =>
+    const showDetailPanel = ['/graph', '/tree', '/learn', '/report'].some((prefix) =>
       window.location.pathname.startsWith(prefix)
     )
     if (showDetailPanel) {
@@ -143,7 +143,7 @@ describe('App routing', () => {
     setStoredUser('demo')
     window.history.pushState({}, '', '/map')
     render(<App />)
-    expect(screen.getByRole('heading', { name: '지도' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /지도/ })).toBeInTheDocument()
     expectPersistentLayout()
     expect(screen.getByRole('link', { name: /지도/i })).toHaveAttribute('aria-current', 'page')
   })

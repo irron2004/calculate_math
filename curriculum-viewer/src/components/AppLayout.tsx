@@ -2,7 +2,6 @@ import { type ReactNode, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { ClipboardList, Home, Map as MapIcon } from 'lucide-react'
 import { useAuth } from '../lib/auth/AuthProvider'
-import { useFocusNodeId } from '../lib/routing/useFocusNodeId'
 import { ROUTES } from '../routes'
 
 export type DetailPanelContext = {
@@ -13,9 +12,6 @@ export default function AppLayout() {
   const { isAuthenticated, isAdmin, user, logout, setMode } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const { focusNodeId } = useFocusNodeId()
-
-  const focusQuery = focusNodeId ? `?focus=${encodeURIComponent(focusNodeId)}` : ''
 
   const userLabel = user
     ? user.name && user.name !== user.username
@@ -33,7 +29,6 @@ export default function AppLayout() {
     const path = location.pathname
     return (
       path.startsWith(ROUTES.graph) ||
-      path.startsWith(ROUTES.map) ||
       path.startsWith(ROUTES.tree) ||
       path.startsWith(ROUTES.learn) ||
       path.startsWith(ROUTES.report)
@@ -58,7 +53,7 @@ export default function AppLayout() {
               </NavLink>
             </li>
             <li>
-              <NavLink to={`${ROUTES.map}${focusQuery}`}>
+              <NavLink to={ROUTES.map}>
                 <MapIcon aria-hidden="true" size={18} />
                 <span>지도</span>
                 <span className="nav-badge" aria-label="Beta">

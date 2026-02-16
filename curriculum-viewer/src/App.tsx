@@ -32,6 +32,7 @@ import AuthorStudentsPage from './pages/AuthorStudentsPage'
 import AuthorValidatePage from './pages/AuthorValidatePage'
 import SkillGraphImportPage from './pages/SkillGraphImportPage'
 import SignupPage from './pages/SignupPage'
+import StudentStageMapPage from './pages/StudentStageMapPage'
 import StudentPreviewPage from './pages/StudentPreviewPage'
 import { ROUTE_SEGMENTS, ROUTES } from './routes'
 
@@ -89,7 +90,7 @@ export default function App() {
                   path={ROUTE_SEGMENTS.map}
                   element={
                     <RequireAuth>
-                      <GraphPage />
+                      <StudentStageMapPage />
                     </RequireAuth>
                   }
                 />
