@@ -259,6 +259,18 @@ export default function MyPage() {
     return sorted[0]?.reason ?? null
   }, [stickerHistory])
 
+  const stickerPreviewReasons = useMemo(() => {
+    if (stickerHistory.length === 0) return []
+    return [...stickerHistory]
+      .sort((a, b) => {
+        const aTime = new Date(a.grantedAt).getTime()
+        const bTime = new Date(b.grantedAt).getTime()
+        return bTime - aTime
+      })
+      .slice(0, 8)
+      .map((sticker) => sticker.reason)
+  }, [stickerHistory])
+
   if (!user) {
     return (
       <section>
@@ -302,7 +314,12 @@ export default function MyPage() {
             </div>
           ) : (
             <>
-              <StickerDisplay totalCount={stickerSummary?.totalCount ?? 0} latestReason={latestStickerReason} />
+              <StickerDisplay
+                totalCount={stickerSummary?.totalCount ?? 0}
+                latestReason={latestStickerReason}
+                maxCount={100}
+                recentReasons={stickerPreviewReasons}
+              />
               <StickerHistory stickers={stickerHistory} />
             </>
           )}

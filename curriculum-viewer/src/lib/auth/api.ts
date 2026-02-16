@@ -168,6 +168,22 @@ type AdminStudentFeaturesUpdateResponse = {
   praiseStickerEnabled: boolean
 }
 
+export type AdminGrantStickerInput = {
+  count: number
+  reason: string
+}
+
+export type AdminGrantStickerResponse = {
+  id: string
+  studentId: string
+  count: number
+  reason: string
+  reasonType: 'homework_excellent' | 'bonus'
+  homeworkId?: string | null
+  grantedBy?: string | null
+  grantedAt: string
+}
+
 export async function updateStudentFeatures(
   studentId: string,
   features: { praiseStickerEnabled: boolean }
@@ -183,6 +199,23 @@ export async function updateStudentFeatures(
     throw new Error(isApiError(json) ? json.error.message : '학생 설정을 변경할 수 없습니다.')
   }
   return json as AdminStudentFeaturesUpdateResponse
+}
+
+export async function grantStudentSticker(
+  studentId: string,
+  input: AdminGrantStickerInput
+): Promise<AdminGrantStickerResponse> {
+  const encodedId = encodeURIComponent(studentId)
+  const response = await authFetch(`${API_BASE}/students/${encodedId}/stickers`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input)
+  })
+  const json = await response.json()
+  if (!response.ok) {
+    throw new Error(isApiError(json) ? json.error.message : '칭찬 스티커 지급에 실패했습니다.')
+  }
+  return json as AdminGrantStickerResponse
 }
 
 export async function authFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {

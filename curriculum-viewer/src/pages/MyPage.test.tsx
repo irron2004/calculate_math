@@ -111,7 +111,7 @@ describe('MyPage stickers', () => {
 
       expect(await screen.findByRole('heading', { name: '숙제' })).toBeInTheDocument()
       expect(await screen.findByText('칭찬 스티커')).toBeInTheDocument()
-      expect(await screen.findByText('5개')).toBeInTheDocument()
+      expect(await screen.findByText(/5\s*\/\s*100/)).toBeInTheDocument()
       expect(await screen.findByText('숙제를 성실히 제출했어요.')).toBeInTheDocument()
       expect(screen.getByText('+2개')).toBeInTheDocument()
     } finally {

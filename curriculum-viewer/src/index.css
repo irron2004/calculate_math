@@ -2072,6 +2072,11 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+.sticker-display-stack {
+  display: grid;
+  gap: var(--space-3);
+}
+
 .sticker-display-content {
   display: grid;
   gap: var(--space-1);
@@ -2093,6 +2098,104 @@ body {
 
 .sticker-display-hint {
   margin: 0;
+}
+
+.sticker-progress {
+  position: relative;
+  width: min(360px, 100%);
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-neutral-200);
+  overflow: hidden;
+}
+
+.sticker-progress-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-secondary-500) 0%, var(--color-primary-500) 100%);
+  border-radius: inherit;
+}
+
+.sticker-board-card {
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--color-neutral-200);
+  background: #ffffff;
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.sticker-board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.sticker-board-title,
+.sticker-board-count {
+  margin: 0;
+}
+
+.sticker-board-title {
+  font-weight: 700;
+  color: var(--color-neutral-800);
+}
+
+.sticker-reason-preview {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-2);
+}
+
+.sticker-reason-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-primary-200);
+  background: var(--color-primary-50);
+}
+
+.sticker-reason-preview-icon {
+  font-size: 14px;
+}
+
+.sticker-reason-preview-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-700);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sticker-board-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.sticker-board-slot {
+  height: 24px;
+  border-radius: 6px;
+  border: 1px dashed var(--color-neutral-300);
+  background: var(--color-neutral-100);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.sticker-board-slot--filled {
+  border-style: solid;
+  border-color: var(--color-primary-300);
+  background: linear-gradient(135deg, var(--color-primary-50) 0%, #fff8e1 100%);
 }
 
 .sticker-icon-wrapper {
@@ -2215,6 +2318,10 @@ body {
   .sticker-display-card {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .sticker-board-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
   }
 }
 
@@ -3218,6 +3325,29 @@ body {
 .admin-students-table .student-id {
   font-size: 12px;
   margin-left: 6px;
+}
+
+.admin-sticker-grant-form {
+  display: grid;
+  grid-template-columns: 72px minmax(140px, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-sticker-count-input,
+.admin-sticker-reason-input {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 8px 10px;
+  font-size: 13px;
+  min-height: 34px;
+}
+
+@media (max-width: 980px) {
+  .admin-sticker-grant-form {
+    grid-template-columns: 1fr;
+  }
 }
 
 .admin-submission-header {
