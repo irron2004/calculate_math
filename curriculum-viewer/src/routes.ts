@@ -23,6 +23,7 @@ export const ROUTE_SEGMENTS = {
   authorValidate: 'validate',
   authorPublish: 'publish',
   authorHealth: 'health',
+  authorStudents: 'students',
   authorHomework: 'homework',
   authorHomeworkStatus: 'homework-status'
 } as const
@@ -53,6 +54,7 @@ export const ROUTES = {
   authorValidate: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorValidate}`,
   authorPublish: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorPublish}`,
   authorHealth: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorHealth}`,
+  authorStudents: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorStudents}`,
   authorHomework: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorHomework}`,
   authorHomeworkStatus: `/${ROUTE_SEGMENTS.author}/${ROUTE_SEGMENTS.authorHomeworkStatus}`
 } as const

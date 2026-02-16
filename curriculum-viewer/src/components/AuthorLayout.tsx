@@ -46,6 +46,9 @@ export default function AuthorLayout() {
               <NavLink to={ROUTES.authorHealth}>Health</NavLink>
             </li>
             <li>
+              <NavLink to={ROUTES.authorStudents}>계정 현황</NavLink>
+            </li>
+            <li>
               <NavLink to={ROUTES.authorHomework}>숙제</NavLink>
             </li>
             <li>

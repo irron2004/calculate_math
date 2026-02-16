@@ -28,6 +28,7 @@ import AuthorHomeworkStatusPage from './pages/AuthorHomeworkStatusPage'
 import AuthorMiniFlowPage from './pages/AuthorMiniFlowPage'
 import AuthorPublishPage from './pages/AuthorPublishPage'
 import AuthorResearchGraphPage from './pages/AuthorResearchGraphPage'
+import AuthorStudentsPage from './pages/AuthorStudentsPage'
 import AuthorValidatePage from './pages/AuthorValidatePage'
 import SkillGraphImportPage from './pages/SkillGraphImportPage'
 import SignupPage from './pages/SignupPage'
@@ -61,6 +62,7 @@ export default function App() {
                 <Route path={ROUTE_SEGMENTS.authorMiniFlow} element={<AuthorMiniFlowPage />} />
                 <Route path={ROUTE_SEGMENTS.authorPublish} element={<AuthorPublishPage />} />
                 <Route path={ROUTE_SEGMENTS.authorHealth} element={<HealthPage />} />
+                <Route path={ROUTE_SEGMENTS.authorStudents} element={<AuthorStudentsPage />} />
                 <Route path={ROUTE_SEGMENTS.authorHomework} element={<AuthorHomeworkPage />} />
                 <Route path={ROUTE_SEGMENTS.authorHomeworkStatus} element={<AuthorHomeworkStatusPage />} />
                 <Route path="*" element={<Navigate to={ROUTES.authorEditor} replace />} />
