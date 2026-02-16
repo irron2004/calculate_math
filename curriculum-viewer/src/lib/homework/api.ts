@@ -75,6 +75,9 @@ export async function createAssignment(
       problems: data.problems,
       dueAt: normalizedDueAt,
       scheduledAt: normalizedScheduledAt,
+      stickerRewardCount: typeof data.stickerRewardCount === 'number'
+        ? Math.max(0, Math.trunc(data.stickerRewardCount))
+        : 2,
       targetStudentIds: data.targetStudentIds,
     }),
     signal,

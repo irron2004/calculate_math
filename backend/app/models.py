@@ -1,4 +1,5 @@
 """Pydantic schemas for API responses."""
+
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
@@ -206,6 +207,7 @@ class PraiseStickerSummaryResponse(BaseModel):
 
 class HomeworkProblem(BaseModel):
     """A single problem in a homework assignment."""
+
     id: str
     type: str  # "objective" or "subjective"
     question: str
@@ -219,6 +221,7 @@ class HomeworkAssignmentCreate(BaseModel):
     problems: List[HomeworkProblem]
     dueAt: Optional[str] = None
     scheduledAt: Optional[str] = None
+    stickerRewardCount: int = Field(default=2, ge=0)
     targetStudentIds: List[str]
 
 
@@ -265,6 +268,7 @@ class HomeworkAssignmentListItem(BaseModel):
     problems: List[HomeworkProblem]
     dueAt: Optional[str] = None
     scheduledAt: Optional[str] = None
+    stickerRewardCount: int = 2
     createdAt: str
     submitted: bool
     submissionId: Optional[str] = None
@@ -282,6 +286,7 @@ class HomeworkAssignmentDetail(BaseModel):
     description: Optional[str] = None
     problems: List[HomeworkProblem]
     dueAt: Optional[str] = None
+    stickerRewardCount: int = 2
     createdAt: str
     submission: Optional[HomeworkSubmissionDetail] = None
 
@@ -308,12 +313,14 @@ class HomeworkSubmissionReviewResponse(BaseModel):
 
 class AdminAssignmentSummary(BaseModel):
     """Summary of an assignment for admin list view."""
+
     id: str
     title: str
     description: Optional[str] = None
     problems: List[HomeworkProblem]
     dueAt: Optional[str] = None
     scheduledAt: Optional[str] = None
+    stickerRewardCount: int = 2
     createdBy: str
     createdAt: str
     totalStudents: int
@@ -330,6 +337,7 @@ class AdminAssignmentListResponse(BaseModel):
 
 class AdminStudentSubmissionSummary(BaseModel):
     """Summary of a student's submission status for an assignment."""
+
     studentId: str
     assignedAt: str
     submissionId: Optional[str] = None
@@ -341,12 +349,14 @@ class AdminStudentSubmissionSummary(BaseModel):
 
 class AdminAssignmentDetail(BaseModel):
     """Full assignment detail with student submission summaries."""
+
     id: str
     title: str
     description: Optional[str] = None
     problems: List[HomeworkProblem]
     dueAt: Optional[str] = None
     scheduledAt: Optional[str] = None
+    stickerRewardCount: int = 2
     createdBy: str
     createdAt: str
     students: List[AdminStudentSubmissionSummary]
@@ -354,6 +364,7 @@ class AdminAssignmentDetail(BaseModel):
 
 class AdminSubmissionFile(BaseModel):
     """File info for admin submission view."""
+
     id: str
     storedPath: str
     originalName: str
@@ -364,6 +375,7 @@ class AdminSubmissionFile(BaseModel):
 
 class AdminSubmissionDetail(BaseModel):
     """Full submission detail for admin review."""
+
     id: str
     assignmentId: str
     studentId: str
@@ -382,6 +394,7 @@ class AdminSubmissionDetail(BaseModel):
 
 class HomeworkPendingCountResponse(BaseModel):
     """Count of homework items by status for a student."""
+
     totalAssigned: int
     notSubmitted: int
     returned: int

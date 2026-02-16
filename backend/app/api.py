@@ -9,7 +9,17 @@ from pathlib import Path
 from typing import Any, List
 from uuid import uuid4
 
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, File, Form, Query, Request, UploadFile
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Body,
+    Depends,
+    File,
+    Form,
+    Query,
+    Request,
+    UploadFile,
+)
 from fastapi.responses import JSONResponse
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -113,7 +123,10 @@ router = APIRouter(prefix="/api")
 # Rate limiter - imported from main to avoid circular import
 limiter = Limiter(key_func=get_remote_address)
 
-TEST_ENDPOINT_RESPONSE = {"status": "OK", "message": "PM intake test endpoint is active."}
+TEST_ENDPOINT_RESPONSE = {
+    "status": "OK",
+    "message": "PM intake test endpoint is active.",
+}
 
 
 @router.get("/health")
@@ -214,22 +227,77 @@ def register_user(
     email = data.email.strip().lower()
 
     if not username:
-        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_USERNAME", "message": "아이디를 입력하세요."}})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {"code": "INVALID_USERNAME", "message": "아이디를 입력하세요."}
+            },
+        )
     if len(username) < 3:
-        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_USERNAME", "message": "아이디는 3자 이상이어야 합니다."}})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "INVALID_USERNAME",
+                    "message": "아이디는 3자 이상이어야 합니다.",
+                }
+            },
+        )
     if not password or len(password) < 8:
-        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_PASSWORD", "message": "비밀번호는 8자 이상이어야 합니다."}})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "INVALID_PASSWORD",
+                    "message": "비밀번호는 8자 이상이어야 합니다.",
+                }
+            },
+        )
     if not name:
-        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_NAME", "message": "이름을 입력하세요."}})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {"code": "INVALID_NAME", "message": "이름을 입력하세요."}
+            },
+        )
     if not grade:
-        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_GRADE", "message": "학년을 입력하세요."}})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {"code": "INVALID_GRADE", "message": "학년을 입력하세요."}
+            },
+        )
     if not _is_valid_email(email):
-        return JSONResponse(status_code=400, content={"error": {"code": "INVALID_EMAIL", "message": "이메일 형식이 올바르지 않습니다."}})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "INVALID_EMAIL",
+                    "message": "이메일 형식이 올바르지 않습니다.",
+                }
+            },
+        )
 
     if get_user_by_username(username):
-        return JSONResponse(status_code=400, content={"error": {"code": "USERNAME_EXISTS", "message": "이미 존재하는 아이디입니다."}})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "USERNAME_EXISTS",
+                    "message": "이미 존재하는 아이디입니다.",
+                }
+            },
+        )
     if get_user_by_email(email):
-        return JSONResponse(status_code=400, content={"error": {"code": "EMAIL_EXISTS", "message": "이미 등록된 이메일입니다."}})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "EMAIL_EXISTS",
+                    "message": "이미 등록된 이메일입니다.",
+                }
+            },
+        )
 
     password_hash = hash_password(password)
     try:
@@ -249,22 +317,40 @@ def register_user(
             message = "이미 존재하는 아이디입니다."
         elif code == "EMAIL_EXISTS":
             message = "이미 등록된 이메일입니다."
-        return JSONResponse(status_code=400, content={"error": {"code": code, "message": message}})
+        return JSONResponse(
+            status_code=400, content={"error": {"code": code, "message": message}}
+        )
 
     user = get_user_by_id(user_id)
     if not user:
-        return JSONResponse(status_code=500, content={"error": {"code": "USER_NOT_FOUND", "message": "사용자 생성에 실패했습니다."}})
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": {
+                    "code": "USER_NOT_FOUND",
+                    "message": "사용자 생성에 실패했습니다.",
+                }
+            },
+        )
 
-    access_token, _ = create_access_token(user_id=user["id"], username=user["username"], role=user["role"])
+    access_token, _ = create_access_token(
+        user_id=user["id"], username=user["username"], role=user["role"]
+    )
     refresh_token, refresh_payload = create_refresh_token(
         user_id=user["id"], username=user["username"], role=user["role"]
     )
     store_refresh_token(
         user_id=user["id"],
         token_hash=hash_token(refresh_token),
-        expires_at=datetime.fromtimestamp(refresh_payload["exp"], tz=timezone.utc).isoformat(),
+        expires_at=datetime.fromtimestamp(
+            refresh_payload["exp"], tz=timezone.utc
+        ).isoformat(),
     )
-    return AuthTokenResponse(accessToken=access_token, refreshToken=refresh_token, user=_build_auth_user(user))
+    return AuthTokenResponse(
+        accessToken=access_token,
+        refreshToken=refresh_token,
+        user=_build_auth_user(user),
+    )
 
 
 @router.post(
@@ -280,25 +366,57 @@ def login_user(
     username = data.username.strip()
     password = data.password.strip()
     if not username or not password:
-        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_CREDENTIALS", "message": "아이디 또는 비밀번호가 올바르지 않습니다."}})
+        return JSONResponse(
+            status_code=401,
+            content={
+                "error": {
+                    "code": "INVALID_CREDENTIALS",
+                    "message": "아이디 또는 비밀번호가 올바르지 않습니다.",
+                }
+            },
+        )
 
     user = get_user_by_username(username)
     if not user or not verify_password(password, user["password_hash"]):
-        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_CREDENTIALS", "message": "아이디 또는 비밀번호가 올바르지 않습니다."}})
+        return JSONResponse(
+            status_code=401,
+            content={
+                "error": {
+                    "code": "INVALID_CREDENTIALS",
+                    "message": "아이디 또는 비밀번호가 올바르지 않습니다.",
+                }
+            },
+        )
     if user["status"] != "active":
-        return JSONResponse(status_code=403, content={"error": {"code": "ACCOUNT_DISABLED", "message": "계정이 비활성화되었습니다."}})
+        return JSONResponse(
+            status_code=403,
+            content={
+                "error": {
+                    "code": "ACCOUNT_DISABLED",
+                    "message": "계정이 비활성화되었습니다.",
+                }
+            },
+        )
 
     update_last_login(user["id"])
-    access_token, _ = create_access_token(user_id=user["id"], username=user["username"], role=user["role"])
+    access_token, _ = create_access_token(
+        user_id=user["id"], username=user["username"], role=user["role"]
+    )
     refresh_token, refresh_payload = create_refresh_token(
         user_id=user["id"], username=user["username"], role=user["role"]
     )
     store_refresh_token(
         user_id=user["id"],
         token_hash=hash_token(refresh_token),
-        expires_at=datetime.fromtimestamp(refresh_payload["exp"], tz=timezone.utc).isoformat(),
+        expires_at=datetime.fromtimestamp(
+            refresh_payload["exp"], tz=timezone.utc
+        ).isoformat(),
     )
-    return AuthTokenResponse(accessToken=access_token, refreshToken=refresh_token, user=_build_auth_user(user))
+    return AuthTokenResponse(
+        accessToken=access_token,
+        refreshToken=refresh_token,
+        user=_build_auth_user(user),
+    )
 
 
 @router.post(
@@ -313,31 +431,71 @@ def refresh_token(
 ) -> AuthTokenResponse | JSONResponse:
     refresh = data.refreshToken.strip()
     if not refresh:
-        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_REFRESH", "message": "리프레시 토큰이 없습니다."}})
+        return JSONResponse(
+            status_code=401,
+            content={
+                "error": {
+                    "code": "INVALID_REFRESH",
+                    "message": "리프레시 토큰이 없습니다.",
+                }
+            },
+        )
 
     payload = decode_token(refresh, expected_type="refresh")
     token_hash_value = hash_token(refresh)
     record = get_refresh_token_by_hash(token_hash_value)
     if not record or record.get("revoked_at") is not None:
-        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_REFRESH", "message": "리프레시 토큰이 유효하지 않습니다."}})
+        return JSONResponse(
+            status_code=401,
+            content={
+                "error": {
+                    "code": "INVALID_REFRESH",
+                    "message": "리프레시 토큰이 유효하지 않습니다.",
+                }
+            },
+        )
     if record.get("user_id") != payload.get("sub"):
-        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_REFRESH", "message": "리프레시 토큰이 유효하지 않습니다."}})
+        return JSONResponse(
+            status_code=401,
+            content={
+                "error": {
+                    "code": "INVALID_REFRESH",
+                    "message": "리프레시 토큰이 유효하지 않습니다.",
+                }
+            },
+        )
 
     user = get_user_by_id(payload["sub"])
     if not user:
-        return JSONResponse(status_code=401, content={"error": {"code": "INVALID_REFRESH", "message": "사용자를 찾을 수 없습니다."}})
+        return JSONResponse(
+            status_code=401,
+            content={
+                "error": {
+                    "code": "INVALID_REFRESH",
+                    "message": "사용자를 찾을 수 없습니다.",
+                }
+            },
+        )
 
     revoke_refresh_token(token_hash_value)
-    access_token, _ = create_access_token(user_id=user["id"], username=user["username"], role=user["role"])
+    access_token, _ = create_access_token(
+        user_id=user["id"], username=user["username"], role=user["role"]
+    )
     new_refresh_token, new_refresh_payload = create_refresh_token(
         user_id=user["id"], username=user["username"], role=user["role"]
     )
     store_refresh_token(
         user_id=user["id"],
         token_hash=hash_token(new_refresh_token),
-        expires_at=datetime.fromtimestamp(new_refresh_payload["exp"], tz=timezone.utc).isoformat(),
+        expires_at=datetime.fromtimestamp(
+            new_refresh_payload["exp"], tz=timezone.utc
+        ).isoformat(),
     )
-    return AuthTokenResponse(accessToken=access_token, refreshToken=new_refresh_token, user=_build_auth_user(user))
+    return AuthTokenResponse(
+        accessToken=access_token,
+        refreshToken=new_refresh_token,
+        user=_build_auth_user(user),
+    )
 
 
 @router.post(
@@ -357,7 +515,12 @@ def logout_user(
 @router.post(
     "/auth/password",
     response_model=AuthChangePasswordResponse,
-    responses={400: {"model": ErrorResponse}, 401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}, 429: {"model": ErrorResponse}},
+    responses={
+        400: {"model": ErrorResponse},
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        429: {"model": ErrorResponse},
+    },
 )
 @limiter.limit("5/minute")
 def change_password(
@@ -371,36 +534,66 @@ def change_password(
     if not current_password or not new_password:
         return JSONResponse(
             status_code=400,
-            content={"error": {"code": "INVALID_PASSWORD", "message": "비밀번호를 입력하세요."}},
+            content={
+                "error": {
+                    "code": "INVALID_PASSWORD",
+                    "message": "비밀번호를 입력하세요.",
+                }
+            },
         )
     if len(new_password) < 8:
         return JSONResponse(
             status_code=400,
-            content={"error": {"code": "INVALID_PASSWORD", "message": "비밀번호는 8자 이상이어야 합니다."}},
+            content={
+                "error": {
+                    "code": "INVALID_PASSWORD",
+                    "message": "비밀번호는 8자 이상이어야 합니다.",
+                }
+            },
         )
     if current_password == new_password:
         return JSONResponse(
             status_code=400,
-            content={"error": {"code": "PASSWORD_UNCHANGED", "message": "새 비밀번호를 입력하세요."}},
+            content={
+                "error": {
+                    "code": "PASSWORD_UNCHANGED",
+                    "message": "새 비밀번호를 입력하세요.",
+                }
+            },
         )
 
     row = get_user_by_id(user.user_id)
     if not row or not verify_password(current_password, row["password_hash"]):
         return JSONResponse(
             status_code=401,
-            content={"error": {"code": "INVALID_CREDENTIALS", "message": "현재 비밀번호가 올바르지 않습니다."}},
+            content={
+                "error": {
+                    "code": "INVALID_CREDENTIALS",
+                    "message": "현재 비밀번호가 올바르지 않습니다.",
+                }
+            },
         )
     if row["status"] != "active":
         return JSONResponse(
             status_code=403,
-            content={"error": {"code": "ACCOUNT_DISABLED", "message": "계정이 비활성화되었습니다."}},
+            content={
+                "error": {
+                    "code": "ACCOUNT_DISABLED",
+                    "message": "계정이 비활성화되었습니다.",
+                }
+            },
         )
 
     updated = update_user_password(user.user_id, hash_password(new_password))
     if not updated:
         return JSONResponse(
             status_code=500,
-            content={"error": {"code": "UPDATE_FAILED", "message": "비밀번호 변경에 실패했습니다."}},
+            content={
+                "error": {
+                    "code": "UPDATE_FAILED",
+                    "message": "비밀번호 변경에 실패했습니다.",
+                }
+            },
         )
     revoke_all_refresh_tokens(user.user_id)
     return AuthChangePasswordResponse(success=True)
@@ -414,7 +607,15 @@ def change_password(
 def get_me(user=Depends(get_current_user)) -> AuthUser | JSONResponse:
     row = get_user_by_id(user.user_id)
     if not row:
-        return JSONResponse(status_code=401, content={"error": {"code": "USER_NOT_FOUND", "message": "사용자를 찾을 수 없습니다."}})
+        return JSONResponse(
+            status_code=401,
+            content={
+                "error": {
+                    "code": "USER_NOT_FOUND",
+                    "message": "사용자를 찾을 수 없습니다.",
+                }
+            },
+        )
     return _build_auth_user(row)
 
 
@@ -442,9 +643,16 @@ def list_admin_users(
     response_model=StudentProfileGetResponse,
     responses={401: {"model": ErrorResponse}, 403: {"model": ErrorResponse}},
 )
-def get_student_profile_me(user=Depends(get_current_user)) -> StudentProfileGetResponse | JSONResponse:
+def get_student_profile_me(
+    user=Depends(get_current_user),
+) -> StudentProfileGetResponse | JSONResponse:
     if user.role != "student":
-        return JSONResponse(status_code=403, content={"error": {"code": "STUDENT_ONLY", "message": "학생 전용 기능입니다."}})
+        return JSONResponse(
+            status_code=403,
+            content={
+                "error": {"code": "STUDENT_ONLY", "message": "학생 전용 기능입니다."}
+            },
+        )
 
     profile = get_student_profile(user.username)
     if not profile:
@@ -463,7 +671,12 @@ def upsert_student_profile_me(
     user=Depends(get_current_user),
 ) -> StudentProfileGetResponse | JSONResponse:
     if user.role != "student":
-        return JSONResponse(status_code=403, content={"error": {"code": "STUDENT_ONLY", "message": "학생 전용 기능입니다."}})
+        return JSONResponse(
+            status_code=403,
+            content={
+                "error": {"code": "STUDENT_ONLY", "message": "학생 전용 기능입니다."}
+            },
+        )
 
     upsert_student_profile(
         student_id=user.username,
@@ -592,7 +805,11 @@ def get_student_sticker_summary(
 @router.post(
     "/students/{student_id}/stickers",
     response_model=PraiseSticker,
-    responses={400: {"model": ErrorResponse}, 403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+    responses={
+        400: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+    },
 )
 def grant_bonus_sticker(
     student_id: str,
@@ -602,21 +819,30 @@ def grant_bonus_sticker(
     if data.count <= 0:
         return JSONResponse(
             status_code=400,
-            content={"error": {"code": "INVALID_COUNT", "message": "count must be positive"}},
+            content={
+                "error": {"code": "INVALID_COUNT", "message": "count must be positive"}
+            },
         )
 
     reason = data.reason.strip()
     if not reason:
         return JSONResponse(
             status_code=400,
-            content={"error": {"code": "INVALID_REASON", "message": "reason cannot be empty"}},
+            content={
+                "error": {"code": "INVALID_REASON", "message": "reason cannot be empty"}
+            },
         )
 
     target = get_user_by_username(student_id)
     if not target or target.get("role") != "student":
         return JSONResponse(
             status_code=404,
-            content={"error": {"code": "STUDENT_NOT_FOUND", "message": "학생을 찾을 수 없습니다."}},
+            content={
+                "error": {
+                    "code": "STUDENT_NOT_FOUND",
+                    "message": "학생을 찾을 수 없습니다.",
+                }
+            },
         )
     feature_guard = _require_praise_sticker_enabled(target)
     if feature_guard:
@@ -633,7 +859,11 @@ def grant_bonus_sticker(
     return PraiseSticker(**sticker)
 
 
-@router.get("/graph/draft", response_model=GraphResponse, responses={404: {"model": ErrorResponse}})
+@router.get(
+    "/graph/draft",
+    response_model=GraphResponse,
+    responses={404: {"model": ErrorResponse}},
+)
 def get_draft_graph() -> GraphResponse | JSONResponse:
     graph = fetch_latest_graph("draft")
     if not graph:
@@ -649,7 +879,11 @@ def get_draft_graph() -> GraphResponse | JSONResponse:
     return graph
 
 
-@router.get("/graph/published", response_model=GraphResponse, responses={404: {"model": ErrorResponse}})
+@router.get(
+    "/graph/published",
+    response_model=GraphResponse,
+    responses={404: {"model": ErrorResponse}},
+)
 def get_published_graph() -> GraphResponse | JSONResponse:
     graph = fetch_latest_graph("published")
     if not graph:
@@ -665,8 +899,12 @@ def get_published_graph() -> GraphResponse | JSONResponse:
     return graph
 
 
-@router.get("/problems", response_model=List[Problem], responses={404: {"model": ErrorResponse}})
-def list_problems(nodeId: str = Query(..., min_length=1)) -> List[Problem] | JSONResponse:
+@router.get(
+    "/problems", response_model=List[Problem], responses={404: {"model": ErrorResponse}}
+)
+def list_problems(
+    nodeId: str = Query(..., min_length=1),
+) -> List[Problem] | JSONResponse:
     problems = fetch_problems(nodeId)
     if problems is None:
         return JSONResponse(
@@ -688,7 +926,13 @@ def list_problems(nodeId: str = Query(..., min_length=1)) -> List[Problem] | JSO
 # File upload constants
 MAX_FILE_COUNT = 3
 MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024  # 5MB
-ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/jpg", "image/pjpeg", "image/png", "image/webp"}
+ALLOWED_CONTENT_TYPES = {
+    "image/jpeg",
+    "image/jpg",
+    "image/pjpeg",
+    "image/png",
+    "image/webp",
+}
 UPLOAD_BASE_DIR = Path(__file__).resolve().parent.parent / "data" / "uploads"
 
 
@@ -784,7 +1028,9 @@ def create_assignment(
                     }
                 },
             )
-        if problem.type == "objective" and (not problem.options or len(problem.options) < 2):
+        if problem.type == "objective" and (
+            not problem.options or len(problem.options) < 2
+        ):
             return JSONResponse(
                 status_code=400,
                 content={
@@ -808,7 +1054,12 @@ def create_assignment(
         )
 
     due_at = data.dueAt.strip() if data.dueAt and data.dueAt.strip() else None
-    scheduled_at = data.scheduledAt.strip() if data.scheduledAt and data.scheduledAt.strip() else None
+    scheduled_at = (
+        data.scheduledAt.strip()
+        if data.scheduledAt and data.scheduledAt.strip()
+        else None
+    )
+    sticker_reward_count = max(0, int(data.stickerRewardCount))
 
     # Convert problems to dict for storage
     problems_data = [p.model_dump() for p in data.problems]
@@ -821,6 +1072,7 @@ def create_assignment(
         description=data.description,
         due_at=due_at,
         scheduled_at=scheduled_at,
+        sticker_reward_count=sticker_reward_count,
     )
 
     return HomeworkAssignmentCreateResponse(id=assignment_id)
@@ -1193,9 +1445,14 @@ def review_homework_submission(
                 reason_type="homework_excellent",
             )
             if not already_granted:
+                sticker_reward_count = max(
+                    0, int(submission.get("assignmentStickerRewardCount") or 2)
+                )
+                if sticker_reward_count <= 0:
+                    return HomeworkSubmissionReviewResponse()
                 create_praise_sticker(
                     student_id=student_id,
-                    count=2,
+                    count=sticker_reward_count,
                     reason=AUTO_STICKER_REASON,
                     reason_type="homework_excellent",
                     homework_id=homework_id,
@@ -1214,7 +1471,9 @@ def review_homework_submission(
     "/homework/admin/assignments",
     response_model=AdminAssignmentListResponse,
 )
-def list_admin_assignments(_admin=Depends(require_admin)) -> AdminAssignmentListResponse:
+def list_admin_assignments(
+    _admin=Depends(require_admin),
+) -> AdminAssignmentListResponse:
     """Admin: List all homework assignments with submission statistics."""
     assignments = list_all_homework_assignments_admin()
     return AdminAssignmentListResponse(assignments=assignments)

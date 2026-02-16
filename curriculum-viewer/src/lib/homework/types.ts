@@ -26,6 +26,7 @@ export type HomeworkAssignment = {
   problems: HomeworkProblem[]
   dueAt?: string
   scheduledAt?: string | null
+  stickerRewardCount?: number
   createdAt: string
   submitted: boolean
   submissionId?: string | null
@@ -39,6 +40,7 @@ export type HomeworkAssignmentDetail = {
   description?: string
   problems: HomeworkProblem[]
   dueAt?: string
+  stickerRewardCount?: number
   createdAt: string
   submission?: HomeworkSubmissionInfo
 }
@@ -79,6 +81,7 @@ export type CreateAssignmentData = {
   problems: HomeworkProblem[]
   dueAt?: string
   scheduledAt?: string
+  stickerRewardCount?: number
   targetStudentIds: string[]
 }
 
@@ -146,6 +149,7 @@ export type AdminAssignmentSummary = {
   problems: HomeworkProblem[]
   dueAt?: string | null
   scheduledAt?: string | null
+  stickerRewardCount?: number
   createdBy: string
   createdAt: string
   totalStudents: number
@@ -173,6 +177,7 @@ export type AdminAssignmentDetail = {
   problems: HomeworkProblem[]
   dueAt?: string | null
   scheduledAt?: string | null
+  stickerRewardCount?: number
   createdBy: string
   createdAt: string
   students: AdminStudentSubmissionSummary[]

@@ -160,6 +160,7 @@ type JsonHomeworkData = {
   description?: string
   dueAt?: string
   scheduledAt?: string
+  stickerRewardCount?: number
   problems?: Array<{
     type?: 'objective' | 'subjective'
     question?: string
@@ -173,6 +174,7 @@ const JSON_TEMPLATE = `{
   "description": "숙제 설명 (선택)",
   "dueAt": "2026-02-01T18:00",
   "scheduledAt": "2026-01-30T09:00",
+  "stickerRewardCount": 2,
   "problems": [
     {
       "type": "objective",
@@ -198,6 +200,7 @@ export default function AuthorHomeworkPage() {
   const [description, setDescription] = useState('')
   const [dueAt, setDueAt] = useState('')
   const [scheduledAt, setScheduledAt] = useState('')
+  const [stickerRewardCount, setStickerRewardCount] = useState('2')
   const [problems, setProblems] = useState<HomeworkProblem[]>([createEmptyProblem(1)])
 
   const [submitting, setSubmitting] = useState(false)
@@ -298,6 +301,9 @@ export default function AuthorHomeworkPage() {
       if (data.scheduledAt && typeof data.scheduledAt === 'string') {
         setScheduledAt(data.scheduledAt)
       }
+      if (typeof data.stickerRewardCount === 'number' && Number.isFinite(data.stickerRewardCount)) {
+        setStickerRewardCount(String(Math.max(0, Math.trunc(data.stickerRewardCount))))
+      }
 
       if (data.problems && Array.isArray(data.problems) && data.problems.length > 0) {
         const importedProblems: HomeworkProblem[] = data.problems.map((p, index) => {
@@ -370,6 +376,12 @@ export default function AuthorHomeworkPage() {
         return
       }
 
+      const parsedStickerRewardCount = Number.parseInt(stickerRewardCount, 10)
+      if (!Number.isFinite(parsedStickerRewardCount) || parsedStickerRewardCount < 0) {
+        setMessage({ type: 'error', text: '스티커 개수는 0 이상의 정수여야 합니다.' })
+        return
+      }
+
       setSubmitting(true)
       setMessage(null)
 
@@ -385,6 +397,7 @@ export default function AuthorHomeworkPage() {
           })),
           dueAt: dueAt || undefined,
           scheduledAt: scheduledAt || undefined,
+          stickerRewardCount: parsedStickerRewardCount,
           targetStudentIds: Array.from(selectedStudentIds)
         })
 
@@ -393,6 +406,7 @@ export default function AuthorHomeworkPage() {
         setDescription('')
         setDueAt('')
         setScheduledAt('')
+        setStickerRewardCount('2')
         setProblems([createEmptyProblem(1)])
         setSelectedStudentIds(new Set())
       } catch (err) {
@@ -405,7 +419,7 @@ export default function AuthorHomeworkPage() {
         setSubmitting(false)
       }
     },
-    [description, dueAt, scheduledAt, problems, selectedStudentIds, title]
+    [description, dueAt, scheduledAt, stickerRewardCount, problems, selectedStudentIds, title]
   )
 
   if (!user) {
@@ -594,6 +608,18 @@ export default function AuthorHomeworkPage() {
                 onChange={(e) => setScheduledAt(e.target.value)}
               />
               <span className="muted">설정 시 해당 시간 이후에 학생에게 표시됩니다.</span>
+            </label>
+
+            <label className="form-field">
+              숙제 완료 스티커 개수
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={stickerRewardCount}
+                onChange={(e) => setStickerRewardCount(e.target.value)}
+              />
+              <span className="muted">숙제가 승인되면 설정한 개수만큼 자동 지급됩니다.</span>
             </label>
           </div>
 

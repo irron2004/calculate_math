@@ -36,29 +36,42 @@ def _login_admin(client: TestClient) -> str:
     return response.json()["accessToken"]
 
 
-def _create_assignment(client: TestClient, *, admin_token: str, student_id: str, due_at: str) -> str:
+def _create_assignment(
+    client: TestClient,
+    *,
+    admin_token: str,
+    student_id: str,
+    due_at: str,
+    sticker_reward_count: int | None = None,
+) -> str:
+    payload: dict[str, object] = {
+        "title": "숙제 테스트",
+        "description": "문제를 풀고 제출하세요",
+        "dueAt": due_at,
+        "targetStudentIds": [student_id],
+        "problems": [
+            {
+                "id": "p1",
+                "type": "subjective",
+                "question": "문제 1: 답을 작성하세요.",
+            }
+        ],
+    }
+    if sticker_reward_count is not None:
+        payload["stickerRewardCount"] = sticker_reward_count
+
     response = client.post(
         "/api/homework/assignments",
-        json={
-            "title": "숙제 테스트",
-            "description": "문제를 풀고 제출하세요",
-            "dueAt": due_at,
-            "targetStudentIds": [student_id],
-            "problems": [
-                {
-                    "id": "p1",
-                    "type": "subjective",
-                    "question": "문제 1: 답을 작성하세요.",
-                }
-            ],
-        },
+        json=payload,
         headers=_auth_headers(admin_token),
     )
     assert response.status_code == 200, response.text
     return response.json()["id"]
 
 
-def _submit_homework(client: TestClient, *, student_token: str, assignment_id: str, student_id: str) -> str:
+def _submit_homework(
+    client: TestClient, *, student_token: str, assignment_id: str, student_id: str
+) -> str:
     response = client.post(
         f"/api/homework/assignments/{assignment_id}/submit",
         data={
@@ -90,7 +103,9 @@ def _review_submission(
     assert response.status_code == 200, response.text
 
 
-def test_auto_grant_on_approved_on_time(client: tuple[TestClient, object], monkeypatch) -> None:
+def test_auto_grant_on_approved_on_time(
+    client: tuple[TestClient, object], monkeypatch
+) -> None:
     test_client, _db_path = client
 
     student_id = "sticker_auto_on_time"
@@ -175,7 +190,9 @@ def test_no_grant_when_late(client: tuple[TestClient, object], monkeypatch) -> N
     assert list_response.json()["stickers"] == []
 
 
-def test_no_grant_when_not_approved(client: tuple[TestClient, object], monkeypatch) -> None:
+def test_no_grant_when_not_approved(
+    client: tuple[TestClient, object], monkeypatch
+) -> None:
     test_client, _db_path = client
 
     student_id = "sticker_auto_returned"
@@ -216,7 +233,9 @@ def test_no_grant_when_not_approved(client: tuple[TestClient, object], monkeypat
     assert list_response.json()["stickers"] == []
 
 
-def test_no_grant_when_sticker_feature_disabled(client: tuple[TestClient, Any], monkeypatch) -> None:
+def test_no_grant_when_sticker_feature_disabled(
+    client: tuple[TestClient, Any], monkeypatch
+) -> None:
     test_client, db_path = client
 
     student_id = "sticker_auto_demo_off"
@@ -245,7 +264,9 @@ def test_no_grant_when_sticker_feature_disabled(client: tuple[TestClient, Any], 
     assert list_praise_stickers(student_id, path=db_path) == []
 
 
-def test_auto_grant_prevents_duplicates(client: tuple[TestClient, object], monkeypatch) -> None:
+def test_auto_grant_prevents_duplicates(
+    client: tuple[TestClient, object], monkeypatch
+) -> None:
     test_client, _db_path = client
 
     student_id = "sticker_auto_dup"
@@ -289,3 +310,48 @@ def test_auto_grant_prevents_duplicates(client: tuple[TestClient, object], monke
     )
     assert list_response.status_code == 200, list_response.text
     assert len(list_response.json()["stickers"]) == 1
+
+
+def test_auto_grant_uses_assignment_sticker_reward_count(
+    client: tuple[TestClient, object], monkeypatch
+) -> None:
+    test_client, _db_path = client
+
+    student_id = "sticker_auto_custom_count"
+    student_token = _register_student(test_client, username=student_id)
+    admin_token = _login_admin(test_client)
+    enable_response = test_client.patch(
+        f"/api/admin/students/{student_id}/features",
+        json={"praiseStickerEnabled": True},
+        headers=_auth_headers(admin_token),
+    )
+    assert enable_response.status_code == 200, enable_response.text
+
+    assignment_id = _create_assignment(
+        test_client,
+        admin_token=admin_token,
+        student_id=student_id,
+        due_at="2099-01-01T00:00:00",
+        sticker_reward_count=5,
+    )
+    submission_id = _submit_homework(
+        test_client,
+        student_token=student_token,
+        assignment_id=assignment_id,
+        student_id=student_id,
+    )
+    _review_submission(
+        test_client,
+        admin_token=admin_token,
+        submission_id=submission_id,
+        status="approved",
+    )
+
+    list_response = test_client.get(
+        f"/api/students/{student_id}/stickers",
+        headers=_auth_headers(student_token),
+    )
+    assert list_response.status_code == 200, list_response.text
+    data = list_response.json()
+    assert len(data["stickers"]) == 1
+    assert data["stickers"][0]["count"] == 5

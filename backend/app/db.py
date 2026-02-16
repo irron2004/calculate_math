@@ -1,4 +1,5 @@
 """SQLite storage helpers for graph and problem data."""
+
 from __future__ import annotations
 
 import json
@@ -12,8 +13,12 @@ from uuid import uuid4
 DEFAULT_SCHEMA_VERSION = 1
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "app.db"
-DEFAULT_CURRICULUM_SEED_PATH = REPO_ROOT / "public" / "data" / "curriculum_math_2022.json"
-LOCAL_CURRICULUM_SEED_PATH = Path(__file__).resolve().parent / "data" / "curriculum_math_2022.json"
+DEFAULT_CURRICULUM_SEED_PATH = (
+    REPO_ROOT / "public" / "data" / "curriculum_math_2022.json"
+)
+LOCAL_CURRICULUM_SEED_PATH = (
+    Path(__file__).resolve().parent / "data" / "curriculum_math_2022.json"
+)
 FALLBACK_SEED_PATH = Path(__file__).resolve().parent / "data" / "seed.json"
 
 
@@ -41,7 +46,9 @@ def get_seed_path() -> Path:
 def resolve_database_path(path: Optional[Path] = None) -> Path:
     resolved = path or get_database_path()
     if resolved.exists() and resolved.is_dir():
-        raise ValueError(f"Database path '{resolved}' points to a directory, not a file.")
+        raise ValueError(
+            f"Database path '{resolved}' points to a directory, not a file."
+        )
     parent = resolved.parent
     if parent.exists() and not parent.is_dir():
         raise ValueError(f"Database directory '{parent}' is not a directory.")
@@ -135,6 +142,7 @@ def init_db(path: Optional[Path] = None) -> None:
             problems_json TEXT NOT NULL,
             due_at TEXT,
             scheduled_at TEXT,
+            sticker_reward_count INTEGER NOT NULL DEFAULT 2,
             created_by TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
@@ -230,6 +238,7 @@ def init_db(path: Optional[Path] = None) -> None:
     )
     _ensure_homework_review_columns(conn)
     _ensure_homework_scheduled_at_column(conn)
+    _ensure_homework_sticker_reward_count_column(conn)
     _ensure_user_columns(conn)
     _ensure_refresh_token_columns(conn)
     conn.execute(
@@ -269,7 +278,9 @@ def _ensure_homework_review_columns(conn: sqlite3.Connection) -> None:
         if name in columns:
             continue
         conn.execute(f"ALTER TABLE homework_submissions ADD COLUMN {definition}")
-    conn.execute("UPDATE homework_submissions SET review_status = 'pending' WHERE review_status IS NULL")
+    conn.execute(
+        "UPDATE homework_submissions SET review_status = 'pending' WHERE review_status IS NULL"
+    )
 
 
 def _ensure_homework_scheduled_at_column(conn: sqlite3.Connection) -> None:
@@ -277,6 +288,14 @@ def _ensure_homework_scheduled_at_column(conn: sqlite3.Connection) -> None:
     columns = _get_table_columns(conn, "homework_assignments")
     if "scheduled_at" not in columns:
         conn.execute("ALTER TABLE homework_assignments ADD COLUMN scheduled_at TEXT")
+
+
+def _ensure_homework_sticker_reward_count_column(conn: sqlite3.Connection) -> None:
+    columns = _get_table_columns(conn, "homework_assignments")
+    if "sticker_reward_count" not in columns:
+        conn.execute(
+            "ALTER TABLE homework_assignments ADD COLUMN sticker_reward_count INTEGER NOT NULL DEFAULT 2"
+        )
 
 
 def _ensure_user_columns(conn: sqlite3.Connection) -> None:
@@ -338,10 +357,12 @@ def _ensure_unique_entries(items: List[Dict[str, Any]], key: str, label: str) ->
     duplicates: set[str] = set()
     for item in items:
         value = item.get(key)
+        if value is None:
+            continue
         if value in seen:
             duplicates.add(str(value))
         else:
-            seen.add(value)
+            seen.add(str(value))
     if duplicates:
         dup_list = ", ".join(sorted(duplicates))
         raise ValueError(f"Duplicate {label} id(s) in seed data: {dup_list}")
@@ -403,7 +424,9 @@ def seed_db(path: Optional[Path] = None, seed_path: Optional[Path] = None) -> No
 
     conn = connect(db_path)
     try:
-        existing = conn.execute("SELECT COUNT(*) AS count FROM graph_versions").fetchone()
+        existing = conn.execute(
+            "SELECT COUNT(*) AS count FROM graph_versions"
+        ).fetchone()
         if existing and existing["count"] > 0:
             return
 
@@ -523,7 +546,9 @@ def _insert_graph_version(
     return graph_version_id
 
 
-def _insert_nodes(conn: sqlite3.Connection, graph_version_id: str, nodes: List[Dict[str, Any]]) -> None:
+def _insert_nodes(
+    conn: sqlite3.Connection, graph_version_id: str, nodes: List[Dict[str, Any]]
+) -> None:
     for node in nodes:
         try:
             conn.execute(
@@ -554,7 +579,9 @@ def _insert_nodes(conn: sqlite3.Connection, graph_version_id: str, nodes: List[D
             ) from exc
 
 
-def _insert_edges(conn: sqlite3.Connection, graph_version_id: str, edges: List[Dict[str, Any]]) -> None:
+def _insert_edges(
+    conn: sqlite3.Connection, graph_version_id: str, edges: List[Dict[str, Any]]
+) -> None:
     for edge in edges:
         try:
             conn.execute(
@@ -583,9 +610,15 @@ def _insert_edges(conn: sqlite3.Connection, graph_version_id: str, edges: List[D
             ) from exc
 
 
-def fetch_latest_graph(status: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+def fetch_latest_graph(
+    status: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
     conn = connect(path)
-    order_by = "published_at DESC, created_at DESC" if status == "published" else "created_at DESC"
+    order_by = (
+        "published_at DESC, created_at DESC"
+        if status == "published"
+        else "created_at DESC"
+    )
     row = conn.execute(
         f"SELECT id, schema_version FROM graph_versions WHERE status = ? ORDER BY {order_by} LIMIT 1",
         (status,),
@@ -666,7 +699,9 @@ def _get_active_graph_version_id(conn: sqlite3.Connection) -> Optional[str]:
     return None
 
 
-def fetch_problems(node_id: str, path: Optional[Path] = None) -> Optional[List[Dict[str, Any]]]:
+def fetch_problems(
+    node_id: str, path: Optional[Path] = None
+) -> Optional[List[Dict[str, Any]]]:
     conn = connect(path)
     active_graph_id = _get_active_graph_version_id(conn)
     if not active_graph_id:
@@ -736,7 +771,19 @@ def create_user(
                 (id, username, email, name, grade, password_hash, role, status, created_at, updated_at, last_login_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (user_id, username, email, name, grade, password_hash, role, status, now, now, None),
+            (
+                user_id,
+                username,
+                email,
+                name,
+                grade,
+                password_hash,
+                role,
+                status,
+                now,
+                now,
+                None,
+            ),
         )
         conn.commit()
         return user_id
@@ -751,7 +798,9 @@ def create_user(
         conn.close()
 
 
-def get_user_by_username(username: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+def get_user_by_username(
+    username: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
     conn = connect(path)
     try:
         row = conn.execute(
@@ -768,7 +817,9 @@ def get_user_by_username(username: str, path: Optional[Path] = None) -> Optional
         conn.close()
 
 
-def get_user_by_email(email: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+def get_user_by_email(
+    email: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
     conn = connect(path)
     try:
         row = conn.execute(
@@ -785,7 +836,9 @@ def get_user_by_email(email: str, path: Optional[Path] = None) -> Optional[Dict[
         conn.close()
 
 
-def get_user_by_id(user_id: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+def get_user_by_id(
+    user_id: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
     conn = connect(path)
     try:
         row = conn.execute(
@@ -866,7 +919,9 @@ def update_last_login(user_id: str, path: Optional[Path] = None) -> None:
         conn.close()
 
 
-def update_user_password(user_id: str, password_hash: str, path: Optional[Path] = None) -> bool:
+def update_user_password(
+    user_id: str, password_hash: str, path: Optional[Path] = None
+) -> bool:
     conn = connect(path)
     try:
         now = _now_iso()
@@ -903,7 +958,9 @@ def store_refresh_token(
         conn.close()
 
 
-def get_refresh_token_by_hash(token_hash: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+def get_refresh_token_by_hash(
+    token_hash: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
     conn = connect(path)
     try:
         row = conn.execute(
@@ -995,7 +1052,9 @@ def ensure_admin_user(
 # ============================================================
 
 
-def get_student_profile(student_id: str, path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+def get_student_profile(
+    student_id: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
     conn = connect(path)
     try:
         row = conn.execute(
@@ -1057,7 +1116,14 @@ def upsert_student_profile(
                 SET survey_json = ?, placement_json = ?, estimated_level = ?, weak_tags_json = ?, updated_at = ?
                 WHERE student_id = ?
                 """,
-                (survey_json, placement_json, estimated_level, weak_tags_json, now, student_id),
+                (
+                    survey_json,
+                    placement_json,
+                    estimated_level,
+                    weak_tags_json,
+                    now,
+                    student_id,
+                ),
             )
         else:
             conn.execute(
@@ -1066,7 +1132,15 @@ def upsert_student_profile(
                     (student_id, survey_json, placement_json, estimated_level, weak_tags_json, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
-                (student_id, survey_json, placement_json, estimated_level, weak_tags_json, now, now),
+                (
+                    student_id,
+                    survey_json,
+                    placement_json,
+                    estimated_level,
+                    weak_tags_json,
+                    now,
+                    now,
+                ),
             )
         conn.commit()
     finally:
@@ -1099,7 +1173,9 @@ def list_students_with_profiles(path: Optional[Path] = None) -> List[Dict[str, A
         for row in rows:
             profile = None
             if row["profile_updated_at"]:
-                weak_tags = json.loads(row["weak_tags_json"]) if row["weak_tags_json"] else []
+                weak_tags = (
+                    json.loads(row["weak_tags_json"]) if row["weak_tags_json"] else []
+                )
                 if not isinstance(weak_tags, list):
                     weak_tags = []
                 profile = {
@@ -1171,7 +1247,16 @@ def create_praise_sticker(
                 granted_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (sticker_id, student_id, count, reason, reason_type, homework_id, granted_by, granted_at_value),
+            (
+                sticker_id,
+                student_id,
+                count,
+                reason,
+                reason_type,
+                homework_id,
+                granted_by,
+                granted_at_value,
+            ),
         )
         conn.commit()
         return {
@@ -1188,7 +1273,9 @@ def create_praise_sticker(
         conn.close()
 
 
-def list_praise_stickers(student_id: str, path: Optional[Path] = None) -> List[Dict[str, Any]]:
+def list_praise_stickers(
+    student_id: str, path: Optional[Path] = None
+) -> List[Dict[str, Any]]:
     conn = connect(path)
     try:
         rows = conn.execute(
@@ -1266,12 +1353,18 @@ def create_homework_assignment(
     description: Optional[str] = None,
     due_at: Optional[str] = None,
     scheduled_at: Optional[str] = None,
+    sticker_reward_count: int = 2,
     path: Optional[Path] = None,
 ) -> str:
     """Create a new homework assignment and assign it to students."""
     normalized_due_at = due_at.strip() if due_at and due_at.strip() else None
-    normalized_description = description.strip() if description and description.strip() else None
-    normalized_scheduled_at = scheduled_at.strip() if scheduled_at and scheduled_at.strip() else None
+    normalized_description = (
+        description.strip() if description and description.strip() else None
+    )
+    normalized_scheduled_at = (
+        scheduled_at.strip() if scheduled_at and scheduled_at.strip() else None
+    )
+    normalized_sticker_reward_count = max(0, int(sticker_reward_count))
     normalized_student_ids: List[str] = []
     seen: set[str] = set()
     for raw_student_id in target_student_ids:
@@ -1291,10 +1384,22 @@ def create_homework_assignment(
 
         conn.execute(
             """
-            INSERT INTO homework_assignments (id, title, description, problems_json, due_at, scheduled_at, created_by, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO homework_assignments (
+                id, title, description, problems_json, due_at, scheduled_at, sticker_reward_count, created_by, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (assignment_id, title, normalized_description, problems_json, normalized_due_at, normalized_scheduled_at, created_by, created_at),
+            (
+                assignment_id,
+                title,
+                normalized_description,
+                problems_json,
+                normalized_due_at,
+                normalized_scheduled_at,
+                normalized_sticker_reward_count,
+                created_by,
+                created_at,
+            ),
         )
 
         for student_id in normalized_student_ids:
@@ -1354,9 +1459,7 @@ def update_homework_assignment(
         conn.close()
 
 
-def delete_homework_assignment(
-    assignment_id: str, path: Optional[Path] = None
-) -> bool:
+def delete_homework_assignment(assignment_id: str, path: Optional[Path] = None) -> bool:
     """Delete a homework assignment and its related records."""
     conn = connect(path)
     try:
@@ -1391,6 +1494,7 @@ def list_homework_assignments_for_student(
                 ha.problems_json,
                 ha.due_at,
                 ha.scheduled_at,
+                ha.sticker_reward_count,
                 ha.created_at,
                 hs.id AS submission_id,
                 hs.submitted_at AS submitted_at,
@@ -1420,11 +1524,15 @@ def list_homework_assignments_for_student(
                 "problems": json.loads(row["problems_json"]),
                 "dueAt": row["due_at"],
                 "scheduledAt": row["scheduled_at"],
+                "stickerRewardCount": row["sticker_reward_count"]
+                if row["sticker_reward_count"] is not None
+                else 2,
                 "createdAt": row["created_at"],
                 "submitted": bool(row["submitted"]),
                 "submissionId": row["submission_id"],
                 "submittedAt": row["submitted_at"],
-                "reviewStatus": row["review_status"] or ("pending" if row["submission_id"] else None),
+                "reviewStatus": row["review_status"]
+                or ("pending" if row["submission_id"] else None),
             }
             for row in rows
         ]
@@ -1452,7 +1560,7 @@ def get_homework_assignment(
 
         row = conn.execute(
             """
-            SELECT id, title, description, problems_json, due_at, scheduled_at, created_at
+            SELECT id, title, description, problems_json, due_at, scheduled_at, sticker_reward_count, created_at
             FROM homework_assignments
             WHERE id = ?
             """,
@@ -1522,6 +1630,9 @@ def get_homework_assignment(
             "description": row["description"],
             "problems": json.loads(row["problems_json"]),
             "dueAt": row["due_at"],
+            "stickerRewardCount": row["sticker_reward_count"]
+            if row["sticker_reward_count"] is not None
+            else 2,
             "createdAt": row["created_at"],
             "submission": submission,
         }
@@ -1572,7 +1683,14 @@ def create_homework_submission(
             (id, assignment_id, student_id, answers_json, submitted_at, review_status)
             VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (submission_id, assignment_id, student_id, answers_json, submitted_at, "pending"),
+            (
+                submission_id,
+                assignment_id,
+                student_id,
+                answers_json,
+                submitted_at,
+                "pending",
+            ),
         )
 
         conn.commit()
@@ -1601,7 +1719,15 @@ def save_homework_submission_file(
             (id, submission_id, stored_path, original_name, content_type, size_bytes, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (file_id, submission_id, stored_path, original_name, content_type, size_bytes, created_at),
+            (
+                file_id,
+                submission_id,
+                stored_path,
+                original_name,
+                content_type,
+                size_bytes,
+                created_at,
+            ),
         )
 
         conn.commit()
@@ -1630,7 +1756,8 @@ def get_homework_submission_for_review(
                 hs.problem_reviews_json,
                 ha.title AS assignment_title,
                 ha.problems_json,
-                ha.due_at
+                ha.due_at,
+                ha.sticker_reward_count
             FROM homework_submissions hs
             INNER JOIN homework_assignments ha ON hs.assignment_id = ha.id
             WHERE hs.id = ?
@@ -1658,6 +1785,9 @@ def get_homework_submission_for_review(
             "assignmentTitle": row["assignment_title"],
             "problems": json.loads(row["problems_json"]),
             "dueAt": row["due_at"],
+            "assignmentStickerRewardCount": row["sticker_reward_count"]
+            if row["sticker_reward_count"] is not None
+            else 2,
         }
     finally:
         conn.close()
@@ -1683,7 +1813,13 @@ def update_homework_submission_review(
             SET review_status = ?, reviewed_at = ?, reviewed_by = ?, problem_reviews_json = ?
             WHERE id = ?
             """,
-            (review_status, reviewed_at, reviewed_by, problem_reviews_json, submission_id),
+            (
+                review_status,
+                reviewed_at,
+                reviewed_by,
+                problem_reviews_json,
+                submission_id,
+            ),
         )
         conn.commit()
         return result.rowcount > 0
@@ -1787,6 +1923,7 @@ def list_all_homework_assignments_admin(
                 ha.problems_json,
                 ha.due_at,
                 ha.scheduled_at,
+                ha.sticker_reward_count,
                 ha.created_by,
                 ha.created_at,
                 (
@@ -1832,6 +1969,9 @@ def list_all_homework_assignments_admin(
                 "problems": json.loads(row["problems_json"]),
                 "dueAt": row["due_at"],
                 "scheduledAt": row["scheduled_at"],
+                "stickerRewardCount": row["sticker_reward_count"]
+                if row["sticker_reward_count"] is not None
+                else 2,
                 "createdBy": row["created_by"],
                 "createdAt": row["created_at"],
                 "totalStudents": row["total_students"],
@@ -1856,7 +1996,7 @@ def get_homework_assignment_admin(
         # Get assignment
         assignment_row = conn.execute(
             """
-            SELECT id, title, description, problems_json, due_at, scheduled_at, created_by, created_at
+            SELECT id, title, description, problems_json, due_at, scheduled_at, sticker_reward_count, created_by, created_at
             FROM homework_assignments
             WHERE id = ?
             """,
@@ -1897,7 +2037,8 @@ def get_homework_assignment_admin(
                 "assignedAt": row["assigned_at"],
                 "submissionId": row["submission_id"],
                 "submittedAt": row["submitted_at"],
-                "reviewStatus": row["review_status"] or (None if not row["submission_id"] else "pending"),
+                "reviewStatus": row["review_status"]
+                or (None if not row["submission_id"] else "pending"),
                 "reviewedAt": row["reviewed_at"],
                 "reviewedBy": row["reviewed_by"],
             }
@@ -1911,6 +2052,9 @@ def get_homework_assignment_admin(
             "problems": json.loads(assignment_row["problems_json"]),
             "dueAt": assignment_row["due_at"],
             "scheduledAt": assignment_row["scheduled_at"],
+            "stickerRewardCount": assignment_row["sticker_reward_count"]
+            if assignment_row["sticker_reward_count"] is not None
+            else 2,
             "createdBy": assignment_row["created_by"],
             "createdAt": assignment_row["created_at"],
             "students": students,
