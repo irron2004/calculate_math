@@ -89,7 +89,7 @@ function writeStoredUser(user: AuthUser | null): void {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(() => readStoredUser())
   const [mode, setMode] = useState<AppMode>('student')
   const isAdmin = user?.role === 'admin'
 
@@ -104,17 +104,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function bootstrap() {
       const accessToken = getAccessToken()
       const refreshToken = getRefreshToken()
-      if (!accessToken && !refreshToken) {
-        writeStoredUser(null)
-        return
-      }
+      if (!accessToken && !refreshToken) return
 
       try {
         const me = await fetchMe()
         if (cancelled) return
         setUser(me)
         writeStoredUser(me)
-        setMode(me.role === 'admin' ? 'author' : 'student')
+        setMode('student')
       } catch {
         if (cancelled) return
         setUser(null)
@@ -139,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { user: nextUser } = await loginUser({ username: normalizedId, password: normalizedPw })
       setUser(nextUser)
       writeStoredUser(nextUser)
-      setMode(nextUser.role === 'admin' ? 'author' : 'student')
+      setMode('student')
       return null
     } catch (err) {
       return err instanceof Error ? err.message : '로그인에 실패했습니다.'

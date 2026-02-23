@@ -1,7 +1,7 @@
 import type { StudentProfileSummary } from '../auth/types'
-import type { HomeworkProblem } from './types'
+import type { AdminHomeworkProblem } from './types'
 
-type HomeworkProblemTemplate = HomeworkProblem & {
+type HomeworkProblemTemplate = AdminHomeworkProblem & {
   meta: {
     tags: string[]
     difficulty: number // 1~5
@@ -166,7 +166,7 @@ function intersects(a: string[], b: string[]): boolean {
 export function recommendHomeworkProblems(
   profile: StudentProfileSummary,
   desiredCount = 10
-): HomeworkProblem[] {
+): AdminHomeworkProblem[] {
   const weakTags = (profile.weakTagsTop3 ?? []).filter(Boolean)
   const parsed = profile.estimatedLevel ? parseEstimatedLevel(profile.estimatedLevel) : null
   const targetDifficulty = parsed ? Math.min(Math.max(parsed.band + 1, 1), 5) : 3
@@ -226,4 +226,3 @@ export function recommendHomeworkProblems(
     answer: problem.answer
   }))
 }
-

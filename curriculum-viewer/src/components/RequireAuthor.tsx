@@ -38,8 +38,8 @@ export default function RequireAuthor({ children }: { children: ReactElement }) 
           <button
             type="button"
             className="button button-primary"
-            onClick={() => {
-              logout()
+            onClick={async () => {
+              await logout()
               navigate(ROUTES.login)
             }}
           >

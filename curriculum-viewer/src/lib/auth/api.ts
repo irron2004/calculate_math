@@ -118,6 +118,7 @@ export async function fetchMe(): Promise<AuthUser> {
 
 export async function logoutUser(): Promise<void> {
   const refreshToken = getRefreshToken()
+  clearTokens()
   if (refreshToken) {
     await fetch(`${API_BASE}/auth/logout`, {
       method: 'POST',
@@ -125,7 +126,6 @@ export async function logoutUser(): Promise<void> {
       body: JSON.stringify({ refreshToken })
     }).catch(() => {})
   }
-  clearTokens()
 }
 
 export async function changePassword(

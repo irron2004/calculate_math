@@ -212,13 +212,21 @@ class HomeworkProblem(BaseModel):
     type: str  # "objective" or "subjective"
     question: str
     options: Optional[List[str]] = None  # For objective (multiple choice)
-    answer: Optional[str] = None  # Correct answer (for grading reference)
+    answer: Optional[str] = None
+
+
+class StudentHomeworkProblem(BaseModel):
+    id: str
+    type: str  # "objective" or "subjective"
+    question: str
+    options: Optional[List[str]] = None
 
 
 class HomeworkAssignmentCreate(BaseModel):
     title: str
     description: Optional[str] = None
-    problems: List[HomeworkProblem]
+    problems: List[HomeworkProblem] = Field(default_factory=list)
+    problemIds: List[str] = Field(default_factory=list)
     dueAt: Optional[str] = None
     scheduledAt: Optional[str] = None
     stickerRewardCount: int = Field(default=2, ge=0)
@@ -265,7 +273,7 @@ class HomeworkAssignmentListItem(BaseModel):
     id: str
     title: str
     description: Optional[str] = None
-    problems: List[HomeworkProblem]
+    problems: List[StudentHomeworkProblem]
     dueAt: Optional[str] = None
     scheduledAt: Optional[str] = None
     stickerRewardCount: int = 2
@@ -284,7 +292,7 @@ class HomeworkAssignmentDetail(BaseModel):
     id: str
     title: str
     description: Optional[str] = None
-    problems: List[HomeworkProblem]
+    problems: List[StudentHomeworkProblem]
     dueAt: Optional[str] = None
     stickerRewardCount: int = 2
     createdAt: str
@@ -401,3 +409,62 @@ class HomeworkPendingCountResponse(BaseModel):
     pendingReview: int
     approved: int
     actionRequired: int
+
+
+class HomeworkLabel(BaseModel):
+    id: str
+    key: str
+    label: str
+    kind: str
+    createdBy: str
+    createdAt: str
+    archivedAt: Optional[str] = None
+
+
+class HomeworkLabelCreateRequest(BaseModel):
+    key: str
+    label: str
+    kind: str = "custom"
+
+
+class HomeworkLabelListResponse(BaseModel):
+    labels: List[HomeworkLabel]
+
+
+class HomeworkProblemBankProblem(BaseModel):
+    id: str
+    batchId: Optional[str] = None
+    weekKey: Optional[str] = None
+    dayKey: Optional[str] = None
+    orderIndex: int
+    type: str
+    question: str
+    options: Optional[List[str]] = None
+    answer: Optional[str] = None
+    labelKeys: List[str] = Field(default_factory=list)
+    createdAt: str
+
+
+class HomeworkProblemBankListResponse(BaseModel):
+    problems: List[HomeworkProblemBankProblem]
+
+
+class HomeworkProblemLabelSetRequest(BaseModel):
+    labelKeys: List[str]
+
+
+class HomeworkProblemLabelSetResponse(BaseModel):
+    success: bool = True
+
+
+class HomeworkProblemBankImportRequest(BaseModel):
+    weekKey: str
+    dayKey: str
+    payload: Dict[str, Any]
+
+
+class HomeworkProblemBankImportResponse(BaseModel):
+    batchId: str
+    createdProblemCount: int
+    skippedProblemCount: int
+    success: bool = True

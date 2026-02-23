@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
-from typing import Generator, Tuple
+from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
@@ -17,10 +16,13 @@ from app.main import create_app
 
 
 @pytest.fixture
-def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[Tuple[TestClient, Path], None, None]:
+def client(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> Generator[tuple[TestClient, Path], None, None]:
     db_path = tmp_path / "test.db"
     monkeypatch.setenv("DATABASE_PATH", str(db_path))
-    monkeypatch.setenv("JWT_SECRET", "test-secret")
+    monkeypatch.setenv("JWT_SECRET", "test-secret-please-use-at-least-32-bytes")
     monkeypatch.setenv("DISABLE_RATE_LIMITS", "1")
     monkeypatch.setenv("ADMIN_USERNAME", "admin")
     monkeypatch.setenv("ADMIN_PASSWORD", "admin")

@@ -61,7 +61,7 @@ describe('AuthorValidatePage', () => {
   })
 
   it('jumps focus when clicking a validation issue', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
+    window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
 
     const graphId = 'g-cycle'
     setAuthorActiveGraphId(graphId)

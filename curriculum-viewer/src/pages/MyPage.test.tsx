@@ -95,7 +95,7 @@ describe('MyPage stickers', () => {
   })
 
   it('renders sticker summary and history when sticker feature enabled', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo', true)))
+    window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo', true)))
     const { restore } = mockFetch()
 
     try {
@@ -112,7 +112,7 @@ describe('MyPage stickers', () => {
       expect(await screen.findByRole('heading', { name: '숙제' })).toBeInTheDocument()
       expect(await screen.findByText('칭찬 스티커')).toBeInTheDocument()
       expect(await screen.findByText(/5\s*\/\s*100/)).toBeInTheDocument()
-      expect(await screen.findByText('숙제를 성실히 제출했어요.')).toBeInTheDocument()
+      expect((await screen.findAllByText('숙제를 성실히 제출했어요.')).length).toBeGreaterThan(0)
       expect(screen.getByText('+2개')).toBeInTheDocument()
     } finally {
       restore()
@@ -120,7 +120,7 @@ describe('MyPage stickers', () => {
   })
 
   it('shows reason tooltip when hovering the sticker icon', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo', true)))
+    window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo', true)))
     const { restore } = mockFetch()
 
     try {
@@ -148,7 +148,7 @@ describe('MyPage stickers', () => {
   })
 
   it('does not show sticker UI when sticker feature disabled', async () => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('student-1', false)))
+    window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('student-1', false)))
     const { fetchMock, restore } = mockFetch()
 
     try {

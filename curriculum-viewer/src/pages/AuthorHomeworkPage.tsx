@@ -3,15 +3,28 @@ import { useAuth } from '../lib/auth/AuthProvider'
 import { listStudents } from '../lib/auth/api'
 import type { StudentInfo } from '../lib/auth/types'
 import { formatTagKo } from '../lib/diagnostic/tags'
-import { createAssignment, HomeworkApiError } from '../lib/homework/api'
+import {
+  createAssignment,
+  createProblemBankLabel,
+  HomeworkApiError,
+  importProblemBank,
+  listProblemBankLabels,
+  listProblemBankProblems,
+  setProblemBankProblemLabels,
+} from '../lib/homework/api'
 import { recommendHomeworkProblems } from '../lib/homework/recommendation'
-import type { HomeworkProblem, HomeworkProblemType } from '../lib/homework/types'
+import type {
+  AdminHomeworkProblem,
+  HomeworkLabel,
+  HomeworkProblemType,
+  ProblemBankProblem,
+} from '../lib/homework/types'
 import { createEmptyProblem } from '../lib/homework/types'
 
 type ProblemEditorProps = {
-  problem: HomeworkProblem
+  problem: AdminHomeworkProblem
   index: number
-  onChange: (problem: HomeworkProblem) => void
+  onChange: (problem: AdminHomeworkProblem) => void
   onRemove: () => void
   disabled?: boolean
 }
@@ -201,7 +214,7 @@ export default function AuthorHomeworkPage() {
   const [dueAt, setDueAt] = useState('')
   const [scheduledAt, setScheduledAt] = useState('')
   const [stickerRewardCount, setStickerRewardCount] = useState('2')
-  const [problems, setProblems] = useState<HomeworkProblem[]>([createEmptyProblem(1)])
+  const [problems, setProblems] = useState<AdminHomeworkProblem[]>([createEmptyProblem(1)])
 
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -211,11 +224,41 @@ export default function AuthorHomeworkPage() {
   const [jsonInput, setJsonInput] = useState('')
   const [jsonError, setJsonError] = useState<string | null>(null)
 
+  const [problemSource, setProblemSource] = useState<'manual' | 'bank'>('manual')
+
+  const [bankLabels, setBankLabels] = useState<HomeworkLabel[]>([])
+  const [bankProblems, setBankProblems] = useState<ProblemBankProblem[]>([])
+  const [bankSelectedProblemIds, setBankSelectedProblemIds] = useState<Set<string>>(new Set())
+  const [bankWeekKey, setBankWeekKey] = useState('')
+  const [bankDayKey, setBankDayKey] = useState('')
+  const [bankLabelKey, setBankLabelKey] = useState('')
+  const [bankLoading, setBankLoading] = useState(false)
+
+  const [bankImportWeekKey, setBankImportWeekKey] = useState('')
+  const [bankImportDayKey, setBankImportDayKey] = useState<'mon' | 'tue' | 'wed' | 'thu' | 'fri'>('mon')
+  const [bankImportJson, setBankImportJson] = useState('')
+  const [bankImportError, setBankImportError] = useState<string | null>(null)
+
+  const [newLabelKey, setNewLabelKey] = useState('')
+  const [newLabelLabel, setNewLabelLabel] = useState('')
+
+  const [editingProblemId, setEditingProblemId] = useState<string | null>(null)
+  const [editingLabelKeys, setEditingLabelKeys] = useState<Set<string>>(new Set())
+  const [savingLabels, setSavingLabels] = useState(false)
+
   const selectedSingleStudent = useMemo(() => {
     if (selectedStudentIds.size !== 1) return null
     const studentId = Array.from(selectedStudentIds)[0]
     return students.find((s) => s.id === studentId) ?? null
   }, [selectedStudentIds, students])
+
+  const labelMap = useMemo(() => {
+    const map = new Map<string, HomeworkLabel>()
+    for (const item of bankLabels) {
+      map.set(item.key, item)
+    }
+    return map
+  }, [bankLabels])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -230,6 +273,50 @@ export default function AuthorHomeworkPage() {
       })
     return () => controller.abort()
   }, [])
+
+  useEffect(() => {
+    if (problemSource !== 'bank') return
+    const controller = new AbortController()
+    listProblemBankLabels(controller.signal)
+      .then((labels) => {
+        if (!controller.signal.aborted) setBankLabels(labels)
+      })
+      .catch((err) => {
+        if (!controller.signal.aborted) {
+          setMessage({ type: 'error', text: err instanceof Error ? err.message : '라벨 목록을 불러올 수 없습니다.' })
+        }
+      })
+    return () => controller.abort()
+  }, [problemSource])
+
+  useEffect(() => {
+    if (problemSource !== 'bank') return
+    const controller = new AbortController()
+
+    setBankLoading(true)
+    listProblemBankProblems(
+      {
+        weekKey: bankWeekKey.trim() || undefined,
+        dayKey: bankDayKey.trim() || undefined,
+        labelKey: bankLabelKey.trim() || undefined,
+        limit: 200,
+        offset: 0,
+      },
+      controller.signal
+    )
+      .then((problems) => {
+        if (!controller.signal.aborted) setBankProblems(problems)
+      })
+      .catch((err) => {
+        if (!controller.signal.aborted) {
+          setMessage({ type: 'error', text: err instanceof Error ? err.message : '문제은행을 불러올 수 없습니다.' })
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setBankLoading(false)
+      })
+    return () => controller.abort()
+  }, [problemSource, bankWeekKey, bankDayKey, bankLabelKey])
 
   const handleToggleStudent = useCallback((studentId: string) => {
     setSelectedStudentIds((prev) => {
@@ -251,6 +338,22 @@ export default function AuthorHomeworkPage() {
     }
   }, [selectedStudentIds.size, students])
 
+  const handleToggleBankProblem = useCallback((problemId: string) => {
+    setBankSelectedProblemIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(problemId)) next.delete(problemId)
+      else next.add(problemId)
+      return next
+    })
+  }, [])
+
+  const handleSelectAllBankProblems = useCallback(() => {
+    setBankSelectedProblemIds((prev) => {
+      if (prev.size === bankProblems.length) return new Set()
+      return new Set(bankProblems.map((p) => p.id))
+    })
+  }, [bankProblems])
+
   const handleLoadRecommended = useCallback(() => {
     if (!selectedSingleStudent?.profile) {
       setMessage({ type: 'error', text: '추천 숙제를 만들려면 학생 진단이 필요합니다.' })
@@ -268,7 +371,7 @@ export default function AuthorHomeworkPage() {
     setProblems((prev) => [...prev, createEmptyProblem(prev.length + 1)])
   }, [])
 
-  const handleProblemChange = useCallback((index: number, problem: HomeworkProblem) => {
+  const handleProblemChange = useCallback((index: number, problem: AdminHomeworkProblem) => {
     setProblems((prev) => {
       const next = [...prev]
       next[index] = problem
@@ -306,7 +409,7 @@ export default function AuthorHomeworkPage() {
       }
 
       if (data.problems && Array.isArray(data.problems) && data.problems.length > 0) {
-        const importedProblems: HomeworkProblem[] = data.problems.map((p, index) => {
+        const importedProblems: AdminHomeworkProblem[] = data.problems.map((p, index) => {
           const type = p.type === 'objective' ? 'objective' : 'subjective'
           return {
             id: `p${index + 1}`,
@@ -336,6 +439,94 @@ export default function AuthorHomeworkPage() {
     })
   }, [])
 
+  const handleBankImport = useCallback(async () => {
+    setBankImportError(null)
+    if (!bankImportWeekKey.trim()) {
+      setBankImportError('weekKey를 입력하세요. (예: 2026-W04)')
+      return
+    }
+    if (!bankImportJson.trim()) {
+      setBankImportError('가져올 JSON을 입력하세요.')
+      return
+    }
+
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(bankImportJson)
+    } catch {
+      setBankImportError('JSON 형식이 올바르지 않습니다.')
+      return
+    }
+
+    try {
+      await importProblemBank({ weekKey: bankImportWeekKey.trim(), dayKey: bankImportDayKey, payload: parsed })
+      setBankImportJson('')
+      setBankImportWeekKey('')
+      setBankWeekKey(bankImportWeekKey.trim())
+      setBankDayKey(bankImportDayKey)
+      setMessage({ type: 'success', text: '문제은행에 import 완료. 목록을 새로고침했습니다.' })
+    } catch (err) {
+      if (err instanceof HomeworkApiError) {
+        setBankImportError(err.message)
+      } else {
+        setBankImportError('import 중 오류가 발생했습니다.')
+      }
+    }
+  }, [bankImportDayKey, bankImportJson, bankImportWeekKey])
+
+  const handleCreateCustomLabel = useCallback(async () => {
+    const key = newLabelKey.trim()
+    const label = newLabelLabel.trim()
+    if (!key || !label) {
+      setMessage({ type: 'error', text: '라벨 key와 라벨 이름을 입력하세요.' })
+      return
+    }
+    try {
+      const created = await createProblemBankLabel({ key, label, kind: 'custom' })
+      setBankLabels((prev) => {
+        if (prev.find((x) => x.key === created.key)) return prev
+        return [...prev, created].sort((a, b) => a.key.localeCompare(b.key))
+      })
+      setNewLabelKey('')
+      setNewLabelLabel('')
+      setMessage({ type: 'success', text: '라벨을 추가했습니다.' })
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : '라벨 생성 실패' })
+    }
+  }, [newLabelKey, newLabelLabel])
+
+  const handleOpenLabelEditor = useCallback((problem: ProblemBankProblem) => {
+    setEditingProblemId(problem.id)
+    setEditingLabelKeys(new Set(problem.labelKeys ?? []))
+  }, [])
+
+  const handleToggleEditingLabel = useCallback((labelKey: string) => {
+    setEditingLabelKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(labelKey)) next.delete(labelKey)
+      else next.add(labelKey)
+      return next
+    })
+  }, [])
+
+  const handleSaveProblemLabels = useCallback(async () => {
+    if (!editingProblemId) return
+    setSavingLabels(true)
+    try {
+      const keys = Array.from(editingLabelKeys)
+      await setProblemBankProblemLabels(editingProblemId, keys)
+      setBankProblems((prev) =>
+        prev.map((p) => (p.id === editingProblemId ? { ...p, labelKeys: keys } : p))
+      )
+      setEditingProblemId(null)
+      setMessage({ type: 'success', text: '라벨을 저장했습니다.' })
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : '라벨 저장 실패' })
+    } finally {
+      setSavingLabels(false)
+    }
+  }, [editingLabelKeys, editingProblemId])
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault()
@@ -345,27 +536,33 @@ export default function AuthorHomeworkPage() {
         return
       }
 
-      if (problems.length === 0) {
-        setMessage({ type: 'error', text: '문제를 하나 이상 추가하세요.' })
-        return
-      }
-
-      // Validate problems
-      for (let i = 0; i < problems.length; i++) {
-        const problem = problems[i]
-        if (!problem.question.trim()) {
-          setMessage({ type: 'error', text: `문제 ${i + 1}의 내용을 입력하세요.` })
+      if (problemSource === 'bank') {
+        if (bankSelectedProblemIds.size === 0) {
+          setMessage({ type: 'error', text: '문제은행에서 출제할 문제를 선택하세요.' })
           return
         }
-        if (problem.type === 'objective') {
-          if (!problem.options || problem.options.length < 2) {
-            setMessage({ type: 'error', text: `문제 ${i + 1}에 보기를 2개 이상 추가하세요.` })
+      } else {
+        if (problems.length === 0) {
+          setMessage({ type: 'error', text: '문제를 하나 이상 추가하세요.' })
+          return
+        }
+
+        for (let i = 0; i < problems.length; i++) {
+          const problem = problems[i]
+          if (!problem.question.trim()) {
+            setMessage({ type: 'error', text: `문제 ${i + 1}의 내용을 입력하세요.` })
             return
           }
-          for (let j = 0; j < problem.options.length; j++) {
-            if (!problem.options[j].trim()) {
-              setMessage({ type: 'error', text: `문제 ${i + 1}의 보기 ${j + 1}을(를) 입력하세요.` })
+          if (problem.type === 'objective') {
+            if (!problem.options || problem.options.length < 2) {
+              setMessage({ type: 'error', text: `문제 ${i + 1}에 보기를 2개 이상 추가하세요.` })
               return
+            }
+            for (let j = 0; j < problem.options.length; j++) {
+              if (!problem.options[j].trim()) {
+                setMessage({ type: 'error', text: `문제 ${i + 1}의 보기 ${j + 1}을(를) 입력하세요.` })
+                return
+              }
             }
           }
         }
@@ -386,26 +583,38 @@ export default function AuthorHomeworkPage() {
       setMessage(null)
 
       try {
-        await createAssignment({
+        const base = {
           title: title.trim(),
           description: description.trim() || undefined,
-          problems: problems.map((p) => ({
-            ...p,
-            question: p.question.trim(),
-            options: p.options?.map((o) => o.trim()),
-            answer: p.answer?.trim() || undefined
-          })),
           dueAt: dueAt || undefined,
           scheduledAt: scheduledAt || undefined,
           stickerRewardCount: parsedStickerRewardCount,
           targetStudentIds: Array.from(selectedStudentIds)
-        })
+        }
+
+        if (problemSource === 'bank') {
+          await createAssignment({
+            ...base,
+            problemIds: Array.from(bankSelectedProblemIds)
+          })
+        } else {
+          await createAssignment({
+            ...base,
+            problems: problems.map((p) => ({
+              ...p,
+              question: p.question.trim(),
+              options: p.options?.map((o) => o.trim()),
+              answer: p.answer?.trim() || undefined
+            }))
+          })
+        }
 
         setMessage({ type: 'success', text: scheduledAt ? '숙제가 예약되었습니다.' : '숙제가 출제되었습니다.' })
         setTitle('')
         setDescription('')
         setDueAt('')
         setScheduledAt('')
+        setBankSelectedProblemIds(new Set())
         setStickerRewardCount('2')
         setProblems([createEmptyProblem(1)])
         setSelectedStudentIds(new Set())
@@ -419,7 +628,17 @@ export default function AuthorHomeworkPage() {
         setSubmitting(false)
       }
     },
-    [description, dueAt, scheduledAt, stickerRewardCount, problems, selectedStudentIds, title]
+    [
+      description,
+      dueAt,
+      scheduledAt,
+      stickerRewardCount,
+      problems,
+      selectedStudentIds,
+      title,
+      problemSource,
+      bankSelectedProblemIds,
+    ]
   )
 
   if (!user) {
@@ -440,59 +659,61 @@ export default function AuthorHomeworkPage() {
         <p className={message.type === 'success' ? 'success' : 'error'}>{message.text}</p>
       )}
 
-      <div className="homework-import-section">
-        <button
-          type="button"
-          className="button button-ghost"
-          onClick={() => setShowJsonImport(!showJsonImport)}
-        >
-          {showJsonImport ? 'JSON 가져오기 닫기' : 'JSON으로 가져오기'}
-        </button>
+      {problemSource === 'manual' && (
+        <div className="homework-import-section">
+          <button
+            type="button"
+            className="button button-ghost"
+            onClick={() => setShowJsonImport(!showJsonImport)}
+          >
+            {showJsonImport ? 'JSON 가져오기 닫기' : 'JSON으로 가져오기'}
+          </button>
 
-        {showJsonImport && (
-          <div className="json-import-panel">
-            <div className="json-import-header">
-              <h3>JSON 가져오기</h3>
-              <button
-                type="button"
-                className="button button-ghost button-small"
-                onClick={handleCopyTemplate}
-              >
-                템플릿 복사
-              </button>
+          {showJsonImport && (
+            <div className="json-import-panel">
+              <div className="json-import-header">
+                <h3>JSON 가져오기</h3>
+                <button
+                  type="button"
+                  className="button button-ghost button-small"
+                  onClick={handleCopyTemplate}
+                >
+                  템플릿 복사
+                </button>
+              </div>
+              <textarea
+                value={jsonInput}
+                onChange={(e) => setJsonInput(e.target.value)}
+                placeholder={JSON_TEMPLATE}
+                rows={12}
+                className="json-input"
+              />
+              {jsonError && <p className="error">{jsonError}</p>}
+              <div className="json-import-actions">
+                <button
+                  type="button"
+                  className="button button-primary"
+                  onClick={handleJsonImport}
+                  disabled={!jsonInput.trim()}
+                >
+                  가져오기
+                </button>
+                <button
+                  type="button"
+                  className="button button-ghost"
+                  onClick={() => {
+                    setShowJsonImport(false)
+                    setJsonInput('')
+                    setJsonError(null)
+                  }}
+                >
+                  취소
+                </button>
+              </div>
             </div>
-            <textarea
-              value={jsonInput}
-              onChange={(e) => setJsonInput(e.target.value)}
-              placeholder={JSON_TEMPLATE}
-              rows={12}
-              className="json-input"
-            />
-            {jsonError && <p className="error">{jsonError}</p>}
-            <div className="json-import-actions">
-              <button
-                type="button"
-                className="button button-primary"
-                onClick={handleJsonImport}
-                disabled={!jsonInput.trim()}
-              >
-                가져오기
-              </button>
-              <button
-                type="button"
-                className="button button-ghost"
-                onClick={() => {
-                  setShowJsonImport(false)
-                  setJsonInput('')
-                  setJsonError(null)
-                }}
-              >
-                취소
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <fieldset disabled={submitting}>
@@ -623,34 +844,289 @@ export default function AuthorHomeworkPage() {
             </label>
           </div>
 
-          <h3>문제 ({problems.length}개)</h3>
-          <div className="problems-editor">
-            {problems.map((problem, index) => (
-              <ProblemEditor
-                key={problem.id}
-                problem={problem}
-                index={index}
-                onChange={(p) => handleProblemChange(index, p)}
-                onRemove={() => handleRemoveProblem(index)}
-                disabled={submitting}
-              />
-            ))}
+          <h3>문제</h3>
+
+          <div className="node-actions" style={{ marginBottom: '1rem' }}>
+            <button
+              type="button"
+              className={problemSource === 'manual' ? 'button button-primary' : 'button button-ghost'}
+              onClick={() => setProblemSource('manual')}
+              disabled={submitting}
+            >
+              직접 입력
+            </button>
+            <button
+              type="button"
+              className={problemSource === 'bank' ? 'button button-primary' : 'button button-ghost'}
+              onClick={() => setProblemSource('bank')}
+              disabled={submitting}
+            >
+              문제은행
+            </button>
+            <span className="muted">
+              선택: {problemSource === 'manual' ? problems.length : bankSelectedProblemIds.size}개
+            </span>
           </div>
 
-          <button
-            type="button"
-            className="button button-ghost"
-            onClick={handleAddProblem}
-            style={{ marginTop: '1rem' }}
-          >
-            + 문제 추가
-          </button>
+          {problemSource === 'manual' ? (
+            <>
+              <div className="problems-editor">
+                {problems.map((problem, index) => (
+                  <ProblemEditor
+                    key={problem.id}
+                    problem={problem}
+                    index={index}
+                    onChange={(p) => handleProblemChange(index, p)}
+                    onRemove={() => handleRemoveProblem(index)}
+                    disabled={submitting}
+                  />
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="button button-ghost"
+                onClick={handleAddProblem}
+                style={{ marginTop: '1rem' }}
+              >
+                + 문제 추가
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="recommended-panel" style={{ marginTop: 12 }}>
+                <div className="recommended-panel-title">문제은행</div>
+
+                <div className="form-row" style={{ marginTop: 10 }}>
+                  <label className="form-field">
+                    weekKey
+                    <input
+                      type="text"
+                      value={bankWeekKey}
+                      onChange={(e) => setBankWeekKey(e.target.value)}
+                      placeholder="예: 2026-W04"
+                    />
+                  </label>
+
+                  <label className="form-field">
+                    day
+                    <select value={bankDayKey} onChange={(e) => setBankDayKey(e.target.value)}>
+                      <option value="">전체</option>
+                      <option value="mon">월</option>
+                      <option value="tue">화</option>
+                      <option value="wed">수</option>
+                      <option value="thu">목</option>
+                      <option value="fri">금</option>
+                    </select>
+                  </label>
+
+                  <label className="form-field">
+                    label
+                    <select value={bankLabelKey} onChange={(e) => setBankLabelKey(e.target.value)}>
+                      <option value="">전체</option>
+                      {bankLabels.map((l) => (
+                        <option key={l.id} value={l.key}>
+                          {l.label} ({l.key})
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                <div className="node-actions" style={{ marginTop: 6, marginBottom: 10 }}>
+                  <button
+                    type="button"
+                    className="button button-ghost"
+                    onClick={handleSelectAllBankProblems}
+                    disabled={submitting || bankProblems.length === 0}
+                  >
+                    {bankSelectedProblemIds.size === bankProblems.length ? '전체 해제' : '전체 선택'}
+                  </button>
+                  <span className="muted">
+                    {bankLoading ? '불러오는 중...' : `목록: ${bankProblems.length}개`}
+                  </span>
+                </div>
+
+                {bankProblems.length === 0 ? (
+                  <p className="muted">조건에 맞는 문제가 없습니다.</p>
+                ) : (
+                  <div className="student-select-list">
+                    {bankProblems.map((p) => (
+                      <div key={p.id} className="student-select-item" style={{ alignItems: 'flex-start' }}>
+                        <label style={{ display: 'flex', gap: 10, flex: 1, cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={bankSelectedProblemIds.has(p.id)}
+                            onChange={() => handleToggleBankProblem(p.id)}
+                          />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                              <span className="badge badge-ok">
+                                {p.dayKey ?? '-'} #{p.orderIndex}
+                              </span>
+                              <span className="badge badge-warn">
+                                {p.type === 'objective' ? '객관식' : '주관식'}
+                              </span>
+                              {(p.labelKeys ?? []).map((k) => (
+                                <span key={k} className="tag-chip">
+                                  {labelMap.get(k)?.label ?? k}
+                                </span>
+                              ))}
+                            </div>
+                            <p style={{ margin: '8px 0 0' }}>{p.question}</p>
+                          </div>
+                        </label>
+                        <button
+                          type="button"
+                          className="button button-ghost button-small"
+                          onClick={() => handleOpenLabelEditor(p)}
+                          disabled={submitting}
+                        >
+                          라벨
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="json-import-panel" style={{ marginTop: 16 }}>
+                <div className="json-import-header">
+                  <h3>문제은행 Import</h3>
+                </div>
+                <div className="form-row">
+                  <label className="form-field">
+                    weekKey
+                    <input
+                      type="text"
+                      value={bankImportWeekKey}
+                      onChange={(e) => setBankImportWeekKey(e.target.value)}
+                      placeholder="예: 2026-W04"
+                    />
+                  </label>
+                  <label className="form-field">
+                    day
+                    <select
+                      value={bankImportDayKey}
+                      onChange={(e) => setBankImportDayKey(e.target.value as 'mon' | 'tue' | 'wed' | 'thu' | 'fri')}
+                    >
+                      <option value="mon">월</option>
+                      <option value="tue">화</option>
+                      <option value="wed">수</option>
+                      <option value="thu">목</option>
+                      <option value="fri">금</option>
+                    </select>
+                  </label>
+                </div>
+                <textarea
+                  value={bankImportJson}
+                  onChange={(e) => setBankImportJson(e.target.value)}
+                  placeholder="요일 JSON을 붙여넣으세요 (title/description/problems)"
+                  rows={8}
+                  className="json-input"
+                />
+                {bankImportError && <p className="error">{bankImportError}</p>}
+                <div className="json-import-actions">
+                  <button
+                    type="button"
+                    className="button button-primary"
+                    onClick={handleBankImport}
+                    disabled={submitting}
+                  >
+                    Import
+                  </button>
+                </div>
+              </div>
+
+              <div className="json-import-panel" style={{ marginTop: 16 }}>
+                <div className="json-import-header">
+                  <h3>라벨 추가 (custom)</h3>
+                </div>
+                <div className="form-row">
+                  <label className="form-field">
+                    key
+                    <input
+                      type="text"
+                      value={newLabelKey}
+                      onChange={(e) => setNewLabelKey(e.target.value)}
+                      placeholder="예: divide_basic"
+                    />
+                  </label>
+                  <label className="form-field">
+                    이름
+                    <input
+                      type="text"
+                      value={newLabelLabel}
+                      onChange={(e) => setNewLabelLabel(e.target.value)}
+                      placeholder="예: 나눗셈-기초"
+                    />
+                  </label>
+                </div>
+                <div className="json-import-actions">
+                  <button
+                    type="button"
+                    className="button button-primary"
+                    onClick={handleCreateCustomLabel}
+                    disabled={submitting}
+                  >
+                    라벨 추가
+                  </button>
+                </div>
+              </div>
+
+              {editingProblemId && (
+                <div className="json-import-panel" style={{ marginTop: 16 }}>
+                  <div className="json-import-header">
+                    <h3>라벨 편집</h3>
+                    <button
+                      type="button"
+                      className="button button-ghost button-small"
+                      onClick={() => setEditingProblemId(null)}
+                      disabled={savingLabels}
+                    >
+                      닫기
+                    </button>
+                  </div>
+                  <div style={{ display: 'grid', gap: 8 }}>
+                    {bankLabels.map((l) => (
+                      <label key={l.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={editingLabelKeys.has(l.key)}
+                          onChange={() => handleToggleEditingLabel(l.key)}
+                          disabled={savingLabels}
+                        />
+                        <span>{l.label}</span>
+                        <span className="muted">({l.key})</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="json-import-actions">
+                    <button
+                      type="button"
+                      className="button button-primary"
+                      onClick={handleSaveProblemLabels}
+                      disabled={savingLabels}
+                    >
+                      {savingLabels ? '저장 중...' : '저장'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
 
           <div className="node-actions" style={{ marginTop: '1.5rem' }}>
             <button
               type="submit"
               className="button button-primary"
-              disabled={submitting || selectedStudentIds.size === 0 || problems.length === 0}
+              disabled={
+                submitting ||
+                selectedStudentIds.size === 0 ||
+                (problemSource === 'manual'
+                  ? problems.length === 0
+                  : bankSelectedProblemIds.size === 0)
+              }
             >
               {submitting ? '출제 중...' : scheduledAt ? '숙제 예약' : '숙제 출제'}
             </button>

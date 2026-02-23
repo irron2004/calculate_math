@@ -107,7 +107,7 @@ export default function StudentStageMapPage() {
     if (!repo) {
       return computeNodeProgressV1({ graph: learningGraph, store: EMPTY_STORE })
     }
-    const store = repo.readStore(user.username)
+    const store = repo.readStore(user.id)
     return computeNodeProgressV1({ graph: learningGraph, store })
   }, [learningGraph, user])
 

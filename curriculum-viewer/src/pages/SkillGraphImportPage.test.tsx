@@ -29,7 +29,7 @@ const buildStoredUser = (username = 'demo') => ({
 })
 
 function renderPage() {
-  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
+    window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
   render(
     <MemoryRouter>
       <AuthProvider>

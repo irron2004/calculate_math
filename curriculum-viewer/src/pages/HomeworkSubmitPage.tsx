@@ -4,7 +4,7 @@ import ImageUploader from '../components/ImageUploader'
 import Scratchpad, { type ScratchpadHandle } from '../components/Scratchpad'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { getAssignment, HomeworkApiError, submitHomework } from '../lib/homework/api'
-import type { HomeworkAssignmentDetail, HomeworkProblem, HomeworkProblemReview } from '../lib/homework/types'
+import type { HomeworkAssignmentDetail, StudentHomeworkProblem, HomeworkProblemReview } from '../lib/homework/types'
 
 function formatDateTime(isoString: string): string {
   const date = new Date(isoString)
@@ -18,7 +18,7 @@ function formatDateTime(isoString: string): string {
 }
 
 type ProblemViewProps = {
-  problem: HomeworkProblem
+  problem: StudentHomeworkProblem
   index: number
   answer: string
   onAnswerChange: (answer: string) => void
@@ -88,7 +88,7 @@ function makeScratchpadKey(studentId: string, assignmentId: string, problemId: s
 }
 
 type ProblemSubmissionViewProps = {
-  problem: HomeworkProblem
+  problem: StudentHomeworkProblem
   index: number
   answer: string
 }

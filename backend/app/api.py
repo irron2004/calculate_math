@@ -73,6 +73,12 @@ from .db import (
     upsert_student_profile,
     update_homework_submission_review,
     update_last_login,
+    create_homework_label,
+    import_homework_problem_batch,
+    list_homework_labels,
+    list_homework_problems_admin,
+    set_homework_problem_labels,
+    get_homework_problem_bank_problems_by_ids,
 )
 from .email_service import send_homework_notification
 from .models import (
@@ -114,6 +120,15 @@ from .models import (
     PraiseStickerSummaryResponse,
     StudentProfile,
     TestStatusResponse,
+    HomeworkLabel,
+    HomeworkLabelCreateRequest,
+    HomeworkLabelListResponse,
+    HomeworkProblemBankProblem,
+    HomeworkProblemBankListResponse,
+    HomeworkProblemLabelSetRequest,
+    HomeworkProblemLabelSetResponse,
+    HomeworkProblemBankImportRequest,
+    HomeworkProblemBankImportResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -1005,41 +1020,67 @@ def create_assignment(
             },
         )
 
-    if not data.problems:
-        return JSONResponse(
-            status_code=400,
-            content={
-                "error": {
-                    "code": "NO_PROBLEMS",
-                    "message": "At least one problem is required",
-                }
-            },
-        )
+    normalized_problem_ids: list[str] = []
+    seen_problem_ids: set[str] = set()
+    for raw_problem_id in data.problemIds:
+        pid = raw_problem_id.strip()
+        if not pid or pid in seen_problem_ids:
+            continue
+        normalized_problem_ids.append(pid)
+        seen_problem_ids.add(pid)
 
-    # Validate each problem
-    for i, problem in enumerate(data.problems):
-        if not problem.question.strip():
+    if normalized_problem_ids:
+        try:
+            problems_data = get_homework_problem_bank_problems_by_ids(
+                normalized_problem_ids
+            )
+        except ValueError as exc:
             return JSONResponse(
                 status_code=400,
                 content={
                     "error": {
-                        "code": "INVALID_PROBLEM",
-                        "message": f"Problem {i + 1} has empty question",
+                        "code": "INVALID_PROBLEM_IDS",
+                        "message": str(exc),
                     }
                 },
             )
-        if problem.type == "objective" and (
-            not problem.options or len(problem.options) < 2
-        ):
+    else:
+        if not data.problems:
             return JSONResponse(
                 status_code=400,
                 content={
                     "error": {
-                        "code": "INVALID_PROBLEM",
-                        "message": f"Objective problem {i + 1} needs at least 2 options",
+                        "code": "NO_PROBLEMS",
+                        "message": "At least one problem is required",
                     }
                 },
             )
+
+        for i, problem in enumerate(data.problems):
+            if not problem.question.strip():
+                return JSONResponse(
+                    status_code=400,
+                    content={
+                        "error": {
+                            "code": "INVALID_PROBLEM",
+                            "message": f"Problem {i + 1} has empty question",
+                        }
+                    },
+                )
+            if problem.type == "objective" and (
+                not problem.options or len(problem.options) < 2
+            ):
+                return JSONResponse(
+                    status_code=400,
+                    content={
+                        "error": {
+                            "code": "INVALID_PROBLEM",
+                            "message": f"Objective problem {i + 1} needs at least 2 options",
+                        }
+                    },
+                )
+
+        problems_data = [p.model_dump() for p in data.problems]
 
     normalized_student_ids = _normalize_student_ids(data.targetStudentIds)
     if not normalized_student_ids:
@@ -1060,9 +1101,6 @@ def create_assignment(
         else None
     )
     sticker_reward_count = max(0, int(data.stickerRewardCount))
-
-    # Convert problems to dict for storage
-    problems_data = [p.model_dump() for p in data.problems]
 
     assignment_id = create_homework_assignment(
         title=data.title.strip(),
@@ -1465,6 +1503,127 @@ def review_homework_submission(
 # ============================================================
 # Admin Homework Endpoints
 # ============================================================
+
+
+@router.get(
+    "/homework/admin/problem-bank/labels",
+    response_model=HomeworkLabelListResponse,
+)
+def list_problem_bank_labels(
+    _admin=Depends(require_admin),
+) -> HomeworkLabelListResponse:
+    labels = list_homework_labels()
+    return HomeworkLabelListResponse(labels=[HomeworkLabel(**l) for l in labels])
+
+
+@router.post(
+    "/homework/admin/problem-bank/labels",
+    response_model=HomeworkLabel,
+    responses={400: {"model": ErrorResponse}},
+)
+def create_problem_bank_label(
+    data: HomeworkLabelCreateRequest,
+    _admin=Depends(require_admin),
+) -> HomeworkLabel | JSONResponse:
+    try:
+        label = create_homework_label(
+            key=data.key,
+            label=data.label,
+            kind=data.kind,
+            created_by="admin",
+        )
+    except ValueError as exc:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "INVALID_LABEL",
+                    "message": str(exc),
+                }
+            },
+        )
+    return HomeworkLabel(**label)
+
+
+@router.post(
+    "/homework/admin/problem-bank/import",
+    response_model=HomeworkProblemBankImportResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def import_problem_bank(
+    data: HomeworkProblemBankImportRequest,
+    _admin=Depends(require_admin),
+) -> HomeworkProblemBankImportResponse | JSONResponse:
+    try:
+        result = import_homework_problem_batch(
+            week_key=data.weekKey,
+            day_key=data.dayKey,
+            payload=data.payload,
+            imported_by="admin",
+        )
+    except ValueError as exc:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "INVALID_IMPORT",
+                    "message": str(exc),
+                }
+            },
+        )
+    return HomeworkProblemBankImportResponse(**result)
+
+
+@router.get(
+    "/homework/admin/problem-bank/problems",
+    response_model=HomeworkProblemBankListResponse,
+)
+def list_problem_bank_problems(
+    labelKey: str | None = Query(default=None),
+    weekKey: str | None = Query(default=None),
+    dayKey: str | None = Query(default=None),
+    limit: int = Query(default=200, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    _admin=Depends(require_admin),
+) -> HomeworkProblemBankListResponse:
+    problems = list_homework_problems_admin(
+        label_key=labelKey,
+        week_key=weekKey,
+        day_key=dayKey,
+        limit=limit,
+        offset=offset,
+    )
+    return HomeworkProblemBankListResponse(
+        problems=[HomeworkProblemBankProblem(**p) for p in problems]
+    )
+
+
+@router.put(
+    "/homework/admin/problem-bank/problems/{problem_id}/labels",
+    response_model=HomeworkProblemLabelSetResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def set_problem_bank_problem_labels(
+    problem_id: str,
+    data: HomeworkProblemLabelSetRequest,
+    _admin=Depends(require_admin),
+) -> HomeworkProblemLabelSetResponse | JSONResponse:
+    try:
+        set_homework_problem_labels(
+            problem_id=problem_id,
+            label_keys=data.labelKeys,
+        )
+    except ValueError as exc:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "INVALID_LABEL_KEYS",
+                    "message": str(exc),
+                }
+            },
+        )
+    return HomeworkProblemLabelSetResponse()
 
 
 @router.get(

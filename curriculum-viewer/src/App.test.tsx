@@ -45,7 +45,7 @@ describe('App routing', () => {
   })
 
   const setStoredUser = (username = 'demo') => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser(username)))
+    window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser(username)))
   }
 
   it.each([
@@ -136,7 +136,7 @@ describe('App routing', () => {
       await screen.findByRole('heading', { name: '로그인' })
     ).toBeInTheDocument()
     await waitFor(() => expect(window.location.pathname).toBe('/login'))
-    expect(window.localStorage.getItem(AUTH_STORAGE_KEY)).toBeNull()
+    expect(window.sessionStorage.getItem(AUTH_STORAGE_KEY)).toBeNull()
   })
 
   it('highlights current menu tab on /map', () => {

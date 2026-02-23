@@ -13,6 +13,9 @@ import type {
   HomeworkPendingCount,
   HomeworkSubmitData,
   HomeworkSubmissionReviewData,
+  HomeworkLabel,
+  ProblemBankProblem,
+  ProblemBankImportResult,
 } from './types'
 import { authFetch } from '../auth/api'
 
@@ -64,6 +67,8 @@ export async function createAssignment(
 ): Promise<{ id: string }> {
   const normalizedDueAt = normalizeDateTimeInput(data.dueAt)
   const normalizedScheduledAt = normalizeDateTimeInput(data.scheduledAt)
+
+  const hasProblemIds = Boolean(data.problemIds && data.problemIds.length > 0)
   const response = await authFetch(`${API_BASE}/homework/assignments`, {
     method: 'POST',
     headers: {
@@ -72,7 +77,7 @@ export async function createAssignment(
     body: JSON.stringify({
       title: data.title,
       description: data.description || null,
-      problems: data.problems,
+      ...(hasProblemIds ? { problemIds: data.problemIds } : { problems: data.problems ?? [] }),
       dueAt: normalizedDueAt,
       scheduledAt: normalizedScheduledAt,
       stickerRewardCount: typeof data.stickerRewardCount === 'number'
@@ -259,6 +264,135 @@ export async function getAssignmentAdmin(
   }
 
   return json as AdminAssignmentDetail
+}
+
+export async function listProblemBankLabels(signal?: AbortSignal): Promise<HomeworkLabel[]> {
+  const response = await authFetch(`${API_BASE}/homework/admin/problem-bank/labels`, { signal })
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to list problem bank labels')
+  }
+
+  return (json.labels ?? []) as HomeworkLabel[]
+}
+
+export async function createProblemBankLabel(
+  data: { key: string; label: string; kind?: 'preset' | 'custom' },
+  signal?: AbortSignal
+): Promise<HomeworkLabel> {
+  const response = await authFetch(`${API_BASE}/homework/admin/problem-bank/labels`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      key: data.key,
+      label: data.label,
+      kind: data.kind ?? 'custom',
+    }),
+    signal,
+  })
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to create problem bank label')
+  }
+
+  return json as HomeworkLabel
+}
+
+export async function listProblemBankProblems(
+  params: {
+    labelKey?: string
+    weekKey?: string
+    dayKey?: string
+    limit?: number
+    offset?: number
+  },
+  signal?: AbortSignal
+): Promise<ProblemBankProblem[]> {
+  const search = new URLSearchParams()
+  if (params.labelKey) search.set('labelKey', params.labelKey)
+  if (params.weekKey) search.set('weekKey', params.weekKey)
+  if (params.dayKey) search.set('dayKey', params.dayKey)
+  if (typeof params.limit === 'number') search.set('limit', String(params.limit))
+  if (typeof params.offset === 'number') search.set('offset', String(params.offset))
+
+  const response = await authFetch(
+    `${API_BASE}/homework/admin/problem-bank/problems?${search.toString()}`,
+    { signal }
+  )
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to list problem bank problems')
+  }
+
+  return (json.problems ?? []) as ProblemBankProblem[]
+}
+
+export async function importProblemBank(
+  data: { weekKey: string; dayKey: string; payload: unknown },
+  signal?: AbortSignal
+): Promise<ProblemBankImportResult> {
+  const response = await authFetch(`${API_BASE}/homework/admin/problem-bank/import`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      weekKey: data.weekKey,
+      dayKey: data.dayKey,
+      payload: data.payload,
+    }),
+    signal,
+  })
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to import problem bank')
+  }
+
+  return json as ProblemBankImportResult
+}
+
+export async function setProblemBankProblemLabels(
+  problemId: string,
+  labelKeys: string[],
+  signal?: AbortSignal
+): Promise<void> {
+  const response = await authFetch(
+    `${API_BASE}/homework/admin/problem-bank/problems/${encodeURIComponent(problemId)}/labels`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ labelKeys }),
+      signal,
+    }
+  )
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to set problem labels')
+  }
 }
 
 /**

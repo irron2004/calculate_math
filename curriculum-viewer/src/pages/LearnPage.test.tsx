@@ -40,7 +40,7 @@ describe('LearnPage route', () => {
   beforeEach(() => {
     window.localStorage.clear()
     window.sessionStorage.clear()
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
+    window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
   })
 
   it('renders LearnPage at /learn/:nodeId', async () => {

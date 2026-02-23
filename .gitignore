@@ -11,6 +11,16 @@ _cacache/
 .playwright-browsers
 *.log
 
+# Tooling caches / local artifacts
+.plugins/
+.tmp-bun/
+.xdg/
+.xdg-ulr-test/
+
+# Playwright artifacts (frontend)
+curriculum-viewer/test-results/
+curriculum-viewer/playwright-report/
+
 # Environment files (sensitive data)
 .env
 .env.local

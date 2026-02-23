@@ -71,8 +71,8 @@ export default function AuthorLayout() {
           <button
             type="button"
             className="button button-ghost"
-            onClick={() => {
-              logout()
+            onClick={async () => {
+              await logout()
               navigate(ROUTES.login, { replace: true })
             }}
           >

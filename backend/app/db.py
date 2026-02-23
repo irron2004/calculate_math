@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
+import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -69,6 +70,14 @@ def connect(path: Optional[Path] = None) -> sqlite3.Connection:
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _sha256_hex(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _canonical_json_for_hash(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
 def init_db(path: Optional[Path] = None) -> None:
@@ -179,6 +188,51 @@ def init_db(path: Optional[Path] = None) -> None:
             FOREIGN KEY (submission_id) REFERENCES homework_submissions(id) ON DELETE CASCADE
         );
 
+        CREATE TABLE IF NOT EXISTS homework_import_batches (
+            id TEXT PRIMARY KEY,
+            week_key TEXT NOT NULL,
+            day_key TEXT NOT NULL,
+            payload_sha256 TEXT NOT NULL,
+            title TEXT,
+            description TEXT,
+            imported_by TEXT NOT NULL,
+            imported_at TEXT NOT NULL,
+            stats_json TEXT,
+            UNIQUE (week_key, day_key, payload_sha256)
+        );
+
+        CREATE TABLE IF NOT EXISTS homework_problems (
+            id TEXT PRIMARY KEY,
+            batch_id TEXT,
+            day_key TEXT,
+            order_index INTEGER NOT NULL,
+            type TEXT NOT NULL,
+            question TEXT NOT NULL,
+            options_json TEXT,
+            answer TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (batch_id) REFERENCES homework_import_batches(id) ON DELETE SET NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS homework_labels (
+            id TEXT PRIMARY KEY,
+            key TEXT NOT NULL UNIQUE,
+            label TEXT NOT NULL,
+            kind TEXT NOT NULL,
+            created_by TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            archived_at TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS homework_problem_labels (
+            problem_id TEXT NOT NULL,
+            label_id TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            PRIMARY KEY (problem_id, label_id),
+            FOREIGN KEY (problem_id) REFERENCES homework_problems(id) ON DELETE CASCADE,
+            FOREIGN KEY (label_id) REFERENCES homework_labels(id) ON DELETE CASCADE
+        );
+
         CREATE TABLE IF NOT EXISTS users (
             id TEXT PRIMARY KEY,
             username TEXT NOT NULL UNIQUE,
@@ -234,6 +288,11 @@ def init_db(path: Optional[Path] = None) -> None:
         CREATE INDEX IF NOT EXISTS idx_student_profiles_student_id ON student_profiles(student_id);
         CREATE INDEX IF NOT EXISTS idx_praise_stickers_student_id ON praise_stickers(student_id);
         CREATE INDEX IF NOT EXISTS idx_praise_stickers_student_granted_at ON praise_stickers(student_id, granted_at);
+
+        CREATE INDEX IF NOT EXISTS idx_homework_problems_batch_id ON homework_problems(batch_id);
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_homework_problems_batch_order_unique ON homework_problems(batch_id, order_index);
+        CREATE INDEX IF NOT EXISTS idx_homework_problems_day_order ON homework_problems(day_key, order_index);
+        CREATE INDEX IF NOT EXISTS idx_homework_problem_labels_label_id ON homework_problem_labels(label_id);
         """
     )
     _ensure_homework_review_columns(conn)
@@ -1413,6 +1472,418 @@ def create_homework_assignment(
 
         conn.commit()
         return assignment_id
+    finally:
+        conn.close()
+
+
+def import_homework_problem_batch(
+    *,
+    week_key: str,
+    day_key: str,
+    payload: Dict[str, Any],
+    imported_by: str,
+    expected_problem_count: Optional[int] = 20,
+    path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    from app.homework_problem_bank import validate_weekly_homework_payload
+
+    normalized = validate_weekly_homework_payload(
+        payload, expected_problem_count=expected_problem_count
+    )
+    payload_sha256 = _sha256_hex(_canonical_json_for_hash(normalized))
+    imported_at = _now_iso()
+
+    conn = connect(path)
+    try:
+        try:
+            batch_id = str(uuid4())
+            conn.execute(
+                """
+                INSERT INTO homework_import_batches (
+                    id, week_key, day_key, payload_sha256, title, description, imported_by, imported_at, stats_json
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    batch_id,
+                    week_key,
+                    day_key,
+                    payload_sha256,
+                    normalized.get("title"),
+                    normalized.get("description"),
+                    imported_by,
+                    imported_at,
+                    None,
+                ),
+            )
+        except sqlite3.IntegrityError:
+            row = conn.execute(
+                """
+                SELECT id
+                FROM homework_import_batches
+                WHERE week_key = ? AND day_key = ? AND payload_sha256 = ?
+                """,
+                (week_key, day_key, payload_sha256),
+            ).fetchone()
+            if not row:
+                raise
+            batch_id = str(row["id"])
+
+        created_problem_count = 0
+        for order_index, problem in enumerate(normalized["problems"], start=1):
+            problem_id = f"hb_{batch_id}_{order_index}"
+            options_json = (
+                json.dumps(problem["options"], ensure_ascii=False)
+                if problem.get("options") is not None
+                else None
+            )
+            cursor = conn.execute(
+                """
+                INSERT OR IGNORE INTO homework_problems (
+                    id, batch_id, day_key, order_index, type, question, options_json, answer, created_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    problem_id,
+                    batch_id,
+                    day_key,
+                    order_index,
+                    problem["type"],
+                    problem["question"],
+                    options_json,
+                    problem.get("answer"),
+                    imported_at,
+                ),
+            )
+            if cursor.rowcount == 1:
+                created_problem_count += 1
+
+        conn.commit()
+        total = len(normalized["problems"])
+        return {
+            "batchId": batch_id,
+            "createdProblemCount": created_problem_count,
+            "skippedProblemCount": total - created_problem_count,
+        }
+    finally:
+        conn.close()
+
+
+def create_homework_label(
+    *,
+    key: str,
+    label: str,
+    kind: str,
+    created_by: str,
+    path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    normalized_key = key.strip()
+    if not normalized_key:
+        raise ValueError("Label key cannot be empty")
+    normalized_label = label.strip()
+    if not normalized_label:
+        raise ValueError("Label label cannot be empty")
+    if kind not in {"preset", "custom"}:
+        raise ValueError("Label kind must be 'preset' or 'custom'")
+
+    conn = connect(path)
+    try:
+        label_id = str(uuid4())
+        created_at = _now_iso()
+        try:
+            conn.execute(
+                """
+                INSERT INTO homework_labels (
+                    id, key, label, kind, created_by, created_at, archived_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    label_id,
+                    normalized_key,
+                    normalized_label,
+                    kind,
+                    created_by,
+                    created_at,
+                    None,
+                ),
+            )
+        except sqlite3.IntegrityError as exc:
+            raise ValueError(f"Label key already exists: {normalized_key}") from exc
+
+        conn.commit()
+        return {
+            "id": label_id,
+            "key": normalized_key,
+            "label": normalized_label,
+            "kind": kind,
+            "createdBy": created_by,
+            "createdAt": created_at,
+            "archivedAt": None,
+        }
+    finally:
+        conn.close()
+
+
+def list_homework_labels(
+    *, include_archived: bool = False, path: Optional[Path] = None
+) -> List[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        where = "" if include_archived else "WHERE archived_at IS NULL"
+        rows = conn.execute(
+            f"""
+            SELECT id, key, label, kind, created_by, created_at, archived_at
+            FROM homework_labels
+            {where}
+            ORDER BY kind ASC, key ASC, id ASC
+            """
+        ).fetchall()
+        return [
+            {
+                "id": r["id"],
+                "key": r["key"],
+                "label": r["label"],
+                "kind": r["kind"],
+                "createdBy": r["created_by"],
+                "createdAt": r["created_at"],
+                "archivedAt": r["archived_at"],
+            }
+            for r in rows
+        ]
+    finally:
+        conn.close()
+
+
+def list_homework_problem_ids_for_batch(
+    batch_id: str, *, path: Optional[Path] = None
+) -> List[str]:
+    conn = connect(path)
+    try:
+        rows = conn.execute(
+            """
+            SELECT id
+            FROM homework_problems
+            WHERE batch_id = ?
+            ORDER BY order_index ASC
+            """,
+            (batch_id,),
+        ).fetchall()
+        return [str(r["id"]) for r in rows]
+    finally:
+        conn.close()
+
+
+def set_homework_problem_labels(
+    *,
+    problem_id: str,
+    label_keys: List[str],
+    path: Optional[Path] = None,
+) -> None:
+    normalized_keys: List[str] = []
+    seen: set[str] = set()
+    for raw_key in label_keys:
+        k = raw_key.strip()
+        if not k or k in seen:
+            continue
+        normalized_keys.append(k)
+        seen.add(k)
+
+    conn = connect(path)
+    try:
+        label_rows: list[sqlite3.Row] = []
+        if normalized_keys:
+            placeholders = ",".join(["?"] * len(normalized_keys))
+            label_rows = conn.execute(
+                f"""
+                SELECT id, key
+                FROM homework_labels
+                WHERE key IN ({placeholders}) AND archived_at IS NULL
+                """,
+                tuple(normalized_keys),
+            ).fetchall()
+
+        found = {str(r["key"]) for r in label_rows}
+        missing = [k for k in normalized_keys if k not in found]
+        if missing:
+            missing_joined = ", ".join(missing)
+            raise ValueError(f"Unknown label key(s): {missing_joined}")
+
+        conn.execute(
+            "DELETE FROM homework_problem_labels WHERE problem_id = ?",
+            (problem_id,),
+        )
+
+        created_at = _now_iso()
+        for row in label_rows:
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO homework_problem_labels (problem_id, label_id, created_at)
+                VALUES (?, ?, ?)
+                """,
+                (problem_id, row["id"], created_at),
+            )
+
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def list_homework_problems_admin(
+    *,
+    label_key: Optional[str] = None,
+    week_key: Optional[str] = None,
+    day_key: Optional[str] = None,
+    limit: int = 200,
+    offset: int = 0,
+    path: Optional[Path] = None,
+) -> List[Dict[str, Any]]:
+    normalized_label_key = (
+        label_key.strip() if isinstance(label_key, str) and label_key.strip() else None
+    )
+    normalized_week_key = (
+        week_key.strip() if isinstance(week_key, str) and week_key.strip() else None
+    )
+    normalized_day_key = (
+        day_key.strip() if isinstance(day_key, str) and day_key.strip() else None
+    )
+
+    normalized_limit = max(1, min(500, int(limit)))
+    normalized_offset = max(0, int(offset))
+
+    where: list[str] = []
+    params: list[Any] = []
+    if normalized_week_key is not None:
+        where.append("hib.week_key = ?")
+        params.append(normalized_week_key)
+    if normalized_day_key is not None:
+        where.append("hp.day_key = ?")
+        params.append(normalized_day_key)
+    if normalized_label_key is not None:
+        where.append(
+            """
+            EXISTS (
+                SELECT 1
+                FROM homework_problem_labels hpl
+                INNER JOIN homework_labels hl ON hl.id = hpl.label_id
+                WHERE hpl.problem_id = hp.id AND hl.key = ? AND hl.archived_at IS NULL
+            )
+            """.strip()
+        )
+        params.append(normalized_label_key)
+
+    where_sql = f"WHERE {' AND '.join(where)}" if where else ""
+
+    conn = connect(path)
+    try:
+        rows = conn.execute(
+            f"""
+            SELECT
+                hp.id,
+                hp.batch_id,
+                hib.week_key,
+                hp.day_key,
+                hp.order_index,
+                hp.type,
+                hp.question,
+                hp.options_json,
+                hp.answer,
+                hp.created_at
+            FROM homework_problems hp
+            LEFT JOIN homework_import_batches hib ON hib.id = hp.batch_id
+            {where_sql}
+            ORDER BY hib.week_key DESC, hp.day_key ASC, hp.order_index ASC, hp.id ASC
+            LIMIT ? OFFSET ?
+            """,
+            (*params, normalized_limit, normalized_offset),
+        ).fetchall()
+
+        problem_ids = [str(r["id"]) for r in rows]
+        label_map: Dict[str, List[str]] = {pid: [] for pid in problem_ids}
+        if problem_ids:
+            placeholders = ",".join(["?"] * len(problem_ids))
+            label_rows = conn.execute(
+                f"""
+                SELECT hpl.problem_id, hl.key
+                FROM homework_problem_labels hpl
+                INNER JOIN homework_labels hl ON hl.id = hpl.label_id
+                WHERE hpl.problem_id IN ({placeholders}) AND hl.archived_at IS NULL
+                ORDER BY hl.key ASC
+                """,
+                tuple(problem_ids),
+            ).fetchall()
+            for lr in label_rows:
+                pid = str(lr["problem_id"])
+                if pid in label_map:
+                    label_map[pid].append(str(lr["key"]))
+
+        result: List[Dict[str, Any]] = []
+        for row in rows:
+            options = json.loads(row["options_json"]) if row["options_json"] else None
+            result.append(
+                {
+                    "id": row["id"],
+                    "batchId": row["batch_id"],
+                    "weekKey": row["week_key"],
+                    "dayKey": row["day_key"],
+                    "orderIndex": row["order_index"],
+                    "type": row["type"],
+                    "question": row["question"],
+                    "options": options,
+                    "answer": row["answer"],
+                    "labelKeys": label_map.get(str(row["id"]), []),
+                    "createdAt": row["created_at"],
+                }
+            )
+        return result
+    finally:
+        conn.close()
+
+
+def get_homework_problem_bank_problems_by_ids(
+    problem_ids: List[str], *, path: Optional[Path] = None
+) -> List[Dict[str, Any]]:
+    normalized_ids: List[str] = []
+    seen: set[str] = set()
+    for raw_id in problem_ids:
+        pid = raw_id.strip()
+        if not pid or pid in seen:
+            continue
+        normalized_ids.append(pid)
+        seen.add(pid)
+
+    if not normalized_ids:
+        raise ValueError("No problem ids provided")
+
+    placeholders = ",".join(["?"] * len(normalized_ids))
+    conn = connect(path)
+    try:
+        rows = conn.execute(
+            f"""
+            SELECT id, type, question, options_json, answer
+            FROM homework_problems
+            WHERE id IN ({placeholders})
+            """,
+            tuple(normalized_ids),
+        ).fetchall()
+        by_id: Dict[str, Dict[str, Any]] = {}
+        for row in rows:
+            options = json.loads(row["options_json"]) if row["options_json"] else None
+            by_id[str(row["id"])] = {
+                "id": row["id"],
+                "type": row["type"],
+                "question": row["question"],
+                "options": options,
+                "answer": row["answer"],
+            }
+
+        missing = [pid for pid in normalized_ids if pid not in by_id]
+        if missing:
+            missing_joined = ", ".join(missing)
+            raise ValueError(f"Unknown problem id(s): {missing_joined}")
+
+        return [by_id[pid] for pid in normalized_ids]
     finally:
         conn.close()
 

@@ -11,19 +11,36 @@ export type HomeworkProblemReview = {
   comment?: string
 }
 
-export type HomeworkProblem = {
+export type HomeworkProblemBase = {
   id: string
   type: HomeworkProblemType
   question: string
   options?: string[]  // For objective (multiple choice)
-  answer?: string     // Correct answer (for admin reference)
+}
+
+export type StudentHomeworkProblem = HomeworkProblemBase
+
+export type AdminHomeworkProblem = HomeworkProblemBase & {
+  answer?: string
+}
+
+export type HomeworkLabelKind = 'preset' | 'custom'
+
+export type HomeworkLabel = {
+  id: string
+  key: string
+  label: string
+  kind: HomeworkLabelKind
+  createdBy: string
+  createdAt: string
+  archivedAt?: string | null
 }
 
 export type HomeworkAssignment = {
   id: string
   title: string
   description?: string
-  problems: HomeworkProblem[]
+  problems: StudentHomeworkProblem[]
   dueAt?: string
   scheduledAt?: string | null
   stickerRewardCount?: number
@@ -38,7 +55,7 @@ export type HomeworkAssignmentDetail = {
   id: string
   title: string
   description?: string
-  problems: HomeworkProblem[]
+  problems: StudentHomeworkProblem[]
   dueAt?: string
   stickerRewardCount?: number
   createdAt: string
@@ -78,11 +95,32 @@ export type HomeworkSubmissionReviewData = {
 export type CreateAssignmentData = {
   title: string
   description?: string
-  problems: HomeworkProblem[]
+  problems?: AdminHomeworkProblem[]
+  problemIds?: string[]
   dueAt?: string
   scheduledAt?: string
   stickerRewardCount?: number
   targetStudentIds: string[]
+}
+
+export type ProblemBankProblem = {
+  id: string
+  batchId?: string | null
+  weekKey?: string | null
+  dayKey?: string | null
+  orderIndex: number
+  type: HomeworkProblemType
+  question: string
+  options?: string[] | null
+  answer?: string | null
+  labelKeys: string[]
+  createdAt: string
+}
+
+export type ProblemBankImportResult = {
+  batchId: string
+  createdProblemCount: number
+  skippedProblemCount: number
 }
 
 export type UpdateAssignmentData = {
@@ -128,7 +166,7 @@ export function isOverdueSoon(assignment: HomeworkAssignment): boolean {
   return hoursUntilDue > 0 && hoursUntilDue <= 24
 }
 
-export function createEmptyProblem(index: number): HomeworkProblem {
+export function createEmptyProblem(index: number): AdminHomeworkProblem {
   return {
     id: `p${index}`,
     type: 'subjective',
@@ -146,7 +184,7 @@ export type AdminAssignmentSummary = {
   id: string
   title: string
   description?: string | null
-  problems: HomeworkProblem[]
+  problems: AdminHomeworkProblem[]
   dueAt?: string | null
   scheduledAt?: string | null
   stickerRewardCount?: number
@@ -174,7 +212,7 @@ export type AdminAssignmentDetail = {
   id: string
   title: string
   description?: string | null
-  problems: HomeworkProblem[]
+  problems: AdminHomeworkProblem[]
   dueAt?: string | null
   scheduledAt?: string | null
   stickerRewardCount?: number
@@ -204,7 +242,7 @@ export type AdminSubmissionDetail = {
   problemReviews: Record<string, HomeworkProblemReview>
   assignmentTitle: string
   assignmentDescription?: string | null
-  problems: HomeworkProblem[]
+  problems: AdminHomeworkProblem[]
   dueAt?: string | null
   files: AdminSubmissionFile[]
 }
