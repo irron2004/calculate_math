@@ -14,7 +14,7 @@ export const GRAPH_LAYOUT_DEFAULTS = {
 } as const
 
 const NODE_WIDTH = 260
-const NODE_HEIGHT = 90
+const NODE_HEIGHT = 112
 
 export type CurriculumGraphNode = {
   id: string

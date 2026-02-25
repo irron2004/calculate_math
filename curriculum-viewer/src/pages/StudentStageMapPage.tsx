@@ -279,58 +279,62 @@ export default function StudentStageMapPage() {
         </div>
       </section>
 
-      <section className="student-stage-map-canvas" style={{ minHeight: canvasHeight }}>
-        <svg className="student-stage-map-svg" viewBox={`0 0 100 ${canvasHeight}`} preserveAspectRatio="none">
-          {pathD ? <path d={pathD} className="student-stage-map-main-path" /> : null}
-          {model.sideQuests.map((node) => {
-            const anchor = findAnchorStage(node, model.stages)
-            if (!anchor) return null
+      <section className="student-stage-map-canvas" aria-label="학습 지도">
+        <div className="student-stage-map-inner" style={{ height: canvasHeight }}>
+          <svg className="student-stage-map-svg" viewBox={`0 0 100 ${canvasHeight}`} preserveAspectRatio="none">
+            {pathD ? <path d={pathD} className="student-stage-map-main-path" /> : null}
+            {model.sideQuests.map((node) => {
+              const anchor = findAnchorStage(node, model.stages)
+              if (!anchor) return null
+              return (
+                <line
+                  key={`line-${node.nodeId}`}
+                  x1={anchor.xPercent}
+                  y1={anchor.y}
+                  x2={node.xPercent}
+                  y2={node.y}
+                  className="student-stage-map-side-line"
+                />
+              )
+            })}
+          </svg>
+
+          {allVisibleStages.map((node) => {
+            const className = [
+              'student-stage-bubble',
+              `status-${node.status.toLowerCase()}`,
+              node.isSideQuest ? 'is-side' : '',
+              node.isRecommended ? 'is-recommended' : ''
+            ]
+              .filter(Boolean)
+              .join(' ')
             return (
-              <line
-                key={`line-${node.nodeId}`}
-                x1={anchor.xPercent}
-                y1={anchor.y}
-                x2={node.xPercent}
-                y2={node.y}
-                className="student-stage-map-side-line"
-              />
+              <button
+                key={node.nodeId}
+                ref={(el) => {
+                  buttonRefs.current[node.nodeId] = el
+                }}
+                type="button"
+                className={className}
+                style={{ left: `${node.xPercent}%`, top: `${node.y}px` }}
+                onClick={() => setSelectedStage(node)}
+                aria-label={`${node.title} ${statusLabel(node.status)}`}
+              >
+                <span className="student-stage-bubble-icon" aria-hidden="true">
+                  {statusIcon(node.status)}
+                </span>
+                <span className="student-stage-bubble-title">{node.title}</span>
+                <span className="student-stage-bubble-status">
+                  {node.isSideQuest ? '도전' : statusLabel(node.status)}
+                </span>
+              </button>
             )
           })}
-        </svg>
 
-        {allVisibleStages.map((node) => {
-          const className = [
-            'student-stage-bubble',
-            `status-${node.status.toLowerCase()}`,
-            node.isSideQuest ? 'is-side' : '',
-            node.isRecommended ? 'is-recommended' : ''
-          ]
-            .filter(Boolean)
-            .join(' ')
-          return (
-            <button
-              key={node.nodeId}
-              ref={(el) => {
-                buttonRefs.current[node.nodeId] = el
-              }}
-              type="button"
-              className={className}
-              style={{ left: `${node.xPercent}%`, top: `${node.y}px` }}
-              onClick={() => setSelectedStage(node)}
-              aria-label={`${node.title} ${statusLabel(node.status)}`}
-            >
-              <span className="student-stage-bubble-icon" aria-hidden="true">
-                {statusIcon(node.status)}
-              </span>
-              <span className="student-stage-bubble-title">{node.title}</span>
-              <span className="student-stage-bubble-status">{node.isSideQuest ? '도전' : statusLabel(node.status)}</span>
-            </button>
-          )
-        })}
-
-        {model.hiddenFutureCount > 0 ? (
-          <div className="student-stage-hidden-future">앞으로 {model.hiddenFutureCount}개 스테이지가 더 열려요</div>
-        ) : null}
+          {model.hiddenFutureCount > 0 ? (
+            <div className="student-stage-hidden-future">앞으로 {model.hiddenFutureCount}개 스테이지가 더 열려요</div>
+          ) : null}
+        </div>
       </section>
 
       {selectedStage ? (

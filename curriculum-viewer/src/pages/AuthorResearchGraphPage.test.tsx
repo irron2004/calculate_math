@@ -1,9 +1,13 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import AuthorResearchGraphPage from './AuthorResearchGraphPage'
 
 let latestReactFlowProps: any = null
+const originalConsoleError = console.error
+const originalConsoleWarn = console.warn
+const ACT_WARNING_FRAGMENT = 'not wrapped in act'
+const ROUTER_FUTURE_WARNING_FRAGMENT = 'React Router Future Flag Warning'
 
 vi.mock('reactflow', () => {
   const ReactFlow = (props: any) => {
@@ -21,6 +25,28 @@ vi.mock('reactflow', () => {
 })
 
 describe('/author/research-graph', () => {
+  beforeAll(() => {
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      const firstArg = args[0]
+      if (typeof firstArg === 'string' && firstArg.includes(ACT_WARNING_FRAGMENT)) {
+        return
+      }
+      originalConsoleError(...(args as Parameters<typeof console.error>))
+    })
+
+    vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      const firstArg = args[0]
+      if (typeof firstArg === 'string' && firstArg.includes(ROUTER_FUTURE_WARNING_FRAGMENT)) {
+        return
+      }
+      originalConsoleWarn(...(args as Parameters<typeof console.warn>))
+    })
+  })
+
+  afterAll(() => {
+    vi.restoreAllMocks()
+  })
+
   beforeEach(() => {
     latestReactFlowProps = null
     window.localStorage.clear()
@@ -177,26 +203,43 @@ describe('/author/research-graph', () => {
     }
   }
 
-  async function sleep(ms: number) {
-    await new Promise((resolve) => setTimeout(resolve, ms))
+  async function renderPage() {
+    render(
+      <MemoryRouter initialEntries={['/author/research-graph']}>
+        <Routes>
+          <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await screen.findByTestId('reactflow')
+    await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
+    await waitFor(() => {
+      expect(screen.queryByText('Loading…')).not.toBeInTheDocument()
+    })
+    await waitFor(() => {
+      expect(screen.queryByText('research patch loading…')).not.toBeInTheDocument()
+    })
+  }
+
+  async function waitForDebounce(ms: number) {
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, ms))
+    })
   }
 
   it('renders the page header and graph canvas', async () => {
     const restoreFetch = mockFetch()
 
     try {
-      render(
-        <MemoryRouter initialEntries={['/author/research-graph']}>
-          <Routes>
-            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
-          </Routes>
-        </MemoryRouter>
-      )
+      await renderPage()
 
       expect(await screen.findByRole('heading', { name: 'Research Graph Editor' })).toBeInTheDocument()
       expect(screen.getByLabelText('Research graph canvas')).toBeInTheDocument()
+      expect(screen.queryByText('Research Suggestions')).not.toBeInTheDocument()
 
       await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
+      expect(latestReactFlowProps.nodesConnectable).toBe(false)
       const nodeIds = (latestReactFlowProps.nodes ?? []).map((node: any) => node.id)
       expect(nodeIds).toEqual(expect.arrayContaining(['TU1', 'TU2']))
 
@@ -207,8 +250,33 @@ describe('/author/research-graph', () => {
         expect(hasAcceptedResearchEdge).toBe(true)
       })
 
-      const prereqEdge = (latestReactFlowProps.edges ?? []).find((edge: any) => edge.edgeType === 'prereq' || edge.label === 'prereq')
+      const prereqEdge = (latestReactFlowProps.edges ?? []).find((edge: any) => edge?.data?.edgeType === 'prereq')
       expect(prereqEdge?.style?.stroke).toBeTruthy()
+
+      const nonPrereqEdges = (latestReactFlowProps.edges ?? []).filter((edge: any) => edge?.data?.edgeType !== 'prereq')
+      expect(nonPrereqEdges).toHaveLength(0)
+      expect((latestReactFlowProps.edges ?? []).every((edge: any) => edge.label === undefined)).toBe(true)
+    } finally {
+      restoreFetch()
+    }
+  })
+
+  it('switches to editor mode and restores editing controls', async () => {
+    const restoreFetch = mockFetch()
+
+    try {
+      await renderPage()
+      expect(latestReactFlowProps.nodesConnectable).toBe(false)
+
+      const user = userEvent.setup()
+      await user.click(screen.getByTestId('research-graph-mode-editor'))
+
+      await waitFor(() => {
+        expect(latestReactFlowProps.nodesConnectable).toBe(true)
+      })
+      expect(screen.getByText('Research Suggestions')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Export JSON' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Proposed 노드 추가' })).toBeInTheDocument()
     } finally {
       restoreFetch()
     }
@@ -218,17 +286,10 @@ describe('/author/research-graph', () => {
     const restoreFetch = mockFetch()
 
     try {
-      render(
-        <MemoryRouter initialEntries={['/author/research-graph']}>
-          <Routes>
-            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
-          </Routes>
-        </MemoryRouter>
-      )
-
-      await screen.findByTestId('reactflow')
+      await renderPage()
 
       const user = userEvent.setup()
+      await user.click(screen.getByTestId('research-graph-mode-editor'))
       await user.click(await screen.findByRole('button', { name: 'Proposed 노드 추가' }))
       await user.type(screen.getByLabelText('label'), '입체도형의 구성 요소와 전개도')
       await user.type(screen.getByLabelText('note (optional)'), 'bridge node')
@@ -247,17 +308,10 @@ describe('/author/research-graph', () => {
     const restoreFetch = mockFetch()
 
     try {
-      render(
-        <MemoryRouter initialEntries={['/author/research-graph']}>
-          <Routes>
-            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
-          </Routes>
-        </MemoryRouter>
-      )
-
-      await screen.findByTestId('reactflow')
+      await renderPage()
 
       const user = userEvent.setup()
+      await user.click(screen.getByTestId('research-graph-mode-editor'))
       await user.click(await screen.findByRole('button', { name: 'Proposed 노드 추가' }))
       await user.type(screen.getByLabelText('label'), '***')
       await user.click(screen.getByRole('button', { name: '생성' }))
@@ -275,16 +329,7 @@ describe('/author/research-graph', () => {
     const restoreFetch = mockFetch()
 
     try {
-      render(
-        <MemoryRouter initialEntries={['/author/research-graph']}>
-          <Routes>
-            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
-          </Routes>
-        </MemoryRouter>
-      )
-
-      await screen.findByTestId('reactflow')
-      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
+      await renderPage()
 
       await waitFor(() => {
         expect(typeof latestReactFlowProps.onNodeMouseEnter).toBe('function')
@@ -293,7 +338,9 @@ describe('/author/research-graph', () => {
 
       expect(screen.queryByTestId('research-hover-panel')).toBeNull()
 
-      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      act(() => {
+        latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      })
 
       await waitFor(() => {
         expect(screen.getByTestId('research-hover-panel')).toHaveTextContent('Unit 1')
@@ -315,7 +362,9 @@ describe('/author/research-graph', () => {
         expect(disconnected?.style?.opacity).toBeLessThan(0.2)
       })
 
-      latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+      act(() => {
+        latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+      })
 
       await waitFor(() => {
         const tu3 = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
@@ -330,21 +379,16 @@ describe('/author/research-graph', () => {
     const restoreFetch = mockFetch()
 
     try {
-      render(
-        <MemoryRouter initialEntries={['/author/research-graph']}>
-          <Routes>
-            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
-          </Routes>
-        </MemoryRouter>
-      )
+      await renderPage()
 
-      await screen.findByTestId('reactflow')
-      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
-
-      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      act(() => {
+        latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      })
       await waitFor(() => expect(screen.getByTestId('research-hover-panel')).toHaveTextContent('Unit 1'))
 
-      latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+      act(() => {
+        latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+      })
 
       expect(screen.getByTestId('research-hover-panel')).toHaveTextContent('Unit 1')
       const tu3WhileDebounced = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
@@ -364,24 +408,19 @@ describe('/author/research-graph', () => {
     const restoreFetch = mockFetch()
 
     try {
-      render(
-        <MemoryRouter initialEntries={['/author/research-graph']}>
-          <Routes>
-            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
-          </Routes>
-        </MemoryRouter>
-      )
+      await renderPage()
 
-      await screen.findByTestId('reactflow')
-      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
-
-      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      act(() => {
+        latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      })
       const panel = await screen.findByTestId('research-hover-panel')
 
-      latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+      act(() => {
+        latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+      })
       fireEvent.mouseEnter(panel)
 
-      await sleep(180)
+      await waitForDebounce(180)
 
       expect(screen.getByTestId('research-hover-panel')).toHaveTextContent('Unit 1')
       const tu3WhilePanelHovered = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
@@ -403,24 +442,19 @@ describe('/author/research-graph', () => {
     const restoreFetch = mockFetch()
 
     try {
-      render(
-        <MemoryRouter initialEntries={['/author/research-graph']}>
-          <Routes>
-            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
-          </Routes>
-        </MemoryRouter>
-      )
+      await renderPage()
 
-      await screen.findByTestId('reactflow')
-      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
-
-      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      act(() => {
+        latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      })
       await screen.findByTestId('research-hover-panel')
 
-      latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
-      latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU2' })
+      act(() => {
+        latestReactFlowProps.onNodeMouseLeave(null, { id: 'TU1' })
+        latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU2' })
+      })
 
-      await sleep(180)
+      await waitForDebounce(180)
 
       const panel = screen.getByTestId('research-hover-panel')
       expect(panel).toHaveTextContent('Unit 2')
@@ -439,18 +473,11 @@ describe('/author/research-graph', () => {
     const restoreFetch = mockFetchWithPatchAlignsTo()
 
     try {
-      render(
-        <MemoryRouter initialEntries={['/author/research-graph']}>
-          <Routes>
-            <Route path="/author/research-graph" element={<AuthorResearchGraphPage />} />
-          </Routes>
-        </MemoryRouter>
-      )
+      await renderPage()
 
-      await screen.findByTestId('reactflow')
-      await waitFor(() => expect(latestReactFlowProps).not.toBeNull())
-
-      latestReactFlowProps.onNodeMouseEnter(null, { id: 'BRIDGE' })
+      act(() => {
+        latestReactFlowProps.onNodeMouseEnter(null, { id: 'BRIDGE' })
+      })
 
       const panel = await screen.findByTestId('research-hover-panel')
       expect(panel).toHaveTextContent('Bridge Unit')

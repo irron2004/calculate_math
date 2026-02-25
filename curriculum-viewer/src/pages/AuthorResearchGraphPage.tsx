@@ -29,6 +29,16 @@ import type { ProposedTextbookUnitNode } from '../lib/curriculum2022/types'
 import { buildPatchExport } from '../lib/research/patchExport'
 import { loadResearchEditorState, saveResearchEditorState } from '../lib/research/editorState'
 import { parseProblemBank, type ProblemBank } from '../lib/learn/problems'
+import ResearchGraphModeToggle from '../components/ResearchGraphModeToggle'
+import { buildResearchNodeLabel } from '../lib/researchGraph/nodeLabel'
+import { getEdgeLabelForMode, isEdgeTypeVisibleInMode } from '../lib/researchGraph/edgeLod'
+import {
+  getEffectiveEdgeTypes,
+  getEditorDefaultEdgeTypes,
+  normalizeEditorEdgeTypes,
+  shouldShowEdgeLabels,
+  type ResearchGraphViewMode
+} from '../lib/researchGraph/viewMode'
 
 type LoadState =
   | { status: 'loading' }
@@ -225,6 +235,7 @@ function getNodeStyle(nodeType: string, proposed?: boolean): CSSProperties {
 export default function AuthorResearchGraphPage() {
   const initialEditorState = useMemo(() => loadResearchEditorState(), [])
   const [state, setState] = useState<LoadState>({ status: 'loading' })
+  const [viewMode, setViewMode] = useState<ResearchGraphViewMode>('overview')
   const [activeTrack, setActiveTrack] = useState<ResearchTrack>(initialEditorState.selectedTrack)
   const [visibleDomainCodes, setVisibleDomainCodes] = useState<DomainLayerCode[]>([
     ...DOMAIN_LAYER_ORDER,
@@ -232,7 +243,9 @@ export default function AuthorResearchGraphPage() {
   ])
   const [visibleDepthRange, setVisibleDepthRange] = useState<{ min: number; max: number }>({ min: 1, max: 99 })
   const [visibleGradeBands, setVisibleGradeBands] = useState<string[]>([]) // empty means all visible
-  const [visibleEdgeTypes, setVisibleEdgeTypes] = useState<string[]>(['contains', 'alignsTo', 'prereq'])
+  const [editorVisibleEdgeTypes, setEditorVisibleEdgeTypes] = useState<string[]>(() =>
+    normalizeEditorEdgeTypes(getEditorDefaultEdgeTypes())
+  )
   const [selectedPrereq, setSelectedPrereq] = useState<PrereqEdgeWithOrigin | null>(null)
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
   const [inspectedNodeId, setInspectedNodeId] = useState<string | null>(null)
@@ -320,6 +333,14 @@ export default function AuthorResearchGraphPage() {
       removedEdges: manualRemovedEdges
     })
   }, [activeTrack, manualAddedEdges, manualProposedNodes, manualRemovedEdges])
+
+  useEffect(() => {
+    if (viewMode !== 'overview') return
+    setShowAddProposed(false)
+    setSelectedPrereq(null)
+    setExportJson(null)
+    setProposedError(null)
+  }, [viewMode])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -692,18 +713,18 @@ export default function AuthorResearchGraphPage() {
   }, [])
 
   const handleToggleEdgeType = useCallback((edgeType: string) => {
-    setVisibleEdgeTypes((prev) => {
+    setEditorVisibleEdgeTypes((prev) => {
       if (prev.includes(edgeType)) return prev.filter((t) => t !== edgeType)
       return [...prev, edgeType]
     })
   }, [])
 
   const handleShowOnlyEdgeType = useCallback((edgeType: string) => {
-    setVisibleEdgeTypes([edgeType])
+    setEditorVisibleEdgeTypes(normalizeEditorEdgeTypes([edgeType]))
   }, [])
 
   const handleShowAllEdgeTypes = useCallback(() => {
-    setVisibleEdgeTypes(['contains', 'alignsTo', 'prereq'])
+    setEditorVisibleEdgeTypes(getEditorDefaultEdgeTypes())
   }, [])
 
   const allNodes = useMemo(() => {
@@ -748,9 +769,17 @@ export default function AuthorResearchGraphPage() {
     return new Set(visibleGradeBands)
   }, [visibleGradeBands])
 
+  const effectiveVisibleEdgeTypes = useMemo(() => {
+    return getEffectiveEdgeTypes({ mode: viewMode, editorEdgeTypes: editorVisibleEdgeTypes })
+  }, [editorVisibleEdgeTypes, viewMode])
+
+  const editorVisibleEdgeTypeSet = useMemo(() => {
+    return new Set(editorVisibleEdgeTypes)
+  }, [editorVisibleEdgeTypes])
+
   const visibleEdgeTypeSet = useMemo(() => {
-    return new Set(visibleEdgeTypes)
-  }, [visibleEdgeTypes])
+    return new Set(effectiveVisibleEdgeTypes)
+  }, [effectiveVisibleEdgeTypes])
 
   const currentPrereqEdges = useMemo(() => {
     if (!editState) return []
@@ -1064,36 +1093,41 @@ export default function AuthorResearchGraphPage() {
       const maxDepth = domainNodes.reduce((max, node) => Math.max(max, depthById.get(node.id) ?? 1), 1)
       const depthHeaderY = yOffset + DOMAIN_HEADER_HEIGHT + DOMAIN_HEADER_GAP_Y
 
-      for (let depth = 1; depth <= maxDepth; depth += 1) {
-        layeredNodes.push({
-          id: `__domain_depth_${domainCode}_${depth}`,
-          position: {
-            x: (depth - 1) * (NODE_WIDTH + GRID_GAP_X),
-            y: depthHeaderY
-          },
-          data: {
-            label: (
-              <div className="mono" style={{ fontWeight: 700 }}>
-                depth {depth}
-              </div>
-            )
-          },
-          style: decorateNodeStyle(`__domain_depth_${domainCode}_${depth}`, {
-            width: NODE_WIDTH,
-            height: DEPTH_HEADER_HEIGHT,
-            padding: 8,
-            borderRadius: 10,
-            border: '1px solid #0f172a',
-            background: '#e2e8f0',
-            color: '#0f172a'
-          }),
-          draggable: false,
-          selectable: false,
-          connectable: false
-        })
+      if (viewMode === 'editor') {
+        for (let depth = 1; depth <= maxDepth; depth += 1) {
+          layeredNodes.push({
+            id: `__domain_depth_${domainCode}_${depth}`,
+            position: {
+              x: (depth - 1) * (NODE_WIDTH + GRID_GAP_X),
+              y: depthHeaderY
+            },
+            data: {
+              label: (
+                <div className="mono" style={{ fontWeight: 700 }}>
+                  depth {depth}
+                </div>
+              )
+            },
+            style: decorateNodeStyle(`__domain_depth_${domainCode}_${depth}`, {
+              width: NODE_WIDTH,
+              height: DEPTH_HEADER_HEIGHT,
+              padding: 8,
+              borderRadius: 10,
+              border: '1px solid #0f172a',
+              background: '#e2e8f0',
+              color: '#0f172a'
+            }),
+            draggable: false,
+            selectable: false,
+            connectable: false
+          })
+        }
       }
 
-      let domainYOffset = depthHeaderY + DEPTH_HEADER_HEIGHT + DEPTH_HEADER_GAP_Y
+      let domainYOffset =
+        viewMode === 'editor'
+          ? depthHeaderY + DEPTH_HEADER_HEIGHT + DEPTH_HEADER_GAP_Y
+          : yOffset + DOMAIN_HEADER_HEIGHT + DOMAIN_HEADER_GAP_Y
 
       const groupedByBand = new Map<string, typeof domainNodes>()
       for (const node of domainNodes) {
@@ -1134,28 +1168,15 @@ export default function AuthorResearchGraphPage() {
               y: domainYOffset + index * (NODE_HEIGHT + GRID_GAP_Y)
             },
             data: {
-              label: (
-                <div>
-                  <div className="mono" style={{ fontSize: 12, opacity: 0.7 }}>
-                    {node.nodeType}
-                    <span style={{ marginLeft: 6 }}>depth {depth}</span>
-                    {node.proposed ? (
-                      <span className="badge badge-warn" style={{ marginLeft: 6 }}>
-                        proposed
-                      </span>
-                    ) : null}
-                  </div>
-                  <div style={{ fontWeight: 600 }}>{node.label}</div>
-                  {description ? (
-                    <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-                      {description}
-                    </div>
-                  ) : null}
-                  <div className="mono" style={{ fontSize: 12, opacity: 0.75 }}>
-                    {node.id}
-                  </div>
-                </div>
-              )
+              label: buildResearchNodeLabel({
+                mode: viewMode,
+                nodeType: node.nodeType,
+                depth,
+                label: node.label,
+                id: node.id,
+                proposed: Boolean(node.proposed),
+                description
+              })
             },
             style: decorateNodeStyle(node.id, {
               width: NODE_WIDTH,
@@ -1174,7 +1195,7 @@ export default function AuthorResearchGraphPage() {
     }
 
     return layeredNodes
-  }, [allNodesDepthById, domainCodeById, domainLabelByCode, hoverHighlight, hoveredNodeId, state, visibleNodes])
+  }, [allNodesDepthById, domainCodeById, domainLabelByCode, hoverHighlight, hoveredNodeId, state, viewMode, visibleNodes])
 
   const edges = useMemo((): Edge[] => {
     if (state.status !== 'ready') return []
@@ -1215,35 +1236,43 @@ export default function AuthorResearchGraphPage() {
     }
 
     const shouldShowNonPrereqEdge = (edgeType: string) => {
-      if (edgeType === 'contains' || edgeType === 'alignsTo') {
-        return visibleEdgeTypeSet.has(edgeType)
-      }
-      return true
+      return isEdgeTypeVisibleInMode({
+        mode: viewMode,
+        edgeType,
+        editorEdgeTypeSet: editorVisibleEdgeTypeSet
+      })
     }
 
-    const nonPrereq = mergedNonPrereqEdges
-      .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
-      .filter((edge) => shouldShowNonPrereqEdge(edge.edgeType))
-      .map((edge) => {
-        const baseStyle = getEdgeStyle(edge.edgeType)
-        const domainStyle = decorateForDomain({ ...baseStyle }, edge.source, edge.target) as CSSProperties
-        const id = edge.id ?? `${edge.edgeType}:${edge.source}->${edge.target}`
-        const dimLabel = hoverActive && hoverEdgeIds && !hoverEdgeIds.has(id)
-        return {
-          id,
-          source: edge.source,
-          target: edge.target,
-          type: 'smoothstep',
-          label: edge.edgeType,
-          data: { edgeType: edge.edgeType },
-          style: decorateEdgeStyle(id, domainStyle),
-          labelStyle: {
-            fill: (domainStyle.stroke as string) ?? '#64748b',
-            fontSize: 12,
-            ...(dimLabel ? { opacity: 0 } : {})
-          }
-        }
-      })
+    const showEdgeLabels = shouldShowEdgeLabels(viewMode)
+
+    const nonPrereq =
+      viewMode === 'overview'
+        ? []
+        : mergedNonPrereqEdges
+            .filter((edge) => visibleNodeIdSet.has(edge.source) && visibleNodeIdSet.has(edge.target))
+            .filter((edge) => shouldShowNonPrereqEdge(edge.edgeType))
+            .map((edge) => {
+              const baseStyle = getEdgeStyle(edge.edgeType)
+              const domainStyle = decorateForDomain({ ...baseStyle }, edge.source, edge.target) as CSSProperties
+              const id = edge.id ?? `${edge.edgeType}:${edge.source}->${edge.target}`
+              const dimLabel = hoverActive && hoverEdgeIds && !hoverEdgeIds.has(id)
+              return {
+                id,
+                source: edge.source,
+                target: edge.target,
+                type: 'smoothstep',
+                label: getEdgeLabelForMode({ mode: viewMode, edgeType: edge.edgeType }),
+                data: { edgeType: edge.edgeType },
+                style: decorateEdgeStyle(id, domainStyle),
+                labelStyle: showEdgeLabels
+                  ? {
+                      fill: (domainStyle.stroke as string) ?? '#64748b',
+                      fontSize: 12,
+                      ...(dimLabel ? { opacity: 0 } : {})
+                    }
+                  : undefined
+              }
+            })
 
     const prereq = visibleEdgeTypeSet.has('prereq')
       ? currentPrereqEdges
@@ -1260,20 +1289,33 @@ export default function AuthorResearchGraphPage() {
               source: edge.source,
               target: edge.target,
               type: 'smoothstep',
-              label: 'prereq',
+              label: getEdgeLabelForMode({ mode: viewMode, edgeType: 'prereq' }),
               data: { edgeType: 'prereq', origin: edge.origin },
               style: decorateEdgeStyle(id, domainStyle),
-              labelStyle: {
-                fill: (domainStyle.stroke as string) ?? '#64748b',
-                fontSize: 12,
-                ...(dimLabel ? { opacity: 0 } : {})
-              }
+              labelStyle: showEdgeLabels
+                ? {
+                    fill: (domainStyle.stroke as string) ?? '#64748b',
+                    fontSize: 12,
+                    ...(dimLabel ? { opacity: 0 } : {})
+                  }
+                : undefined
             }
           })
       : []
 
     return [...nonPrereq, ...prereq]
-  }, [currentPrereqEdges, domainCodeById, hoverHighlight, hoveredNodeId, mergedNonPrereqEdges, state, visibleEdgeTypeSet, visibleNodeIdSet])
+  }, [
+    currentPrereqEdges,
+    domainCodeById,
+    editorVisibleEdgeTypeSet,
+    hoverHighlight,
+    hoveredNodeId,
+    mergedNonPrereqEdges,
+    state,
+    viewMode,
+    visibleEdgeTypeSet,
+    visibleNodeIdSet
+  ])
 
   const counts = useMemo(() => {
     if (state.status !== 'ready') return null
@@ -1392,6 +1434,12 @@ export default function AuthorResearchGraphPage() {
               <option value="T3">T3</option>
             </select>
           </label>
+          <div className="graph-control" style={{ minWidth: 180 }}>
+            <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
+              View mode
+            </div>
+            <ResearchGraphModeToggle mode={viewMode} onChange={setViewMode} disabled={state.status !== 'ready'} />
+          </div>
           <div className="graph-control" style={{ minWidth: 320 }}>
             <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
               Domain layers
@@ -1561,7 +1609,8 @@ export default function AuthorResearchGraphPage() {
               </div>
             </div>
           ) : null}
-          <div className="graph-control" style={{ minWidth: 260 }}>
+          {viewMode === 'editor' ? (
+            <div className="graph-control" style={{ minWidth: 260 }}>
             <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
               Edge filter
             </div>
@@ -1615,26 +1664,33 @@ export default function AuthorResearchGraphPage() {
                 all
               </button>
             </div>
-          </div>
-          <button
-            type="button"
-            className="button button-ghost"
-            onClick={() => {
-              setShowAddProposed((prev) => !prev)
-              setProposedError(null)
-            }}
-          >
-            Proposed 노드 추가
-          </button>
-          <button type="button" className="button button-primary" onClick={handleExportPatch}>
-            Export JSON
-          </button>
-          <div className="mono" style={{ fontSize: 12, opacity: 0.85 }}>
-            prereq: {counts?.visiblePrereq.total ?? 0}/{counts?.prereq.total ?? 0} (existing{' '}
-            {counts?.visiblePrereq.base ?? 0}/{counts?.prereq.base ?? 0} / research {counts?.visiblePrereq.research ?? 0}/
-            {counts?.prereq.research ?? 0} / manual {counts?.visiblePrereq.manual ?? 0}/{counts?.prereq.manual ?? 0}) |
-            changes: +{editState.added.length} / -{editState.removed.length}
-          </div>
+            </div>
+          ) : null}
+          {viewMode === 'editor' ? (
+            <button
+              type="button"
+              className="button button-ghost"
+              onClick={() => {
+                setShowAddProposed((prev) => !prev)
+                setProposedError(null)
+              }}
+            >
+              Proposed 노드 추가
+            </button>
+          ) : null}
+          {viewMode === 'editor' ? (
+            <button type="button" className="button button-primary" onClick={handleExportPatch}>
+              Export JSON
+            </button>
+          ) : null}
+          {viewMode === 'editor' ? (
+            <div className="mono" style={{ fontSize: 12, opacity: 0.85 }}>
+              prereq: {counts?.visiblePrereq.total ?? 0}/{counts?.prereq.total ?? 0} (existing{' '}
+              {counts?.visiblePrereq.base ?? 0}/{counts?.prereq.base ?? 0} / research {counts?.visiblePrereq.research ?? 0}/
+              {counts?.prereq.research ?? 0} / manual {counts?.visiblePrereq.manual ?? 0}/{counts?.prereq.manual ?? 0}) |
+              changes: +{editState.added.length} / -{editState.removed.length}
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -1654,15 +1710,16 @@ export default function AuthorResearchGraphPage() {
         </p>
       ) : null}
 
-      <div
-        style={{
-          border: '1px solid #e2e8f0',
-          borderRadius: 12,
-          padding: 12,
-          background: '#f8fafc',
-          marginBottom: 12
-        }}
-      >
+      {viewMode === 'editor' ? (
+        <div
+          style={{
+            border: '1px solid #e2e8f0',
+            borderRadius: 12,
+            padding: 12,
+            background: '#f8fafc',
+            marginBottom: 12
+          }}
+        >
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', marginBottom: 10 }}>
           <strong>Research Suggestions</strong>
           <span className="mono" style={{ fontSize: 12, opacity: 0.75 }}>
@@ -1805,9 +1862,10 @@ export default function AuthorResearchGraphPage() {
             </div>
           </div>
         ) : null}
-      </div>
+        </div>
+      ) : null}
 
-      {exportJson ? (
+      {viewMode === 'editor' && exportJson ? (
         <div
           style={{
             border: '1px solid #e2e8f0',
@@ -1831,7 +1889,7 @@ export default function AuthorResearchGraphPage() {
         </div>
       ) : null}
 
-      {showAddProposed ? (
+      {viewMode === 'editor' && showAddProposed ? (
         <form
           onSubmit={(event) => {
             event.preventDefault()
@@ -1903,7 +1961,7 @@ export default function AuthorResearchGraphPage() {
         </form>
       ) : null}
 
-      {selectedPrereq ? (
+      {viewMode === 'editor' && selectedPrereq ? (
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8 }}>
           <div className="mono" style={{ fontSize: 12 }}>
             selected prereq: {selectedPrereq.source} → {selectedPrereq.target}
@@ -2051,11 +2109,12 @@ export default function AuthorResearchGraphPage() {
             edges={edges}
             fitView
             nodesDraggable={false}
-            nodesConnectable
+            nodesConnectable={viewMode === 'editor'}
             deleteKeyCode={null}
             onNodeMouseEnter={handleNodeMouseEnter}
             onNodeMouseLeave={handleNodeMouseLeave}
             onConnect={(connection: Connection) => {
+              if (viewMode !== 'editor') return
               if (!editState) return
 
               const source = connection.source
@@ -2073,7 +2132,8 @@ export default function AuthorResearchGraphPage() {
               setManualRemovedEdges(next.removed)
             }}
             onEdgeClick={(_, edge) => {
-              const isPrereq = edge?.data?.edgeType === 'prereq' || edge?.label === 'prereq'
+              if (viewMode !== 'editor') return
+              const isPrereq = edge?.data?.edgeType === 'prereq'
               if (!isPrereq) return
               const origin = edge?.data?.origin
               if (origin !== 'base' && origin !== 'research' && origin !== 'manual') return

@@ -20,6 +20,12 @@ import type {
   ProblemBankProblem,
 } from '../lib/homework/types'
 import { createEmptyProblem } from '../lib/homework/types'
+import {
+  computeDefaultScheduleAndDue,
+  formatHomeworkTitleDaySuffix,
+  resolveHomeworkDayKey,
+  type HomeworkDayKey,
+} from '../lib/homework/scheduling'
 
 type ProblemEditorProps = {
   problem: AdminHomeworkProblem
@@ -228,6 +234,7 @@ export default function AuthorHomeworkPage() {
 
   const [bankLabels, setBankLabels] = useState<HomeworkLabel[]>([])
   const [bankProblems, setBankProblems] = useState<ProblemBankProblem[]>([])
+  const [bankKnownProblemsById, setBankKnownProblemsById] = useState<Record<string, ProblemBankProblem>>({})
   const [bankSelectedProblemIds, setBankSelectedProblemIds] = useState<Set<string>>(new Set())
   const [bankWeekKey, setBankWeekKey] = useState('')
   const [bankDayKey, setBankDayKey] = useState('')
@@ -305,7 +312,15 @@ export default function AuthorHomeworkPage() {
       controller.signal
     )
       .then((problems) => {
-        if (!controller.signal.aborted) setBankProblems(problems)
+        if (controller.signal.aborted) return
+        setBankProblems(problems)
+        setBankKnownProblemsById((prev) => {
+          const next = { ...prev }
+          for (const problem of problems) {
+            next[problem.id] = problem
+          }
+          return next
+        })
       })
       .catch((err) => {
         if (!controller.signal.aborted) {
@@ -583,23 +598,64 @@ export default function AuthorHomeworkPage() {
       setMessage(null)
 
       try {
+        const now = new Date()
         const base = {
           title: title.trim(),
           description: description.trim() || undefined,
-          dueAt: dueAt || undefined,
-          scheduledAt: scheduledAt || undefined,
           stickerRewardCount: parsedStickerRewardCount,
           targetStudentIds: Array.from(selectedStudentIds)
         }
 
         if (problemSource === 'bank') {
-          await createAssignment({
-            ...base,
-            problemIds: Array.from(bankSelectedProblemIds)
+          const selectedIds = Array.from(bankSelectedProblemIds)
+
+          const buckets = new Map<HomeworkDayKey | null, string[]>()
+          for (const problemId of selectedIds) {
+            const problem = bankKnownProblemsById[problemId]
+            const key = resolveHomeworkDayKey(problem?.dayKey)
+            const list = buckets.get(key) ?? []
+            list.push(problemId)
+            buckets.set(key, list)
+          }
+
+          const entries = Array.from(buckets.entries()).filter(([, list]) => list.length > 0)
+          const shouldSuffixTitle = entries.length > 1
+          let createdCount = 0
+
+          for (const [bucketDayKey, problemIds] of entries) {
+            const defaults = computeDefaultScheduleAndDue({ now, dayKey: bucketDayKey, fallbackDayKey: 'fri' })
+            const effectiveScheduledAt = scheduledAt || defaults.scheduledAt
+            const effectiveDueAt = dueAt || defaults.dueAt
+            const displayDayKey: HomeworkDayKey = bucketDayKey ?? 'fri'
+            const assignmentTitle = shouldSuffixTitle
+              ? `${base.title} (${formatHomeworkTitleDaySuffix(displayDayKey)})`
+              : base.title
+
+            await createAssignment({
+              ...base,
+              title: assignmentTitle,
+              dueAt: effectiveDueAt,
+              scheduledAt: effectiveScheduledAt,
+              problemIds
+            })
+            createdCount += 1
+          }
+
+          setMessage({
+            type: 'success',
+            text:
+              createdCount > 1
+                ? `숙제 ${createdCount}개가 예약되었습니다.`
+                : '숙제가 예약되었습니다.'
           })
         } else {
+          const defaults = computeDefaultScheduleAndDue({ now, dayKey: null, fallbackDayKey: 'fri' })
+          const effectiveScheduledAt = scheduledAt || defaults.scheduledAt
+          const effectiveDueAt = dueAt || defaults.dueAt
           await createAssignment({
             ...base,
+            dueAt: effectiveDueAt,
+            scheduledAt: effectiveScheduledAt,
             problems: problems.map((p) => ({
               ...p,
               question: p.question.trim(),
@@ -607,9 +663,10 @@ export default function AuthorHomeworkPage() {
               answer: p.answer?.trim() || undefined
             }))
           })
+
+          setMessage({ type: 'success', text: '숙제가 예약되었습니다.' })
         }
 
-        setMessage({ type: 'success', text: scheduledAt ? '숙제가 예약되었습니다.' : '숙제가 출제되었습니다.' })
         setTitle('')
         setDescription('')
         setDueAt('')
@@ -638,6 +695,7 @@ export default function AuthorHomeworkPage() {
       title,
       problemSource,
       bankSelectedProblemIds,
+      bankKnownProblemsById,
     ]
   )
 

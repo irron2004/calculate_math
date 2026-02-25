@@ -37,7 +37,7 @@ type Props = {
 }
 
 const NODE_WIDTH = 260
-const NODE_HEIGHT = 90
+const NODE_HEIGHT = 112
 const DEFAULT_FITVIEW_PADDING = 0.15
 
 const NODE_COLORS: Record<string, { bg: string; border: string }> = {
