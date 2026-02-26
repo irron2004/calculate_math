@@ -114,6 +114,28 @@ describe('/author/research-graph', () => {
         }
       }
 
+      if (url === '/data/research/node_guides_2022_v1.json') {
+        return {
+          ok: true,
+          json: async () => ({
+            meta: {
+              schemaVersion: 1,
+              curriculumVersion: 'KR-MATH-2022',
+              fallbacks: {
+                summaryGoal: '(준비중)',
+                problemGenerationGuideText: '(준비중)'
+              }
+            },
+            nodes: {
+              TU1: {
+                summaryGoal: 'TU1 summary goal',
+                problemGenerationGuideText: 'line 1\n연결 흐름: 1자리 → 2자리 → 3~4자리\nline 2'
+              }
+            }
+          })
+        }
+      }
+
       return { ok: false, status: 404 }
     }) as unknown as typeof fetch
 
@@ -191,6 +213,28 @@ describe('/author/research-graph', () => {
               }
             ],
             remove_edges: []
+          })
+        }
+      }
+
+      if (url === '/data/research/node_guides_2022_v1.json') {
+        return {
+          ok: true,
+          json: async () => ({
+            meta: {
+              schemaVersion: 1,
+              curriculumVersion: 'KR-MATH-2022',
+              fallbacks: {
+                summaryGoal: '(준비중)',
+                problemGenerationGuideText: '(준비중)'
+              }
+            },
+            nodes: {
+              BRIDGE: {
+                summaryGoal: 'Bridge summary',
+                problemGenerationGuideText: 'bridge line 1\nbridge line 2'
+              }
+            }
           })
         }
       }
@@ -433,6 +477,48 @@ describe('/author/research-graph', () => {
         const tu3AfterPanelLeave = (latestReactFlowProps.nodes ?? []).find((node: any) => node.id === 'TU3')
         expect(tu3AfterPanelLeave?.style?.opacity).toBeUndefined()
       })
+    } finally {
+      restoreFetch()
+    }
+  })
+
+  it('shows node guide sections and seeded guide content on hover', async () => {
+    const restoreFetch = mockFetch()
+
+    try {
+      await renderPage()
+
+      act(() => {
+        latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU1' })
+      })
+
+      const panel = await screen.findByTestId('research-hover-panel')
+      expect(panel).toHaveTextContent('요약 목표')
+      expect(panel).toHaveTextContent('문제 생성 가이드')
+      expect(panel).toHaveTextContent('TU1 summary goal')
+      expect(panel).toHaveTextContent('line 1')
+      expect(panel).toHaveTextContent('연결 흐름: 1자리 → 2자리 → 3~4자리')
+      expect(panel).toHaveTextContent('line 2')
+    } finally {
+      restoreFetch()
+    }
+  })
+
+  it('shows guide fallbacks for nodes without seeded guide entries', async () => {
+    const restoreFetch = mockFetch()
+
+    try {
+      await renderPage()
+
+      act(() => {
+        latestReactFlowProps.onNodeMouseEnter(null, { id: 'TU2' })
+      })
+
+      const panel = await screen.findByTestId('research-hover-panel')
+      expect(panel).toHaveTextContent('요약 목표')
+      expect(panel).toHaveTextContent('문제 생성 가이드')
+      const fallbackMatches = screen.getAllByText('(준비중)')
+      expect(fallbackMatches.length).toBeGreaterThanOrEqual(2)
     } finally {
       restoreFetch()
     }

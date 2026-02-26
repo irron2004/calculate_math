@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import ReactFlow, { Background, Controls, MiniMap, type Connection, type Edge, type Node } from 'reactflow'
+import ReactFlow, { Background, Controls, MiniMap, type Connection, type Edge, type Node, type ReactFlowInstance } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { loadCurriculum2022Graph } from '../lib/curriculum2022/graph'
 import { getEdgeStyle } from '../lib/curriculum2022/view'
@@ -16,6 +16,7 @@ import {
 import { generateProposedNodeId } from '../lib/curriculum2022/proposedNodes'
 import { loadResearchPatchForTrack } from '../lib/research/loaders'
 import type { ResearchPatchV1, ResearchTrack } from '../lib/research/schema'
+import { getNodeGuideOrFallback, loadNodeGuideLookup, type NodeGuideLookup } from '../lib/research/nodeGuides'
 import {
   getResearchSuggestionStatus,
   loadResearchSuggestionsStore,
@@ -72,6 +73,12 @@ type InspectableNode = {
 type ExamplePrompt = {
   nodeId: string
   prompt: string
+}
+
+const DEFAULT_NODE_GUIDE_LOOKUP: NodeGuideLookup = {
+  guideByNodeId: new Map(),
+  fallbackSummaryGoal: '(준비중)',
+  fallbackGuideText: '(준비중)'
 }
 
 const NODE_WIDTH = 260
@@ -233,6 +240,7 @@ function getNodeStyle(nodeType: string, proposed?: boolean): CSSProperties {
 }
 
 export default function AuthorResearchGraphPage() {
+  const reactFlowInstanceRef = useRef<ReactFlowInstance | null>(null)
   const initialEditorState = useMemo(() => loadResearchEditorState(), [])
   const [state, setState] = useState<LoadState>({ status: 'loading' })
   const [viewMode, setViewMode] = useState<ResearchGraphViewMode>('overview')
@@ -251,6 +259,7 @@ export default function AuthorResearchGraphPage() {
   const [inspectedNodeId, setInspectedNodeId] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [problemBank2022, setProblemBank2022] = useState<ProblemBank | null>(null)
+  const [nodeGuideLookup, setNodeGuideLookup] = useState<NodeGuideLookup>(DEFAULT_NODE_GUIDE_LOOKUP)
   const [manualProposedNodes, setManualProposedNodes] = useState<ProposedTextbookUnitNode[]>(
     initialEditorState.proposedNodes
   )
@@ -267,6 +276,20 @@ export default function AuthorResearchGraphPage() {
   const [exportJson, setExportJson] = useState<string | null>(null)
   const hoverLeaveTimerRef = useRef<number | null>(null)
   const hoverPanelActiveRef = useRef(false)
+  const didApplyInitialInspectRef = useRef(false)
+  const didApplyInitialCenterRef = useRef(false)
+
+  const initialInspectNodeId = useMemo(() => {
+    const params = new URLSearchParams(window.location.search)
+    const value = params.get('inspectNodeId')
+    return value?.trim() ? value.trim() : null
+  }, [])
+
+  const initialCenterNodeId = useMemo(() => {
+    const params = new URLSearchParams(window.location.search)
+    const value = params.get('centerNodeId')
+    return value?.trim() ? value.trim() : null
+  }, [])
 
   const cancelHoverLeaveTimer = useCallback(() => {
     if (hoverLeaveTimerRef.current === null) return
@@ -350,6 +373,22 @@ export default function AuthorResearchGraphPage() {
       .catch((error) => {
         const message = error instanceof Error ? error.message : String(error)
         setState({ status: 'error', message })
+      })
+
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    loadNodeGuideLookup({ signal: controller.signal })
+      .then((lookup) => {
+        if (controller.signal.aborted) return
+        setNodeGuideLookup(lookup)
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return
+        setNodeGuideLookup(DEFAULT_NODE_GUIDE_LOOKUP)
       })
 
     return () => controller.abort()
@@ -860,6 +899,23 @@ export default function AuthorResearchGraphPage() {
     return new Set(visibleNodes.map((node) => node.id))
   }, [visibleNodes])
 
+  useEffect(() => {
+    if (didApplyInitialInspectRef.current) return
+    if (!initialInspectNodeId) {
+      didApplyInitialInspectRef.current = true
+      return
+    }
+    if (initialInspectNodeId.startsWith('__')) {
+      didApplyInitialInspectRef.current = true
+      return
+    }
+    if (!visibleNodeIdSet.has(initialInspectNodeId)) return
+
+    didApplyInitialInspectRef.current = true
+    setHoveredNodeId(initialInspectNodeId)
+    setInspectedNodeId(initialInspectNodeId)
+  }, [initialInspectNodeId, visibleNodeIdSet])
+
   const hoverEdgeRefs = useMemo((): HoverEdgeRef[] => {
     const out: HoverEdgeRef[] = []
 
@@ -963,6 +1019,7 @@ export default function AuthorResearchGraphPage() {
           : []
 
     const note = node.note ?? node.reason ?? null
+    const guide = getNodeGuideOrFallback(inspectedNodeId, nodeGuideLookup)
 
     const examplePrompts: ExamplePrompt[] = []
     if (problemBank2022) {
@@ -990,7 +1047,9 @@ export default function AuthorResearchGraphPage() {
       goals,
       alignedAchievementCount: alignedAchievements.length,
       note,
-      examplePrompts
+      examplePrompts,
+      summaryGoalText: guide.summaryGoalText,
+      guideText: guide.guideText
     }
   }, [
     alignsToBySource,
@@ -999,6 +1058,7 @@ export default function AuthorResearchGraphPage() {
     domainLabelByCode,
     inspectableNodeById,
     inspectedNodeId,
+    nodeGuideLookup,
     problemBank2022,
     visibleNodeIdSet
   ])
@@ -1196,6 +1256,31 @@ export default function AuthorResearchGraphPage() {
 
     return layeredNodes
   }, [allNodesDepthById, domainCodeById, domainLabelByCode, hoverHighlight, hoveredNodeId, state, viewMode, visibleNodes])
+
+  useEffect(() => {
+    if (didApplyInitialCenterRef.current) return
+    if (!initialCenterNodeId) {
+      didApplyInitialCenterRef.current = true
+      return
+    }
+    if (initialCenterNodeId.startsWith('__')) {
+      didApplyInitialCenterRef.current = true
+      return
+    }
+    if (state.status !== 'ready') return
+
+    const instance = reactFlowInstanceRef.current
+    if (!instance) return
+
+    const targetNode = nodes.find((node) => node.id === initialCenterNodeId)
+    if (!targetNode) {
+      didApplyInitialCenterRef.current = true
+      return
+    }
+
+    didApplyInitialCenterRef.current = true
+    instance.fitView({ nodes: [targetNode], duration: 0, padding: 0.25 })
+  }, [initialCenterNodeId, nodes, state.status])
 
   const edges = useMemo((): Edge[] => {
     if (state.status !== 'ready') return []
@@ -2036,6 +2121,13 @@ export default function AuthorResearchGraphPage() {
 
             <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
+                <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 6 }}>요약 목표</div>
+                <div className="muted" style={{ fontSize: 12 }}>
+                  {inspectedPanel.summaryGoalText}
+                </div>
+              </div>
+
+              <div>
                 <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 6 }}>
                   목표
                   {inspectedPanel.node.nodeType === 'textbookUnit'
@@ -2077,6 +2169,13 @@ export default function AuthorResearchGraphPage() {
               </div>
 
               <div>
+                <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 6 }}>문제 생성 가이드</div>
+                <div className="muted" style={{ fontSize: 12, whiteSpace: 'pre-wrap' }}>
+                  {inspectedPanel.guideText}
+                </div>
+              </div>
+
+              <div>
                 <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 6 }}>예시 문제</div>
 
                 {inspectedPanel.examplePrompts.length > 0 ? (
@@ -2108,6 +2207,9 @@ export default function AuthorResearchGraphPage() {
             nodes={nodes}
             edges={edges}
             fitView
+            onInit={(instance) => {
+              reactFlowInstanceRef.current = instance
+            }}
             nodesDraggable={false}
             nodesConnectable={viewMode === 'editor'}
             deleteKeyCode={null}
