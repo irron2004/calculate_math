@@ -172,6 +172,18 @@
         "type": "numeric",
         "prompt": "6의 배수 중 30보다 작은 가장 큰 수를 입력하세요.",
         "answer": "24"
+      },
+      {
+        "id": "g5-na-001-3",
+        "type": "numeric",
+        "prompt": "48과 60의 최소공배수를 입력하세요.",
+        "answer": "240"
+      },
+      {
+        "id": "g5-na-001-4",
+        "type": "numeric",
+        "prompt": "2.5 × 4 의 값을 입력하세요.",
+        "answer": "10"
       }
     ],
     "MATH-2022-G-6-NA-001": [
@@ -186,6 +198,18 @@
         "type": "numeric",
         "prompt": "A:B = 3:5이고 A=12일 때 B의 값을 입력하세요.",
         "answer": "20"
+      },
+      {
+        "id": "g6-na-001-3",
+        "type": "numeric",
+        "prompt": "전체가 80이고 부분이 12일 때 비율(부분/전체)을 소수로 입력하세요.",
+        "answer": "0.15"
+      },
+      {
+        "id": "g6-na-001-4",
+        "type": "numeric",
+        "prompt": "A:B = 2:3이고 B=27일 때 A의 값을 입력하세요.",
+        "answer": "18"
       }
     ]
   }

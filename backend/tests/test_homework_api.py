@@ -256,3 +256,28 @@ def test_homework_create_from_problem_ids(client: tuple[TestClient, Any]) -> Non
     assert detail_response.status_code == 200, detail_response.text
     detail_json = detail_response.json()
     assert [p["question"] for p in detail_json["problems"]] == ["Q1", "Q2"]
+
+
+def test_admin_assignment_due_at_patch_updates_due_date(
+    client: tuple[TestClient, Any],
+) -> None:
+    test_client, _db_path = client
+
+    _register_student(test_client, student_id="student_due_patch")
+    assignment_id = _create_assignment(test_client, student_ids=["student_due_patch"])
+    admin_token = _login_admin(test_client)
+
+    patch_response = test_client.patch(
+        f"/api/homework/admin/assignments/{assignment_id}",
+        json={"dueAt": "2026-02-08T23:59:59"},
+        headers=_auth_headers(admin_token),
+    )
+    assert patch_response.status_code == 200, patch_response.text
+
+    detail_response = test_client.get(
+        f"/api/homework/admin/assignments/{assignment_id}",
+        headers=_auth_headers(admin_token),
+    )
+    assert detail_response.status_code == 200, detail_response.text
+    detail_json = detail_response.json()
+    assert detail_json["dueAt"] == "2026-02-08T23:59:59"

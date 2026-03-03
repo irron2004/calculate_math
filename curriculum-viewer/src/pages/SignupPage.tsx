@@ -9,6 +9,17 @@ type RedirectState = {
   }
 }
 
+const SURVEY_STORAGE_KEY = 'onboarding:survey:v1'
+
+function safeSessionStorageSet(key: string, value: string): boolean {
+  try {
+    window.sessionStorage.setItem(key, value)
+    return true
+  } catch {
+    return false
+  }
+}
+
 function normalizeEmail(value: string): string {
   return value.trim().toLowerCase()
 }
@@ -46,7 +57,7 @@ export default function SignupPage() {
   }, [email, grade, name, password, userId])
 
   if (isAuthenticated) {
-    return <Navigate to={didSignup ? fromPathname : ROUTES.dashboard} replace />
+    return <Navigate to={didSignup ? ROUTES.placement : ROUTES.dashboard} replace />
   }
 
   return (
@@ -60,18 +71,42 @@ export default function SignupPage() {
 
           setError(null)
 
+          const normalizedGrade = grade.trim()
+          const parsedGrade = Number(normalizedGrade)
+          if (!Number.isInteger(parsedGrade) || parsedGrade < 1 || parsedGrade > 6) {
+            setError('학년은 1~6 사이 숫자로 입력해 주세요.')
+            return
+          }
+
           setSubmitting(true)
           const message = await register({
             username: userId,
             password,
             name,
-            grade,
+            grade: normalizedGrade,
             email
           })
           setSubmitting(false)
 
           if (message) {
             setError(message)
+            return
+          }
+
+          const storageSaved = safeSessionStorageSet(
+            SURVEY_STORAGE_KEY,
+            JSON.stringify({
+              grade: normalizedGrade,
+              confidence: null,
+              recentHardTags: [],
+              studyStyle: null,
+              diagnosticMode: 'adjacent-grade-na-v1'
+            })
+          )
+
+          if (!storageSaved) {
+            setError('브라우저 저장소를 사용할 수 없어 홈으로 이동합니다.')
+            setDidSignup(false)
             return
           }
 

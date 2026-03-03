@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth/AuthProvider'
+import { buildAdjacentGradeDiagnostic, type AdjacentGradeDiagnosticPlan } from '../lib/diagnostic/adjacentGradeDiagnostic'
 import { PLACEMENT_QUESTIONS_V1, type PlacementQuestion } from '../lib/diagnostic/placementQuestions'
 import { formatTagKo } from '../lib/diagnostic/tags'
 import { gradeNumericAnswer } from '../lib/learn/grading'
+import { loadProblemBank, type Problem } from '../lib/learn/problems'
 import { upsertMyStudentProfile } from '../lib/studentProfile/api'
 import { ROUTES } from '../routes'
 
@@ -12,6 +14,7 @@ type SurveyDraft = {
   confidence: number | null
   recentHardTags: string[]
   studyStyle: 'short' | 'long' | null
+  diagnosticMode?: string
 }
 
 const SURVEY_STORAGE_KEY = 'onboarding:survey:v1'
@@ -55,7 +58,10 @@ export default function PlacementTestPage() {
   const navigate = useNavigate()
 
   const [survey, setSurvey] = useState<SurveyDraft | null>(null)
-  const questions = PLACEMENT_QUESTIONS_V1
+  const isAdjacentGradeDiagnosticMode = survey?.diagnosticMode === 'adjacent-grade-na-v1'
+  const [diagnosticProblemsByNodeId, setDiagnosticProblemsByNodeId] = useState<Record<string, Problem[]> | null>(null)
+  const [diagnosticProblemBankLoading, setDiagnosticProblemBankLoading] = useState(false)
+  const [diagnosticProblemBankError, setDiagnosticProblemBankError] = useState<string | null>(null)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -80,6 +86,110 @@ export default function PlacementTestPage() {
       setSurvey(null)
     }
   }, [isAdmin])
+
+  useEffect(() => {
+    if (!isAdjacentGradeDiagnosticMode) {
+      setDiagnosticProblemsByNodeId(null)
+      setDiagnosticProblemBankLoading(false)
+      setDiagnosticProblemBankError(null)
+      return
+    }
+
+    const controller = new AbortController()
+    setDiagnosticProblemBankLoading(true)
+    setDiagnosticProblemBankError(null)
+
+    loadProblemBank(controller.signal)
+      .then((bank) => {
+        if (!controller.signal.aborted) {
+          setDiagnosticProblemsByNodeId(bank.problemsByNodeId)
+        }
+      })
+      .catch((err) => {
+        if (controller.signal.aborted) return
+        setDiagnosticProblemBankError(err instanceof Error ? err.message : '문제 데이터를 불러올 수 없습니다.')
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setDiagnosticProblemBankLoading(false)
+        }
+      })
+
+    return () => controller.abort()
+  }, [isAdjacentGradeDiagnosticMode])
+
+  type DiagnosticState =
+    | { status: 'disabled' }
+    | { status: 'loading' }
+    | { status: 'error'; message: string }
+    | { status: 'ready'; questions: PlacementQuestion[]; plan: AdjacentGradeDiagnosticPlan }
+
+  const diagnosticState = useMemo<DiagnosticState>(() => {
+    if (!isAdjacentGradeDiagnosticMode) return { status: 'disabled' }
+    if (!survey) return { status: 'loading' }
+    if (diagnosticProblemBankError) return { status: 'error', message: diagnosticProblemBankError }
+    if (diagnosticProblemBankLoading || !diagnosticProblemsByNodeId) return { status: 'loading' }
+
+    const parsedGrade = Number(survey.grade)
+    if (!Number.isInteger(parsedGrade) || parsedGrade < 1 || parsedGrade > 6) {
+      return { status: 'error', message: '학년 정보가 올바르지 않아 진단을 시작할 수 없습니다. 홈으로 이동해 다시 가입해 주세요.' }
+    }
+
+    let planResult: ReturnType<typeof buildAdjacentGradeDiagnostic>
+    try {
+      planResult = buildAdjacentGradeDiagnostic({
+        grade: parsedGrade,
+        problemsByNodeId: diagnosticProblemsByNodeId
+      })
+    } catch (err) {
+      return { status: 'error', message: err instanceof Error ? err.message : String(err) }
+    }
+
+    if (!planResult.ok) {
+      return { status: 'error', message: `진단 문제 수가 부족하거나 설정이 올바르지 않습니다. ${planResult.error}` }
+    }
+
+    const questions: PlacementQuestion[] = []
+    for (const item of planResult.plan.items) {
+      const problems = diagnosticProblemsByNodeId[item.nodeId] ?? []
+      const problem = problems.find((p) => p.id === item.problemId) ?? null
+      if (!problem) {
+        return { status: 'error', message: `문제 데이터를 찾지 못했습니다: ${item.nodeId}:${item.problemId}` }
+      }
+
+      questions.push({
+        id: `adj:${item.nodeId}:${problem.id}`,
+        type: 'subjective',
+        prompt: problem.prompt,
+        answer: problem.answer,
+        answerType: 'numeric',
+        tags: [],
+        difficulty: 2,
+        gradeHint: item.groupGrade,
+        estimatedTimeSec: 25
+      })
+    }
+
+    return { status: 'ready', questions, plan: planResult.plan }
+  }, [
+    diagnosticProblemBankError,
+    diagnosticProblemBankLoading,
+    diagnosticProblemsByNodeId,
+    isAdjacentGradeDiagnosticMode,
+    survey
+  ])
+
+  const questions = diagnosticState.status === 'ready' ? diagnosticState.questions : PLACEMENT_QUESTIONS_V1
+
+  const questionSetKey = diagnosticState.status === 'ready' ? 'adjacent-grade-na-v1' : 'placement-v1'
+  useEffect(() => {
+    setCurrentIndex(0)
+    setAnswers({})
+    setError(null)
+    activeStartedAtRef.current = Date.now()
+    timeSpentByQuestionIdRef.current = {}
+    editCountByQuestionIdRef.current = {}
+  }, [questionSetKey])
 
   const current = questions[currentIndex] ?? null
 
@@ -137,6 +247,36 @@ export default function PlacementTestPage() {
         </div>
       </section>
     )
+  }
+
+  if (isAdjacentGradeDiagnosticMode) {
+    if (diagnosticState.status === 'loading') {
+      return (
+        <section>
+          <h1>진단</h1>
+          <p className="muted">진단 문제를 준비하는 중...</p>
+          <div className="node-actions" style={{ marginTop: 16 }}>
+            <Link to={ROUTES.dashboard} className="button button-ghost">
+              홈으로
+            </Link>
+          </div>
+        </section>
+      )
+    }
+
+    if (diagnosticState.status === 'error') {
+      return (
+        <section>
+          <h1>진단</h1>
+          <p className="error">{diagnosticState.message}</p>
+          <div className="node-actions" style={{ marginTop: 16 }}>
+            <Link to={ROUTES.dashboard} className="button button-primary">
+              홈으로
+            </Link>
+          </div>
+        </section>
+      )
+    }
   }
 
   return (
@@ -260,7 +400,7 @@ export default function PlacementTestPage() {
               setSubmitting(true)
 
               try {
-                const perQuestion = questions.map((q) => {
+                let perQuestion = questions.map((q) => {
                   const submitted = answers[q.id] ?? ''
                   const isCorrect = gradePlacementAnswer(q, submitted)
                   const timeSpentMs = timeSpentByQuestionIdRef.current[q.id] ?? 0
@@ -277,6 +417,81 @@ export default function PlacementTestPage() {
                     isSlow: timeSpentMs >= SLOW_THRESHOLD_MS
                   }
                 })
+
+                const adjacentPlan = diagnosticState.status === 'ready' ? diagnosticState.plan : null
+                let adjacentBreakdown:
+                  | null
+                  | {
+                      grade: number
+                      domainCode: string
+                      counts: AdjacentGradeDiagnosticPlan['counts']
+                      nodeIdsUsed: {
+                        pre: string[]
+                        post: string[]
+                        fill: string[]
+                      }
+                      groupStats: {
+                        pre: { totalCount: number; correctCount: number; accuracy: number }
+                        post: { totalCount: number; correctCount: number; accuracy: number }
+                        fill: { totalCount: number; correctCount: number; accuracy: number }
+                      }
+                    } = null
+
+                if (adjacentPlan) {
+                  const itemByKey = new Map<string, { group: string; groupGrade: number }>()
+                  for (const item of adjacentPlan.items) {
+                    itemByKey.set(`${item.nodeId}:${item.problemId}`, { group: item.group, groupGrade: item.groupGrade })
+                  }
+
+                  const groupCounts = new Map<string, { totalCount: number; correctCount: number }>()
+                  perQuestion = perQuestion.map((row) => {
+                    const match = /^adj:([^:]+):([^:]+)$/.exec(String(row.questionId))
+                    const nodeId = match?.[1] ?? null
+                    const problemId = match?.[2] ?? null
+                    const key = nodeId && problemId ? `${nodeId}:${problemId}` : null
+                    const meta = key ? itemByKey.get(key) : undefined
+
+                    if (meta) {
+                      const stat = groupCounts.get(meta.group) ?? { totalCount: 0, correctCount: 0 }
+                      stat.totalCount += 1
+                      if (row.isCorrect) stat.correctCount += 1
+                      groupCounts.set(meta.group, stat)
+                    }
+
+                    return {
+                      ...row,
+                      diagnosticNodeId: nodeId,
+                      diagnosticProblemId: problemId,
+                      diagnosticGroup: meta?.group,
+                      diagnosticGroupGrade: meta?.groupGrade
+                    }
+                  })
+
+                  const toStat = (group: 'pre' | 'post' | 'fill') => {
+                    const stat = groupCounts.get(group) ?? { totalCount: 0, correctCount: 0 }
+                    return {
+                      totalCount: stat.totalCount,
+                      correctCount: stat.correctCount,
+                      accuracy: stat.totalCount > 0 ? stat.correctCount / stat.totalCount : 0
+                    }
+                  }
+
+                  adjacentBreakdown = {
+                    grade: adjacentPlan.grade,
+                    domainCode: adjacentPlan.domainCode,
+                    counts: adjacentPlan.counts,
+                    nodeIdsUsed: {
+                      pre: adjacentPlan.preNodeIds,
+                      post: adjacentPlan.postNodeIds,
+                      fill: adjacentPlan.fillNodeIds
+                    },
+                    groupStats: {
+                      pre: toStat('pre'),
+                      post: toStat('post'),
+                      fill: toStat('fill')
+                    }
+                  }
+                }
 
                 const correctCount = perQuestion.filter((x) => x.isCorrect).length
                 const accuracy = totalCount > 0 ? correctCount / totalCount : 0
@@ -319,6 +534,12 @@ export default function PlacementTestPage() {
                 await upsertMyStudentProfile({
                   survey,
                   placement: {
+                    ...(adjacentBreakdown
+                      ? {
+                          mode: adjacentPlan?.mode,
+                          adjacent: adjacentBreakdown
+                        }
+                      : {}),
                     totalCount,
                     correctCount,
                     accuracy,
@@ -353,4 +574,3 @@ export default function PlacementTestPage() {
     </section>
   )
 }
-

@@ -11,6 +11,7 @@ import {
   reviewSubmission,
   HomeworkApiError
 } from '../lib/homework/api'
+import { extendDueAtByWeek } from '../lib/homework/dueAt'
 import type {
   AdminAssignmentDetail,
   AdminAssignmentSummary,
@@ -361,6 +362,44 @@ export default function AuthorHomeworkStatusPage() {
     }
   }, [assignmentDetail, editDueAt, editTitle, loadAssignmentDetail, loadAssignments])
 
+  const handleExtendDueAtByWeek = useCallback(async () => {
+    if (!assignmentDetail?.dueAt) return
+
+    const hasUnsubmitted = assignmentDetail.students.some((student) => !student.submissionId)
+    if (!hasUnsubmitted) return
+
+    const nextDueAt = extendDueAtByWeek(assignmentDetail.dueAt)
+    if (!nextDueAt) {
+      setEditMessage({ type: 'error', text: '현재 마감일을 연장할 수 없습니다.' })
+      return
+    }
+
+    const confirmed = window.confirm('이 숙제의 전체 마감일을 1주일 연장할까요?')
+    if (!confirmed) return
+
+    setEditSubmitting(true)
+    setEditMessage(null)
+    try {
+      await updateAssignmentAdmin(assignmentDetail.id, {
+        title: assignmentDetail.title,
+        dueAt: nextDueAt
+      })
+      setEditMessage({ type: 'success', text: '마감일을 1주일 연장했습니다.' })
+
+      const controller = new AbortController()
+      await loadAssignments(controller.signal)
+      await loadAssignmentDetail(assignmentDetail.id, controller.signal)
+    } catch (err) {
+      if (err instanceof HomeworkApiError) {
+        setEditMessage({ type: 'error', text: err.message })
+      } else {
+        setEditMessage({ type: 'error', text: '마감일 연장 중 오류가 발생했습니다.' })
+      }
+    } finally {
+      setEditSubmitting(false)
+    }
+  }, [assignmentDetail, loadAssignmentDetail, loadAssignments])
+
   const handleAssignmentDelete = useCallback(
     async (assignmentId: string) => {
       const confirmed = window.confirm('이 숙제를 삭제할까요? 제출 기록도 함께 삭제됩니다.')
@@ -573,6 +612,8 @@ export default function AuthorHomeworkStatusPage() {
       return <p className="muted">숙제를 선택하세요.</p>
     }
 
+    const hasUnsubmitted = assignmentDetail.students.some((student) => !student.submissionId)
+
     return (
       <>
         <button type="button" className="button button-ghost button-small" onClick={handleBackToList}>
@@ -586,7 +627,20 @@ export default function AuthorHomeworkStatusPage() {
           )}
           <div className="admin-assignment-meta">
             {assignmentDetail.dueAt && (
-              <span className="muted">마감: {formatDateTime(assignmentDetail.dueAt)}</span>
+              <span className="muted">
+                마감: {formatDateTime(assignmentDetail.dueAt)}
+                {hasUnsubmitted ? (
+                  <button
+                    type="button"
+                    className="button button-ghost button-small"
+                    onClick={handleExtendDueAtByWeek}
+                    disabled={editSubmitting}
+                    style={{ marginLeft: 8 }}
+                  >
+                    마감 1주일 연장
+                  </button>
+                ) : null}
+              </span>
             )}
             {assignmentDetail.scheduledAt && (
               <span className="muted">예약: {formatDateTime(assignmentDetail.scheduledAt)}</span>

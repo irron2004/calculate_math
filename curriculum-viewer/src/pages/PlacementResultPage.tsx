@@ -15,6 +15,12 @@ function getLevelLabel(level: string): string {
   return `초${grade} (${bandLabel})`
 }
 
+function formatPercent(value: unknown): string {
+  const num = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(num)) return '-'
+  return `${Math.round(num * 100)}%`
+}
+
 export default function PlacementResultPage() {
   const { isAdmin } = useAuth()
   const [profile, setProfile] = useState<StudentProfile | null>(null)
@@ -44,6 +50,36 @@ export default function PlacementResultPage() {
     const mainTag = profile.weakTagsTop3?.[0]
     if (!mainTag) return '이제 맞춤 숙제를 시작해볼까요?'
     return `먼저 "${formatTagKo(mainTag)}"부터 차근차근!`
+  }, [profile])
+
+  const diagnosticSummary = useMemo(() => {
+    if (!profile) return null
+    const placement = profile.placement as Record<string, unknown>
+    const mode = placement.mode
+    if (mode !== 'adjacent-grade-na-v1') return null
+
+    const adjacent = placement.adjacent as Record<string, unknown> | undefined
+    const groupStats = adjacent?.groupStats as Record<string, unknown> | undefined
+    const pre = groupStats?.pre as Record<string, unknown> | undefined
+    const post = groupStats?.post as Record<string, unknown> | undefined
+
+    const preAccuracy = typeof pre?.accuracy === 'number' ? pre.accuracy : Number(pre?.accuracy)
+    const postAccuracy = typeof post?.accuracy === 'number' ? post.accuracy : Number(post?.accuracy)
+
+    let nextStep = '현재 학년 핵심 개념을 중심으로 학습을 이어가세요.'
+    if (Number.isFinite(preAccuracy) && Number.isFinite(postAccuracy)) {
+      if (preAccuracy < postAccuracy) {
+        nextStep = '전학년 기초를 먼저 보강한 뒤 다음 학년 문제로 확장해보세요.'
+      } else if (postAccuracy < preAccuracy) {
+        nextStep = '현재 학년 핵심 개념을 먼저 단단히 다진 뒤 다음 학년으로 넘어가세요.'
+      }
+    }
+
+    return {
+      prePercent: formatPercent(pre?.accuracy),
+      postPercent: formatPercent(post?.accuracy),
+      nextStep
+    }
   }, [profile])
 
   if (isAdmin) {
@@ -123,6 +159,17 @@ export default function PlacementResultPage() {
         </div>
       </div>
 
+      {diagnosticSummary ? (
+        <div style={{ marginTop: 18 }}>
+          <h2 style={{ margin: 0, fontSize: 18 }}>진단 요약</h2>
+          <div style={{ display: 'grid', gap: 8, marginTop: 10 }}>
+            <div className="muted">전학년 정확도: {diagnosticSummary.prePercent}</div>
+            <div className="muted">후학년 정확도: {diagnosticSummary.postPercent}</div>
+            <div>{diagnosticSummary.nextStep}</div>
+          </div>
+        </div>
+      ) : null}
+
       {profile.weakTagsTop3.length > 0 ? (
         <div style={{ marginTop: 18 }}>
           <h2 style={{ margin: 0, fontSize: 18 }}>약점 태그</h2>
@@ -138,4 +185,3 @@ export default function PlacementResultPage() {
     </section>
   )
 }
-

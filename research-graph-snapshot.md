@@ -1,0 +1,1431 @@
+- generic [ref=e9]:
+  - banner [ref=e10]:
+    - navigation "Author" [ref=e11]:
+      - list [ref=e12]:
+        - listitem [ref=e13]:
+          - link "Home" [ref=e14] [cursor=pointer]:
+            - /url: /author
+        - listitem [ref=e15]:
+          - link "Preview" [ref=e16] [cursor=pointer]:
+            - /url: /author/editor
+        - listitem [ref=e17]:
+          - link "Research" [ref=e18] [cursor=pointer]:
+            - /url: /author/research-graph
+        - listitem [ref=e19]:
+          - link "Import" [ref=e20] [cursor=pointer]:
+            - /url: /author/import
+        - listitem [ref=e21]:
+          - link "Mini" [ref=e22] [cursor=pointer]:
+            - /url: /author/mini
+        - listitem [ref=e23]:
+          - link "Validate" [ref=e24] [cursor=pointer]:
+            - /url: /author/validate
+        - listitem [ref=e25]:
+          - link "Publish" [ref=e26] [cursor=pointer]:
+            - /url: /author/publish
+        - listitem [ref=e27]:
+          - link "Health" [ref=e28] [cursor=pointer]:
+            - /url: /author/health
+        - listitem [ref=e29]:
+          - link "계정 현황" [ref=e30] [cursor=pointer]:
+            - /url: /author/students
+        - listitem [ref=e31]:
+          - link "숙제" [ref=e32] [cursor=pointer]:
+            - /url: /author/homework
+        - listitem [ref=e33]:
+          - link "숙제 현황" [ref=e34] [cursor=pointer]:
+            - /url: /author/homework-status
+    - generic [ref=e35]:
+      - generic [ref=e36]: Smoke Admin (smoke-admin)
+      - button "Student 모드" [ref=e37] [cursor=pointer]
+      - button "로그아웃" [ref=e38] [cursor=pointer]
+  - main [ref=e39]:
+    - generic [ref=e41]:
+      - heading "Research Graph Editor" [level=1] [ref=e42]
+      - paragraph [ref=e43]: 2022 그래프 기본 렌더링 (React Flow)
+      - paragraph [ref=e44]: "nodes: 466/466 · edges: 319/889 · textbookUnit: 330/330"
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - text: Research track
+          - combobox "Research track" [ref=e47]:
+            - option "T1"
+            - option "T2"
+            - option "T3" [selected]
+        - generic [ref=e48]:
+          - generic [ref=e49]: View mode
+          - generic "View mode" [ref=e50]:
+            - button "Overview" [pressed] [ref=e51] [cursor=pointer]
+            - button "Editor" [ref=e52] [cursor=pointer]
+        - generic [ref=e53]:
+          - generic [ref=e54]: Domain layers
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - checkbox "수와 연산" [checked] [ref=e58]
+                - generic [ref=e59]: 수와 연산
+              - button "only" [ref=e60] [cursor=pointer]
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - checkbox "변화와 관계" [checked] [ref=e63]
+                - generic [ref=e64]: 변화와 관계
+              - button "only" [ref=e65] [cursor=pointer]
+            - generic [ref=e66]:
+              - generic [ref=e67]:
+                - checkbox "도형과 측정" [checked] [ref=e68]
+                - generic [ref=e69]: 도형과 측정
+              - button "only" [ref=e70] [cursor=pointer]
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - checkbox "자료와 가능성" [checked] [ref=e73]
+                - generic [ref=e74]: 자료와 가능성
+              - button "only" [ref=e75] [cursor=pointer]
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - checkbox "기타/미분류" [checked] [ref=e78]
+                - generic [ref=e79]: 기타/미분류
+              - button "only" [ref=e80] [cursor=pointer]
+          - button "all" [ref=e82] [cursor=pointer]
+        - generic [ref=e83]:
+          - generic [ref=e84]: Depth filter (1-8)
+          - generic [ref=e85]:
+            - generic [ref=e86]:
+              - generic [ref=e87]: min
+              - spinbutton "min" [ref=e88]: "1"
+            - generic [ref=e89]:
+              - generic [ref=e90]: max
+              - spinbutton "max" [ref=e91]: "8"
+            - button "reset" [ref=e92] [cursor=pointer]
+          - generic [ref=e93]:
+            - button "1" [ref=e94] [cursor=pointer]
+            - button "2" [ref=e95] [cursor=pointer]
+            - button "3" [ref=e96] [cursor=pointer]
+            - button "4" [ref=e97] [cursor=pointer]
+            - button "5" [ref=e98] [cursor=pointer]
+            - button "6" [ref=e99] [cursor=pointer]
+            - button "7" [ref=e100] [cursor=pointer]
+            - button "8" [ref=e101] [cursor=pointer]
+        - generic [ref=e102]:
+          - generic [ref=e103]: 학년 필터
+          - generic [ref=e104]:
+            - button "초등" [ref=e105] [cursor=pointer]
+            - button "중등" [ref=e106] [cursor=pointer]
+            - button "고등" [ref=e107] [cursor=pointer]
+            - button "all" [ref=e108] [cursor=pointer]
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - generic [ref=e111]:
+                - checkbox "초 1-2" [checked] [ref=e112]
+                - generic "1-2" [ref=e113]: 초 1-2
+              - button "only" [ref=e114] [cursor=pointer]
+            - generic [ref=e115]:
+              - generic [ref=e116]:
+                - checkbox "초 3-4" [checked] [ref=e117]
+                - generic "3-4" [ref=e118]: 초 3-4
+              - button "only" [ref=e119] [cursor=pointer]
+            - generic [ref=e120]:
+              - generic [ref=e121]:
+                - checkbox "초 5-6" [checked] [ref=e122]
+                - generic "5-6" [ref=e123]: 초 5-6
+              - button "only" [ref=e124] [cursor=pointer]
+            - generic [ref=e125]:
+              - generic [ref=e126]:
+                - checkbox "중 7-9" [checked] [ref=e127]
+                - generic "7-9" [ref=e128]: 중 7-9
+              - button "only" [ref=e129] [cursor=pointer]
+            - generic [ref=e130]:
+              - generic [ref=e131]:
+                - checkbox "고 10-12" [checked] [ref=e132]
+                - generic "10-12" [ref=e133]: 고 10-12
+              - button "only" [ref=e134] [cursor=pointer]
+      - generic "Research graph canvas" [ref=e135]:
+        - generic [ref=e136]:
+          - generic [ref=e138]:
+            - generic:
+              - img:
+                - generic:
+                  - button "Edge from 2수01-01 to 2수01-02" [ref=e139] [cursor=pointer]
+                  - button "Edge from 4수01-01 to 4수01-04" [ref=e142] [cursor=pointer]
+                  - button "Edge from 6수01-06 to 6수01-08" [ref=e145] [cursor=pointer]
+                  - button "Edge from 2수01-A to 2수01-B" [ref=e148] [cursor=pointer]
+                  - button "Edge from 2수01-B to 2수01-C" [ref=e151] [cursor=pointer]
+                  - button "Edge from 2수01-A to 2수04-A" [ref=e154] [cursor=pointer]
+                  - button "Edge from 2수01-A to 4수01-A" [ref=e157] [cursor=pointer]
+                  - button "Edge from 2수01-A to 4수01-B" [ref=e160] [cursor=pointer]
+                  - button "Edge from 2수01-A to 4수01-C" [ref=e163] [cursor=pointer]
+                  - button "Edge from 2수01-B to 4수01-D" [ref=e166] [cursor=pointer]
+                  - button "Edge from 2수01-C to 4수01-E" [ref=e169] [cursor=pointer]
+                  - button "Edge from 4수01-A to 4수01-D" [ref=e172] [cursor=pointer]
+                  - button "Edge from 4수01-B to 4수01-F" [ref=e175] [cursor=pointer]
+                  - button "Edge from 4수01-C to 4수01-G" [ref=e178] [cursor=pointer]
+                  - button "Edge from 4수01-D to 4수01-E" [ref=e181] [cursor=pointer]
+                  - button "Edge from 4수01-A to 6수01-A" [ref=e184] [cursor=pointer]
+                  - button "Edge from 4수01-D to 6수01-B" [ref=e187] [cursor=pointer]
+                  - button "Edge from 4수01-E to 6수01-B" [ref=e190] [cursor=pointer]
+                  - button "Edge from 4수01-E to 6수01-C" [ref=e193] [cursor=pointer]
+                  - button "Edge from 4수01-B to 6수01-D" [ref=e196] [cursor=pointer]
+                  - button "Edge from 4수01-F to 6수01-D" [ref=e199] [cursor=pointer]
+                  - button "Edge from 6수01-C to 6수01-D" [ref=e202] [cursor=pointer]
+                  - button "Edge from 6수01-D to 6수01-E" [ref=e205] [cursor=pointer]
+                  - button "Edge from 4수01-B to 6수01-F" [ref=e208] [cursor=pointer]
+                  - button "Edge from 4수01-C to 6수01-F" [ref=e211] [cursor=pointer]
+                  - button "Edge from 4수01-C to 6수01-G" [ref=e214] [cursor=pointer]
+                  - button "Edge from 4수01-G to 6수01-G" [ref=e217] [cursor=pointer]
+                  - button "Edge from 6수01-F to 6수01-G" [ref=e220] [cursor=pointer]
+                  - button "Edge from 4수01-E to 6수01-H" [ref=e223] [cursor=pointer]
+                  - button "Edge from 4수01-B to 6수01-H" [ref=e226] [cursor=pointer]
+                  - button "Edge from 4수01-C to 6수01-H" [ref=e229] [cursor=pointer]
+                  - button "Edge from 4수01-D to 4수03-H" [ref=e232] [cursor=pointer]
+                  - button "Edge from 4수01-E to 4수04-C" [ref=e235] [cursor=pointer]
+                  - button "Edge from 2수02-A to 4수02-A" [ref=e238] [cursor=pointer]
+                  - button "Edge from 4수02-A to 4수02-B" [ref=e241] [cursor=pointer]
+                  - button "Edge from 4수02-B to 4수02-C" [ref=e244] [cursor=pointer]
+                  - button "Edge from 4수02-C to 6수02-A" [ref=e247] [cursor=pointer]
+                  - button "Edge from 4수01-E to 6수02-A" [ref=e250] [cursor=pointer]
+                  - button "Edge from 6수02-A to 6수02-B" [ref=e253] [cursor=pointer]
+                  - button "Edge from 2수03-B to 4수03-A" [ref=e256] [cursor=pointer]
+                  - button "Edge from 4수03-A to 4수03-B" [ref=e259] [cursor=pointer]
+                  - button "Edge from 4수03-A to 4수03-C" [ref=e262] [cursor=pointer]
+                  - button "Edge from 4수03-A to 4수03-D" [ref=e265] [cursor=pointer]
+                  - button "Edge from 4수03-C to 4수03-E" [ref=e268] [cursor=pointer]
+                  - button "Edge from 4수03-D to 4수03-E" [ref=e271] [cursor=pointer]
+                  - button "Edge from 4수03-E to 4수03-F" [ref=e274] [cursor=pointer]
+                  - button "Edge from 4수03-F to 6수03-A" [ref=e277] [cursor=pointer]
+                  - button "Edge from 2수03-A to P_TU_solid_figures_bridge" [ref=e280] [cursor=pointer]
+                  - button "Edge from P_TU_solid_figures_bridge to 6수03-B" [ref=e283] [cursor=pointer]
+                  - button "Edge from 4수03-B to 6수03-C" [ref=e286] [cursor=pointer]
+                  - button "Edge from 4수03-E to 6수03-C" [ref=e289] [cursor=pointer]
+                  - button "Edge from 4수03-H to 6수03-C" [ref=e292] [cursor=pointer]
+                  - button "Edge from 6수03-B to 6수03-C" [ref=e295] [cursor=pointer]
+                  - button "Edge from 2수03-D to 4수03-G" [ref=e298] [cursor=pointer]
+                  - button "Edge from 2수03-C to 4수03-H" [ref=e301] [cursor=pointer]
+                  - button "Edge from 2수03-E to 4수03-H" [ref=e304] [cursor=pointer]
+                  - button "Edge from 4수03-H to 4수03-G" [ref=e307] [cursor=pointer]
+                  - button "Edge from 2수04-A to 2수04-B" [ref=e310] [cursor=pointer]
+                  - button "Edge from 2수04-B to 4수04-A" [ref=e313] [cursor=pointer]
+                  - button "Edge from 4수04-A to 4수04-B" [ref=e316] [cursor=pointer]
+                  - button "Edge from 4수04-A to 4수04-C" [ref=e319] [cursor=pointer]
+                  - button "Edge from 4수04-B to 6수04-A" [ref=e322] [cursor=pointer]
+                  - button "Edge from 4수04-C to 6수04-B" [ref=e325] [cursor=pointer]
+                  - button "Edge from 2수01-B to 2수02-A" [ref=e328] [cursor=pointer]
+                  - button "Edge from 2수02-A to P_TU_ARITH_SEQ" [ref=e331] [cursor=pointer]
+                  - button "Edge from 2수01-C to P_TU_GEO_SEQ" [ref=e334] [cursor=pointer]
+                  - button "Edge from P_TU_LOG_CONCEPT to P_TU_LOG_FUNCTION" [ref=e337] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to P_TU_LOG_FUNCTION" [ref=e340] [cursor=pointer]
+                  - button "Edge from P_TU_QUADRATIC_EQUATION to P_TU_QUADRATIC_FUNCTION" [ref=e343] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to P_TU_QUADRATIC_FUNCTION" [ref=e346] [cursor=pointer]
+                  - button "Edge from P_TU_INEQUALITY to P_TU_QUADRATIC_INEQUALITY" [ref=e349] [cursor=pointer]
+                  - button "Edge from P_TU_QUADRATIC_EQUATION to P_TU_QUADRATIC_INEQUALITY" [ref=e352] [cursor=pointer]
+                  - button "Edge from P_TU_QUADRATIC_FUNCTION to P_TU_QUADRATIC_INEQUALITY" [ref=e355] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_LAWS_REVIEW to CSAT2025-C-01" [ref=e358] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2025-C-02" [ref=e361] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_GEOM to CSAT2025-C-03" [ref=e364] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2025-C-04" [ref=e367] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2025-C-05" [ref=e370] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2025-C-06" [ref=e373] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL to CSAT2025-C-07" [ref=e376] [cursor=pointer]
+                  - button "Edge from P_TU_LOG_PROPERTIES to CSAT2025-C-08" [ref=e379] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL to CSAT2025-C-09" [ref=e382] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2025-C-10" [ref=e385] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2025-C-11" [ref=e388] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_ARITH to CSAT2025-C-12" [ref=e391] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_SUM to CSAT2025-C-12" [ref=e394] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2025-C-13" [ref=e397] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2025-C-13" [ref=e400] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_LAW to CSAT2025-C-14" [ref=e403] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2025-C-15" [ref=e406] [cursor=pointer]
+                  - button "Edge from P_TU_QUADRATIC_FUNCTION to CSAT2025-C-15" [ref=e409] [cursor=pointer]
+                  - button "Edge from P_TU_LOG_PROPERTIES to CSAT2025-C-16" [ref=e412] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2025-C-17" [ref=e415] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_ARITH to CSAT2025-C-18" [ref=e418] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2025-C-19" [ref=e421] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2025-C-20" [ref=e424] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2025-C-20" [ref=e427] [cursor=pointer]
+                  - button "Edge from P_TU_POLYNOMIAL to CSAT2025-C-21" [ref=e430] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2025-C-21" [ref=e433] [cursor=pointer]
+                  - button "Edge from P_TU_INDUCTION to CSAT2025-C-22" [ref=e436] [cursor=pointer]
+                  - button "Edge from P_TU_BINOMIAL_THM to CSAT2025-PS-23" [ref=e439] [cursor=pointer]
+                  - button "Edge from P_TU_COND_PROB to CSAT2025-PS-24" [ref=e442] [cursor=pointer]
+                  - button "Edge from P_TU_STAT_INFER to CSAT2025-PS-25" [ref=e445] [cursor=pointer]
+                  - button "Edge from P_TU_PROBABILITY to CSAT2025-PS-26" [ref=e448] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2025-PS-26" [ref=e451] [cursor=pointer]
+                  - button "Edge from P_TU_PROB_DIST to CSAT2025-PS-27" [ref=e454] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2025-PS-28" [ref=e457] [cursor=pointer]
+                  - button "Edge from P_TU_PROB_DIST to CSAT2025-PS-29" [ref=e460] [cursor=pointer]
+                  - button "Edge from P_TU_PROBABILITY to CSAT2025-PS-30" [ref=e463] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2025-PS-30" [ref=e466] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2025-CA-23" [ref=e469] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2025-CA-23" [ref=e472] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL to CSAT2025-CA-24" [ref=e475] [cursor=pointer]
+                  - button "Edge from P_TU_SEQ_LIMIT_SERIES to CSAT2025-CA-25" [ref=e478] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2025-CA-26" [ref=e481] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2025-CA-27" [ref=e484] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2025-CA-27" [ref=e487] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2025-CA-27" [ref=e490] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2025-CA-28" [ref=e493] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2025-CA-28" [ref=e496] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2025-CA-28" [ref=e499] [cursor=pointer]
+                  - button "Edge from P_TU_SEQ_LIMIT_SERIES to CSAT2025-CA-29" [ref=e502] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_GEOM to CSAT2025-CA-29" [ref=e505] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2025-CA-30" [ref=e508] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2025-CA-30" [ref=e511] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR to CSAT2025-GE-23" [ref=e514] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2025-GE-24" [ref=e517] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2025-GE-25" [ref=e520] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2025-GE-26" [ref=e523] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2025-GE-27" [ref=e526] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR_DOT to CSAT2025-GE-27" [ref=e529] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2025-GE-28" [ref=e532] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR_DOT to CSAT2025-GE-28" [ref=e535] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2025-GE-29" [ref=e538] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR_DOT to CSAT2025-GE-30" [ref=e541] [cursor=pointer]
+                  - button "Edge from P_TU_COORD_GEOM to CSAT2025-GE-30" [ref=e544] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_LAWS_REVIEW to CSAT2023-C-01" [ref=e547] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2023-C-02" [ref=e550] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_GEOM to CSAT2023-C-03" [ref=e553] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2023-C-04" [ref=e556] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2023-C-05" [ref=e559] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2023-C-06" [ref=e562] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_ARITH to CSAT2023-C-07" [ref=e565] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_SUM to CSAT2023-C-07" [ref=e568] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2023-C-08" [ref=e571] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2023-C-09" [ref=e574] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2023-C-10" [ref=e577] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_LAW to CSAT2023-C-11" [ref=e580] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2023-C-12" [ref=e583] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2023-C-13" [ref=e586] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2023-C-14" [ref=e589] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2023-C-14" [ref=e592] [cursor=pointer]
+                  - button "Edge from P_TU_INDUCTION to CSAT2023-C-15" [ref=e595] [cursor=pointer]
+                  - button "Edge from P_TU_LOG_PROPERTIES to CSAT2023-C-16" [ref=e598] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2023-C-17" [ref=e601] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_SUM to CSAT2023-C-18" [ref=e604] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2023-C-19" [ref=e607] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2023-C-20" [ref=e610] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2023-C-20" [ref=e613] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2023-C-21" [ref=e616] [cursor=pointer]
+                  - button "Edge from P_TU_LOG_FUNCTION to CSAT2023-C-21" [ref=e619] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2023-C-22" [ref=e622] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2023-C-22" [ref=e625] [cursor=pointer]
+                  - button "Edge from P_TU_BINOMIAL_THM to CSAT2023-PS-23" [ref=e628] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2023-PS-24" [ref=e631] [cursor=pointer]
+                  - button "Edge from P_TU_PROBABILITY to CSAT2023-PS-25" [ref=e634] [cursor=pointer]
+                  - button "Edge from P_TU_PROBABILITY to CSAT2023-PS-26" [ref=e637] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2023-PS-26" [ref=e640] [cursor=pointer]
+                  - button "Edge from P_TU_STAT_INFER to CSAT2023-PS-27" [ref=e643] [cursor=pointer]
+                  - button "Edge from P_TU_PROB_DIST to CSAT2023-PS-28" [ref=e646] [cursor=pointer]
+                  - button "Edge from P_TU_COND_PROB to CSAT2023-PS-29" [ref=e649] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2023-PS-29" [ref=e652] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2023-PS-30" [ref=e655] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2023-CA-23" [ref=e658] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL to CSAT2023-CA-24" [ref=e661] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_GEOM to CSAT2023-CA-25" [ref=e664] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2023-CA-26" [ref=e667] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2023-CA-26" [ref=e670] [cursor=pointer]
+                  - button "Edge from P_TU_SEQ_LIMIT_SERIES to CSAT2023-CA-27" [ref=e673] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2023-CA-28" [ref=e676] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2023-CA-28" [ref=e679] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2023-CA-29" [ref=e682] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_ADV to CSAT2023-CA-29" [ref=e685] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2023-CA-30" [ref=e688] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2023-CA-30" [ref=e691] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2023-CA-30" [ref=e694] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2023-GE-23" [ref=e697] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2023-GE-24" [ref=e700] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2023-GE-25" [ref=e703] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR to CSAT2023-GE-26" [ref=e706] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR_DOT to CSAT2023-GE-26" [ref=e709] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2023-GE-27" [ref=e712] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2023-GE-28" [ref=e715] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR_DOT to CSAT2023-GE-29" [ref=e718] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2023-GE-30" [ref=e721] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR_DOT to CSAT2023-GE-30" [ref=e724] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_LAWS_REVIEW to CSAT2024-C-01" [ref=e727] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2024-C-02" [ref=e730] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2024-C-03" [ref=e733] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2024-C-04" [ref=e736] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2024-C-05" [ref=e739] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_GEOM to CSAT2024-C-06" [ref=e742] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_SUM to CSAT2024-C-06" [ref=e745] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2024-C-07" [ref=e748] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL to CSAT2024-C-08" [ref=e751] [cursor=pointer]
+                  - button "Edge from P_TU_LOG_PROPERTIES to CSAT2024-C-09" [ref=e754] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2024-C-10" [ref=e757] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_ARITH to CSAT2024-C-11" [ref=e760] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_SUM to CSAT2024-C-11" [ref=e763] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2024-C-12" [ref=e766] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_LAW to CSAT2024-C-13" [ref=e769] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2024-C-14" [ref=e772] [cursor=pointer]
+                  - button "Edge from P_TU_QUADRATIC_FUNCTION to CSAT2024-C-14" [ref=e775] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_ARITH to CSAT2024-C-15" [ref=e778] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2024-C-16" [ref=e781] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2024-C-17" [ref=e784] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_SUM to CSAT2024-C-18" [ref=e787] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2024-C-19" [ref=e790] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2024-C-20" [ref=e793] [cursor=pointer]
+                  - button "Edge from P_TU_LOG_FUNCTION to CSAT2024-C-21" [ref=e796] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2024-C-21" [ref=e799] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2024-C-22" [ref=e802] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2024-PS-23" [ref=e805] [cursor=pointer]
+                  - button "Edge from P_TU_PROBABILITY to CSAT2024-PS-24" [ref=e808] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2024-PS-25" [ref=e811] [cursor=pointer]
+                  - button "Edge from P_TU_PROBABILITY to CSAT2024-PS-25" [ref=e814] [cursor=pointer]
+                  - button "Edge from P_TU_PROB_DIST to CSAT2024-PS-26" [ref=e817] [cursor=pointer]
+                  - button "Edge from P_TU_STAT_INFER to CSAT2024-PS-27" [ref=e820] [cursor=pointer]
+                  - button "Edge from P_TU_COND_PROB to CSAT2024-PS-28" [ref=e823] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2024-PS-28" [ref=e826] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2024-PS-29" [ref=e829] [cursor=pointer]
+                  - button "Edge from P_TU_PROB_DIST to CSAT2024-PS-30" [ref=e832] [cursor=pointer]
+                  - button "Edge from P_TU_STAT_INFER to CSAT2024-PS-30" [ref=e835] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2024-CA-23" [ref=e838] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2024-CA-24" [ref=e841] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_ADV to CSAT2024-CA-25" [ref=e844] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2024-CA-25" [ref=e847] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2024-CA-26" [ref=e850] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2024-CA-26" [ref=e853] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2024-CA-27" [ref=e856] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2024-CA-27" [ref=e859] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_ADV to CSAT2024-CA-28" [ref=e862] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2024-CA-28" [ref=e865] [cursor=pointer]
+                  - button "Edge from P_TU_SEQ_LIMIT_SERIES to CSAT2024-CA-29" [ref=e868] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_GEOM to CSAT2024-CA-29" [ref=e871] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_ADV to CSAT2024-CA-30" [ref=e874] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2024-CA-30" [ref=e877] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2024-GE-23" [ref=e880] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2024-GE-24" [ref=e883] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR_DOT to CSAT2024-GE-25" [ref=e886] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2024-GE-26" [ref=e889] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2024-GE-27" [ref=e892] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2024-GE-28" [ref=e895] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2024-GE-28" [ref=e898] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2024-GE-29" [ref=e901] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR_DOT to CSAT2024-GE-30" [ref=e904] [cursor=pointer]
+                  - button "Edge from P_TU_COORD_GEOM to CSAT2024-GE-30" [ref=e907] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_LAWS_REVIEW to CSAT2026-C-01" [ref=e910] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2026-C-02" [ref=e913] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_SUM to CSAT2026-C-03" [ref=e916] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2026-C-04" [ref=e919] [cursor=pointer]
+                  - button "Edge from P_TU_DERIVATIVE to CSAT2026-C-05" [ref=e922] [cursor=pointer]
+                  - button "Edge from P_TU_LOG_PROPERTIES to CSAT2026-C-06" [ref=e925] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL to CSAT2026-C-07" [ref=e928] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2026-C-08" [ref=e931] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2026-C-09" [ref=e934] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2026-C-10" [ref=e937] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2026-C-10" [ref=e940] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2026-C-11" [ref=e943] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_GEOM to CSAT2026-C-12" [ref=e946] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2026-C-13" [ref=e949] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_LAW to CSAT2026-C-14" [ref=e952] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2026-C-15" [ref=e955] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2026-C-15" [ref=e958] [cursor=pointer]
+                  - button "Edge from P_TU_INDUCTION to CSAT2026-C-16" [ref=e961] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL to CSAT2026-C-17" [ref=e964] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_LAW to CSAT2026-C-18" [ref=e967] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_APP to CSAT2026-C-19" [ref=e970] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_SUM to CSAT2026-C-20" [ref=e973] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_ARITH to CSAT2026-C-20" [ref=e976] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2026-C-21" [ref=e979] [cursor=pointer]
+                  - button "Edge from P_TU_POLYNOMIAL to CSAT2026-C-21" [ref=e982] [cursor=pointer]
+                  - button "Edge from P_TU_LOG_FUNCTION to CSAT2026-C-22" [ref=e985] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2026-C-22" [ref=e988] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2026-PS-23" [ref=e991] [cursor=pointer]
+                  - button "Edge from P_TU_COND_PROB to CSAT2026-PS-24" [ref=e994] [cursor=pointer]
+                  - button "Edge from P_TU_PROBABILITY to CSAT2026-PS-25" [ref=e997] [cursor=pointer]
+                  - button "Edge from P_TU_STAT_INFER to CSAT2026-PS-26" [ref=e1000] [cursor=pointer]
+                  - button "Edge from P_TU_PROB_DIST to CSAT2026-PS-27" [ref=e1003] [cursor=pointer]
+                  - button "Edge from P_TU_PROB_DIST to CSAT2026-PS-28" [ref=e1006] [cursor=pointer]
+                  - button "Edge from P_TU_COND_PROB to CSAT2026-PS-28" [ref=e1009] [cursor=pointer]
+                  - button "Edge from P_TU_STAT_INFER to CSAT2026-PS-29" [ref=e1012] [cursor=pointer]
+                  - button "Edge from P_TU_PROBABILITY to CSAT2026-PS-29" [ref=e1015] [cursor=pointer]
+                  - button "Edge from P_TU_COMBINATORICS to CSAT2026-PS-30" [ref=e1018] [cursor=pointer]
+                  - button "Edge from P_TU_LIMIT to CSAT2026-CA-23" [ref=e1021] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL to CSAT2026-CA-24" [ref=e1024] [cursor=pointer]
+                  - button "Edge from P_TU_TRIG_FUNC to CSAT2026-CA-24" [ref=e1027] [cursor=pointer]
+                  - button "Edge from P_TU_SEQ_LIMIT_SERIES to CSAT2026-CA-25" [ref=e1030] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_APP to CSAT2026-CA-26" [ref=e1033] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2026-CA-27" [ref=e1036] [cursor=pointer]
+                  - button "Edge from P_TU_DERIV_ADV to CSAT2026-CA-28" [ref=e1039] [cursor=pointer]
+                  - button "Edge from P_TU_INTEGRAL_ADV to CSAT2026-CA-28" [ref=e1042] [cursor=pointer]
+                  - button "Edge from P_TU_SEQ_LIMIT_SERIES to CSAT2026-CA-29" [ref=e1045] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_ARITH to CSAT2026-CA-29" [ref=e1048] [cursor=pointer]
+                  - button "Edge from P_TU_SEQUENCE_GEOM to CSAT2026-CA-29" [ref=e1051] [cursor=pointer]
+                  - button "Edge from P_TU_FUNCTION to CSAT2026-CA-30" [ref=e1054] [cursor=pointer]
+                  - button "Edge from P_TU_EXP_FUNC to CSAT2026-CA-30" [ref=e1057] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR to CSAT2026-GE-23" [ref=e1060] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2026-GE-24" [ref=e1063] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2026-GE-25" [ref=e1066] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2026-GE-26" [ref=e1069] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2026-GE-27" [ref=e1072] [cursor=pointer]
+                  - button "Edge from P_TU_3D_COORD to CSAT2026-GE-28" [ref=e1075] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR to CSAT2026-GE-28" [ref=e1078] [cursor=pointer]
+                  - button "Edge from P_TU_CONIC_SECTION to CSAT2026-GE-29" [ref=e1081] [cursor=pointer]
+                  - button "Edge from P_TU_VECTOR_DOT to CSAT2026-GE-30" [ref=e1084] [cursor=pointer]
+                  - button "Edge from P_TU_COORD_GEOM to CSAT2026-GE-30" [ref=e1087] [cursor=pointer]
+                  - button "Edge from 4수01-B to 6수02-A" [ref=e1090] [cursor=pointer]
+                  - button "Edge from 4수01-C to 6수02-A" [ref=e1093] [cursor=pointer]
+              - generic:
+                - button "수와 연산 (NA)" [ref=e1096]:
+                  - generic [ref=e1097]:
+                    - text: 수와 연산
+                    - generic [ref=e1098]: (NA)
+                - 'button "0~100 수: 세기·읽기·쓰기" [ref=e1099]':
+                  - generic [ref=e1101]: "0~100 수: 세기·읽기·쓰기"
+                - button "네 자리 이하 자연수 계열·크기 비교" [ref=e1102]:
+                  - generic [ref=e1104]: 네 자리 이하 자연수 계열·크기 비교
+                - button "수 분해·합성(수 감각)" [ref=e1105]:
+                  - generic [ref=e1107]: 수 분해·합성(수 감각)
+                - button "덧셈·뺄셈 의미(실생활)" [ref=e1108]:
+                  - generic [ref=e1110]: 덧셈·뺄셈 의미(실생활)
+                - button "두 자리 수 덧셈·뺄셈 계산 원리" [ref=e1111]:
+                  - generic [ref=e1113]: 두 자리 수 덧셈·뺄셈 계산 원리
+                - button "덧셈과 뺄셈의 관계" [ref=e1114]:
+                  - generic [ref=e1116]: 덧셈과 뺄셈의 관계
+                - button "세 수의 덧셈·뺄셈(두 자리 수 범위)" [ref=e1117]:
+                  - generic [ref=e1119]: 세 수의 덧셈·뺄셈(두 자리 수 범위)
+                - button "□ 포함 덧셈·뺄셈식 만들기·해결" [ref=e1120]:
+                  - generic [ref=e1122]: □ 포함 덧셈·뺄셈식 만들기·해결
+                - button "곱셈 의미(실생활)" [ref=e1123]:
+                  - generic [ref=e1125]: 곱셈 의미(실생활)
+                - button "곱셈구구·한 자리 수 곱셈" [ref=e1126]:
+                  - generic [ref=e1128]: 곱셈구구·한 자리 수 곱셈
+                - button "네 자리 이하의 수" [ref=e1129]:
+                  - generic [ref=e1131]: 네 자리 이하의 수
+                - button "수와 연산" [ref=e1132]:
+                  - generic [ref=e1134]: 수와 연산
+                - button "자릿값(일·십·백·천)과 위치적 기수법" [ref=e1135]:
+                  - generic [ref=e1137]: 자릿값(일·십·백·천)과 위치적 기수법
+                - button "두 자리 수 범위의 덧셈과 뺄셈" [ref=e1138]:
+                  - generic [ref=e1140]: 두 자리 수 범위의 덧셈과 뺄셈
+                - button "한 자리 수의 곱셈" [ref=e1141]:
+                  - generic [ref=e1143]: 한 자리 수의 곱셈
+                - button "큰 수 읽고 쓰기(5자리 이상)" [ref=e1144]:
+                  - generic [ref=e1146]: 큰 수 읽고 쓰기(5자리 이상)
+                - button "분수 의미·읽기/쓰기" [ref=e1147]:
+                  - generic [ref=e1149]: 분수 의미·읽기/쓰기
+                - button "소수 개념·읽기/쓰기" [ref=e1150]:
+                  - generic [ref=e1152]: 소수 개념·읽기/쓰기
+                - 'button "자연수 곱셈 계산 원리(예: 2자리×2자리)" [ref=e1153]':
+                  - generic [ref=e1155]: "자연수 곱셈 계산 원리(예: 2자리×2자리)"
+                - button "나눗셈 의미·한 자리 수로 나눗셈" [ref=e1156]:
+                  - generic [ref=e1158]: 나눗셈 의미·한 자리 수로 나눗셈
+                - button "분모 같은 분수 덧셈·뺄셈(의미 포함)" [ref=e1159]:
+                  - generic [ref=e1161]: 분모 같은 분수 덧셈·뺄셈(의미 포함)
+                - button "소수 덧셈·뺄셈(방법 설명)" [ref=e1162]:
+                  - generic [ref=e1164]: 소수 덧셈·뺄셈(방법 설명)
+                - button "수와 연산" [ref=e1165]:
+                  - generic [ref=e1167]: 수와 연산
+                - button "세 자리 수 덧셈·뺄셈(원리/계산)" [ref=e1168]:
+                  - generic [ref=e1170]: 세 자리 수 덧셈·뺄셈(원리/계산)
+                - button "다섯 자리 이상의 수" [ref=e1171]:
+                  - generic [ref=e1173]: 다섯 자리 이상의 수
+                - button "분수" [ref=e1174]:
+                  - generic [ref=e1176]: 분수
+                - button "소수" [ref=e1177]:
+                  - generic [ref=e1179]: 소수
+                - button "세 자리 수의 덧셈과 뺄셈" [ref=e1180]:
+                  - generic [ref=e1182]: 세 자리 수의 덧셈과 뺄셈
+                - button "분모가 같은 분수의 덧셈과 뺄셈" [ref=e1183]:
+                  - generic [ref=e1185]: 분모가 같은 분수의 덧셈과 뺄셈
+                - button "소수의 덧셈과 뺄셈" [ref=e1186]:
+                  - generic [ref=e1188]: 소수의 덧셈과 뺄셈
+                - button "자연수의 곱셈과 나눗셈" [ref=e1189]:
+                  - generic [ref=e1191]: 자연수의 곱셈과 나눗셈
+                - button "혼합 계산 순서 이해·계산" [ref=e1192]:
+                  - generic [ref=e1194]: 혼합 계산 순서 이해·계산
+                - button "이상/이하/초과/미만 의미·범위 표현" [ref=e1195]:
+                  - generic [ref=e1197]: 이상/이하/초과/미만 의미·범위 표현
+                - button "올림/버림/반올림으로 어림값 활용" [ref=e1198]:
+                  - generic [ref=e1200]: 올림/버림/반올림으로 어림값 활용
+                - button "약수/공약수/최대공약수" [ref=e1201]:
+                  - generic [ref=e1203]: 약수/공약수/최대공약수
+                - button "배수/공배수/최소공배수" [ref=e1204]:
+                  - generic [ref=e1206]: 배수/공배수/최소공배수
+                - button "약분·통분(동치 분수 만들기)" [ref=e1207]:
+                  - generic [ref=e1209]: 약분·통분(동치 분수 만들기)
+                - button "분모 다른 분수 크기 비교(방법 설명)" [ref=e1210]:
+                  - generic [ref=e1212]: 분모 다른 분수 크기 비교(방법 설명)
+                - button "분수 곱셈(원리 탐구/계산)" [ref=e1213]:
+                  - generic [ref=e1215]: 분수 곱셈(원리 탐구/계산)
+                - button "자연수÷자연수 몫을 분수로" [ref=e1216]:
+                  - generic [ref=e1218]: 자연수÷자연수 몫을 분수로
+                - button "분수 나눗셈(원리 탐구/계산)" [ref=e1219]:
+                  - generic [ref=e1221]: 분수 나눗셈(원리 탐구/계산)
+                - button "분수↔소수 관계 이해·비교·설명" [ref=e1222]:
+                  - generic [ref=e1224]: 분수↔소수 관계 이해·비교·설명
+                - button "소수 곱셈(원리 탐구/계산)" [ref=e1225]:
+                  - generic [ref=e1227]: 소수 곱셈(원리 탐구/계산)
+                - button "자연수÷자연수 몫을 소수로" [ref=e1228]:
+                  - generic [ref=e1230]: 자연수÷자연수 몫을 소수로
+                - button "소수 나눗셈(원리 탐구/계산)" [ref=e1231]:
+                  - generic [ref=e1233]: 소수 나눗셈(원리 탐구/계산)
+                - button "수와 연산" [ref=e1234]:
+                  - generic [ref=e1236]: 수와 연산
+                - button "분모 다른 분수 덧셈·뺄셈(원리 탐구/계산)" [ref=e1237]:
+                  - generic [ref=e1239]: 분모 다른 분수 덧셈·뺄셈(원리 탐구/계산)
+                - button "수의 범위와 어림" [ref=e1240]:
+                  - generic [ref=e1242]: 수의 범위와 어림
+                - button "분수와 소수의 관계" [ref=e1243]:
+                  - generic [ref=e1245]: 분수와 소수의 관계
+                - button "소수의 곱셈과 나눗셈" [ref=e1246]:
+                  - generic [ref=e1248]: 소수의 곱셈과 나눗셈
+                - button "자연수의 혼합 계산" [ref=e1249]:
+                  - generic [ref=e1251]: 자연수의 혼합 계산
+                - button "약수와 배수" [ref=e1252]:
+                  - generic [ref=e1254]: 약수와 배수
+                - button "나눗셈에서의 몫 표현(분수/소수)" [ref=e1255]:
+                  - generic [ref=e1257]: 나눗셈에서의 몫 표현(분수/소수)
+                - button "분수의 덧셈과 뺄셈" [ref=e1258]:
+                  - generic [ref=e1260]: 분수의 덧셈과 뺄셈
+                - button "분수의 곱셈과 나눗셈" [ref=e1261]:
+                  - generic [ref=e1263]: 분수의 곱셈과 나눗셈
+                - button "소인수분해" [ref=e1264]:
+                  - generic [ref=e1266]: 소인수분해
+                - button "최대공약수·최소공배수" [ref=e1267]:
+                  - generic [ref=e1269]: 최대공약수·최소공배수
+                - button "정수·유리수(양수·음수)" [ref=e1270]:
+                  - generic [ref=e1272]: 정수·유리수(양수·음수)
+                - button "정수·유리수의 대소 관계" [ref=e1273]:
+                  - generic [ref=e1275]: 정수·유리수의 대소 관계
+                - button "정수·유리수의 사칙연산" [ref=e1276]:
+                  - generic [ref=e1278]: 정수·유리수의 사칙연산
+                - button "순환소수" [ref=e1279]:
+                  - generic [ref=e1281]: 순환소수
+                - button "제곱근" [ref=e1282]:
+                  - generic [ref=e1284]: 제곱근
+                - button "무리수" [ref=e1285]:
+                  - generic [ref=e1287]: 무리수
+                - button "실수의 대소 관계" [ref=e1288]:
+                  - generic [ref=e1290]: 실수의 대소 관계
+                - button "근호 포함 식의 사칙연산" [ref=e1291]:
+                  - generic [ref=e1293]: 근호 포함 식의 사칙연산
+                - button "소인수분해와 최대공약수·최소공배수" [ref=e1294]:
+                  - generic [ref=e1296]: 소인수분해와 최대공약수·최소공배수
+                - button "정수·유리수 개념과 사칙연산" [ref=e1297]:
+                  - generic [ref=e1299]: 정수·유리수 개념과 사칙연산
+                - button "순환소수와 유리수" [ref=e1300]:
+                  - generic [ref=e1302]: 순환소수와 유리수
+                - button "제곱근·무리수·실수" [ref=e1303]:
+                  - generic [ref=e1305]: 제곱근·무리수·실수
+                - button "근호 포함 식의 연산" [ref=e1306]:
+                  - generic [ref=e1308]: 근호 포함 식의 연산
+                - button "수와 연산" [ref=e1309]:
+                  - generic [ref=e1311]: 수와 연산
+                - button "수와 연산" [ref=e1312]:
+                  - generic [ref=e1314]: 수와 연산
+                - button "복소수(이차방정식과의 연결)" [ref=e1315]:
+                  - generic [ref=e1317]: 복소수(이차방정식과의 연결)
+                - button "인수분해(다항식)" [ref=e1318]:
+                  - generic [ref=e1320]: 인수분해(다항식)
+                - button "행렬(기초 연산)" [ref=e1321]:
+                  - generic [ref=e1323]: 행렬(기초 연산)
+                - button "행렬의 활용(연립방정식·변환)" [ref=e1324]:
+                  - generic [ref=e1326]: 행렬의 활용(연립방정식·변환)
+                - button "다항식(연산·나머지정리·인수분해 기초)" [ref=e1327]:
+                  - generic [ref=e1329]: 다항식(연산·나머지정리·인수분해 기초)
+                - button "연립방정식(대수적 풀이)" [ref=e1330]:
+                  - generic [ref=e1332]: 연립방정식(대수적 풀이)
+                - button "변화와 관계 (RR)" [ref=e1333]:
+                  - generic [ref=e1334]:
+                    - text: 변화와 관계
+                    - generic [ref=e1335]: (RR)
+                - button "규칙적인 변화 찾기·표현" [ref=e1336]:
+                  - generic [ref=e1338]: 규칙적인 변화 찾기·표현
+                - button "변화와 관계" [ref=e1339]:
+                  - generic [ref=e1341]: 변화와 관계
+                - button "규칙" [ref=e1342]:
+                  - generic [ref=e1344]: 규칙
+                - button "배열에서 규칙 찾아 표현" [ref=e1345]:
+                  - generic [ref=e1347]: 배열에서 규칙 찾아 표현
+                - button "등호 의미·동치 관계" [ref=e1348]:
+                  - generic [ref=e1350]: 등호 의미·동치 관계
+                - button "대응 관계를 표/식으로 나타내기" [ref=e1351]:
+                  - generic [ref=e1353]: 대응 관계를 표/식으로 나타내기
+                - button "변화와 관계" [ref=e1354]:
+                  - generic [ref=e1356]: 변화와 관계
+                - button "규칙" [ref=e1357]:
+                  - generic [ref=e1359]: 규칙
+                - button "동치 관계" [ref=e1360]:
+                  - generic [ref=e1362]: 동치 관계
+                - button "대응 관계" [ref=e1363]:
+                  - generic [ref=e1365]: 대응 관계
+                - button "비/비율 이해" [ref=e1366]:
+                  - generic [ref=e1368]: 비/비율 이해
+                - button "비율을 분수/소수/백분율로" [ref=e1369]:
+                  - generic [ref=e1371]: 비율을 분수/소수/백분율로
+                - button "비례식 풀이·비례배분" [ref=e1372]:
+                  - generic [ref=e1374]: 비례식 풀이·비례배분
+                - button "변화와 관계" [ref=e1375]:
+                  - generic [ref=e1377]: 변화와 관계
+                - button "비와 비율" [ref=e1378]:
+                  - generic [ref=e1380]: 비와 비율
+                - button "비례식과 비례배분" [ref=e1381]:
+                  - generic [ref=e1383]: 비례식과 비례배분
+                - button "문자 사용과 식의 값" [ref=e1384]:
+                  - generic [ref=e1386]: 문자 사용과 식의 값
+                - button "일차식의 덧셈·뺄셈" [ref=e1387]:
+                  - generic [ref=e1389]: 일차식의 덧셈·뺄셈
+                - button "방정식과 등식의 성질" [ref=e1390]:
+                  - generic [ref=e1392]: 방정식과 등식의 성질
+                - button "일차방정식 풀이·활용" [ref=e1393]:
+                  - generic [ref=e1395]: 일차방정식 풀이·활용
+                - button "좌표(순서쌍)" [ref=e1396]:
+                  - generic [ref=e1398]: 좌표(순서쌍)
+                - button "그래프 표현·해석" [ref=e1399]:
+                  - generic [ref=e1401]: 그래프 표현·해석
+                - button "정비례·반비례" [ref=e1402]:
+                  - generic [ref=e1404]: 정비례·반비례
+                - button "지수법칙" [ref=e1405]:
+                  - generic [ref=e1407]: 지수법칙
+                - button "다항식의 덧셈·뺄셈" [ref=e1408]:
+                  - generic [ref=e1410]: 다항식의 덧셈·뺄셈
+                - button "단항식×다항식/다항식÷단항식" [ref=e1411]:
+                  - generic [ref=e1413]: 단항식×다항식/다항식÷단항식
+                - button "부등식과 해" [ref=e1414]:
+                  - generic [ref=e1416]: 부등식과 해
+                - button "일차부등식 풀이·활용" [ref=e1417]:
+                  - generic [ref=e1419]: 일차부등식 풀이·활용
+                - button "문자와 식의 값" [ref=e1420]:
+                  - generic [ref=e1422]: 문자와 식의 값
+                - button "일차식의 연산" [ref=e1423]:
+                  - generic [ref=e1425]: 일차식의 연산
+                - button "방정식과 등식의 성질" [ref=e1426]:
+                  - generic [ref=e1428]: 방정식과 등식의 성질
+                - button "일차방정식 풀이·활용" [ref=e1429]:
+                  - generic [ref=e1431]: 일차방정식 풀이·활용
+                - button "좌표와 그래프" [ref=e1432]:
+                  - generic [ref=e1434]: 좌표와 그래프
+                - button "정비례·반비례" [ref=e1435]:
+                  - generic [ref=e1437]: 정비례·반비례
+                - button "지수법칙" [ref=e1438]:
+                  - generic [ref=e1440]: 지수법칙
+                - button "다항식의 덧셈·뺄셈" [ref=e1441]:
+                  - generic [ref=e1443]: 다항식의 덧셈·뺄셈
+                - button "다항식의 곱셈·나눗셈(기초)" [ref=e1444]:
+                  - generic [ref=e1446]: 다항식의 곱셈·나눗셈(기초)
+                - button "부등식과 해" [ref=e1447]:
+                  - generic [ref=e1449]: 부등식과 해
+                - button "일차부등식 풀이·활용" [ref=e1450]:
+                  - generic [ref=e1452]: 일차부등식 풀이·활용
+                - button "연립일차방정식" [ref=e1453]:
+                  - generic [ref=e1455]: 연립일차방정식
+                - button "일차함수" [ref=e1456]:
+                  - generic [ref=e1458]: 일차함수
+                - button "다항식의 곱셈·인수분해" [ref=e1459]:
+                  - generic [ref=e1461]: 다항식의 곱셈·인수분해
+                - button "변화와 관계" [ref=e1462]:
+                  - generic [ref=e1464]: 변화와 관계
+                - button "등차수열" [ref=e1465]:
+                  - generic [ref=e1467]: 등차수열
+                - button "등비수열" [ref=e1468]:
+                  - generic [ref=e1470]: 등비수열
+                - button "변화와 관계" [ref=e1471]:
+                  - generic [ref=e1473]: 변화와 관계
+                - button "미분 심화(합성/삼각/지수·로그)" [ref=e1474]:
+                  - generic [ref=e1476]: 미분 심화(합성/삼각/지수·로그)
+                - button "미분의 활용" [ref=e1477]:
+                  - generic [ref=e1479]: 미분의 활용
+                - button "미분(도함수)" [ref=e1480]:
+                  - generic [ref=e1482]: 미분(도함수)
+                - button "지수함수" [ref=e1483]:
+                  - generic [ref=e1485]: 지수함수
+                - button "지수법칙(확장/정리)" [ref=e1486]:
+                  - generic [ref=e1488]: 지수법칙(확장/정리)
+                - button "함수" [ref=e1489]:
+                  - generic [ref=e1491]: 함수
+                - button "수학적 귀납법" [ref=e1492]:
+                  - generic [ref=e1494]: 수학적 귀납법
+                - button "부등식" [ref=e1495]:
+                  - generic [ref=e1497]: 부등식
+                - button "적분(부정·정적분)" [ref=e1498]:
+                  - generic [ref=e1500]: 적분(부정·정적분)
+                - button "적분 심화(치환/부분)" [ref=e1501]:
+                  - generic [ref=e1503]: 적분 심화(치환/부분)
+                - button "적분의 활용(넓이·누적)" [ref=e1504]:
+                  - generic [ref=e1506]: 적분의 활용(넓이·누적)
+                - button "무리함수" [ref=e1507]:
+                  - generic [ref=e1509]: 무리함수
+                - button "함수의 극한과 연속" [ref=e1510]:
+                  - generic [ref=e1512]: 함수의 극한과 연속
+                - button "로그" [ref=e1513]:
+                  - generic [ref=e1515]: 로그
+                - button "로그의 성질(로그법칙)" [ref=e1516]:
+                  - generic [ref=e1518]: 로그의 성질(로그법칙)
+                - button "이차방정식" [ref=e1519]:
+                  - generic [ref=e1521]: 이차방정식
+                - button "유리함수" [ref=e1522]:
+                  - generic [ref=e1524]: 유리함수
+                - button "수열의 극한·급수" [ref=e1525]:
+                  - generic [ref=e1527]: 수열의 극한·급수
+                - button "등차수열" [ref=e1528]:
+                  - generic [ref=e1530]: 등차수열
+                - button "등비수열" [ref=e1531]:
+                  - generic [ref=e1533]: 등비수열
+                - button "수열의 합(등차·등비)" [ref=e1534]:
+                  - generic [ref=e1536]: 수열의 합(등차·등비)
+                - button "집합과 명제(논리)" [ref=e1537]:
+                  - generic [ref=e1539]: 집합과 명제(논리)
+                - button "삼각함수" [ref=e1540]:
+                  - generic [ref=e1542]: 삼각함수
+                - button "삼각법(사인·코사인 법칙)" [ref=e1543]:
+                  - generic [ref=e1545]: 삼각법(사인·코사인 법칙)
+                - button "로그함수" [ref=e1546]:
+                  - generic [ref=e1548]: 로그함수
+                - button "이차함수" [ref=e1549]:
+                  - generic [ref=e1551]: 이차함수
+                - button "이차부등식" [ref=e1552]:
+                  - generic [ref=e1554]: 이차부등식
+                - button "도형과 측정 (GM)" [ref=e1555]:
+                  - generic [ref=e1556]:
+                    - text: 도형과 측정
+                    - generic [ref=e1557]: (GM)
+                - button "입체도형 직관적 인식(상자·공 등)" [ref=e1558]:
+                  - generic [ref=e1560]: 입체도형 직관적 인식(상자·공 등)
+                - button "삼각형·사각형과 구성 요소(변·꼭짓점)" [ref=e1561]:
+                  - generic [ref=e1563]: 삼각형·사각형과 구성 요소(변·꼭짓점)
+                - button "길이·무게·넓이 등 직접 비교" [ref=e1564]:
+                  - generic [ref=e1566]: 길이·무게·넓이 등 직접 비교
+                - 'button "시·분: 시각/시간 이해" [ref=e1567]':
+                  - generic [ref=e1569]: "시·분: 시각/시간 이해"
+                - button "cm/m로 길이 측정·비교" [ref=e1570]:
+                  - generic [ref=e1572]: cm/m로 길이 측정·비교
+                - button "입체도형의 모양" [ref=e1573]:
+                  - generic [ref=e1575]: 입체도형의 모양
+                - button "평면도형과 그 구성 요소" [ref=e1576]:
+                  - generic [ref=e1578]: 평면도형과 그 구성 요소
+                - button "양의 비교" [ref=e1579]:
+                  - generic [ref=e1581]: 양의 비교
+                - button "시각과 시간" [ref=e1582]:
+                  - generic [ref=e1584]: 시각과 시간
+                - button "길이 측정" [ref=e1585]:
+                  - generic [ref=e1587]: 길이 측정
+                - button "도형과 측정" [ref=e1588]:
+                  - generic [ref=e1590]: 도형과 측정
+                - button "직선/선분/각 + 평행/수직" [ref=e1591]:
+                  - generic [ref=e1593]: 직선/선분/각 + 평행/수직
+                - button "중심/반지름/지름 이해·원 그리기" [ref=e1594]:
+                  - generic [ref=e1596]: 중심/반지름/지름 이해·원 그리기
+                - button "삼각형 종류와 특성" [ref=e1597]:
+                  - generic [ref=e1599]: 삼각형 종류와 특성
+                - button "사각형 종류와 성질" [ref=e1600]:
+                  - generic [ref=e1602]: 사각형 종류와 성질
+                - button "다각형 개념 + 오각형/육각형 특징" [ref=e1603]:
+                  - generic [ref=e1605]: 다각형 개념 + 오각형/육각형 특징
+                - button "밀기/뒤집기/돌리기 불변 성질" [ref=e1606]:
+                  - generic [ref=e1608]: 밀기/뒤집기/돌리기 불변 성질
+                - button "초 단위까지 시간 읽기·측정" [ref=e1609]:
+                  - generic [ref=e1611]: 초 단위까지 시간 읽기·측정
+                - button "mm↔km 등 길이 단위 관계 활용" [ref=e1612]:
+                  - generic [ref=e1614]: mm↔km 등 길이 단위 관계 활용
+                - button "들이·무게 단위(L/mL, kg/g) 측정" [ref=e1615]:
+                  - generic [ref=e1617]: 들이·무게 단위(L/mL, kg/g) 측정
+                - button "각도(°) 이해·각도기 측정" [ref=e1618]:
+                  - generic [ref=e1620]: 각도(°) 이해·각도기 측정
+                - button "도형과 측정" [ref=e1621]:
+                  - generic [ref=e1623]: 도형과 측정
+                - button "도형의 기초" [ref=e1624]:
+                  - generic [ref=e1626]: 도형의 기초
+                - button "입체도형의 구성 요소와 전개도" [ref=e1627]:
+                  - generic [ref=e1629]: 입체도형의 구성 요소와 전개도
+                - button "원의 구성 요소" [ref=e1630]:
+                  - generic [ref=e1632]: 원의 구성 요소
+                - button "여러 가지 삼각형" [ref=e1633]:
+                  - generic [ref=e1635]: 여러 가지 삼각형
+                - button "여러 가지 사각형" [ref=e1636]:
+                  - generic [ref=e1638]: 여러 가지 사각형
+                - button "다각형" [ref=e1639]:
+                  - generic [ref=e1641]: 다각형
+                - button "긴 길이/들이/무게/각도 측정" [ref=e1642]:
+                  - generic [ref=e1644]: 긴 길이/들이/무게/각도 측정
+                - button "평면도형의 이동" [ref=e1645]:
+                  - generic [ref=e1647]: 평면도형의 이동
+                - button "시각과 시간(초)" [ref=e1648]:
+                  - generic [ref=e1650]: 시각과 시간(초)
+                - button "합동 판단·합동 도형 그리기" [ref=e1651]:
+                  - generic [ref=e1653]: 합동 판단·합동 도형 그리기
+                - button "선대칭/점대칭 도형 찾기" [ref=e1654]:
+                  - generic [ref=e1656]: 선대칭/점대칭 도형 찾기
+                - button "직육면체·정육면체 특징" [ref=e1657]:
+                  - generic [ref=e1659]: 직육면체·정육면체 특징
+                - button "각기둥/각뿔 특징·전개도" [ref=e1660]:
+                  - generic [ref=e1662]: 각기둥/각뿔 특징·전개도
+                - button "원기둥/원뿔/구 특징 비교" [ref=e1663]:
+                  - generic [ref=e1665]: 원기둥/원뿔/구 특징 비교
+                - button "다각형 둘레·넓이 구하기" [ref=e1666]:
+                  - generic [ref=e1668]: 다각형 둘레·넓이 구하기
+                - button "원주율·원의 넓이" [ref=e1669]:
+                  - generic [ref=e1671]: 원주율·원의 넓이
+                - button "직육면체/정육면체 겉넓이·부피" [ref=e1672]:
+                  - generic [ref=e1674]: 직육면체/정육면체 겉넓이·부피
+                - button "도형과 측정" [ref=e1675]:
+                  - generic [ref=e1677]: 도형과 측정
+                - button "입체도형" [ref=e1678]:
+                  - generic [ref=e1680]: 입체도형
+                - button "도형의 측정" [ref=e1681]:
+                  - generic [ref=e1683]: 도형의 측정
+                - button "합동과 대칭" [ref=e1684]:
+                  - generic [ref=e1686]: 합동과 대칭
+                - button "점·직선·평면의 위치 관계" [ref=e1687]:
+                  - generic [ref=e1689]: 점·직선·평면의 위치 관계
+                - button "평행선과 각" [ref=e1690]:
+                  - generic [ref=e1692]: 평행선과 각
+                - button "삼각형의 작도" [ref=e1693]:
+                  - generic [ref=e1695]: 삼각형의 작도
+                - button "삼각형 합동 조건" [ref=e1696]:
+                  - generic [ref=e1698]: 삼각형 합동 조건
+                - button "다각형의 성질" [ref=e1699]:
+                  - generic [ref=e1701]: 다각형의 성질
+                - button "부채꼴의 호의 길이·넓이" [ref=e1702]:
+                  - generic [ref=e1704]: 부채꼴의 호의 길이·넓이
+                - button "다면체·회전체의 성질" [ref=e1705]:
+                  - generic [ref=e1707]: 다면체·회전체의 성질
+                - button "점·직선·평면과 위치 관계" [ref=e1708]:
+                  - generic [ref=e1710]: 점·직선·평면과 위치 관계
+                - button "평행선과 각의 성질" [ref=e1711]:
+                  - generic [ref=e1713]: 평행선과 각의 성질
+                - button "삼각형 작도와 합동" [ref=e1714]:
+                  - generic [ref=e1716]: 삼각형 작도와 합동
+                - button "다각형의 성질" [ref=e1717]:
+                  - generic [ref=e1719]: 다각형의 성질
+                - button "부채꼴(호의 길이·넓이)" [ref=e1720]:
+                  - generic [ref=e1722]: 부채꼴(호의 길이·넓이)
+                - button "다면체·회전체" [ref=e1723]:
+                  - generic [ref=e1725]: 다면체·회전체
+                - button "삼각형의 닮음" [ref=e1726]:
+                  - generic [ref=e1728]: 삼각형의 닮음
+                - button "피타고라스 정리" [ref=e1729]:
+                  - generic [ref=e1731]: 피타고라스 정리
+                - button "원과 원의 성질" [ref=e1732]:
+                  - generic [ref=e1734]: 원과 원의 성질
+                - button "삼각비" [ref=e1735]:
+                  - generic [ref=e1737]: 삼각비
+                - button "도형과 측정" [ref=e1738]:
+                  - generic [ref=e1740]: 도형과 측정
+                - button "도형과 측정" [ref=e1741]:
+                  - generic [ref=e1743]: 도형과 측정
+                - button "공간도형·공간좌표" [ref=e1744]:
+                  - generic [ref=e1746]: 공간도형·공간좌표
+                - button "이차곡선(포물선·타원·쌍곡선)" [ref=e1747]:
+                  - generic [ref=e1749]: 이차곡선(포물선·타원·쌍곡선)
+                - button "도형의 방정식(좌표기하)" [ref=e1750]:
+                  - generic [ref=e1752]: 도형의 방정식(좌표기하)
+                - button "벡터(평면·공간)" [ref=e1753]:
+                  - generic [ref=e1755]: 벡터(평면·공간)
+                - button "벡터의 내적" [ref=e1756]:
+                  - generic [ref=e1758]: 벡터의 내적
+                - button "자료와 가능성 (DP)" [ref=e1759]:
+                  - generic [ref=e1760]:
+                    - text: 자료와 가능성
+                    - generic [ref=e1761]: (DP)
+                - button "기준에 따라 분류·결과 말하기" [ref=e1762]:
+                  - generic [ref=e1764]: 기준에 따라 분류·결과 말하기
+                - button "분류한 자료를 표로 정리" [ref=e1765]:
+                  - generic [ref=e1767]: 분류한 자료를 표로 정리
+                - button "기호(O/X/…)로 그림그래프 표현·해석" [ref=e1768]:
+                  - generic [ref=e1770]: 기호(O/X/…)로 그림그래프 표현·해석
+                - button "자료와 가능성" [ref=e1771]:
+                  - generic [ref=e1773]: 자료와 가능성
+                - button "자료의 분류" [ref=e1774]:
+                  - generic [ref=e1776]: 자료의 분류
+                - button "표와 그림그래프" [ref=e1777]:
+                  - generic [ref=e1779]: 표와 그림그래프
+                - button "막대그래프 표현·해석" [ref=e1780]:
+                  - generic [ref=e1782]: 막대그래프 표현·해석
+                - button "꺾은선그래프 표현·해석" [ref=e1783]:
+                  - generic [ref=e1785]: 꺾은선그래프 표현·해석
+                - button "평균 구하기·의미 설명" [ref=e1786]:
+                  - generic [ref=e1788]: 평균 구하기·의미 설명
+                - button "자료와 가능성" [ref=e1789]:
+                  - generic [ref=e1791]: 자료와 가능성
+                - button "막대그래프" [ref=e1792]:
+                  - generic [ref=e1794]: 막대그래프
+                - button "꺾은선그래프" [ref=e1795]:
+                  - generic [ref=e1797]: 꺾은선그래프
+                - button "평균" [ref=e1798]:
+                  - generic [ref=e1800]: 평균
+                - button "띠그래프/원그래프로 표현·해석" [ref=e1801]:
+                  - generic [ref=e1803]: 띠그래프/원그래프로 표현·해석
+                - button "가능성 정도 구별·설명" [ref=e1804]:
+                  - generic [ref=e1806]: 가능성 정도 구별·설명
+                - button "자료와 가능성" [ref=e1807]:
+                  - generic [ref=e1809]: 자료와 가능성
+                - button "띠그래프와 원그래프" [ref=e1810]:
+                  - generic [ref=e1812]: 띠그래프와 원그래프
+                - button "가능성" [ref=e1813]:
+                  - generic [ref=e1815]: 가능성
+                - button "중앙값·최빈값" [ref=e1816]:
+                  - generic [ref=e1818]: 중앙값·최빈값
+                - button "자료의 분포 표현" [ref=e1819]:
+                  - generic [ref=e1821]: 자료의 분포 표현
+                - button "상대도수" [ref=e1822]:
+                  - generic [ref=e1824]: 상대도수
+                - button "통계적 탐구" [ref=e1825]:
+                  - generic [ref=e1827]: 통계적 탐구
+                - button "경우의 수" [ref=e1828]:
+                  - generic [ref=e1830]: 경우의 수
+                - button "확률" [ref=e1831]:
+                  - generic [ref=e1833]: 확률
+                - button "대푯값(중앙값·최빈값)" [ref=e1834]:
+                  - generic [ref=e1836]: 대푯값(중앙값·최빈값)
+                - button "자료의 분포 표현" [ref=e1837]:
+                  - generic [ref=e1839]: 자료의 분포 표현
+                - button "상대도수" [ref=e1840]:
+                  - generic [ref=e1842]: 상대도수
+                - button "통계적 탐구" [ref=e1843]:
+                  - generic [ref=e1845]: 통계적 탐구
+                - button "경우의 수" [ref=e1846]:
+                  - generic [ref=e1848]: 경우의 수
+                - button "확률" [ref=e1849]:
+                  - generic [ref=e1851]: 확률
+                - button "자료와 가능성" [ref=e1852]:
+                  - generic [ref=e1854]: 자료와 가능성
+                - button "자료와 가능성" [ref=e1855]:
+                  - generic [ref=e1857]: 자료와 가능성
+                - button "이항정리" [ref=e1858]:
+                  - generic [ref=e1860]: 이항정리
+                - button "경우의 수(순열·조합)" [ref=e1861]:
+                  - generic [ref=e1863]: 경우의 수(순열·조합)
+                - button "조건부확률·독립" [ref=e1864]:
+                  - generic [ref=e1866]: 조건부확률·독립
+                - button "확률분포(이산/연속)" [ref=e1867]:
+                  - generic [ref=e1869]: 확률분포(이산/연속)
+                - button "확률" [ref=e1870]:
+                  - generic [ref=e1872]: 확률
+                - button "기술통계(산포·상관 등)" [ref=e1873]:
+                  - generic [ref=e1875]: 기술통계(산포·상관 등)
+                - button "통계적 추정(표본·신뢰)" [ref=e1876]:
+                  - generic [ref=e1878]: 통계적 추정(표본·신뢰)
+                - button "기타/미분류 (__unspecified__)" [ref=e1879]:
+                  - generic [ref=e1880]:
+                    - text: 기타/미분류
+                    - generic [ref=e1881]: (__unspecified__)
+                - button "초등 1~2학년군" [ref=e1882]:
+                  - generic [ref=e1884]: 초등 1~2학년군
+                - button "초등 3~4학년군" [ref=e1885]:
+                  - generic [ref=e1887]: 초등 3~4학년군
+                - button "초등 5~6학년군" [ref=e1888]:
+                  - generic [ref=e1890]: 초등 5~6학년군
+                - button "중등 1~3학년군" [ref=e1891]:
+                  - generic [ref=e1893]: 중등 1~3학년군
+                - button "2023 수능 미적분(23-30)" [ref=e1894]:
+                  - generic [ref=e1896]: 2023 수능 미적분(23-30)
+                - button "2023 수능 수학 공통(1-22)" [ref=e1897]:
+                  - generic [ref=e1899]: 2023 수능 수학 공통(1-22)
+                - button "2023 수능 기하(23-30)" [ref=e1900]:
+                  - generic [ref=e1902]: 2023 수능 기하(23-30)
+                - button "2023 수능 확률과 통계(23-30)" [ref=e1903]:
+                  - generic [ref=e1905]: 2023 수능 확률과 통계(23-30)
+                - button "2024 수능 미적분(23-30)" [ref=e1906]:
+                  - generic [ref=e1908]: 2024 수능 미적분(23-30)
+                - button "2024 수능 수학 공통(1-22)" [ref=e1909]:
+                  - generic [ref=e1911]: 2024 수능 수학 공통(1-22)
+                - button "2024 수능 기하(23-30)" [ref=e1912]:
+                  - generic [ref=e1914]: 2024 수능 기하(23-30)
+                - button "2024 수능 확률과 통계(23-30)" [ref=e1915]:
+                  - generic [ref=e1917]: 2024 수능 확률과 통계(23-30)
+                - button "2025 수능 미적분(23-30)" [ref=e1918]:
+                  - generic [ref=e1920]: 2025 수능 미적분(23-30)
+                - button "2025 수능 수학 공통(1-22)" [ref=e1921]:
+                  - generic [ref=e1923]: 2025 수능 수학 공통(1-22)
+                - button "2025 수능 기하(23-30)" [ref=e1924]:
+                  - generic [ref=e1926]: 2025 수능 기하(23-30)
+                - button "2025 수능 확률과 통계(23-30)" [ref=e1927]:
+                  - generic [ref=e1929]: 2025 수능 확률과 통계(23-30)
+                - button "2026 수능 미적분(23-30)" [ref=e1930]:
+                  - generic [ref=e1932]: 2026 수능 미적분(23-30)
+                - button "2026 수능 수학 공통(1-22)" [ref=e1933]:
+                  - generic [ref=e1935]: 2026 수능 수학 공통(1-22)
+                - button "2026 수능 기하(23-30)" [ref=e1936]:
+                  - generic [ref=e1938]: 2026 수능 기하(23-30)
+                - button "2026 수능 확률과 통계(23-30)" [ref=e1939]:
+                  - generic [ref=e1941]: 2026 수능 확률과 통계(23-30)
+                - button "고등 1~3학년군" [ref=e1942]:
+                  - generic [ref=e1944]: 고등 1~3학년군
+                - button "2023 수능 공통 1번" [ref=e1945]:
+                  - generic [ref=e1947]: 2023 수능 공통 1번
+                - button "2023 수능 공통 2번" [ref=e1948]:
+                  - generic [ref=e1950]: 2023 수능 공통 2번
+                - button "2023 수능 공통 3번" [ref=e1951]:
+                  - generic [ref=e1953]: 2023 수능 공통 3번
+                - button "2023 수능 공통 4번" [ref=e1954]:
+                  - generic [ref=e1956]: 2023 수능 공통 4번
+                - button "2023 수능 공통 5번" [ref=e1957]:
+                  - generic [ref=e1959]: 2023 수능 공통 5번
+                - button "2023 수능 공통 6번" [ref=e1960]:
+                  - generic [ref=e1962]: 2023 수능 공통 6번
+                - button "2023 수능 공통 7번" [ref=e1963]:
+                  - generic [ref=e1965]: 2023 수능 공통 7번
+                - button "2023 수능 공통 8번" [ref=e1966]:
+                  - generic [ref=e1968]: 2023 수능 공통 8번
+                - button "2023 수능 공통 9번" [ref=e1969]:
+                  - generic [ref=e1971]: 2023 수능 공통 9번
+                - button "2023 수능 공통 10번" [ref=e1972]:
+                  - generic [ref=e1974]: 2023 수능 공통 10번
+                - button "2023 수능 공통 11번" [ref=e1975]:
+                  - generic [ref=e1977]: 2023 수능 공통 11번
+                - button "2023 수능 공통 12번" [ref=e1978]:
+                  - generic [ref=e1980]: 2023 수능 공통 12번
+                - button "2023 수능 공통 13번" [ref=e1981]:
+                  - generic [ref=e1983]: 2023 수능 공통 13번
+                - button "2023 수능 공통 14번" [ref=e1984]:
+                  - generic [ref=e1986]: 2023 수능 공통 14번
+                - button "2023 수능 공통 15번" [ref=e1987]:
+                  - generic [ref=e1989]: 2023 수능 공통 15번
+                - button "2023 수능 공통 16번" [ref=e1990]:
+                  - generic [ref=e1992]: 2023 수능 공통 16번
+                - button "2023 수능 공통 17번" [ref=e1993]:
+                  - generic [ref=e1995]: 2023 수능 공통 17번
+                - button "2023 수능 공통 18번" [ref=e1996]:
+                  - generic [ref=e1998]: 2023 수능 공통 18번
+                - button "2023 수능 공통 19번" [ref=e1999]:
+                  - generic [ref=e2001]: 2023 수능 공통 19번
+                - button "2023 수능 공통 20번" [ref=e2002]:
+                  - generic [ref=e2004]: 2023 수능 공통 20번
+                - button "2023 수능 공통 22번" [ref=e2005]:
+                  - generic [ref=e2007]: 2023 수능 공통 22번
+                - button "2023 수능 미적분 23번" [ref=e2008]:
+                  - generic [ref=e2010]: 2023 수능 미적분 23번
+                - button "2023 수능 미적분 24번" [ref=e2011]:
+                  - generic [ref=e2013]: 2023 수능 미적분 24번
+                - button "2023 수능 미적분 25번" [ref=e2014]:
+                  - generic [ref=e2016]: 2023 수능 미적분 25번
+                - button "2023 수능 미적분 26번" [ref=e2017]:
+                  - generic [ref=e2019]: 2023 수능 미적분 26번
+                - button "2023 수능 미적분 27번" [ref=e2020]:
+                  - generic [ref=e2022]: 2023 수능 미적분 27번
+                - button "2023 수능 미적분 28번" [ref=e2023]:
+                  - generic [ref=e2025]: 2023 수능 미적분 28번
+                - button "2023 수능 미적분 29번" [ref=e2026]:
+                  - generic [ref=e2028]: 2023 수능 미적분 29번
+                - button "2023 수능 미적분 30번" [ref=e2029]:
+                  - generic [ref=e2031]: 2023 수능 미적분 30번
+                - button "2023 수능 기하 23번" [ref=e2032]:
+                  - generic [ref=e2034]: 2023 수능 기하 23번
+                - button "2023 수능 기하 24번" [ref=e2035]:
+                  - generic [ref=e2037]: 2023 수능 기하 24번
+                - button "2023 수능 기하 25번" [ref=e2038]:
+                  - generic [ref=e2040]: 2023 수능 기하 25번
+                - button "2023 수능 기하 26번" [ref=e2041]:
+                  - generic [ref=e2043]: 2023 수능 기하 26번
+                - button "2023 수능 기하 27번" [ref=e2044]:
+                  - generic [ref=e2046]: 2023 수능 기하 27번
+                - button "2023 수능 기하 28번" [ref=e2047]:
+                  - generic [ref=e2049]: 2023 수능 기하 28번
+                - button "2023 수능 기하 29번" [ref=e2050]:
+                  - generic [ref=e2052]: 2023 수능 기하 29번
+                - button "2023 수능 기하 30번" [ref=e2053]:
+                  - generic [ref=e2055]: 2023 수능 기하 30번
+                - button "2023 수능 확률과통계 23번" [ref=e2056]:
+                  - generic [ref=e2058]: 2023 수능 확률과통계 23번
+                - button "2023 수능 확률과통계 24번" [ref=e2059]:
+                  - generic [ref=e2061]: 2023 수능 확률과통계 24번
+                - button "2023 수능 확률과통계 25번" [ref=e2062]:
+                  - generic [ref=e2064]: 2023 수능 확률과통계 25번
+                - button "2023 수능 확률과통계 26번" [ref=e2065]:
+                  - generic [ref=e2067]: 2023 수능 확률과통계 26번
+                - button "2023 수능 확률과통계 27번" [ref=e2068]:
+                  - generic [ref=e2070]: 2023 수능 확률과통계 27번
+                - button "2023 수능 확률과통계 28번" [ref=e2071]:
+                  - generic [ref=e2073]: 2023 수능 확률과통계 28번
+                - button "2023 수능 확률과통계 29번" [ref=e2074]:
+                  - generic [ref=e2076]: 2023 수능 확률과통계 29번
+                - button "2023 수능 확률과통계 30번" [ref=e2077]:
+                  - generic [ref=e2079]: 2023 수능 확률과통계 30번
+                - button "2024 수능 공통 1번" [ref=e2080]:
+                  - generic [ref=e2082]: 2024 수능 공통 1번
+                - button "2024 수능 공통 2번" [ref=e2083]:
+                  - generic [ref=e2085]: 2024 수능 공통 2번
+                - button "2024 수능 공통 3번" [ref=e2086]:
+                  - generic [ref=e2088]: 2024 수능 공통 3번
+                - button "2024 수능 공통 4번" [ref=e2089]:
+                  - generic [ref=e2091]: 2024 수능 공통 4번
+                - button "2024 수능 공통 5번" [ref=e2092]:
+                  - generic [ref=e2094]: 2024 수능 공통 5번
+                - button "2024 수능 공통 6번" [ref=e2095]:
+                  - generic [ref=e2097]: 2024 수능 공통 6번
+                - button "2024 수능 공통 7번" [ref=e2098]:
+                  - generic [ref=e2100]: 2024 수능 공통 7번
+                - button "2024 수능 공통 8번" [ref=e2101]:
+                  - generic [ref=e2103]: 2024 수능 공통 8번
+                - button "2024 수능 공통 9번" [ref=e2104]:
+                  - generic [ref=e2106]: 2024 수능 공통 9번
+                - button "2024 수능 공통 10번" [ref=e2107]:
+                  - generic [ref=e2109]: 2024 수능 공통 10번
+                - button "2024 수능 공통 11번" [ref=e2110]:
+                  - generic [ref=e2112]: 2024 수능 공통 11번
+                - button "2024 수능 공통 12번" [ref=e2113]:
+                  - generic [ref=e2115]: 2024 수능 공통 12번
+                - button "2024 수능 공통 13번" [ref=e2116]:
+                  - generic [ref=e2118]: 2024 수능 공통 13번
+                - button "2024 수능 공통 15번" [ref=e2119]:
+                  - generic [ref=e2121]: 2024 수능 공통 15번
+                - button "2024 수능 공통 16번" [ref=e2122]:
+                  - generic [ref=e2124]: 2024 수능 공통 16번
+                - button "2024 수능 공통 17번" [ref=e2125]:
+                  - generic [ref=e2127]: 2024 수능 공통 17번
+                - button "2024 수능 공통 18번" [ref=e2128]:
+                  - generic [ref=e2130]: 2024 수능 공통 18번
+                - button "2024 수능 공통 19번" [ref=e2131]:
+                  - generic [ref=e2133]: 2024 수능 공통 19번
+                - button "2024 수능 공통 20번" [ref=e2134]:
+                  - generic [ref=e2136]: 2024 수능 공통 20번
+                - button "2024 수능 공통 22번" [ref=e2137]:
+                  - generic [ref=e2139]: 2024 수능 공통 22번
+                - button "2024 수능 미적 23번" [ref=e2140]:
+                  - generic [ref=e2142]: 2024 수능 미적 23번
+                - button "2024 수능 미적 24번" [ref=e2143]:
+                  - generic [ref=e2145]: 2024 수능 미적 24번
+                - button "2024 수능 미적 25번" [ref=e2146]:
+                  - generic [ref=e2148]: 2024 수능 미적 25번
+                - button "2024 수능 미적 26번" [ref=e2149]:
+                  - generic [ref=e2151]: 2024 수능 미적 26번
+                - button "2024 수능 미적 27번" [ref=e2152]:
+                  - generic [ref=e2154]: 2024 수능 미적 27번
+                - button "2024 수능 미적 28번" [ref=e2155]:
+                  - generic [ref=e2157]: 2024 수능 미적 28번
+                - button "2024 수능 미적 29번" [ref=e2158]:
+                  - generic [ref=e2160]: 2024 수능 미적 29번
+                - button "2024 수능 미적 30번" [ref=e2161]:
+                  - generic [ref=e2163]: 2024 수능 미적 30번
+                - button "2024 수능 기하 23번" [ref=e2164]:
+                  - generic [ref=e2166]: 2024 수능 기하 23번
+                - button "2024 수능 기하 24번" [ref=e2167]:
+                  - generic [ref=e2169]: 2024 수능 기하 24번
+                - button "2024 수능 기하 25번" [ref=e2170]:
+                  - generic [ref=e2172]: 2024 수능 기하 25번
+                - button "2024 수능 기하 26번" [ref=e2173]:
+                  - generic [ref=e2175]: 2024 수능 기하 26번
+                - button "2024 수능 기하 27번" [ref=e2176]:
+                  - generic [ref=e2178]: 2024 수능 기하 27번
+                - button "2024 수능 기하 28번" [ref=e2179]:
+                  - generic [ref=e2181]: 2024 수능 기하 28번
+                - button "2024 수능 기하 29번" [ref=e2182]:
+                  - generic [ref=e2184]: 2024 수능 기하 29번
+                - button "2024 수능 기하 30번" [ref=e2185]:
+                  - generic [ref=e2187]: 2024 수능 기하 30번
+                - button "2024 수능 확통 23번" [ref=e2188]:
+                  - generic [ref=e2190]: 2024 수능 확통 23번
+                - button "2024 수능 확통 24번" [ref=e2191]:
+                  - generic [ref=e2193]: 2024 수능 확통 24번
+                - button "2024 수능 확통 25번" [ref=e2194]:
+                  - generic [ref=e2196]: 2024 수능 확통 25번
+                - button "2024 수능 확통 26번" [ref=e2197]:
+                  - generic [ref=e2199]: 2024 수능 확통 26번
+                - button "2024 수능 확통 27번" [ref=e2200]:
+                  - generic [ref=e2202]: 2024 수능 확통 27번
+                - button "2024 수능 확통 28번" [ref=e2203]:
+                  - generic [ref=e2205]: 2024 수능 확통 28번
+                - button "2024 수능 확통 29번" [ref=e2206]:
+                  - generic [ref=e2208]: 2024 수능 확통 29번
+                - button "2024 수능 확통 30번" [ref=e2209]:
+                  - generic [ref=e2211]: 2024 수능 확통 30번
+                - button "2025 수능 공통 1번" [ref=e2212]:
+                  - generic [ref=e2214]: 2025 수능 공통 1번
+                - button "2025 수능 공통 2번" [ref=e2215]:
+                  - generic [ref=e2217]: 2025 수능 공통 2번
+                - button "2025 수능 공통 3번" [ref=e2218]:
+                  - generic [ref=e2220]: 2025 수능 공통 3번
+                - button "2025 수능 공통 4번" [ref=e2221]:
+                  - generic [ref=e2223]: 2025 수능 공통 4번
+                - button "2025 수능 공통 5번" [ref=e2224]:
+                  - generic [ref=e2226]: 2025 수능 공통 5번
+                - button "2025 수능 공통 6번" [ref=e2227]:
+                  - generic [ref=e2229]: 2025 수능 공통 6번
+                - button "2025 수능 공통 7번" [ref=e2230]:
+                  - generic [ref=e2232]: 2025 수능 공통 7번
+                - button "2025 수능 공통 8번" [ref=e2233]:
+                  - generic [ref=e2235]: 2025 수능 공통 8번
+                - button "2025 수능 공통 9번" [ref=e2236]:
+                  - generic [ref=e2238]: 2025 수능 공통 9번
+                - button "2025 수능 공통 10번" [ref=e2239]:
+                  - generic [ref=e2241]: 2025 수능 공통 10번
+                - button "2025 수능 공통 11번" [ref=e2242]:
+                  - generic [ref=e2244]: 2025 수능 공통 11번
+                - button "2025 수능 공통 12번" [ref=e2245]:
+                  - generic [ref=e2247]: 2025 수능 공통 12번
+                - button "2025 수능 공통 13번" [ref=e2248]:
+                  - generic [ref=e2250]: 2025 수능 공통 13번
+                - button "2025 수능 공통 14번" [ref=e2251]:
+                  - generic [ref=e2253]: 2025 수능 공통 14번
+                - button "2025 수능 공통 16번" [ref=e2254]:
+                  - generic [ref=e2256]: 2025 수능 공통 16번
+                - button "2025 수능 공통 17번" [ref=e2257]:
+                  - generic [ref=e2259]: 2025 수능 공통 17번
+                - button "2025 수능 공통 18번" [ref=e2260]:
+                  - generic [ref=e2262]: 2025 수능 공통 18번
+                - button "2025 수능 공통 19번" [ref=e2263]:
+                  - generic [ref=e2265]: 2025 수능 공통 19번
+                - button "2025 수능 공통 20번" [ref=e2266]:
+                  - generic [ref=e2268]: 2025 수능 공통 20번
+                - button "2025 수능 공통 21번" [ref=e2269]:
+                  - generic [ref=e2271]: 2025 수능 공통 21번
+                - button "2025 수능 공통 22번" [ref=e2272]:
+                  - generic [ref=e2274]: 2025 수능 공통 22번
+                - button "2025 수능 미적분 23번" [ref=e2275]:
+                  - generic [ref=e2277]: 2025 수능 미적분 23번
+                - button "2025 수능 미적분 24번" [ref=e2278]:
+                  - generic [ref=e2280]: 2025 수능 미적분 24번
+                - button "2025 수능 미적분 25번" [ref=e2281]:
+                  - generic [ref=e2283]: 2025 수능 미적분 25번
+                - button "2025 수능 미적분 26번" [ref=e2284]:
+                  - generic [ref=e2286]: 2025 수능 미적분 26번
+                - button "2025 수능 미적분 27번" [ref=e2287]:
+                  - generic [ref=e2289]: 2025 수능 미적분 27번
+                - button "2025 수능 미적분 28번" [ref=e2290]:
+                  - generic [ref=e2292]: 2025 수능 미적분 28번
+                - button "2025 수능 미적분 29번" [ref=e2293]:
+                  - generic [ref=e2295]: 2025 수능 미적분 29번
+                - button "2025 수능 미적분 30번" [ref=e2296]:
+                  - generic [ref=e2298]: 2025 수능 미적분 30번
+                - button "2025 수능 기하 23번" [ref=e2299]:
+                  - generic [ref=e2301]: 2025 수능 기하 23번
+                - button "2025 수능 기하 24번" [ref=e2302]:
+                  - generic [ref=e2304]: 2025 수능 기하 24번
+                - button "2025 수능 기하 25번" [ref=e2305]:
+                  - generic [ref=e2307]: 2025 수능 기하 25번
+                - button "2025 수능 기하 26번" [ref=e2308]:
+                  - generic [ref=e2310]: 2025 수능 기하 26번
+                - button "2025 수능 기하 27번" [ref=e2311]:
+                  - generic [ref=e2313]: 2025 수능 기하 27번
+                - button "2025 수능 기하 28번" [ref=e2314]:
+                  - generic [ref=e2316]: 2025 수능 기하 28번
+                - button "2025 수능 기하 29번" [ref=e2317]:
+                  - generic [ref=e2319]: 2025 수능 기하 29번
+                - button "2025 수능 기하 30번" [ref=e2320]:
+                  - generic [ref=e2322]: 2025 수능 기하 30번
+                - button "2025 수능 확률과통계 23번" [ref=e2323]:
+                  - generic [ref=e2325]: 2025 수능 확률과통계 23번
+                - button "2025 수능 확률과통계 24번" [ref=e2326]:
+                  - generic [ref=e2328]: 2025 수능 확률과통계 24번
+                - button "2025 수능 확률과통계 25번" [ref=e2329]:
+                  - generic [ref=e2331]: 2025 수능 확률과통계 25번
+                - button "2025 수능 확률과통계 26번" [ref=e2332]:
+                  - generic [ref=e2334]: 2025 수능 확률과통계 26번
+                - button "2025 수능 확률과통계 27번" [ref=e2335]:
+                  - generic [ref=e2337]: 2025 수능 확률과통계 27번
+                - button "2025 수능 확률과통계 28번" [ref=e2338]:
+                  - generic [ref=e2340]: 2025 수능 확률과통계 28번
+                - button "2025 수능 확률과통계 29번" [ref=e2341]:
+                  - generic [ref=e2343]: 2025 수능 확률과통계 29번
+                - button "2025 수능 확률과통계 30번" [ref=e2344]:
+                  - generic [ref=e2346]: 2025 수능 확률과통계 30번
+                - button "2026 수능 공통 1번" [ref=e2347]:
+                  - generic [ref=e2349]: 2026 수능 공통 1번
+                - button "2026 수능 공통 2번" [ref=e2350]:
+                  - generic [ref=e2352]: 2026 수능 공통 2번
+                - button "2026 수능 공통 3번" [ref=e2353]:
+                  - generic [ref=e2355]: 2026 수능 공통 3번
+                - button "2026 수능 공통 4번" [ref=e2356]:
+                  - generic [ref=e2358]: 2026 수능 공통 4번
+                - button "2026 수능 공통 5번" [ref=e2359]:
+                  - generic [ref=e2361]: 2026 수능 공통 5번
+                - button "2026 수능 공통 6번" [ref=e2362]:
+                  - generic [ref=e2364]: 2026 수능 공통 6번
+                - button "2026 수능 공통 7번" [ref=e2365]:
+                  - generic [ref=e2367]: 2026 수능 공통 7번
+                - button "2026 수능 공통 8번" [ref=e2368]:
+                  - generic [ref=e2370]: 2026 수능 공통 8번
+                - button "2026 수능 공통 9번" [ref=e2371]:
+                  - generic [ref=e2373]: 2026 수능 공통 9번
+                - button "2026 수능 공통 10번" [ref=e2374]:
+                  - generic [ref=e2376]: 2026 수능 공통 10번
+                - button "2026 수능 공통 11번" [ref=e2377]:
+                  - generic [ref=e2379]: 2026 수능 공통 11번
+                - button "2026 수능 공통 12번" [ref=e2380]:
+                  - generic [ref=e2382]: 2026 수능 공통 12번
+                - button "2026 수능 공통 13번" [ref=e2383]:
+                  - generic [ref=e2385]: 2026 수능 공통 13번
+                - button "2026 수능 공통 14번" [ref=e2386]:
+                  - generic [ref=e2388]: 2026 수능 공통 14번
+                - button "2026 수능 공통 15번" [ref=e2389]:
+                  - generic [ref=e2391]: 2026 수능 공통 15번
+                - button "2026 수능 공통 16번" [ref=e2392]:
+                  - generic [ref=e2394]: 2026 수능 공통 16번
+                - button "2026 수능 공통 17번" [ref=e2395]:
+                  - generic [ref=e2397]: 2026 수능 공통 17번
+                - button "2026 수능 공통 18번" [ref=e2398]:
+                  - generic [ref=e2400]: 2026 수능 공통 18번
+                - button "2026 수능 공통 19번" [ref=e2401]:
+                  - generic [ref=e2403]: 2026 수능 공통 19번
+                - button "2026 수능 공통 20번" [ref=e2404]:
+                  - generic [ref=e2406]: 2026 수능 공통 20번
+                - button "2026 수능 공통 21번" [ref=e2407]:
+                  - generic [ref=e2409]: 2026 수능 공통 21번
+                - button "2026 수능 미적 23번" [ref=e2410]:
+                  - generic [ref=e2412]: 2026 수능 미적 23번
+                - button "2026 수능 미적 24번" [ref=e2413]:
+                  - generic [ref=e2415]: 2026 수능 미적 24번
+                - button "2026 수능 미적 25번" [ref=e2416]:
+                  - generic [ref=e2418]: 2026 수능 미적 25번
+                - button "2026 수능 미적 26번" [ref=e2419]:
+                  - generic [ref=e2421]: 2026 수능 미적 26번
+                - button "2026 수능 미적 27번" [ref=e2422]:
+                  - generic [ref=e2424]: 2026 수능 미적 27번
+                - button "2026 수능 미적 28번" [ref=e2425]:
+                  - generic [ref=e2427]: 2026 수능 미적 28번
+                - button "2026 수능 미적 29번" [ref=e2428]:
+                  - generic [ref=e2430]: 2026 수능 미적 29번
+                - button "2026 수능 미적 30번" [ref=e2431]:
+                  - generic [ref=e2433]: 2026 수능 미적 30번
+                - button "2026 수능 기하 23번" [ref=e2434]:
+                  - generic [ref=e2436]: 2026 수능 기하 23번
+                - button "2026 수능 기하 24번" [ref=e2437]:
+                  - generic [ref=e2439]: 2026 수능 기하 24번
+                - button "2026 수능 기하 25번" [ref=e2440]:
+                  - generic [ref=e2442]: 2026 수능 기하 25번
+                - button "2026 수능 기하 26번" [ref=e2443]:
+                  - generic [ref=e2445]: 2026 수능 기하 26번
+                - button "2026 수능 기하 27번" [ref=e2446]:
+                  - generic [ref=e2448]: 2026 수능 기하 27번
+                - button "2026 수능 기하 28번" [ref=e2449]:
+                  - generic [ref=e2451]: 2026 수능 기하 28번
+                - button "2026 수능 기하 29번" [ref=e2452]:
+                  - generic [ref=e2454]: 2026 수능 기하 29번
+                - button "2026 수능 기하 30번" [ref=e2455]:
+                  - generic [ref=e2457]: 2026 수능 기하 30번
+                - button "2026 수능 확통 23번" [ref=e2458]:
+                  - generic [ref=e2460]: 2026 수능 확통 23번
+                - button "2026 수능 확통 24번" [ref=e2461]:
+                  - generic [ref=e2463]: 2026 수능 확통 24번
+                - button "2026 수능 확통 25번" [ref=e2464]:
+                  - generic [ref=e2466]: 2026 수능 확통 25번
+                - button "2026 수능 확통 26번" [ref=e2467]:
+                  - generic [ref=e2469]: 2026 수능 확통 26번
+                - button "2026 수능 확통 27번" [ref=e2470]:
+                  - generic [ref=e2472]: 2026 수능 확통 27번
+                - button "2026 수능 확통 28번" [ref=e2473]:
+                  - generic [ref=e2475]: 2026 수능 확통 28번
+                - button "2026 수능 확통 29번" [ref=e2476]:
+                  - generic [ref=e2478]: 2026 수능 확통 29번
+                - button "2026 수능 확통 30번" [ref=e2479]:
+                  - generic [ref=e2481]: 2026 수능 확통 30번
+                - button "2023 수능 공통 21번" [ref=e2482]:
+                  - generic [ref=e2484]: 2023 수능 공통 21번
+                - button "2024 수능 공통 14번" [ref=e2485]:
+                  - generic [ref=e2487]: 2024 수능 공통 14번
+                - button "2024 수능 공통 21번" [ref=e2488]:
+                  - generic [ref=e2490]: 2024 수능 공통 21번
+                - button "2025 수능 공통 15번" [ref=e2491]:
+                  - generic [ref=e2493]: 2025 수능 공통 15번
+                - button "2026 수능 공통 22번" [ref=e2494]:
+                  - generic [ref=e2496]: 2026 수능 공통 22번
+                - button "수학 (2022 개정)" [ref=e2497]:
+                  - generic [ref=e2499]: 수학 (2022 개정)
+                - button "초등수학" [ref=e2500]:
+                  - generic [ref=e2502]: 초등수학
+                - button "고등수학" [ref=e2503]:
+                  - generic [ref=e2505]: 고등수학
+                - button "중등수학" [ref=e2506]:
+                  - generic [ref=e2508]: 중등수학
+          - img [ref=e2509]
+          - generic [ref=e2511]:
+            - button "zoom in" [ref=e2512] [cursor=pointer]:
+              - img [ref=e2513]
+            - button "zoom out" [disabled]:
+              - img
+            - button "fit view" [ref=e2515] [cursor=pointer]:
+              - img [ref=e2516]
+            - button "toggle interactivity" [ref=e2518] [cursor=pointer]:
+              - img [ref=e2519]
+          - img "React Flow mini map" [ref=e2522]
+          - link "React Flow attribution" [ref=e2995] [cursor=pointer]:
+            - /url: https://reactflow.dev
+            - text: React Flow
