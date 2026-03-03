@@ -5,6 +5,7 @@ import Scratchpad, { type ScratchpadHandle } from '../components/Scratchpad'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { getAssignment, HomeworkApiError, submitHomework } from '../lib/homework/api'
 import type { HomeworkAssignmentDetail, StudentHomeworkProblem, HomeworkProblemReview } from '../lib/homework/types'
+import { renderMathText } from '../lib/math/renderMathText'
 
 function formatDateTime(isoString: string): string {
   const date = new Date(isoString)
@@ -35,7 +36,7 @@ function ProblemView({ problem, index, answer, onAnswerChange, feedback, disable
           {problem.type === 'objective' ? '객관식' : '주관식'}
         </span>
       </div>
-      <p className="problem-question">{problem.question}</p>
+      <p className="problem-question">{renderMathText(problem.question)}</p>
 
       {problem.type === 'objective' && problem.options ? (
         <div className="problem-options-answer">
@@ -50,7 +51,7 @@ function ProblemView({ problem, index, answer, onAnswerChange, feedback, disable
                 disabled={disabled}
               />
               <span className="option-number">{optionIndex + 1}.</span>
-              <span className="option-text">{option}</span>
+              <span className="option-text">{renderMathText(option)}</span>
             </label>
           ))}
         </div>
@@ -102,7 +103,7 @@ function ProblemSubmissionView({ problem, index, answer }: ProblemSubmissionView
           {problem.type === 'objective' ? '객관식' : '주관식'}
         </span>
       </div>
-      <p className="problem-question">{problem.question}</p>
+      <p className="problem-question">{renderMathText(problem.question)}</p>
 
       {problem.type === 'objective' && problem.options ? (
         <div className="problem-options-answer submitted">
@@ -114,7 +115,7 @@ function ProblemSubmissionView({ problem, index, answer }: ProblemSubmissionView
                 className={`problem-option-label ${isSelected ? 'selected' : ''}`}
               >
                 <span className="option-number">{optionIndex + 1}.</span>
-                <span className="option-text">{option}</span>
+                <span className="option-text">{renderMathText(option)}</span>
                 {isSelected && <span className="selected-mark">✓</span>}
               </div>
             )

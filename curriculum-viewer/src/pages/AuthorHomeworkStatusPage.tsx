@@ -12,6 +12,7 @@ import {
   HomeworkApiError
 } from '../lib/homework/api'
 import { extendDueAtByWeek } from '../lib/homework/dueAt'
+import { renderMathText } from '../lib/math/renderMathText'
 import type {
   AdminAssignmentDetail,
   AdminAssignmentSummary,
@@ -846,7 +847,7 @@ export default function AuthorHomeworkStatusPage() {
                     {problem.type === 'objective' ? '객관식' : '주관식'}
                   </span>
                 </div>
-                <p className="problem-question">{problem.question}</p>
+                <p className="problem-question">{renderMathText(problem.question)}</p>
 
                 {problem.type === 'objective' && problem.options ? (
                   <div className="problem-options-display">
@@ -858,7 +859,7 @@ export default function AuthorHomeworkStatusPage() {
                           className={`problem-option-display ${isSelected ? 'selected' : ''}`}
                         >
                           <span className="option-number">{optionIndex + 1}.</span>
-                          <span className="option-text">{option}</span>
+                          <span className="option-text">{renderMathText(option)}</span>
                           {isSelected && <span className="selected-mark">학생 답안</span>}
                         </div>
                       )
@@ -873,7 +874,7 @@ export default function AuthorHomeworkStatusPage() {
 
                 {problem.answer && (
                   <div className="admin-problem-answer muted">
-                    <strong>정답:</strong> {problem.answer}
+                    <strong>정답:</strong> {renderMathText(problem.answer)}
                   </div>
                 )}
 

@@ -6,6 +6,7 @@ import { PLACEMENT_QUESTIONS_V1, type PlacementQuestion } from '../lib/diagnosti
 import { formatTagKo } from '../lib/diagnostic/tags'
 import { gradeNumericAnswer } from '../lib/learn/grading'
 import { loadProblemBank, type Problem } from '../lib/learn/problems'
+import { renderMathText } from '../lib/math/renderMathText'
 import { upsertMyStudentProfile } from '../lib/studentProfile/api'
 import { ROUTES } from '../routes'
 
@@ -315,7 +316,7 @@ export default function PlacementTestPage() {
               {current.tags.map(formatTagKo).join(' · ')}
             </span>
           </div>
-          <p className="problem-question">{current.prompt}</p>
+          <p className="problem-question">{renderMathText(current.prompt)}</p>
 
           {current.type === 'objective' && current.options ? (
             <div className="problem-options-answer">
@@ -337,7 +338,7 @@ export default function PlacementTestPage() {
                       disabled={submitting}
                     />
                     <span className="option-number">{value}.</span>
-                    <span className="option-text">{option}</span>
+                    <span className="option-text">{renderMathText(option)}</span>
                   </label>
                 )
               })}

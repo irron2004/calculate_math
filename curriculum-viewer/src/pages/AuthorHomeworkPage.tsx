@@ -26,6 +26,7 @@ import {
   resolveHomeworkDayKey,
   type HomeworkDayKey,
 } from '../lib/homework/scheduling'
+import { renderMathText } from '../lib/math/renderMathText'
 
 type ProblemEditorProps = {
   problem: AdminHomeworkProblem
@@ -1032,7 +1033,7 @@ export default function AuthorHomeworkPage() {
                                 </span>
                               ))}
                             </div>
-                            <p style={{ margin: '8px 0 0' }}>{p.question}</p>
+                            <p style={{ margin: '8px 0 0' }}>{renderMathText(p.question)}</p>
                           </div>
                         </label>
                         <button
