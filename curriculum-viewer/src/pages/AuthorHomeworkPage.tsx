@@ -242,7 +242,7 @@ export default function AuthorHomeworkPage() {
   const [bankLoading, setBankLoading] = useState(false)
 
   const [bankImportWeekKey, setBankImportWeekKey] = useState('')
-  const [bankImportDayKey, setBankImportDayKey] = useState<'mon' | 'tue' | 'wed' | 'thu' | 'fri'>('mon')
+  const [bankImportDayKey, setBankImportDayKey] = useState<'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat'>('mon')
   const [bankImportJson, setBankImportJson] = useState('')
   const [bankImportError, setBankImportError] = useState<string | null>(null)
 
@@ -975,6 +975,7 @@ export default function AuthorHomeworkPage() {
                       <option value="wed">수</option>
                       <option value="thu">목</option>
                       <option value="fri">금</option>
+                      <option value="sat">토</option>
                     </select>
                   </label>
 
@@ -1066,13 +1067,18 @@ export default function AuthorHomeworkPage() {
                     day
                     <select
                       value={bankImportDayKey}
-                      onChange={(e) => setBankImportDayKey(e.target.value as 'mon' | 'tue' | 'wed' | 'thu' | 'fri')}
+                      onChange={(e) =>
+                        setBankImportDayKey(
+                          e.target.value as 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat'
+                        )
+                      }
                     >
                       <option value="mon">월</option>
                       <option value="tue">화</option>
                       <option value="wed">수</option>
                       <option value="thu">목</option>
                       <option value="fri">금</option>
+                      <option value="sat">토</option>
                     </select>
                   </label>
                 </div>

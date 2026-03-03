@@ -1,4 +1,4 @@
-export type HomeworkDayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri'
+export type HomeworkDayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat'
 
 function pad2(value: number): string {
   return String(value).padStart(2, '0')
@@ -23,12 +23,20 @@ function dayKeyToIsoIndex(dayKey: HomeworkDayKey): number {
   if (dayKey === 'tue') return 1
   if (dayKey === 'wed') return 2
   if (dayKey === 'thu') return 3
-  return 4
+  if (dayKey === 'fri') return 4
+  return 5
 }
 
 export function resolveHomeworkDayKey(dayKey: string | null | undefined): HomeworkDayKey | null {
   const trimmed = (dayKey ?? '').trim()
-  if (trimmed === 'mon' || trimmed === 'tue' || trimmed === 'wed' || trimmed === 'thu' || trimmed === 'fri') {
+  if (
+    trimmed === 'mon' ||
+    trimmed === 'tue' ||
+    trimmed === 'wed' ||
+    trimmed === 'thu' ||
+    trimmed === 'fri' ||
+    trimmed === 'sat'
+  ) {
     return trimmed
   }
   return null
@@ -62,5 +70,6 @@ export function formatHomeworkTitleDaySuffix(dayKey: HomeworkDayKey): string {
   if (dayKey === 'tue') return '화'
   if (dayKey === 'wed') return '수'
   if (dayKey === 'thu') return '목'
-  return '금'
+  if (dayKey === 'fri') return '금'
+  return '토'
 }

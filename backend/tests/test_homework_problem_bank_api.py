@@ -103,3 +103,45 @@ def test_admin_problem_bank_import_is_idempotent(
     assert second_json["batchId"] == first_json["batchId"]
     assert second_json["createdProblemCount"] == 0
     assert second_json["skippedProblemCount"] == 20
+
+
+def test_admin_problem_bank_supports_saturday_day_filter(
+    client: tuple[TestClient, Any],
+) -> None:
+    test_client, db_path = client
+    admin_token = _login_admin(test_client)
+
+    import_homework_problem_batch(
+        week_key="2026-W10",
+        day_key="sat",
+        payload={
+            "title": "토요일 로그",
+            "problems": [
+                {
+                    "type": "objective",
+                    "question": "Q1",
+                    "options": ["1", "2"],
+                    "answer": "1",
+                },
+                {
+                    "type": "objective",
+                    "question": "Q2",
+                    "options": ["1", "2"],
+                    "answer": "2",
+                },
+            ],
+        },
+        imported_by="admin",
+        expected_problem_count=2,
+        path=Path(db_path),
+    )
+
+    list_filtered = test_client.get(
+        "/api/homework/admin/problem-bank/problems",
+        params={"weekKey": "2026-W10", "dayKey": "sat"},
+        headers=_auth_headers(admin_token),
+    )
+    assert list_filtered.status_code == 200, list_filtered.text
+    problems = list_filtered.json()["problems"]
+    assert len(problems) == 2
+    assert all(p["dayKey"] == "sat" for p in problems)

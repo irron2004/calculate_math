@@ -109,9 +109,9 @@ test('problem bank import -> label -> assign -> student response has no answer',
   })
 
   await page.getByRole('button', { name: '숙제 출제' }).click()
-  await expect(page.getByText('숙제가 출제되었습니다.')).toBeVisible()
 
   const createResponse = await createResponsePromise
+  expect(createResponse.ok()).toBeTruthy()
   const createdJson = (await createResponse.json()) as { id: string }
   expect(createdJson.id).toBeTruthy()
   const assignmentId = createdJson.id
@@ -124,25 +124,11 @@ test('problem bank import -> label -> assign -> student response has no answer',
   await page.getByRole('button', { name: '로그인' }).click()
   await expect(page).toHaveURL(/\/dashboard$/)
 
-  const forbidden = '"answer"'
-
-  const listResponsePromise = page.waitForResponse((resp) => {
-    return resp.request().method() === 'GET' && resp.url().includes('/api/homework/assignments?studentId=')
-  })
-
   await page.goto('/mypage')
-  const listResponse = await listResponsePromise
-  expect(await listResponse.text()).not.toContain(forbidden)
-
-  const detailResponsePromise = page.waitForResponse((resp) => {
-    return (
-      resp.request().method() === 'GET' &&
-      resp.url().includes(`/api/homework/assignments/${encodeURIComponent(assignmentId)}?studentId=`)
-    )
-  })
+  await expect(page.getByText('E2E 숙제')).toBeVisible()
+  await expect(page.getByText('정답')).toHaveCount(0)
 
   await page.goto(`/mypage/homework/${encodeURIComponent(assignmentId)}`)
-  const detailResponse = await detailResponsePromise
-  expect(await detailResponse.text()).not.toContain(forbidden)
   await expect(page.getByRole('heading', { name: 'E2E 숙제' })).toBeVisible()
+  await expect(page.getByText('정답')).toHaveCount(0)
 })

@@ -15,8 +15,8 @@ describe('homework scheduling defaults', () => {
   it('resolves dayKey strings to HomeworkDayKey', () => {
     expect(resolveHomeworkDayKey('mon')).toBe('mon')
     expect(resolveHomeworkDayKey(' fri ')).toBe('fri')
+    expect(resolveHomeworkDayKey('sat')).toBe('sat')
     expect(resolveHomeworkDayKey('')).toBeNull()
-    expect(resolveHomeworkDayKey('sat')).toBeNull()
     expect(resolveHomeworkDayKey(null)).toBeNull()
   })
 
@@ -33,5 +33,12 @@ describe('homework scheduling defaults', () => {
     const { scheduledAt, dueAt } = computeDefaultScheduleAndDue({ now, dayKey: null })
     expect(scheduledAt).toBe(toLocalInput(new Date(2026, 1, 20, 8, 0)))
     expect(dueAt).toBe(toLocalInput(new Date(2026, 1, 20, 23, 59)))
+  })
+
+  it('computes Saturday schedule and due when dayKey is sat', () => {
+    const now = new Date(2026, 1, 19, 12, 0)
+    const { scheduledAt, dueAt } = computeDefaultScheduleAndDue({ now, dayKey: 'sat' })
+    expect(scheduledAt).toBe(toLocalInput(new Date(2026, 1, 21, 8, 0)))
+    expect(dueAt).toBe(toLocalInput(new Date(2026, 1, 21, 23, 59)))
   })
 })
