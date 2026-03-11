@@ -8,6 +8,11 @@
 .legacy/
 .sisyphus/
 
+# Avoid BuildKit exclude-patterns header issues by omitting dockerignore files
+.dockerignore
+backend/.dockerignore
+curriculum-viewer/.dockerignore
+
 # Local caches / tooling artifacts
 .plugins/
 .tmp-bun/
@@ -15,7 +20,7 @@
 .xdg-ulr-test/
 
 # Local data and large assets not needed at runtime
-data/
+/data/
 homework_*.json
 image.png
 
