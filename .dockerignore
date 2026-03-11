@@ -1,0 +1,22 @@
+.git
+.venv
+.legacy
+.sisyphus
+
+# Local data/assets not needed for builds
+data
+homework_*.json
+image.png
+
+# Frontend artifacts
+curriculum-viewer/node_modules
+curriculum-viewer/dist
+curriculum-viewer/test-results
+curriculum-viewer/playwright-report
+curriculum-viewer/coverage
+curriculum-viewer/*.log
+
+# Backend caches / local DB
+backend/__pycache__
+backend/.pytest_cache
+backend/app/data/*.db

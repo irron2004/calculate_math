@@ -1,0 +1,33 @@
+## Repo-level Railway ignore
+#
+# Railway CLI defaults to uploading from the repo root (git root). This file
+# keeps deploy archives small and avoids including non-essential artifacts.
+
+.git/
+.venv/
+.legacy/
+.sisyphus/
+
+# Local caches / tooling artifacts
+.plugins/
+.tmp-bun/
+.xdg/
+.xdg-ulr-test/
+
+# Local data and large assets not needed at runtime
+data/
+homework_*.json
+image.png
+
+# Frontend build artifacts
+curriculum-viewer/node_modules/
+curriculum-viewer/dist/
+curriculum-viewer/test-results/
+curriculum-viewer/playwright-report/
+curriculum-viewer/coverage/
+curriculum-viewer/*.log
+
+# Backend caches / local DB
+backend/__pycache__/
+backend/.pytest_cache/
+backend/app/data/*.db
