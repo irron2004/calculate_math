@@ -3052,6 +3052,18 @@ body {
   gap: 8px;
 }
 
+.admin-problem-card.is-wrong {
+  border-color: rgba(220, 38, 38, 0.35);
+  background: rgba(254, 242, 242, 0.6);
+}
+
+.admin-problem-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
 .admin-problem-answer {
   font-size: 14px;
 }
@@ -3912,4 +3924,32 @@ body {
   .recent-label {
     width: 100%;
   }
+}
+
+.math-frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  min-width: 1.2em;
+  margin: 0 0.08em;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.math-frac-num,
+.math-frac-den {
+  display: block;
+  text-align: center;
+  font-size: 0.85em;
+  padding: 0 0.18em;
+}
+
+.math-frac-bar {
+  display: block;
+  border-top: 1px solid currentColor;
+  margin: 0.07em 0;
+  height: 0;
+  line-height: 0;
+  font-size: 0;
 }

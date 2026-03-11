@@ -5,6 +5,8 @@
 import type {
   AdminAssignmentDetail,
   AdminAssignmentSummary,
+  AdminStudentAssignmentStatusListResponse,
+  AdminWrongProblemListResponse,
   AdminSubmissionDetail,
   CreateAssignmentData,
   UpdateAssignmentData,
@@ -266,6 +268,26 @@ export async function getAssignmentAdmin(
   return json as AdminAssignmentDetail
 }
 
+export async function listAssignmentsAdminForStudent(
+  studentId: string,
+  signal?: AbortSignal
+): Promise<AdminStudentAssignmentStatusListResponse> {
+  const response = await authFetch(
+    `${API_BASE}/homework/admin/students/${encodeURIComponent(studentId)}/assignments`,
+    { signal }
+  )
+  const json = await response.json()
+
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to list admin assignments for student')
+  }
+
+  return json as AdminStudentAssignmentStatusListResponse
+}
+
 export async function listProblemBankLabels(signal?: AbortSignal): Promise<HomeworkLabel[]> {
   const response = await authFetch(`${API_BASE}/homework/admin/problem-bank/labels`, { signal })
   const json = await response.json()
@@ -475,6 +497,32 @@ export async function getSubmissionAdmin(
   }
 
   return json as AdminSubmissionDetail
+}
+
+export async function listWrongProblemsAdminForStudent(
+  studentId: string,
+  options?: { assignmentId?: string },
+  signal?: AbortSignal
+): Promise<AdminWrongProblemListResponse> {
+  const params = new URLSearchParams()
+  if (options?.assignmentId) {
+    params.set('assignmentId', options.assignmentId)
+  }
+  const suffix = params.toString() ? `?${params.toString()}` : ''
+
+  const response = await authFetch(
+    `${API_BASE}/homework/admin/students/${encodeURIComponent(studentId)}/wrong-problems${suffix}`,
+    { signal }
+  )
+
+  const json = await response.json()
+  if (!response.ok) {
+    if (isApiError(json)) {
+      throw new HomeworkApiError(json.error.code, json.error.message)
+    }
+    throw new HomeworkApiError('UNKNOWN', 'Failed to list wrong problems')
+  }
+  return json as AdminWrongProblemListResponse
 }
 
 /**

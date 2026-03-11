@@ -3,6 +3,9 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 
+MAX_IMPORT_PROBLEM_COUNT = 200
+
+
 def validate_weekly_homework_payload(
     payload: Any,
     *,
@@ -21,7 +24,15 @@ def validate_weekly_homework_payload(
 
     problems = payload.get("problems")
     if not isinstance(problems, list):
-        raise ValueError("problems must be an array")
+        raise ValueError("problems must be a list")
+
+    if not problems:
+        raise ValueError("problems must contain at least 1 item")
+
+    if len(problems) > MAX_IMPORT_PROBLEM_COUNT:
+        raise ValueError(
+            f"problems must contain at most {MAX_IMPORT_PROBLEM_COUNT} item(s), got {len(problems)}"
+        )
 
     if expected_problem_count is not None and len(problems) != expected_problem_count:
         raise ValueError(

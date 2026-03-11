@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useToast } from '../components/Toast'
 import { listStudents } from '../lib/auth/api'
 import type { StudentInfo } from '../lib/auth/types'
 import {
@@ -6,6 +7,8 @@ import {
   getSubmissionAdmin,
   getSubmissionFileUrl,
   listAssignmentsAdmin,
+  listAssignmentsAdminForStudent,
+  listWrongProblemsAdminForStudent,
   updateAssignmentAdmin,
   deleteAssignmentAdmin,
   reviewSubmission,
@@ -16,13 +19,19 @@ import { renderMathText } from '../lib/math/renderMathText'
 import type {
   AdminAssignmentDetail,
   AdminAssignmentSummary,
+  AdminStudentAssignmentStatus,
+  AdminWrongProblemItem,
   AdminSubmissionDetail,
   HomeworkProblemReview
 } from '../lib/homework/types'
 
 type ReviewState = Record<string, { needsRevision: boolean; comment: string }>
 
-type ViewMode = 'list' | 'assignment' | 'submission'
+type ViewMode = 'list' | 'assignment' | 'submission' | 'wrongProblems'
+
+type MainTab = 'students' | 'assignments'
+
+type SubmissionBackMode = 'assignment' | 'students' | 'wrongProblems'
 
 function formatDateTime(isoString: string): string {
   const date = new Date(isoString)
@@ -63,6 +72,16 @@ function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function tryLocalStorageSet(key: string, value: string): boolean {
+  try {
+    if (typeof localStorage === 'undefined') return false
+    localStorage.setItem(key, value)
+    return true
+  } catch {
+    return false
+  }
 }
 
 function StatusBadge({ status }: { status: string | null | undefined }) {
@@ -131,6 +150,8 @@ function ScheduledBadge({ scheduledAt, isScheduled }: { scheduledAt?: string | n
 }
 
 export default function AuthorHomeworkStatusPage() {
+  const { showToast } = useToast()
+
   const [students, setStudents] = useState<StudentInfo[]>([])
   const studentsById = useMemo(() => {
     const map = new Map<string, StudentInfo>()
@@ -142,10 +163,159 @@ export default function AuthorHomeworkStatusPage() {
 
   const [viewMode, setViewMode] = useState<ViewMode>('list')
 
+  const [mainTab, setMainTab] = useState<MainTab>('students')
+  const [submissionBackMode, setSubmissionBackMode] = useState<SubmissionBackMode>('assignment')
+  const [submissionShowWrongOnly, setSubmissionShowWrongOnly] = useState(false)
+
   // Assignments list
   const [assignments, setAssignments] = useState<AdminAssignmentSummary[]>([])
   const [assignmentsLoading, setAssignmentsLoading] = useState(false)
   const [assignmentsError, setAssignmentsError] = useState<string | null>(null)
+
+  const [submissionAlarmEnabled, setSubmissionAlarmEnabled] = useState(() => {
+    try {
+      return localStorage.getItem('authorHomeworkStatus.submissionAlarm') === '1'
+    } catch {
+      return false
+    }
+  })
+  const [browserNotificationEnabled, setBrowserNotificationEnabled] = useState(() => {
+    try {
+      return localStorage.getItem('authorHomeworkStatus.browserNotification') === '1'
+    } catch {
+      return false
+    }
+  })
+  const submissionAlarmInitializedRef = useRef(false)
+  const submissionAlarmPendingByIdRef = useRef(new Map<string, number>())
+
+  const handleToggleSubmissionAlarm = useCallback(
+    (enabled: boolean) => {
+      setSubmissionAlarmEnabled(enabled)
+      tryLocalStorageSet('authorHomeworkStatus.submissionAlarm', enabled ? '1' : '0')
+
+      submissionAlarmInitializedRef.current = false
+      submissionAlarmPendingByIdRef.current = new Map()
+
+      showToast(
+        enabled ? '제출 알림을 켰습니다. 새 제출이 있으면 알려줄게요.' : '제출 알림을 껐습니다.',
+        'info'
+      )
+    },
+    [showToast]
+  )
+
+  const handleToggleBrowserNotification = useCallback(
+    async (enabled: boolean) => {
+      if (!enabled) {
+        setBrowserNotificationEnabled(false)
+        tryLocalStorageSet('authorHomeworkStatus.browserNotification', '0')
+        showToast('브라우저 알림을 껐습니다.', 'info')
+        return
+      }
+
+      if (typeof window === 'undefined' || !("Notification" in window)) {
+        showToast('이 브라우저는 알림을 지원하지 않습니다.', 'warning')
+        setBrowserNotificationEnabled(false)
+        return
+      }
+
+      if (Notification.permission === 'granted') {
+        setBrowserNotificationEnabled(true)
+        tryLocalStorageSet('authorHomeworkStatus.browserNotification', '1')
+        showToast('브라우저 알림을 켰습니다.', 'success')
+        return
+      }
+
+      let result: NotificationPermission | null = null
+      try {
+        result = await Notification.requestPermission()
+      } catch {
+        result = null
+      }
+      if (result === 'granted') {
+        setBrowserNotificationEnabled(true)
+        tryLocalStorageSet('authorHomeworkStatus.browserNotification', '1')
+        showToast('브라우저 알림을 켰습니다.', 'success')
+        return
+      }
+
+      setBrowserNotificationEnabled(false)
+      tryLocalStorageSet('authorHomeworkStatus.browserNotification', '0')
+      showToast('브라우저 알림 권한이 없어 알림을 켤 수 없습니다.', 'warning')
+    },
+    [showToast]
+  )
+
+  const maybeNotifyNewSubmissions = useCallback(
+    (nextAssignments: AdminAssignmentSummary[]) => {
+      if (!submissionAlarmEnabled) return
+
+      const nextPendingById = new Map<string, number>()
+      for (const a of nextAssignments) {
+        nextPendingById.set(a.id, a.pendingCount)
+      }
+
+      if (!submissionAlarmInitializedRef.current) {
+        submissionAlarmInitializedRef.current = true
+        submissionAlarmPendingByIdRef.current = nextPendingById
+        return
+      }
+
+      const prevPendingById = submissionAlarmPendingByIdRef.current
+      const increases: Array<{ title: string; delta: number }> = []
+      for (const a of nextAssignments) {
+        const prev = prevPendingById.get(a.id) ?? 0
+        const next = a.pendingCount
+        if (next > prev) {
+          increases.push({ title: a.title, delta: next - prev })
+        }
+      }
+
+      submissionAlarmPendingByIdRef.current = nextPendingById
+
+      if (increases.length === 0) return
+
+      const totalDelta = increases.reduce((sum, e) => sum + e.delta, 0)
+      const label =
+        increases.length === 1
+          ? increases[0].title
+          : `${increases[0].title} 외 ${increases.length - 1}개`
+
+      showToast(`새 제출물 ${totalDelta}건: ${label}`, 'info')
+
+      if (
+        browserNotificationEnabled &&
+        typeof window !== 'undefined' &&
+        ("Notification" in window) &&
+        Notification.permission === 'granted' &&
+        typeof document !== 'undefined' &&
+        document.visibilityState !== 'visible'
+      ) {
+        try {
+          new Notification('새 숙제 제출', {
+            body: `${label} (+${totalDelta})`
+          })
+        } catch {
+          setBrowserNotificationEnabled(false)
+          tryLocalStorageSet('authorHomeworkStatus.browserNotification', '0')
+        }
+      }
+    },
+    [browserNotificationEnabled, showToast, submissionAlarmEnabled]
+  )
+
+  const [selectedStudentIdForStatus, setSelectedStudentIdForStatus] = useState<string | null>(null)
+  const [studentAssignments, setStudentAssignments] = useState<AdminStudentAssignmentStatus[]>([])
+  const [studentAssignmentsLoading, setStudentAssignmentsLoading] = useState(false)
+  const [studentAssignmentsError, setStudentAssignmentsError] = useState<string | null>(null)
+  const [studentOnlyActionRequired, setStudentOnlyActionRequired] = useState(false)
+  const [studentMessage, setStudentMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [studentSubmitting, setStudentSubmitting] = useState(false)
+
+  const [studentWrongProblems, setStudentWrongProblems] = useState<AdminWrongProblemItem[]>([])
+  const [studentWrongProblemsLoading, setStudentWrongProblemsLoading] = useState(false)
+  const [studentWrongProblemsError, setStudentWrongProblemsError] = useState<string | null>(null)
 
   // Selected assignment detail
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null)
@@ -192,6 +362,7 @@ export default function AuthorHomeworkStatusPage() {
     try {
       const data = await listAssignmentsAdmin(signal)
       if (!signal.aborted) {
+        maybeNotifyNewSubmissions(data)
         setAssignments(data)
       }
     } catch (err) {
@@ -204,13 +375,95 @@ export default function AuthorHomeworkStatusPage() {
     } finally {
       if (!signal.aborted) setAssignmentsLoading(false)
     }
-  }, [])
+  }, [maybeNotifyNewSubmissions])
+
+  const loadStudentAssignments = useCallback(
+    async (studentId: string, signal: AbortSignal) => {
+      setStudentAssignmentsLoading(true)
+      setStudentAssignmentsError(null)
+
+      try {
+        const data = await listAssignmentsAdminForStudent(studentId, signal)
+        if (!signal.aborted) {
+          setStudentAssignments(data.assignments)
+        }
+      } catch (err) {
+        if (signal.aborted) return
+        if (err instanceof HomeworkApiError) {
+          setStudentAssignmentsError(err.message)
+        } else {
+          setStudentAssignmentsError('학생별 숙제 현황을 불러오는 중 오류가 발생했습니다.')
+        }
+      } finally {
+        if (!signal.aborted) setStudentAssignmentsLoading(false)
+      }
+    },
+    []
+  )
+
+  const loadStudentWrongProblems = useCallback(
+    async (studentId: string, signal: AbortSignal) => {
+      setStudentWrongProblemsLoading(true)
+      setStudentWrongProblemsError(null)
+      try {
+        const data = await listWrongProblemsAdminForStudent(studentId, undefined, signal)
+        if (!signal.aborted) {
+          setStudentWrongProblems(data.wrongProblems)
+        }
+      } catch (err) {
+        if (signal.aborted) return
+        if (err instanceof HomeworkApiError) {
+          setStudentWrongProblemsError(err.message)
+        } else {
+          setStudentWrongProblemsError('오답 목록을 불러오는 중 오류가 발생했습니다.')
+        }
+      } finally {
+        if (!signal.aborted) setStudentWrongProblemsLoading(false)
+      }
+    },
+    []
+  )
 
   useEffect(() => {
+    if (submissionAlarmEnabled) return
     const controller = new AbortController()
     loadAssignments(controller.signal)
     return () => controller.abort()
-  }, [loadAssignments])
+  }, [loadAssignments, submissionAlarmEnabled])
+
+  useEffect(() => {
+    if (!submissionAlarmEnabled) return
+    if (typeof window === 'undefined') return
+
+    const controller = new AbortController()
+    loadAssignments(controller.signal)
+
+    const intervalId = window.setInterval(() => {
+      const tick = new AbortController()
+      loadAssignments(tick.signal)
+    }, 30_000)
+
+    return () => {
+      controller.abort()
+      window.clearInterval(intervalId)
+    }
+  }, [loadAssignments, submissionAlarmEnabled])
+
+  useEffect(() => {
+    if (mainTab !== 'students') return
+    if (selectedStudentIdForStatus) return
+    if (students.length === 0) return
+    setSelectedStudentIdForStatus(students[0].id)
+  }, [mainTab, selectedStudentIdForStatus, students])
+
+  useEffect(() => {
+    if (mainTab !== 'students') return
+    if (!selectedStudentIdForStatus) return
+
+    const controller = new AbortController()
+    loadStudentAssignments(selectedStudentIdForStatus, controller.signal)
+    return () => controller.abort()
+  }, [loadStudentAssignments, mainTab, selectedStudentIdForStatus])
 
   // Load assignment detail
   const loadAssignmentDetail = useCallback(async (assignmentId: string, signal: AbortSignal) => {
@@ -305,7 +558,25 @@ export default function AuthorHomeworkStatusPage() {
     setReviewState(next)
   }, [submissionDetail])
 
+  const openSubmission = useCallback(
+    (
+      submissionId: string,
+      options: {
+        backMode: SubmissionBackMode
+        showWrongOnly?: boolean
+      }
+    ) => {
+      setSelectedSubmissionId(submissionId)
+      setSubmissionBackMode(options.backMode)
+      setSubmissionShowWrongOnly(Boolean(options.showWrongOnly))
+      setReviewMessage(null)
+      setViewMode('submission')
+    },
+    []
+  )
+
   const handleSelectAssignment = useCallback((assignmentId: string) => {
+    setMainTab('assignments')
     setSelectedAssignmentId(assignmentId)
     setSelectedSubmissionId(null)
     setViewMode('assignment')
@@ -313,10 +584,8 @@ export default function AuthorHomeworkStatusPage() {
   }, [])
 
   const handleSelectSubmission = useCallback((submissionId: string) => {
-    setSelectedSubmissionId(submissionId)
-    setViewMode('submission')
-    setReviewMessage(null)
-  }, [])
+    openSubmission(submissionId, { backMode: 'assignment' })
+  }, [openSubmission])
 
   const handleBackToList = useCallback(() => {
     setViewMode('list')
@@ -325,11 +594,39 @@ export default function AuthorHomeworkStatusPage() {
     setReviewMessage(null)
   }, [])
 
+  const handleOpenStudentWrongProblems = useCallback(async () => {
+    if (!selectedStudentIdForStatus) return
+    setViewMode('wrongProblems')
+    setStudentWrongProblemsError(null)
+    const controller = new AbortController()
+    await loadStudentWrongProblems(selectedStudentIdForStatus, controller.signal)
+  }, [loadStudentWrongProblems, selectedStudentIdForStatus])
+
   const handleBackToAssignment = useCallback(() => {
     setViewMode('assignment')
     setSelectedSubmissionId(null)
     setReviewMessage(null)
   }, [])
+
+  const handleBackFromSubmission = useCallback(() => {
+    if (submissionBackMode === 'students') {
+      setViewMode('list')
+      setMainTab('students')
+      setSelectedAssignmentId(null)
+      setSelectedSubmissionId(null)
+      setReviewMessage(null)
+      return
+    }
+    if (submissionBackMode === 'wrongProblems') {
+      setViewMode('wrongProblems')
+      setMainTab('students')
+      setSelectedAssignmentId(null)
+      setSelectedSubmissionId(null)
+      setReviewMessage(null)
+      return
+    }
+    handleBackToAssignment()
+  }, [handleBackToAssignment, submissionBackMode])
 
   const handleAssignmentUpdate = useCallback(async () => {
     if (!assignmentDetail) return
@@ -401,6 +698,52 @@ export default function AuthorHomeworkStatusPage() {
     }
   }, [assignmentDetail, loadAssignmentDetail, loadAssignments])
 
+  const handleExtendDueAtForStudent = useCallback(
+    async (assignment: AdminStudentAssignmentStatus) => {
+      if (!selectedStudentIdForStatus) return
+      if (assignment.submissionId) return
+
+      const dueAtRaw = (assignment.dueAt ?? '').trim()
+      if (!dueAtRaw) {
+        setStudentMessage({ type: 'error', text: '마감일이 없는 숙제는 연장할 수 없습니다.' })
+        return
+      }
+
+      const nextDueAt = extendDueAtByWeek(dueAtRaw)
+      if (!nextDueAt) {
+        setStudentMessage({ type: 'error', text: '현재 마감일을 연장할 수 없습니다.' })
+        return
+      }
+
+      const confirmed = window.confirm(
+        '이 학생이 미제출한 숙제입니다. 이 숙제의 전체 마감일을 1주일 연장할까요?'
+      )
+      if (!confirmed) return
+
+      setStudentSubmitting(true)
+      setStudentMessage(null)
+      try {
+        await updateAssignmentAdmin(assignment.id, {
+          title: assignment.title,
+          dueAt: nextDueAt
+        })
+        setStudentMessage({ type: 'success', text: '마감일을 1주일 연장했습니다.' })
+
+        const controller = new AbortController()
+        await loadStudentAssignments(selectedStudentIdForStatus, controller.signal)
+      } catch (err) {
+        if (err instanceof HomeworkApiError) {
+          setStudentMessage({ type: 'error', text: err.message })
+        } else {
+          setStudentMessage({ type: 'error', text: '마감일 연장 중 오류가 발생했습니다.' })
+        }
+      } finally {
+        setStudentSubmitting(false)
+      }
+    },
+    [loadStudentAssignments, selectedStudentIdForStatus]
+  )
+
   const handleAssignmentDelete = useCallback(
     async (assignmentId: string) => {
       const confirmed = window.confirm('이 숙제를 삭제할까요? 제출 기록도 함께 삭제됩니다.')
@@ -461,6 +804,31 @@ export default function AuthorHomeworkStatusPage() {
       return review.needsRevision || review.comment.trim().length > 0
     })
   }, [reviewState])
+
+  const wrongProblemIds = useMemo(() => {
+    const ids = new Set<string>()
+    if (!submissionDetail) return ids
+
+    for (const problem of submissionDetail.problems) {
+      const studentAnswer = (submissionDetail.answers[problem.id] ?? '').trim()
+      const review = reviewState[problem.id] ?? { needsRevision: false, comment: '' }
+      const comment = review.comment.trim()
+
+      if (problem.type === 'objective') {
+        const correctAnswer = (problem.answer ?? '').trim()
+        if (correctAnswer && studentAnswer !== correctAnswer) {
+          ids.add(problem.id)
+        }
+        continue
+      }
+
+      if (review.needsRevision || comment.length > 0) {
+        ids.add(problem.id)
+      }
+    }
+
+    return ids
+  }, [reviewState, submissionDetail])
 
   const handleReviewSubmit = useCallback(
     async (status: 'approved' | 'returned') => {
@@ -540,7 +908,181 @@ export default function AuthorHomeworkStatusPage() {
   )
 
   // Render: List View
-  const renderListView = () => (
+  const renderStudentStatusView = () => {
+    const summary = {
+      total: studentAssignments.length,
+      submitted: studentAssignments.filter((a) => a.submitted).length,
+      pending: studentAssignments.filter((a) => a.reviewStatus === 'pending').length,
+      approved: studentAssignments.filter((a) => a.reviewStatus === 'approved').length,
+      returned: studentAssignments.filter((a) => a.reviewStatus === 'returned').length
+    }
+
+    const filtered = studentOnlyActionRequired
+      ? studentAssignments.filter((a) => !a.submissionId || a.reviewStatus === 'returned')
+      : studentAssignments
+
+    return (
+      <>
+        <h2>학생별 숙제 현황</h2>
+        <div className="admin-homework-toolbar">
+          <label className="form-field" style={{ minWidth: 220 }}>
+            학생
+            <select
+              value={selectedStudentIdForStatus ?? ''}
+              onChange={(e) => {
+                setSelectedStudentIdForStatus(e.target.value || null)
+                setStudentOnlyActionRequired(false)
+                setStudentMessage(null)
+                setStudentWrongProblems([])
+                setStudentWrongProblemsError(null)
+              }}
+              disabled={students.length === 0}
+            >
+              <option value="">학생을 선택하세요</option>
+              {students.map((student) => (
+                <option key={student.id} value={student.id}>
+                  {student.name} ({student.id})
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="admin-review-checkbox">
+            <input
+              type="checkbox"
+              checked={studentOnlyActionRequired}
+              onChange={(e) => setStudentOnlyActionRequired(e.target.checked)}
+              disabled={studentAssignmentsLoading || studentAssignments.length === 0}
+            />
+            미제출/반려만
+          </label>
+
+          <button
+            type="button"
+            className="button button-ghost button-small"
+            onClick={handleOpenStudentWrongProblems}
+            disabled={!selectedStudentIdForStatus || studentWrongProblemsLoading}
+            style={{ marginLeft: 8 }}
+          >
+            오답 모아보기
+          </button>
+        </div>
+
+        {selectedStudentIdForStatus ? (
+          <SubmissionStats
+            total={summary.total}
+            submitted={summary.submitted}
+            pending={summary.pending}
+            approved={summary.approved}
+            returned={summary.returned}
+          />
+        ) : null}
+
+        {studentAssignmentsLoading && <p className="muted">학생별 숙제 현황을 불러오는 중...</p>}
+        {studentAssignmentsError && <p className="error">{studentAssignmentsError}</p>}
+        {studentMessage && (
+          <p className={studentMessage.type === 'success' ? 'success' : 'error'}>{studentMessage.text}</p>
+        )}
+
+        {!studentAssignmentsLoading && !studentAssignmentsError && selectedStudentIdForStatus && filtered.length === 0 && (
+          <p className="muted">표시할 숙제가 없습니다.</p>
+        )}
+
+        {!studentAssignmentsLoading && !studentAssignmentsError && selectedStudentIdForStatus && filtered.length > 0 && (
+          <div className="admin-students-table-wrap">
+            <table className="admin-students-table">
+              <thead>
+                <tr>
+                  <th>숙제</th>
+                  <th>마감</th>
+                  <th>상태</th>
+                  <th>제출</th>
+                  <th>액션</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((assignment) => {
+                  const canExtend = !assignment.submissionId && Boolean((assignment.dueAt ?? '').trim())
+                  const extendTitle =
+                    !assignment.submissionId && !(assignment.dueAt ?? '').trim()
+                      ? '마감일이 없는 숙제는 연장할 수 없습니다.'
+                      : undefined
+                  return (
+                    <tr key={assignment.id}>
+                      <td>
+                        <span className="student-name">
+                          {assignment.title}
+                          <ScheduledBadge scheduledAt={assignment.scheduledAt} isScheduled={assignment.isScheduled} />
+                        </span>
+                        <span className="muted" style={{ marginLeft: 8 }}>
+                          (문제 {assignment.problemCount}개)
+                        </span>
+                      </td>
+                      <td>
+                        {assignment.dueAt ? (
+                          formatDateTime(assignment.dueAt)
+                        ) : (
+                          <span className="muted">-</span>
+                        )}
+                      </td>
+                      <td>
+                        <StatusBadge status={assignment.reviewStatus} />
+                      </td>
+                      <td>
+                        {assignment.submittedAt ? (
+                          formatDateTime(assignment.submittedAt)
+                        ) : (
+                          <span className="muted">-</span>
+                        )}
+                      </td>
+                      <td>
+                        {assignment.submissionId ? (
+                          <>
+                            <button
+                              type="button"
+                              className="button button-ghost button-small"
+                              onClick={() =>
+                                openSubmission(assignment.submissionId!, { backMode: 'students', showWrongOnly: false })
+                              }
+                            >
+                              제출물 보기
+                            </button>
+                            <button
+                              type="button"
+                              className="button button-ghost button-small"
+                              onClick={() =>
+                                openSubmission(assignment.submissionId!, { backMode: 'students', showWrongOnly: true })
+                              }
+                              disabled={studentSubmitting}
+                              style={{ marginLeft: 8 }}
+                            >
+                              오답 보기
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            type="button"
+                            className="button button-ghost button-small"
+                            onClick={() => handleExtendDueAtForStudent(assignment)}
+                            disabled={!canExtend || studentSubmitting}
+                            title={extendTitle}
+                          >
+                            1주일 연장하기
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </>
+    )
+  }
+
+  const renderAssignmentListView = () => (
     <>
       <h2>전체 숙제 목록</h2>
       {assignmentsLoading && <p className="muted">숙제 목록을 불러오는 중...</p>}
@@ -562,7 +1104,7 @@ export default function AuthorHomeworkStatusPage() {
                 )}
               </div>
               {assignment.description && (
-                <p className="admin-assignment-desc">{assignment.description}</p>
+                <p className="admin-assignment-desc">{renderMathText(assignment.description)}</p>
               )}
               <div className="admin-assignment-meta">
                 <span className="muted">문제: {assignment.problems.length}개</span>
@@ -601,6 +1143,130 @@ export default function AuthorHomeworkStatusPage() {
     </>
   )
 
+  const renderListView = () => (
+    <>
+      <div className="admin-assignment-actions" style={{ marginTop: 0 }}>
+        <button
+          type="button"
+          className={`button button-small ${mainTab === 'students' ? 'button-primary' : 'button-ghost'}`}
+          onClick={() => {
+            setMainTab('students')
+            setViewMode('list')
+          }}
+        >
+          학생별
+        </button>
+        <button
+          type="button"
+          className={`button button-small ${mainTab === 'assignments' ? 'button-primary' : 'button-ghost'}`}
+          onClick={() => {
+            setMainTab('assignments')
+            setViewMode('list')
+          }}
+        >
+          숙제별
+        </button>
+      </div>
+
+      {mainTab === 'students' ? renderStudentStatusView() : renderAssignmentListView()}
+    </>
+  )
+
+  const renderWrongProblemsView = () => {
+    if (!selectedStudentIdForStatus) {
+      return (
+        <>
+          <button type="button" className="button button-ghost button-small" onClick={handleBackToList}>
+            &larr; 목록으로
+          </button>
+          <p className="muted">학생을 선택하세요.</p>
+        </>
+      )
+    }
+
+    const studentName = getStudentName(selectedStudentIdForStatus)
+    const rows = studentWrongProblems
+
+    return (
+      <>
+        <button type="button" className="button button-ghost button-small" onClick={handleBackToList}>
+          &larr; 학생별 현황으로
+        </button>
+
+        <div className="admin-assignment-summary" style={{ marginTop: 12 }}>
+          <h2>{studentName} 오답 모아보기</h2>
+          <p className="muted">총 {rows.length}개</p>
+        </div>
+
+        {studentWrongProblemsLoading && <p className="muted">오답 목록을 불러오는 중...</p>}
+        {studentWrongProblemsError && <p className="error">{studentWrongProblemsError}</p>}
+
+        {!studentWrongProblemsLoading && !studentWrongProblemsError && rows.length === 0 && (
+          <p className="muted">오답이 없습니다.</p>
+        )}
+
+        {!studentWrongProblemsLoading && !studentWrongProblemsError && rows.length > 0 && (
+          <div className="admin-assignment-list">
+            {rows.map((item) => {
+              const reviewComment = item.review?.comment?.trim() ?? ''
+              const needsRevision = Boolean(item.review?.needsRevision)
+              return (
+                <div
+                  key={`${item.submissionId}_${item.problemId}`}
+                  className="admin-assignment-card"
+                  style={{ borderLeft: '4px solid var(--danger, #e55)' }}
+                >
+                  <div className="admin-assignment-header">
+                    <h3 style={{ margin: 0 }}>{item.assignmentTitle}</h3>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <StatusBadge status={item.reviewStatus} />
+                      <span className="muted">제출: {formatDateTime(item.submittedAt)}</span>
+                    </div>
+                  </div>
+
+                  <p style={{ margin: '10px 0 0' }}>{renderMathText(item.question)}</p>
+
+                  <div className="admin-assignment-meta" style={{ marginTop: 8 }}>
+                    <span className="muted">문항: {item.problemId} (#{item.problemIndex})</span>
+                    <span className="muted">형태: {item.type === 'objective' ? '객관식' : '주관식'}</span>
+                  </div>
+
+                  {item.type === 'objective' ? (
+                    <div style={{ marginTop: 8, display: 'grid', gap: 4 }}>
+                      <div>
+                        <span className="muted">학생 답:</span> {item.studentAnswer ?? <span className="muted">(없음)</span>}
+                      </div>
+                      <div>
+                        <span className="muted">정답:</span> {item.correctAnswer ?? <span className="muted">(없음)</span>}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {(needsRevision || reviewComment) && (
+                    <div style={{ marginTop: 8 }}>
+                      {needsRevision && <span className="badge badge-error">반려/수정 필요</span>}
+                      {reviewComment && <p className="muted" style={{ margin: '6px 0 0' }}>{reviewComment}</p>}
+                    </div>
+                  )}
+
+                  <div className="admin-assignment-actions" style={{ marginTop: 10 }}>
+                    <button
+                      type="button"
+                      className="button button-ghost button-small"
+                      onClick={() => openSubmission(item.submissionId, { backMode: 'wrongProblems', showWrongOnly: true })}
+                    >
+                      제출물 오답 보기
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </>
+    )
+  }
+
   // Render: Assignment Detail View
   const renderAssignmentView = () => {
     if (detailLoading) {
@@ -624,7 +1290,7 @@ export default function AuthorHomeworkStatusPage() {
         <div className="admin-assignment-summary">
           <h2>{assignmentDetail.title}</h2>
           {assignmentDetail.description && (
-            <p className="muted">{assignmentDetail.description}</p>
+            <p className="muted">{renderMathText(assignmentDetail.description)}</p>
           )}
           <div className="admin-assignment-meta">
             {assignmentDetail.dueAt && (
@@ -786,14 +1452,18 @@ export default function AuthorHomeworkStatusPage() {
       return <p className="muted">제출물을 선택하세요.</p>
     }
 
+    const visibleProblems = submissionShowWrongOnly
+      ? submissionDetail.problems.filter((problem) => wrongProblemIds.has(problem.id))
+      : submissionDetail.problems
+
     return (
       <>
         <button
           type="button"
           className="button button-ghost button-small"
-          onClick={handleBackToAssignment}
+          onClick={handleBackFromSubmission}
         >
-          &larr; 학생 목록으로
+          {submissionBackMode === 'students' ? '← 학생별 현황으로' : '← 학생 목록으로'}
         </button>
 
         <div className="admin-submission-header">
@@ -810,6 +1480,17 @@ export default function AuthorHomeworkStatusPage() {
                 {submissionDetail.reviewedAt && ` (${formatDate(submissionDetail.reviewedAt)})`}
               </span>
             )}
+          </div>
+          <div className="admin-assignment-actions" style={{ marginTop: 8 }}>
+            <label className="admin-review-checkbox">
+              <input
+                type="checkbox"
+                checked={submissionShowWrongOnly}
+                onChange={(e) => setSubmissionShowWrongOnly(e.target.checked)}
+                disabled={wrongProblemIds.size === 0}
+              />
+              오답만 보기 ({wrongProblemIds.size}개)
+            </label>
           </div>
         </div>
 
@@ -835,17 +1516,19 @@ export default function AuthorHomeworkStatusPage() {
         )}
 
         <div className="admin-homework-problems">
-          {submissionDetail.problems.map((problem, index) => {
+          {visibleProblems.map((problem, index) => {
             const answer = submissionDetail.answers[problem.id] || ''
             const review = reviewState[problem.id] ?? { needsRevision: false, comment: '' }
+            const isWrong = wrongProblemIds.has(problem.id)
 
             return (
-              <div key={problem.id} className="admin-problem-card">
+              <div key={problem.id} className={`admin-problem-card ${isWrong ? 'is-wrong' : ''}`}>
                 <div className="admin-problem-header">
                   <span className="problem-number">문제 {index + 1}</span>
                   <span className="problem-type-badge">
                     {problem.type === 'objective' ? '객관식' : '주관식'}
                   </span>
+                  {isWrong && <span className="badge badge-error">오답</span>}
                 </div>
                 <p className="problem-question">{renderMathText(problem.question)}</p>
 
@@ -868,7 +1551,7 @@ export default function AuthorHomeworkStatusPage() {
                 ) : (
                   <div className="admin-problem-answer">
                     <strong>학생 답안:</strong>
-                    <div className="answer-text">{answer || '(미응답)'}</div>
+                    <div className="answer-text">{renderMathText(answer || '(미응답)')}</div>
                   </div>
                 )}
 
@@ -936,10 +1619,46 @@ export default function AuthorHomeworkStatusPage() {
       <h1>숙제 현황</h1>
       <p className="muted">학생별 숙제 제출 현황을 확인하고 검토하세요.</p>
 
+      <div className="admin-homework-toolbar" style={{ alignItems: 'center' }}>
+        <label className="admin-review-checkbox">
+          <input
+            type="checkbox"
+            checked={submissionAlarmEnabled}
+            onChange={(e) => handleToggleSubmissionAlarm(e.target.checked)}
+          />
+          제출 알림
+        </label>
+
+        {typeof window !== 'undefined' && 'Notification' in window ? (
+          <label className="admin-review-checkbox">
+            <input
+              type="checkbox"
+              checked={browserNotificationEnabled}
+              onChange={(e) => {
+                void handleToggleBrowserNotification(e.target.checked)
+              }}
+              disabled={!submissionAlarmEnabled}
+            />
+            브라우저 알림
+          </label>
+        ) : (
+          <span className="muted" style={{ fontSize: 12 }}>
+            브라우저 알림 미지원
+          </span>
+        )}
+
+        <span className="muted" style={{ fontSize: 12 }}>
+          {submissionAlarmEnabled
+            ? '30초마다 새 제출을 확인합니다.'
+            : '페이지를 열어둔 상태에서만 동작합니다.'}
+        </span>
+      </div>
+
       <div className="admin-homework-content">
         {viewMode === 'list' && renderListView()}
         {viewMode === 'assignment' && renderAssignmentView()}
         {viewMode === 'submission' && renderSubmissionView()}
+        {viewMode === 'wrongProblems' && renderWrongProblemsView()}
       </div>
     </section>
   )

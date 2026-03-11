@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { AttemptResponse, GradingResultV1 } from '../lib/studentLearning/types'
+import { renderMathText } from '../lib/math/renderMathText'
 import Scratchpad from './Scratchpad'
 
 function hasNonEmptyStrokesJson(json: string | null | undefined): boolean {
@@ -31,7 +32,7 @@ function ExplanationToggle({ explanation }: { explanation: string }) {
       </button>
       {isOpen && (
         <div className="explanation-content">
-          <p className="explanation-text">{explanation}</p>
+          <p className="explanation-text">{renderMathText(explanation)}</p>
         </div>
       )}
     </div>
@@ -84,7 +85,12 @@ export default function EvalResultList(props: {
             <p className={result.isCorrect ? 'problem-result correct' : 'problem-result wrong'}>
               <span className="result-emoji">{result.isCorrect ? '🎉' : '💪'}</span>
               {result.isCorrect ? '정답이에요!' : '다시 도전해봐요!'}
-              {result.expectedAnswer ? ` · 정답: ${result.expectedAnswer}` : null}
+              {result.expectedAnswer ? (
+                <>
+                  {' · 정답: '}
+                  {renderMathText(result.expectedAnswer)}
+                </>
+              ) : null}
             </p>
             {showExplanation && <ExplanationToggle explanation={result.explanation!} />}
 

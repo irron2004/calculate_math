@@ -123,7 +123,7 @@ function ProblemSubmissionView({ problem, index, answer }: ProblemSubmissionView
         </div>
       ) : (
         <div className="problem-text-answer submitted">
-          <p className="submitted-answer-text">{answer || '(미응답)'}</p>
+          <p className="submitted-answer-text">{renderMathText(answer || '(미응답)')}</p>
         </div>
       )}
     </div>
@@ -340,7 +340,7 @@ export default function HomeworkSubmitPage() {
       <h1>{assignment.title}</h1>
 
       {assignment.description && (
-        <p className="homework-description">{assignment.description}</p>
+        <p className="homework-description">{renderMathText(assignment.description)}</p>
       )}
 
       {assignment.dueAt && (

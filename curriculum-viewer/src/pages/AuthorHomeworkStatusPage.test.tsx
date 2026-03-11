@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AuthorHomeworkStatusPage from './AuthorHomeworkStatusPage'
+import { ToastProvider } from '../components/Toast'
 
 const listStudentsMock = vi.fn()
 const listAssignmentsAdminMock = vi.fn()
+const listAssignmentsAdminForStudentMock = vi.fn()
 const getAssignmentAdminMock = vi.fn()
 const updateAssignmentAdminMock = vi.fn()
 
@@ -14,6 +16,8 @@ vi.mock('../lib/auth/api', () => ({
 
 vi.mock('../lib/homework/api', () => ({
   listAssignmentsAdmin: (...args: unknown[]) => listAssignmentsAdminMock(...args),
+  listAssignmentsAdminForStudent: (...args: unknown[]) => listAssignmentsAdminForStudentMock(...args),
+  listWrongProblemsAdminForStudent: vi.fn(),
   getAssignmentAdmin: (...args: unknown[]) => getAssignmentAdminMock(...args),
   updateAssignmentAdmin: (...args: unknown[]) => updateAssignmentAdminMock(...args),
   getSubmissionAdmin: vi.fn(),
@@ -27,8 +31,10 @@ describe('AuthorHomeworkStatusPage due date extension', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.spyOn(window, 'confirm').mockReturnValue(true)
+    localStorage.clear()
 
     listStudentsMock.mockResolvedValue([{ id: 's1', name: '학생1', grade: '3', email: 's1@example.com' }])
+    listAssignmentsAdminForStudentMock.mockResolvedValue({ studentId: 's1', assignments: [] })
     listAssignmentsAdminMock.mockResolvedValue([
       {
         id: 'a1',
@@ -64,8 +70,14 @@ describe('AuthorHomeworkStatusPage due date extension', () => {
       ]
     })
 
-    render(<AuthorHomeworkStatusPage />)
+    render(
+      <ToastProvider>
+        <AuthorHomeworkStatusPage />
+      </ToastProvider>
+    )
 
+    await userEvent.click(await screen.findByRole('button', { name: '숙제별' }))
+    
     await userEvent.click(await screen.findByRole('button', { name: '상세 보기' }))
     const extendButton = await screen.findByRole('button', { name: '마감 1주일 연장' })
     await userEvent.click(extendButton)
@@ -92,11 +104,45 @@ describe('AuthorHomeworkStatusPage due date extension', () => {
       ]
     })
 
-    render(<AuthorHomeworkStatusPage />)
+    render(
+      <ToastProvider>
+        <AuthorHomeworkStatusPage />
+      </ToastProvider>
+    )
+
+    await userEvent.click(await screen.findByRole('button', { name: '숙제별' }))
 
     await userEvent.click(await screen.findByRole('button', { name: '상세 보기' }))
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: '마감 1주일 연장' })).toBeNull()
+    })
+  })
+
+  it('renders formatted description in assignment detail view', async () => {
+    getAssignmentAdminMock.mockResolvedValue({
+      id: 'a1',
+      title: '테스트 숙제',
+      description: 'log_2 설명',
+      problems: [{ id: 'p1', type: 'subjective', question: 'q1' }],
+      dueAt: '2026-02-01T23:59:59',
+      createdBy: 'admin',
+      createdAt: '2026-01-31T10:00:00',
+      students: [
+        { studentId: 's1', assignedAt: '2026-01-31T10:00:00', submissionId: null, submittedAt: null, reviewStatus: null }
+      ]
+    })
+
+    render(
+      <ToastProvider>
+        <AuthorHomeworkStatusPage />
+      </ToastProvider>
+    )
+
+    await userEvent.click(await screen.findByRole('button', { name: '숙제별' }))
+
+    await userEvent.click(await screen.findByRole('button', { name: '상세 보기' }))
+    await waitFor(() => {
+      expect(document.querySelector('.admin-assignment-summary sub')).toBeTruthy()
     })
   })
 })

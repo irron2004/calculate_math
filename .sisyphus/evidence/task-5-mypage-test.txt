@@ -1,0 +1,11 @@
+Task 5 Evidence: MyPage formatted description test
+Date: 2026-03-05
+
+Command:
+- cd curriculum-viewer
+- npm run test -- --run src/pages/MyPage.test.tsx
+
+Result:
+- PASS
+- Test file passed with 4 tests, including math-markup description assertion.
+- The assignment description test validated presence of `sub`, `sup`, and `.math-frac` in `.homework-card-description`.

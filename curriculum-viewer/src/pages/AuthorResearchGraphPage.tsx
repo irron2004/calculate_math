@@ -40,6 +40,7 @@ import {
   shouldShowEdgeLabels,
   type ResearchGraphViewMode
 } from '../lib/researchGraph/viewMode'
+import { renderMathText } from '../lib/math/renderMathText'
 
 type LoadState =
   | { status: 'loading' }
@@ -2185,7 +2186,7 @@ export default function AuthorResearchGraphPage() {
                         <div className="mono" style={{ fontSize: 11, opacity: 0.75 }}>
                           {item.nodeId}
                         </div>
-                        <div style={{ fontSize: 13 }}>{item.prompt}</div>
+                        <div style={{ fontSize: 13 }}>{renderMathText(item.prompt)}</div>
                       </li>
                     ))}
                   </ol>

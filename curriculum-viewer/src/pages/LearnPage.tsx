@@ -8,6 +8,7 @@ import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
 import { normalizeNumericInput } from '../lib/learn/grading'
 import type { Problem } from '../lib/learn/problems'
 import { loadProblemBank } from '../lib/learn/problems'
+import { renderMathText } from '../lib/math/renderMathText'
 import {
   createEmptyAttemptSessionStoreV1,
   getDraftAttemptSession,
@@ -589,7 +590,7 @@ export default function LearnPage() {
                       onClick={() => switchActiveProblem(problem.id)}
                     >
                       <h3 className="problem-title">
-                        <span className="problem-number">{idx + 1}.</span> {problem.prompt}
+                        <span className="problem-number">{idx + 1}.</span> {renderMathText(problem.prompt)}
                       </h3>
                       <div className="problem-answer">
                         <input

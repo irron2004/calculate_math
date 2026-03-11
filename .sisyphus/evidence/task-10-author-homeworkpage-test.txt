@@ -1,0 +1,9 @@
+> curriculum-viewer@0.0.0 test
+> vitest run src/pages/AuthorHomeworkPage.test.tsx
+
+RUN  v1.6.1 /mnt/c/Users/irron/Desktop/my/ruahverce/calculate_math/curriculum-viewer
+
+✓ src/pages/AuthorHomeworkPage.test.tsx  (1 test)
+
+Test Files  1 passed (1)
+Tests       1 passed (1)

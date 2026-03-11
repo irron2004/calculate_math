@@ -1,0 +1,20 @@
+Task 12 Post-Audit (2026-03-06)
+
+Scope searched:
+- curriculum-viewer/src/**/* for fields question/options/answer/description/explanation/prompt
+
+Method:
+1. Regex scan for direct JSX field rendering occurrences.
+2. Confirmed these surfaces use renderMathText(...):
+   - MyPage assignment.description
+   - HomeworkSubmitPage assignment.description + problem.question + submitted answers
+   - AuthorHomeworkStatusPage assignment/assignmentDetail descriptions + problem.question + problem.answer + student answers
+   - LearnPage problem.prompt
+   - EvalResultList expectedAnswer + explanation
+   - PlacementTestPage prompt/options
+   - AuthorHomeworkPage previews for description/question/options/answer
+   - AuthorResearchGraphPage example prompt panel
+
+Findings:
+- No remaining true-positive raw render paths for problem-content fields in intended student/admin display surfaces.
+- Non-problem metadata description fields in other UI components were excluded as false positives.

@@ -1,0 +1,33 @@
+2026-03-08
+goal: execute production import and verify week/day counts
+
+attempt 1
+command: python scripts/import_problem_bank_from_files.py --base-url https://calculatemath-production.up.railway.app --admin-user admin --admin-pass "" homework_2026-03-09.json
+result: blocked (non-interactive shell cannot answer password prompt; EOFError)
+
+attempt 2
+command: python scripts/import_problem_bank_from_files.py --base-url https://calculatemath-production.up.railway.app --admin-user admin --admin-pass INVALID_PASSWORD homework_2026-03-09.json
+result: login failed 401 INVALID_CREDENTIALS
+
+status: production import not executed in this session because valid admin credentials were unavailable.
+next required step: rerun with valid ADMIN_USERNAME/ADMIN_PASSWORD, then verify each day via /api/homework/admin/problem-bank/problems?weekKey=2026-W11&dayKey=<mon..sat>.
+
+2026-03-09
+goal: execute production import and verify week/day counts
+
+attempt 3
+command: python scripts/import_problem_bank_from_files.py --base-url https://calculatemath-production.up.railway.app --dry-run homework_2026-03-09.json homework_2026-03-10.json homework_2026-03-11.json homework_2026-03-12.json homework_2026-03-13.json homework_2026-03-14.json
+result: success (all six files parsed; weekKey=2026-W11, dayKey=mon..sat, problemCount=10 each)
+
+attempt 4
+command: python scripts/import_problem_bank_from_files.py --base-url https://calculatemath-production.up.railway.app --admin-user admin --admin-pass admin homework_2026-03-09.json homework_2026-03-10.json homework_2026-03-11.json homework_2026-03-12.json homework_2026-03-13.json homework_2026-03-14.json
+result: blocked (login failed 401 INVALID_CREDENTIALS)
+
+env preflight (value redacted): API_BASE_URL=unset, ADMIN_USERNAME=unset, ADMIN_PASSWORD=unset, RAILWAY_API_TOKEN=unset
+status: production import + verify remains blocked due missing valid production admin credentials.
+next required step:
+  1) export API_BASE_URL="https://calculatemath-production.up.railway.app"
+  2) export ADMIN_USERNAME="<valid-admin-username>"
+  3) export ADMIN_PASSWORD="<valid-admin-password>"
+  4) rerun real import command for all six files
+  5) verify per-day counts via /api/homework/admin/problem-bank/problems?weekKey=2026-W11&dayKey=<mon..sat>&limit=200&offset=0

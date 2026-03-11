@@ -174,7 +174,7 @@ describe('/author/research-graph', () => {
                 {
                   id: 'ach1-1',
                   type: 'numeric',
-                  prompt: 'example prompt',
+                  prompt: 'log_2 x + 1/2',
                   answer: '10'
                 }
               ]
@@ -569,7 +569,9 @@ describe('/author/research-graph', () => {
       expect(panel).toHaveTextContent('Bridge Unit')
 
       await waitFor(() => expect(panel).toHaveTextContent('goal text'))
-      await waitFor(() => expect(panel).toHaveTextContent('example prompt'))
+      await waitFor(() => expect(panel).toHaveTextContent('log'))
+      expect(panel.querySelector('sub')).toBeTruthy()
+      expect(panel.querySelector('.math-frac')).toBeTruthy()
     } finally {
       restoreFetch()
     }

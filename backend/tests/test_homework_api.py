@@ -258,6 +258,93 @@ def test_homework_create_from_problem_ids(client: tuple[TestClient, Any]) -> Non
     assert [p["question"] for p in detail_json["problems"]] == ["Q1", "Q2"]
 
 
+def test_admin_can_list_wrong_problems_for_student(
+    client: tuple[TestClient, Any],
+) -> None:
+    test_client, _db_path = client
+
+    student_token = _register_student(test_client, student_id="student_wrong")
+    admin_token = _login_admin(test_client)
+
+    create_response = test_client.post(
+        "/api/homework/assignments",
+        json={
+            "title": "오답 조회 테스트",
+            "targetStudentIds": ["student_wrong"],
+            "problems": [
+                {
+                    "id": "p1",
+                    "type": "objective",
+                    "question": "2 + 2 = ?",
+                    "options": ["3", "4", "5"],
+                    "answer": "4",
+                },
+                {
+                    "id": "p2",
+                    "type": "subjective",
+                    "question": "풀이를 간단히 설명하세요.",
+                },
+            ],
+        },
+        headers=_auth_headers(admin_token),
+    )
+    assert create_response.status_code == 200, create_response.text
+    assignment_id = create_response.json()["id"]
+
+    submit_response = test_client.post(
+        f"/api/homework/assignments/{assignment_id}/submit",
+        data={
+            "studentId": "student_wrong",
+            "answersJson": json.dumps(
+                {"p1": "3", "p2": "잘 모르겠어요"}, ensure_ascii=False
+            ),
+        },
+        headers=_auth_headers(student_token),
+    )
+    assert submit_response.status_code == 200, submit_response.text
+    submission_id = submit_response.json()["submissionId"]
+
+    review_response = test_client.post(
+        f"/api/homework/submissions/{submission_id}/review",
+        json={
+            "status": "returned",
+            "reviewedBy": "admin",
+            "problemReviews": {
+                "p2": {"needsRevision": True, "comment": "분배법칙 힌트 참고"}
+            },
+        },
+        headers=_auth_headers(admin_token),
+    )
+    assert review_response.status_code == 200, review_response.text
+
+    wrong_response = test_client.get(
+        "/api/homework/admin/students/student_wrong/wrong-problems",
+        headers=_auth_headers(admin_token),
+    )
+    assert wrong_response.status_code == 200, wrong_response.text
+    wrong_json = wrong_response.json()
+    assert wrong_json["studentId"] == "student_wrong"
+    assert len(wrong_json["wrongProblems"]) == 2
+
+    by_problem_id = {item["problemId"]: item for item in wrong_json["wrongProblems"]}
+    assert set(by_problem_id.keys()) == {"p1", "p2"}
+    assert by_problem_id["p1"]["type"] == "objective"
+    assert by_problem_id["p1"]["studentAnswer"] == "3"
+    assert by_problem_id["p1"]["correctAnswer"] == "4"
+
+    assert by_problem_id["p2"]["type"] == "subjective"
+    assert by_problem_id["p2"]["review"]["needsRevision"] is True
+    assert "힌트" in by_problem_id["p2"]["review"]["comment"]
+
+    filtered_response = test_client.get(
+        "/api/homework/admin/students/student_wrong/wrong-problems",
+        params={"assignmentId": assignment_id},
+        headers=_auth_headers(admin_token),
+    )
+    assert filtered_response.status_code == 200, filtered_response.text
+    assert len(filtered_response.json()["wrongProblems"]) == 2
+
+
 def test_admin_assignment_due_at_patch_updates_due_date(
     client: tuple[TestClient, Any],
 ) -> None:

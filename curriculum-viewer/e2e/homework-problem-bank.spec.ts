@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 function buildProblemBankPayload(problemCount: number) {
   return {
@@ -12,6 +12,26 @@ function buildProblemBankPayload(problemCount: number) {
       }
     })
   }
+}
+
+async function importProblemBank(
+  page: Page,
+  weekKey: string,
+  dayKey: string,
+  problemCount: number
+) {
+  const payload = buildProblemBankPayload(problemCount)
+  const importPanel = page.locator('.json-import-panel', {
+    has: page.getByRole('heading', { name: '문제은행 Import' })
+  })
+
+  await importPanel.locator('input').first().fill(weekKey)
+  await importPanel.locator('select').first().selectOption(dayKey)
+  await importPanel.locator('textarea').fill(JSON.stringify(payload))
+  await importPanel.getByRole('button', { name: 'Import' }).click()
+
+  await expect(page.getByText('문제은행에 import 완료. 목록을 새로고침했습니다.')).toBeVisible()
+  await expect(page.getByText(new RegExp(`목록:\\s*${problemCount}개`))).toBeVisible()
 }
 
 test('problem bank import -> label -> assign -> student response has no answer', async ({ page, request }) => {
@@ -53,20 +73,8 @@ test('problem bank import -> label -> assign -> student response has no answer',
   await page.getByRole('button', { name: '문제은행' }).click()
 
   const weekKey = '2026-W04'
-  const dayKey = 'mon'
-  const payload = buildProblemBankPayload(20)
-
-  const importPanel = page.locator('.json-import-panel', {
-    has: page.getByRole('heading', { name: '문제은행 Import' })
-  })
-
-  await importPanel.locator('input').first().fill(weekKey)
-  await importPanel.locator('select').first().selectOption(dayKey)
-  await importPanel.locator('textarea').fill(JSON.stringify(payload))
-  await importPanel.getByRole('button', { name: 'Import' }).click()
-
-  await expect(page.getByText('문제은행에 import 완료. 목록을 새로고침했습니다.')).toBeVisible()
-  await expect(page.getByText(/목록:\s*\d+개/)).toBeVisible()
+  await importProblemBank(page, weekKey, 'tue', 10)
+  await importProblemBank(page, weekKey, 'mon', 20)
 
   const labelKey = `e2e_label_${Date.now()}`
   const labelName = 'E2E Label'

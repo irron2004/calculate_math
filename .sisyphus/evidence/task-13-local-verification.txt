@@ -1,0 +1,24 @@
+Task 13 Local Verification (2026-03-06)
+
+Command: cd curriculum-viewer && npm run test
+- Result: PASS
+- Summary: Test Files 67 passed, Tests 320 passed
+
+Command: cd curriculum-viewer && npm run build
+- Result: PASS
+- Summary: vite build completed successfully
+
+Command: cd curriculum-viewer && npm run test:e2e
+- Result: PASS
+- Summary: 8 passed (Playwright)
+
+Deployment and production verification:
+- Railway deployment from clean monorepo-root context: SUCCESS
+  - Deployment ID: `e4bf5de5-e098-4a9e-9593-029627bd5724`
+- Deploy source context: local working tree upload (base HEAD `c9c366a7788a1a0da5319f59e34cae9e018f04f6`, dirty workspace)
+- Production bundle markers confirmed in `.sisyphus/evidence/task-13-prod-bundle-check.txt`
+- Production placement fraction screenshot: `.sisyphus/evidence/task-13-prod-placement.png`
+
+Root-directory regression note:
+- Service rootDirectory remains `curriculum-viewer`.
+- Reliable CLI invocation for this repo shape is to deploy from a clean parent directory that contains `curriculum-viewer/` as a child (do not use `--path-as-root` with `curriculum-viewer` when service rootDirectory is already `curriculum-viewer`).

@@ -219,6 +219,58 @@ export type AdminAssignmentDetail = {
   createdBy: string
   createdAt: string
   students: AdminStudentSubmissionSummary[]
+  }
+  
+export type AdminStudentAssignmentStatus = {
+  id: string
+  title: string
+  description?: string | null
+  problemCount: number
+  dueAt?: string | null
+  scheduledAt?: string | null
+  isScheduled: boolean
+  stickerRewardCount?: number
+  createdBy: string
+  createdAt: string
+  assignedAt: string
+  submitted: boolean
+  submissionId?: string | null
+  submittedAt?: string | null
+  reviewStatus?: HomeworkReviewStatus | null
+  reviewedAt?: string | null
+  reviewedBy?: string | null
+}
+
+export type AdminStudentAssignmentStatusListResponse = {
+  studentId: string
+  assignments: AdminStudentAssignmentStatus[]
+}
+
+export type AdminWrongProblemReview = {
+  needsRevision: boolean
+  comment: string
+}
+
+export type AdminWrongProblemItem = {
+  assignmentId: string
+  assignmentTitle: string
+  submissionId: string
+  submittedAt: string
+  reviewStatus: HomeworkReviewStatus
+
+  problemId: string
+  problemIndex: number
+  type: HomeworkProblemType
+  question: string
+  options?: string[] | null
+  correctAnswer?: string | null
+  studentAnswer?: string | null
+  review: AdminWrongProblemReview
+}
+
+export type AdminWrongProblemListResponse = {
+  studentId: string
+  wrongProblems: AdminWrongProblemItem[]
 }
 
 export type AdminSubmissionFile = {

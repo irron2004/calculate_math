@@ -119,6 +119,11 @@ function ProblemEditor({ problem, index, onChange, onRemove, disabled }: Problem
           rows={3}
           disabled={disabled}
         />
+        {problem.question.trim() ? (
+          <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+            미리보기: {renderMathText(problem.question)}
+          </div>
+        ) : null}
       </label>
 
       {problem.type === 'objective' && (
@@ -127,13 +132,20 @@ function ProblemEditor({ problem, index, onChange, onRemove, disabled }: Problem
           {problem.options?.map((option, optionIndex) => (
             <div key={optionIndex} className="problem-option-row">
               <span className="option-number">{optionIndex + 1}.</span>
-              <input
-                type="text"
-                value={option}
-                onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
-                placeholder={`보기 ${optionIndex + 1}`}
-                disabled={disabled}
-              />
+              <div style={{ flex: 1 }}>
+                <input
+                  type="text"
+                  value={option}
+                  onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
+                  placeholder={`보기 ${optionIndex + 1}`}
+                  disabled={disabled}
+                />
+                {option.trim() ? (
+                  <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>
+                    미리보기: {renderMathText(option)}
+                  </div>
+                ) : null}
+              </div>
               {problem.options && problem.options.length > 2 && (
                 <button
                   type="button"
@@ -170,6 +182,11 @@ function ProblemEditor({ problem, index, onChange, onRemove, disabled }: Problem
           }
           disabled={disabled}
         />
+        {(problem.answer || '').trim() ? (
+          <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+            미리보기: {renderMathText(problem.answer)}
+          </div>
+        ) : null}
       </label>
     </div>
   )
@@ -868,6 +885,11 @@ export default function AuthorHomeworkPage() {
               placeholder="숙제에 대한 설명을 입력하세요."
               rows={2}
             />
+            {description.trim() ? (
+              <div className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+                미리보기: {renderMathText(description)}
+              </div>
+            ) : null}
           </label>
 
           <div className="form-row">

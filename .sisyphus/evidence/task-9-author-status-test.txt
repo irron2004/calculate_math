@@ -1,0 +1,10 @@
+Task 9 Evidence: AuthorHomeworkStatusPage formatting test
+Date: 2026-03-05
+
+Command:
+- cd curriculum-viewer
+- npm run test -- --run src/pages/AuthorHomeworkStatusPage.test.tsx
+
+Result:
+- PASS
+- Added test opens "상세 보기" and verifies formatted description contains `<sub>` markup.

@@ -42,7 +42,7 @@ describe('EvalPage route', () => {
     window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo')))
   })
 
-  it('renders EvalPage at /eval/:sessionId', async () => {
+  it('renders formatted expectedAnswer and explanation at /eval/:sessionId', async () => {
     writeStore('demo', {
       version: 1,
       sessionsById: {
@@ -62,10 +62,12 @@ describe('EvalPage route', () => {
           },
           grading: {
             totalCount: 1,
-            correctCount: 1,
-            accuracy: 1,
-            cleared: true,
-            perProblem: { p1: { isCorrect: true, expectedAnswer: '2' } }
+            correctCount: 0,
+            accuracy: 0,
+            cleared: false,
+            perProblem: {
+              p1: { isCorrect: false, expectedAnswer: 'log_2', explanation: '해설 1/2' }
+            }
           },
           createdAt: '2026-01-15T00:00:00.000Z',
           updatedAt: '2026-01-15T00:00:01.000Z'
@@ -77,7 +79,16 @@ describe('EvalPage route', () => {
     window.history.pushState({}, '', '/eval/s1')
     render(<App />)
 
-    // EvalPage should show evaluation heading
     expect(await screen.findByRole('heading', { name: '평가' })).toBeInTheDocument()
+
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: '해설 보기' }))
+
+    await waitFor(() => {
+      const resultCard = document.querySelector('.problem-result')
+      expect(resultCard?.querySelector('sub')).toBeTruthy()
+      const explanation = document.querySelector('.explanation-text')
+      expect(explanation?.querySelector('.math-frac')).toBeTruthy()
+    })
   })
 })

@@ -79,7 +79,7 @@ def test_admin_problem_bank_import_is_idempotent(
         "title": "t",
         "problems": [
             {"type": "subjective", "question": f"Q{i}", "answer": "A"}
-            for i in range(1, 21)
+            for i in range(1, 11)
         ],
     }
 
@@ -90,7 +90,7 @@ def test_admin_problem_bank_import_is_idempotent(
     )
     assert first.status_code == 200, first.text
     first_json = first.json()
-    assert first_json["createdProblemCount"] == 20
+    assert first_json["createdProblemCount"] == 10
     assert first_json["skippedProblemCount"] == 0
 
     second = test_client.post(
@@ -102,7 +102,57 @@ def test_admin_problem_bank_import_is_idempotent(
     second_json = second.json()
     assert second_json["batchId"] == first_json["batchId"]
     assert second_json["createdProblemCount"] == 0
-    assert second_json["skippedProblemCount"] == 20
+    assert second_json["skippedProblemCount"] == 10
+
+
+def test_admin_problem_bank_import_rejects_empty_problems(
+    client: tuple[TestClient, Any],
+) -> None:
+    test_client, _db_path = client
+    admin_token = _login_admin(test_client)
+
+    response = test_client.post(
+        "/api/homework/admin/problem-bank/import",
+        json={
+            "weekKey": "2026-W04",
+            "dayKey": "mon",
+            "payload": {"title": "t", "problems": []},
+        },
+        headers=_auth_headers(admin_token),
+    )
+
+    assert response.status_code == 400, response.text
+    body = response.json()
+    assert body["error"]["code"] == "INVALID_IMPORT"
+    assert "at least 1 item" in body["error"]["message"]
+
+
+def test_admin_problem_bank_import_rejects_over_limit_problems(
+    client: tuple[TestClient, Any],
+) -> None:
+    test_client, _db_path = client
+    admin_token = _login_admin(test_client)
+
+    response = test_client.post(
+        "/api/homework/admin/problem-bank/import",
+        json={
+            "weekKey": "2026-W04",
+            "dayKey": "mon",
+            "payload": {
+                "title": "t",
+                "problems": [
+                    {"type": "subjective", "question": f"Q{i}", "answer": "A"}
+                    for i in range(1, 202)
+                ],
+            },
+        },
+        headers=_auth_headers(admin_token),
+    )
+
+    assert response.status_code == 400, response.text
+    body = response.json()
+    assert body["error"]["code"] == "INVALID_IMPORT"
+    assert "at most 200" in body["error"]["message"]
 
 
 def test_admin_problem_bank_supports_saturday_day_filter(

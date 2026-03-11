@@ -1,0 +1,12 @@
+Task 6 Evidence: HomeworkSubmitPage math rendering test
+Date: 2026-03-05
+
+Command:
+- cd curriculum-viewer
+- npm run test -- --run src/pages/HomeworkSubmitPage.test.tsx
+
+Result:
+- PASS
+- New test verifies formatted markup appears in:
+  - assignment description (`.homework-description`)
+  - submitted answer display (`.submitted-answer-text`)

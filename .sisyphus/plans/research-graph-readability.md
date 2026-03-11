@@ -134,7 +134,7 @@ Critical Path: 1 -> 6 -> 7
 
 ## TODOs
 
-- [ ] 1. Define Research Graph View Mode Contract
+- [x] 1. Define Research Graph View Mode Contract
 
   **What to do**:
   - Add a small, pure TypeScript module to define the view-mode contract and defaults:
@@ -197,7 +197,7 @@ Critical Path: 1 -> 6 -> 7
   **Commit**: YES (can group with Task 2)
   - Message: `feat(research-graph): define overview/editor view mode defaults`
 
-- [ ] 2. Build Mode Toggle UI Component
+- [x] 2. Build Mode Toggle UI Component
 
   **What to do**:
   - Create a small reusable toggle for `Overview` / `Editor`:
@@ -260,7 +260,7 @@ Critical Path: 1 -> 6 -> 7
   **Commit**: YES (group with Task 1)
   - Message: `feat(research-graph): add overview/editor mode toggle`
 
-- [ ] 3. Implement Node Label LOD Helper (Overview vs Editor)
+- [x] 3. Implement Node Label LOD Helper (Overview vs Editor)
 
   **What to do**:
   - Introduce a single place that defines node label content per mode:
@@ -320,7 +320,7 @@ Critical Path: 1 -> 6 -> 7
   **Commit**: YES (can group with Task 4)
   - Message: `feat(research-graph): add node label LOD helpers`
 
-- [ ] 4. Implement Edge LOD Helper (Prereq-Only + Hide Edge Labels)
+- [x] 4. Implement Edge LOD Helper (Prereq-Only + Hide Edge Labels)
 
   **What to do**:
   - Centralize “which edges are allowed in which mode” in a tiny helper:
@@ -377,7 +377,7 @@ Critical Path: 1 -> 6 -> 7
   **Commit**: YES (group with Task 3)
   - Message: `feat(research-graph): add edge LOD helpers`
 
-- [ ] 5. Add CSS Support for Overview Labels (Clamp + Less Noise)
+- [x] 5. Add CSS Support for Overview Labels (Clamp + Less Noise)
 
   **What to do**:
   - Update CSS to support compact node labels in Overview mode:
@@ -435,7 +435,7 @@ Critical Path: 1 -> 6 -> 7
   **Commit**: YES (can group with Task 6)
   - Message: `style(research-graph): clamp overview node labels`
 
-- [ ] 6. Integrate Overview/Editor Mode Into AuthorResearchGraphPage
+- [x] 6. Integrate Overview/Editor Mode Into AuthorResearchGraphPage
 
   **What to do**:
   - Update the page to default to Overview and reduce clutter:
@@ -539,7 +539,7 @@ Critical Path: 1 -> 6 -> 7
   **Commit**: YES
   - Message: `feat(research-graph): default to overview mode for readability`
 
-- [ ] 7. Update Vitest Unit Tests for Overview/Editor Behavior
+- [x] 7. Update Vitest Unit Tests for Overview/Editor Behavior
 
   **What to do**:
   - Update existing tests to reflect the new default mode and to explicitly switch to Editor mode when testing authoring features:
@@ -600,7 +600,7 @@ Critical Path: 1 -> 6 -> 7
   **Commit**: YES
   - Message: `test(research-graph): cover overview/editor defaults`
 
-- [ ] 8. Add Playwright E2E Smoke Spec for Overview Mode
+- [x] 8. Add Playwright E2E Smoke Spec for Overview Mode
 
   **What to do**:
   - Add an E2E spec that validates the real browser behavior end-to-end:
@@ -667,7 +667,7 @@ Critical Path: 1 -> 6 -> 7
   **Commit**: YES
   - Message: `test(e2e): add research graph overview smoke`
 
-- [ ] 9. Hardening: Empty State + Responsive + A11y in Overview
+- [x] 9. Hardening: Empty State + Responsive + A11y in Overview
 
   **What to do**:
   - Ensure Overview never looks “broken”:
@@ -733,7 +733,7 @@ Critical Path: 1 -> 6 -> 7
 
 ## Final Verification Wave (MANDATORY)
 
-- [ ] F1. Plan Compliance Audit
+- [x] F1. Plan Compliance Audit
 
   **Recommended Agent Profile**:
   - **Category**: `subagent_type=oracle`
@@ -750,7 +750,7 @@ Critical Path: 1 -> 6 -> 7
   **Output**:
   - `Must Have [N/N] | Must NOT Have [N/N] | Evidence [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. Code Quality Review
+- [x] F2. Code Quality Review
 
   **Recommended Agent Profile**:
   - **Category**: `unspecified-high`
@@ -769,7 +769,7 @@ Critical Path: 1 -> 6 -> 7
   **Output**:
   - `Build [PASS/FAIL] | Tests [PASS/FAIL] | Notes [..] | VERDICT`
 
-- [ ] F3. Real QA Run (Playwright)
+- [x] F3. Real QA Run (Playwright)
 
   **Recommended Agent Profile**:
   - **Category**: `unspecified-high`
@@ -784,7 +784,7 @@ Critical Path: 1 -> 6 -> 7
   **Output**:
   - `Scenarios [N/N pass] | E2E [PASS/FAIL] | Responsive [PASS/FAIL] | VERDICT`
 
-- [ ] F4. Scope Fidelity Check
+- [x] F4. Scope Fidelity Check
 
   **Recommended Agent Profile**:
   - **Category**: `deep`

@@ -1,0 +1,17 @@
+Task 3 Evidence: renderMathText unit tests
+Date: 2026-03-05
+
+Command:
+- cd curriculum-viewer
+- npm run test -- --run src/lib/math/renderMathText.test.tsx
+
+Result:
+- PASS
+- Test Files: 1 passed
+- Tests: 6 passed
+
+Coverage highlights validated by tests:
+- `log_2 a=4, log_a b=3, log_(x+1)` renders subscript markup
+- `x^2`, `x^(2t+1)`, `y^-1` render superscript markup
+- `1/2`, `3/2`, `1/a`, `a/b` render `.math-frac` markup
+- null/undefined inputs are handled safely

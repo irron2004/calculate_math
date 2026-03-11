@@ -1,0 +1,10 @@
+Task 7 Evidence: LearnPage prompt renderer test
+Date: 2026-03-05
+
+Command:
+- cd curriculum-viewer
+- npm run test -- --run src/pages/LearnPage.test.tsx
+
+Result:
+- PASS
+- Test confirms prompt rendering includes math markup (`sub` and `.math-frac`).

@@ -1,0 +1,105 @@
+Task 1 Evidence: Render Surface Audit (All Screens)
+Source plan: .sisyphus/plans/.legacy/homework-log-rendering-fix.md (Task 1)
+Date: 2026-03-05
+
+Commands used:
+1) grep -n "\.question\b|\.options\b|\.answer\b|\.description\b|\.explanation\b|\.prompt\b" curriculum-viewer/src/**/*.tsx
+2) grep -n "renderMathText\(" curriculum-viewer/src/**/*.tsx
+3) targeted reads for each candidate page/component
+
+Legend:
+- Surface Type: student/admin/shared
+- renderMathText: yes/no/partial
+- Raw path means JSX text path that does not call renderMathText
+
+1) curriculum-viewer/src/pages/PlacementTestPage.tsx
+- Fields: prompt, options, answer (answer used for grading logic)
+- Surface Type: student
+- renderMathText: yes (prompt/options display)
+- Evidence: line 319 renderMathText(current.prompt), line 341 renderMathText(option)
+- Raw paths: none for displayed prompt/options
+
+2) curriculum-viewer/src/pages/HomeworkSubmitPage.tsx
+- Fields: question, options, description, answer
+- Surface Type: student
+- renderMathText: partial
+- Evidence:
+  - line 39 renderMathText(problem.question)
+  - line 54 renderMathText(option)
+  - line 106 renderMathText(problem.question)
+  - line 118 renderMathText(option)
+- Raw paths:
+  - line 343 assignment.description rendered raw
+  - line 126 submitted subjective answer rendered raw ({answer || '(미응답)'})
+
+3) curriculum-viewer/src/pages/MyPage.tsx
+- Fields: description
+- Surface Type: student
+- renderMathText: no
+- Evidence: line 85 assignment.description rendered raw
+- Raw paths: line 85
+
+4) curriculum-viewer/src/pages/LearnPage.tsx
+- Fields: prompt
+- Surface Type: student
+- renderMathText: no
+- Evidence: line 592 problem.prompt rendered raw
+- Raw paths: line 592
+
+5) curriculum-viewer/src/components/EvalResultList.tsx
+- Fields: expectedAnswer, explanation, answer
+- Surface Type: student/shared result UI
+- renderMathText: no
+- Evidence:
+  - line 87 expectedAnswer rendered in template string
+  - line 34 explanation rendered raw
+- Raw paths: lines 34, 87
+
+6) curriculum-viewer/src/pages/AuthorHomeworkStatusPage.tsx
+- Fields: description, question, options, answer
+- Surface Type: admin
+- renderMathText: partial
+- Evidence:
+  - line 850 renderMathText(problem.question)
+  - line 862 renderMathText(option)
+  - line 877 renderMathText(problem.answer)
+- Raw paths:
+  - line 565 assignment.description rendered raw
+  - line 627 assignmentDetail.description rendered raw
+  - line 871 student subjective answer rendered raw ({answer || '(미응답)'})
+
+7) curriculum-viewer/src/pages/AuthorHomeworkPage.tsx
+- Fields: question, options, answer, description
+- Surface Type: admin authoring
+- renderMathText: partial (preview path only)
+- Evidence: line 1036 renderMathText(p.question)
+- Raw paths:
+  - author input fields keep raw values by design (question/options/answer editors)
+  - no formatted preview for answer/description found in current read path
+
+8) curriculum-viewer/src/pages/AuthorResearchGraphPage.tsx
+- Fields: prompt
+- Surface Type: admin
+- renderMathText: no
+- Evidence: line 2188 item.prompt rendered raw
+- Raw paths: line 2188
+
+Additional related files found (not primary homework problem-content surfaces):
+- curriculum-viewer/src/lib/researchGraph/nodeLabel.tsx: description rendered raw
+- curriculum-viewer/src/components/EdgeTypeSelectModal.tsx: option.description rendered raw
+
+Audit summary:
+- Surfaces with math formatting already applied (at least partial):
+  - PlacementTestPage
+  - HomeworkSubmitPage
+  - AuthorHomeworkStatusPage
+  - AuthorHomeworkPage (question preview only)
+- Surfaces with remaining raw render paths for target fields:
+  - MyPage (description)
+  - HomeworkSubmitPage (description, submitted subjective answer)
+  - LearnPage (prompt)
+  - EvalResultList (expectedAnswer, explanation)
+  - AuthorHomeworkStatusPage (descriptions, student subjective answer)
+  - AuthorResearchGraphPage (example prompt)
+
+Result: Remaining raw render paths are present and should be addressed in subsequent Workstream A tasks.

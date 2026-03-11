@@ -2011,6 +2011,247 @@ def list_homework_assignments_for_student(
         conn.close()
 
 
+def list_homework_assignments_for_student_admin(
+    student_id: str, path: Optional[Path] = None
+) -> List[Dict[str, Any]]:
+    conn = connect(path)
+    try:
+        now = _now_iso()
+        rows = conn.execute(
+            """
+            SELECT
+                ha.id,
+                ha.title,
+                ha.description,
+                ha.problems_json,
+                ha.due_at,
+                ha.scheduled_at,
+                ha.sticker_reward_count,
+                ha.created_by,
+                ha.created_at,
+                hat.assigned_at,
+                hs.id AS submission_id,
+                hs.submitted_at AS submitted_at,
+                hs.review_status AS review_status,
+                hs.reviewed_at AS reviewed_at,
+                hs.reviewed_by AS reviewed_by,
+                CASE WHEN hs.id IS NOT NULL THEN 1 ELSE 0 END AS submitted,
+                CASE
+                    WHEN ha.scheduled_at IS NOT NULL AND ha.scheduled_at > ? THEN 1
+                    ELSE 0
+                END AS is_scheduled
+            FROM homework_assignments ha
+            INNER JOIN homework_assignment_targets hat ON ha.id = hat.assignment_id
+            LEFT JOIN homework_submissions hs ON hs.id = (
+                SELECT id
+                FROM homework_submissions
+                WHERE assignment_id = ha.id AND student_id = ?
+                ORDER BY submitted_at DESC
+                LIMIT 1
+            )
+            WHERE hat.student_id = ?
+            ORDER BY ha.created_at DESC
+            """,
+            (now, student_id, student_id),
+        ).fetchall()
+
+        result: List[Dict[str, Any]] = []
+        for row in rows:
+            try:
+                problems = json.loads(row["problems_json"])
+                problem_count = len(problems) if isinstance(problems, list) else 0
+            except Exception:
+                problem_count = 0
+
+            result.append(
+                {
+                    "id": row["id"],
+                    "title": row["title"],
+                    "description": row["description"],
+                    "problemCount": problem_count,
+                    "dueAt": row["due_at"],
+                    "scheduledAt": row["scheduled_at"],
+                    "isScheduled": bool(row["is_scheduled"]),
+                    "stickerRewardCount": row["sticker_reward_count"]
+                    if row["sticker_reward_count"] is not None
+                    else 2,
+                    "createdBy": row["created_by"],
+                    "createdAt": row["created_at"],
+                    "assignedAt": row["assigned_at"],
+                    "submitted": bool(row["submitted"]),
+                    "submissionId": row["submission_id"],
+                    "submittedAt": row["submitted_at"],
+                    "reviewStatus": row["review_status"]
+                    or ("pending" if row["submission_id"] else None),
+                    "reviewedAt": row["reviewed_at"],
+                    "reviewedBy": row["reviewed_by"],
+                }
+            )
+
+        return result
+    finally:
+        conn.close()
+
+
+def list_wrong_problems_for_student_admin(
+    *,
+    student_id: str,
+    assignment_id: Optional[str] = None,
+    limit: int = 200,
+    offset: int = 0,
+    path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    normalized_student_id = student_id.strip()
+    normalized_assignment_id = (
+        assignment_id.strip()
+        if isinstance(assignment_id, str) and assignment_id.strip()
+        else None
+    )
+    normalized_limit = max(1, min(500, int(limit)))
+    normalized_offset = max(0, int(offset))
+
+    conn = connect(path)
+    try:
+        params: list[Any] = [normalized_student_id, normalized_student_id]
+        where_sql = ""
+        if normalized_assignment_id is not None:
+            where_sql = "AND ha.id = ?"
+            params.append(normalized_assignment_id)
+
+        rows = conn.execute(
+            f"""
+            SELECT
+                ha.id AS assignment_id,
+                ha.title AS assignment_title,
+                ha.problems_json AS problems_json,
+                hs.id AS submission_id,
+                hs.answers_json AS answers_json,
+                hs.problem_reviews_json AS problem_reviews_json,
+                hs.submitted_at AS submitted_at,
+                hs.review_status AS review_status
+            FROM homework_assignments ha
+            INNER JOIN homework_assignment_targets hat ON ha.id = hat.assignment_id
+            LEFT JOIN homework_submissions hs ON hs.id = (
+                SELECT id
+                FROM homework_submissions
+                WHERE assignment_id = ha.id AND student_id = ?
+                ORDER BY submitted_at DESC
+                LIMIT 1
+            )
+            WHERE hat.student_id = ?
+              {where_sql}
+            ORDER BY ha.created_at DESC
+            """,
+            tuple(params),
+        ).fetchall()
+
+        items: list[Dict[str, Any]] = []
+        for row in rows:
+            submission_id = row["submission_id"]
+            if not submission_id:
+                continue
+
+            try:
+                problems_obj = json.loads(row["problems_json"])
+                problems = problems_obj if isinstance(problems_obj, list) else []
+            except Exception:
+                problems = []
+
+            try:
+                answers_obj = (
+                    json.loads(row["answers_json"]) if row["answers_json"] else {}
+                )
+                answers = answers_obj if isinstance(answers_obj, dict) else {}
+            except Exception:
+                answers = {}
+
+            try:
+                reviews_obj = (
+                    json.loads(row["problem_reviews_json"])
+                    if row["problem_reviews_json"]
+                    else {}
+                )
+                reviews = reviews_obj if isinstance(reviews_obj, dict) else {}
+            except Exception:
+                reviews = {}
+
+            assignment_id_value = str(row["assignment_id"])
+            assignment_title_value = str(row["assignment_title"])
+            submitted_at_value = str(row["submitted_at"])
+            review_status_value = str(row["review_status"] or "pending")
+
+            for idx, problem_obj in enumerate(problems, start=1):
+                if not isinstance(problem_obj, dict):
+                    continue
+                problem = dict(problem_obj)
+                problem_id = str(problem.get("id") or f"p{idx}")
+                problem_type = str(problem.get("type") or "").strip()
+                question = str(problem.get("question") or "")
+                options = problem.get("options")
+                options_list = options if isinstance(options, list) else None
+                correct_answer = problem.get("answer")
+                correct_answer_str = (
+                    str(correct_answer) if isinstance(correct_answer, str) else None
+                )
+                student_answer_obj = answers.get(problem_id)
+                student_answer = (
+                    str(student_answer_obj)
+                    if isinstance(student_answer_obj, str)
+                    and student_answer_obj.strip()
+                    else None
+                )
+
+                review_obj = reviews.get(problem_id)
+                needs_revision = False
+                comment = ""
+                if isinstance(review_obj, dict):
+                    needs_revision = bool(review_obj.get("needsRevision"))
+                    raw_comment = review_obj.get("comment")
+                    if isinstance(raw_comment, str):
+                        comment = raw_comment
+                review_marked_wrong = needs_revision or bool(comment.strip())
+
+                is_wrong = False
+                if problem_type == "objective":
+                    if correct_answer_str is not None:
+                        if (
+                            student_answer is None
+                            or student_answer != correct_answer_str
+                        ):
+                            is_wrong = True
+                    if review_marked_wrong:
+                        is_wrong = True
+                elif problem_type == "subjective":
+                    if review_marked_wrong:
+                        is_wrong = True
+
+                if not is_wrong:
+                    continue
+
+                items.append(
+                    {
+                        "assignmentId": assignment_id_value,
+                        "assignmentTitle": assignment_title_value,
+                        "submissionId": str(submission_id),
+                        "submittedAt": submitted_at_value,
+                        "reviewStatus": review_status_value,
+                        "problemId": problem_id,
+                        "problemIndex": idx,
+                        "type": problem_type,
+                        "question": question,
+                        "options": options_list,
+                        "correctAnswer": correct_answer_str,
+                        "studentAnswer": student_answer,
+                        "review": {"needsRevision": needs_revision, "comment": comment},
+                    }
+                )
+
+        sliced = items[normalized_offset : normalized_offset + normalized_limit]
+        return {"studentId": normalized_student_id, "wrongProblems": sliced}
+    finally:
+        conn.close()
+
+
 def get_homework_assignment(
     assignment_id: str, student_id: str, path: Optional[Path] = None
 ) -> Optional[Dict[str, Any]]:

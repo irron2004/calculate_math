@@ -60,6 +60,8 @@ from .db import (
     has_praise_sticker_for_homework,
     list_all_homework_assignments_admin,
     list_homework_assignments_for_student,
+    list_homework_assignments_for_student_admin,
+    list_wrong_problems_for_student_admin,
     list_praise_stickers,
     list_students_with_profiles,
     list_users,
@@ -89,6 +91,10 @@ from .models import (
     StudentProfileUpsertRequest,
     AdminAssignmentDetail,
     AdminAssignmentListResponse,
+    AdminStudentAssignmentStatusItem,
+    AdminStudentAssignmentStatusListResponse,
+    AdminWrongProblemItem,
+    AdminWrongProblemListResponse,
     AdminSubmissionDetail,
     AuthChangePasswordRequest,
     AuthChangePasswordResponse,
@@ -1560,6 +1566,7 @@ def import_problem_bank(
             day_key=data.dayKey,
             payload=data.payload,
             imported_by="admin",
+            expected_problem_count=None,
         )
     except ValueError as exc:
         return JSONResponse(
@@ -1624,6 +1631,42 @@ def set_problem_bank_problem_labels(
             },
         )
     return HomeworkProblemLabelSetResponse()
+
+
+@router.get(
+    "/homework/admin/students/{student_id}/assignments",
+    response_model=AdminStudentAssignmentStatusListResponse,
+)
+def list_admin_assignments_for_student(
+    student_id: str,
+    _admin=Depends(require_admin),
+) -> AdminStudentAssignmentStatusListResponse:
+    assignments = list_homework_assignments_for_student_admin(student_id)
+    items = [AdminStudentAssignmentStatusItem(**a) for a in assignments]
+    return AdminStudentAssignmentStatusListResponse(
+        studentId=student_id, assignments=items
+    )
+
+
+@router.get(
+    "/homework/admin/students/{student_id}/wrong-problems",
+    response_model=AdminWrongProblemListResponse,
+)
+def list_admin_wrong_problems_for_student(
+    student_id: str,
+    assignmentId: str | None = Query(default=None),
+    limit: int = Query(default=200, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    _admin=Depends(require_admin),
+) -> AdminWrongProblemListResponse:
+    data = list_wrong_problems_for_student_admin(
+        student_id=student_id,
+        assignment_id=assignmentId,
+        limit=limit,
+        offset=offset,
+    )
+    items = [AdminWrongProblemItem(**p) for p in data.get("wrongProblems", [])]
+    return AdminWrongProblemListResponse(studentId=student_id, wrongProblems=items)
 
 
 @router.get(

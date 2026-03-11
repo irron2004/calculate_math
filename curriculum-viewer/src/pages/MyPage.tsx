@@ -7,6 +7,7 @@ import { changePassword, fetchMe } from '../lib/auth/api'
 import { listAssignments, HomeworkApiError } from '../lib/homework/api'
 import type { HomeworkAssignment } from '../lib/homework/types'
 import { getHomeworkStatus, isOverdueSoon } from '../lib/homework/types'
+import { renderMathText } from '../lib/math/renderMathText'
 import { getStickerSummary, listStickers, StickerApiError } from '../lib/sticker/api'
 import type { PraiseSticker, StickerSummary } from '../lib/sticker/types'
 import { ROUTES } from '../routes'
@@ -82,7 +83,7 @@ function AssignmentCard({ assignment }: AssignmentCardProps) {
         <StatusBadge assignment={assignment} />
       </div>
       {assignment.description && (
-        <p className="homework-card-description">{assignment.description}</p>
+        <p className="homework-card-description">{renderMathText(assignment.description)}</p>
       )}
       <p className="homework-card-problems">
         총 {problemCounts.total}문제

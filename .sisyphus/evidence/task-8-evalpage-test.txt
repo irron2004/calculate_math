@@ -1,0 +1,12 @@
+Task 8 Evidence: EvalPage expectedAnswer/explanation formatting test
+Date: 2026-03-05
+
+Command:
+- cd curriculum-viewer
+- npm run test -- --run src/pages/EvalPage.test.tsx
+
+Result:
+- PASS
+- Test opens "해설 보기" and verifies:
+  - formatted expectedAnswer contains subscript markup
+  - explanation contains `.math-frac` markup

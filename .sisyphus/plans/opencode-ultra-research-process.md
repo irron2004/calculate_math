@@ -79,7 +79,7 @@ Wave 3 (Docs + regression)
 
 ## TODOs
 
- - [ ] 1. Create `docs/ulr-ultra-research-plan.md` from Appendix A
+ - [x] 1. Create `docs/ulr-ultra-research-plan.md` from Appendix A
 
   **What to do**:
   - Create `docs/ulr-ultra-research-plan.md` using the spec content from **Appendix A** (treat Appendix A as source-of-truth).
@@ -104,7 +104,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-1-spec-present.txt
   ```
 
-- [ ] 2. Remove positional detector typing (make detectors explicitly typed)
+- [x] 2. Remove positional detector typing (make detectors explicitly typed)
 
   **What to do**:
   - Refactor keyword detector registry so each detector includes its explicit `type` (e.g., `ultrawork`, `search`, `ultra-research`, `analyze`) rather than using `types[index]` mapping.
@@ -137,7 +137,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-2-keyword-detector-tests.txt
   ```
 
-- [ ] 3. Add per-session dedupe to prevent repeated injection + toast spam
+- [x] 3. Add per-session dedupe to prevent repeated injection + toast spam
 
   **What to do**:
   - Add lightweight session-scoped state to ensure the same mode message is injected at most once per session.
@@ -170,7 +170,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-3-ulr-dedupe.txt
   ```
 
-- [ ] 4. Define and enforce mode precedence rules (ULR vs analyze/search/ultrawork)
+- [x] 4. Define and enforce mode precedence rules (ULR vs analyze/search/ultrawork)
 
   **What to do**:
   - Decide (default) precedence to avoid impossible constraints:
@@ -207,7 +207,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-4-precedence.txt
   ```
 
-- [ ] 5. Add performance guardrails for keyword detection on large messages
+- [x] 5. Add performance guardrails for keyword detection on large messages
 
   **What to do**:
   - Add a safe max-size slice for detection input (e.g., first N chars) to prevent worst-case regex work on pasted logs.
@@ -238,7 +238,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-5-large-input.txt
   ```
 
-- [ ] 6. Rewrite `ULTRA_RESEARCH_MESSAGE` to match the new research process
+- [x] 6. Rewrite `ULTRA_RESEARCH_MESSAGE` to match the new research process
 
   **What to do**:
   - Replace the current brief ULR prompt with the process defined in `docs/ulr-ultra-research-plan.md` (created in Task 1).
@@ -290,7 +290,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-6-ulr-message.txt
   ```
 
-- [ ] 7. Add/extend unit tests for ULR collisions and dedupe behavior
+- [x] 7. Add/extend unit tests for ULR collisions and dedupe behavior
 
   **What to do**:
   - Add tests for precedence rules, dedupe, and code-block/system-reminder immunity where relevant.
@@ -322,7 +322,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-7-collisions.txt
   ```
 
-- [ ] 8. Add `/ulr` builtin command for explicit ULR activation
+- [x] 8. Add `/ulr` builtin command for explicit ULR activation
 
   **What to do**:
   - Add a new builtin command named `ulr` (slash command: `/ulr`) that injects the ULR instruction template without relying on keyword heuristics.
@@ -356,7 +356,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-8-command.txt
   ```
 
-- [ ] 9. (Optional) Update toast copy/title to match finalized UX
+- [x] 9. (Optional) Update toast copy/title to match finalized UX
 
   **What to do**:
   - Ensure toast title/message and variant behavior are consistent and deduped.
@@ -377,7 +377,7 @@ Wave 3 (Docs + regression)
   **Acceptance Criteria**:
   - [ ] Toast is shown once and does not override pre-set variant
 
-- [ ] 10. Add documentation page for Ultra Research process (plugin docs)
+- [x] 10. Add documentation page for Ultra Research process (plugin docs)
 
   **What to do**:
   - Add a dedicated doc describing: when to use ULR, how to trigger it, round outputs, and examples.
@@ -410,7 +410,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-10-doc-link.txt
   ```
 
-- [ ] 11. Run plugin-level regression: tests + typecheck
+- [x] 11. Run plugin-level regression: tests + typecheck
 
   **What to do**:
   - Run `bun test` and `bun run typecheck` for the plugin.
@@ -442,7 +442,7 @@ Wave 3 (Docs + regression)
     Evidence: .sisyphus/evidence/task-11-plugin-verify.txt
   ```
 
-- [ ] 12. (Optional) Mirror a short spec pointer in repo root docs
+- [x] 12. (Optional) Mirror a short spec pointer in repo root docs
 
   **What to do**:
   - If you want repo-root documentation, add a short pointer doc in `docs/` that links to the canonical plugin docs page.

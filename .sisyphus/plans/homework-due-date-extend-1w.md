@@ -91,7 +91,7 @@ Critical Path: Task 2 → Task 3 → Task 4
 
 ## TODOs
 
-- [ ] 1. Add backend regression test for admin dueAt update
+- [x] 1. Add backend regression test for admin dueAt update
 
   **What to do**:
   - In `backend/tests/test_homework_api.py`, add a test that:
@@ -134,7 +134,7 @@ Critical Path: Task 2 → Task 3 → Task 4
     Evidence: .sisyphus/evidence/task-1-pytest-homework-dueat-patch.txt
   ```
 
-- [ ] 2. Implement +7 day dueAt calculation helper and unit tests (frontend)
+- [x] 2. Implement +7 day dueAt calculation helper and unit tests (frontend)
 
   **What to do**:
   - Add a small pure function in `curriculum-viewer/src/lib/homework/dueAt.ts` that:
@@ -180,7 +180,7 @@ Critical Path: Task 2 → Task 3 → Task 4
     Evidence: .sisyphus/evidence/task-2-vitest-date-helper.txt
   ```
 
-- [ ] 3. Add "마감 1주일 연장" button in assignment detail view and wire to PATCH
+- [x] 3. Add "마감 1주일 연장" button in assignment detail view and wire to PATCH
 
   **What to do**:
   - In `curriculum-viewer/src/pages/AuthorHomeworkStatusPage.tsx` assignment detail meta area (near line ~588), add a button next to the due date.
@@ -233,7 +233,7 @@ Critical Path: Task 2 → Task 3 → Task 4
     Evidence: .sisyphus/evidence/task-3-build-pass.txt
   ```
 
-- [ ] 4. Add frontend component test for button gating and PATCH payload
+- [x] 4. Add frontend component test for button gating and PATCH payload
 
   **What to do**:
   - Add `curriculum-viewer/src/pages/AuthorHomeworkStatusPage.test.tsx` that:
@@ -281,7 +281,7 @@ Critical Path: Task 2 → Task 3 → Task 4
 
 ## Final Verification Wave
 
-- [ ] FV1. Build + tests
+- [x] FV1. Build + tests
   - Run `pytest backend/tests/test_homework_api.py -q`
   - Run `cd curriculum-viewer && npm run test`
   - Run `cd curriculum-viewer && npm run build`

@@ -1,0 +1,8 @@
+2026-03-08
+check: unauthenticated admin import endpoint
+command: curl -sS -o /tmp/f1_import_noauth.json -w "%{http_code}" -X POST "https://calculatemath-production.up.railway.app/api/homework/admin/problem-bank/import" -H "Content-Type: application/json" -d '{"weekKey":"2026-W11","dayKey":"mon","payload":{"title":"x","description":"x","problems":[{"type":"subjective","question":"q","answer":"a"}]}}'
+result: HTTP 401 (protected endpoint)
+
+check: student-facing assignment models exclude answer field
+evidence: backend/app/models.py defines StudentHomeworkProblem with fields {id,type,question,options} and no answer field
+evidence: HomeworkAssignmentListItem and HomeworkAssignmentDetail use StudentHomeworkProblem for student responses

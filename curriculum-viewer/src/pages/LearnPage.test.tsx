@@ -16,8 +16,8 @@ vi.mock('../lib/learn/problems', async () => {
       version: 1,
       problemsByNodeId: {
         '1.1.1': [
-          { id: 'p-1', type: 'numeric', prompt: '1 + 1 = ?', answer: '2' },
-          { id: 'p-2', type: 'numeric', prompt: '10 / 2 = ?', answer: '5' }
+          { id: 'p-1', type: 'numeric', prompt: 'log_2 x^2 = ?', answer: '2' },
+          { id: 'p-2', type: 'numeric', prompt: 'a/b = ?', answer: '5' }
         ]
       }
     }))
@@ -49,5 +49,12 @@ describe('LearnPage route', () => {
 
     // LearnPage should show learning heading
     expect(await screen.findByRole('heading', { name: '학습' })).toBeInTheDocument()
+
+    await waitFor(() => {
+      const firstPrompt = document.querySelector('.problem-title')
+      expect(firstPrompt?.querySelector('sub')).toBeTruthy()
+    })
+
+    expect(document.querySelector('.math-frac')).toBeTruthy()
   })
 })

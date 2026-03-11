@@ -51,9 +51,9 @@
 - 학생 API 응답에서 `answer` 완전 비노출 보장
 
 ### Definition of Done
-- [ ] 관리자 import -> 문제은행 저장 -> 라벨링 -> 학생별 출제 -> 학생 조회까지 E2E 통과
-- [ ] 학생 권한 API 응답 어디에도 `answer` 필드 없음
-- [ ] TDD 테스트(백엔드+프론트) 모두 PASS
+- [x] 관리자 import -> 문제은행 저장 -> 라벨링 -> 학생별 출제 -> 학생 조회까지 E2E 통과
+- [x] 학생 권한 API 응답 어디에도 `answer` 필드 없음
+- [x] TDD 테스트(백엔드+프론트) 모두 PASS
 
 ### Must Have
 - 기존 `homework_assignment_targets` 재사용
@@ -118,7 +118,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
 
 ## TODOs
 
-- [ ] 1. 문제은행 스키마 및 마이그레이션 함수 추가
+- [x] 1. 문제은행 스키마 및 마이그레이션 함수 추가
 
   **What to do**:
   - `backend/app/db.py`에 `homework_problems`, `homework_labels`, `homework_problem_labels`, `homework_import_batches` 생성 `_ensure_*` 추가
@@ -137,7 +137,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-1-idempotency.txt
   ```
 
-- [ ] 2. 관리자/학생 DTO 분리로 answer 비노출 강제
+- [x] 2. 관리자/학생 DTO 분리로 answer 비노출 강제
 
   **What to do**:
   - `backend/app/models.py`에 AdminProblemDTO(answer 포함)와 StudentProblemDTO(answer 제외) 분리
@@ -156,7 +156,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-2-student-dto.txt
   ```
 
-- [ ] 3. 프런트 문제/라벨 타입 계층 분리
+- [x] 3. 프런트 문제/라벨 타입 계층 분리
 
   **What to do**:
   - `curriculum-viewer/src/lib/homework/types.ts`에서 admin/student problem 타입 분리
@@ -175,7 +175,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-3-negative.txt
   ```
 
-- [ ] 4. 주간 JSON import 검증기(TDD) 작성
+- [x] 4. 주간 JSON import 검증기(TDD) 작성
 
   **What to do**:
   - 요일별 20문항, 객관식 options, answer 형식 규칙 검증
@@ -194,7 +194,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-4-invalid.txt
   ```
 
-- [ ] 5. import batch 중복 방지/순서 보존 규칙 구현
+- [x] 5. import batch 중복 방지/순서 보존 규칙 구현
 
   **What to do**:
   - 주차+요일+원본해시 기준 idempotent import
@@ -213,7 +213,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-5-order.txt
   ```
 
-- [ ] 6. 문제은행 DB 접근 함수/리포지토리 계층 추가
+- [x] 6. 문제은행 DB 접근 함수/리포지토리 계층 추가
 
   **What to do**:
   - 문제 생성/조회/라벨 연결/필터 함수를 `backend/app/db.py`에 추가
@@ -232,7 +232,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-6-auth.txt
   ```
 
-- [ ] 7. 관리자 문제은행 API(등록/조회/라벨 필터) 추가
+- [x] 7. 관리자 문제은행 API(등록/조회/라벨 필터) 추가
 
   **What to do**:
   - `backend/app/api.py`에 admin 전용 endpoints 추가
@@ -251,7 +251,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-7-auth-fail.json
   ```
 
-- [ ] 8. 관리자 import API + batch 처리 연결
+- [x] 8. 관리자 import API + batch 처리 연결
 
   **What to do**:
   - 주간 JSON 업로드 API에서 검증기(T4) + idempotent import(T5) + 저장(T6) 실행
@@ -270,7 +270,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-8-import-twice.json
   ```
 
-- [ ] 9. 학생 조회 API answer 비노출 회귀보호 테스트 추가
+- [x] 9. 학생 조회 API answer 비노출 회귀보호 테스트 추가
 
   **What to do**:
   - 기존 학생 assignment/list/detail 경로에서 answer 비노출 단정 테스트 추가
@@ -289,7 +289,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-9-admin-visible.json
   ```
 
-- [ ] 10. 출제 API를 문제은행 선택 기반 스냅샷 생성으로 확장
+- [x] 10. 출제 API를 문제은행 선택 기반 스냅샷 생성으로 확장
 
   **What to do**:
   - assignment 생성 시 `problemIds` 입력을 받아 문제은행에서 스냅샷(`problems_json`) 생성
@@ -308,7 +308,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-10-snapshot-immutable.json
   ```
 
-- [ ] 11. 관리자 출제 화면에 문제은행/라벨 필터/학생선택 통합
+- [x] 11. 관리자 출제 화면에 문제은행/라벨 필터/학생선택 통합
 
   **What to do**:
   - `AuthorHomeworkPage`에 문제은행 탭/검색/라벨 필터/선택 목록 추가
@@ -328,7 +328,7 @@ Wave FINAL (Independent review): F1, F2, F3, F4
     Evidence: .sisyphus/evidence/task-11-no-student.png
   ```
 
-- [ ] 12. E2E 통합(TDD 마무리) + 권한/보안/회귀 하드닝
+- [x] 12. E2E 통합(TDD 마무리) + 권한/보안/회귀 하드닝
 
   **What to do**:
   - 백엔드+프런트 통합 테스트로 import->라벨->출제->학생조회 경로 고정
@@ -351,10 +351,10 @@ Wave FINAL (Independent review): F1, F2, F3, F4
 
 ## Final Verification Wave (MANDATORY)
 
-- [ ] F1. Plan Compliance Audit (`oracle`)
-- [ ] F2. Code Quality Review (`unspecified-high`)
-- [ ] F3. Real QA Replay (`unspecified-high` + `playwright`)
-- [ ] F4. Scope Fidelity Check (`deep`)
+- [x] F1. Plan Compliance Audit (`oracle`)
+- [x] F2. Code Quality Review (`unspecified-high`)
+- [x] F3. Real QA Replay (`unspecified-high` + `playwright`)
+- [x] F4. Scope Fidelity Check (`deep`)
 
 ---
 
@@ -379,6 +379,6 @@ cd curriculum-viewer && npm test -- --run
 ```
 
 ### Final Checklist
-- [ ] 문제은행 import/조회/라벨링/출제 흐름 완료
-- [ ] 학생 응답 정답 비노출 100%
-- [ ] TDD 테스트 및 회귀 테스트 PASS
+- [x] 문제은행 import/조회/라벨링/출제 흐름 완료
+- [x] 학생 응답 정답 비노출 100%
+- [x] TDD 테스트 및 회귀 테스트 PASS

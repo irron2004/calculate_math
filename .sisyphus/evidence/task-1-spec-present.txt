@@ -1,0 +1,14 @@
+Verification: docs ULR spec presence check
+
+Command equivalent:
+grep pattern: ulr-ultra-research-plan|Ultra Research|Round 0|Round 1|Round 2|Round 3
+path: docs/*.md
+
+Matches:
+- docs/ulr-ultra-research-plan.md:1 -> # ULR (Ultra Research) Process Spec
+- docs/ulr-ultra-research-plan.md:37 -> ### Round 0: Brief lock
+- docs/ulr-ultra-research-plan.md:41 -> ### Round 1: Diverge (idea explosion)
+- docs/ulr-ultra-research-plan.md:45 -> ### Round 2: Critique (feasibility + evidence cut)
+- docs/ulr-ultra-research-plan.md:49 -> ### Round 3: Converge (decision + experiment design)
+
+Result: PASS

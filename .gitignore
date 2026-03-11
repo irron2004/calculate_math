@@ -5,6 +5,7 @@ node_modules/
 dist/
 inbox/
 .legacy/
+tasks/
 __cache__
 .npm-cache
 _cacache/

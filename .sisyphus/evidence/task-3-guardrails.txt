@@ -1,0 +1,16 @@
+Task 3 Evidence: renderer guardrails
+Date: 2026-03-05
+
+Guardrail assertion source:
+- curriculum-viewer/src/lib/math/renderMathText.test.tsx
+
+Guardrail case validated:
+- Input: `http://a/b 2026/03/04 foo/bar`
+- Expected: unchanged text, no `.math-frac` markup
+
+Verification command:
+- cd curriculum-viewer
+- npm run test -- --run src/lib/math/renderMathText.test.tsx
+
+Result:
+- PASS (guardrail test succeeded)

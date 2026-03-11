@@ -1,0 +1,4 @@
+2026-03-08
+command: (workdir=curriculum-viewer) npm run test:e2e -- homework-problem-bank
+result: PASS
+details: 1 passed (homework-problem-bank.spec.ts) including 10-problem and 20-problem problem-bank import coverage.

@@ -400,6 +400,58 @@ class AdminSubmissionDetail(BaseModel):
     files: List[AdminSubmissionFile] = Field(default_factory=list)
 
 
+class AdminStudentAssignmentStatusItem(BaseModel):
+    id: str
+    title: str
+    description: Optional[str] = None
+    problemCount: int
+    dueAt: Optional[str] = None
+    scheduledAt: Optional[str] = None
+    isScheduled: bool = False
+    stickerRewardCount: int = 2
+    createdBy: str
+    createdAt: str
+    assignedAt: str
+    submitted: bool
+    submissionId: Optional[str] = None
+    submittedAt: Optional[str] = None
+    reviewStatus: Optional[str] = None
+    reviewedAt: Optional[str] = None
+    reviewedBy: Optional[str] = None
+
+
+class AdminStudentAssignmentStatusListResponse(BaseModel):
+    studentId: str
+    assignments: List[AdminStudentAssignmentStatusItem]
+
+
+class AdminWrongProblemReview(BaseModel):
+    needsRevision: bool = False
+    comment: str = ""
+
+
+class AdminWrongProblemItem(BaseModel):
+    assignmentId: str
+    assignmentTitle: str
+    submissionId: str
+    submittedAt: str
+    reviewStatus: str
+
+    problemId: str
+    problemIndex: int
+    type: str
+    question: str
+    options: Optional[List[str]] = None
+    correctAnswer: Optional[str] = None
+    studentAnswer: Optional[str] = None
+    review: AdminWrongProblemReview = Field(default_factory=AdminWrongProblemReview)
+
+
+class AdminWrongProblemListResponse(BaseModel):
+    studentId: str
+    wrongProblems: List[AdminWrongProblemItem]
+
+
 class HomeworkPendingCountResponse(BaseModel):
     """Count of homework items by status for a student."""
 

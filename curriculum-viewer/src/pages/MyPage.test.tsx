@@ -173,4 +173,45 @@ describe('MyPage stickers', () => {
       restore()
     }
   })
+
+  it('renders assignment description with math markup', async () => {
+    window.sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(buildStoredUser('demo', true)))
+    const { restore } = mockFetch({
+      assignments: [
+        {
+          id: 'hw-math-1',
+          title: '수학 숙제',
+          description: 'log_2 x^2 1/2',
+          dueAt: null,
+          createdAt: '2026-02-01T00:00:00.000Z',
+          status: 'not_submitted',
+          reviewStatus: null,
+          submission: null,
+          problems: [
+            { id: 'p1', type: 'objective', question: 'q', options: ['1', '2'], answer: '1' }
+          ]
+        }
+      ]
+    })
+
+    try {
+      render(
+        <MemoryRouter initialEntries={['/mypage']}>
+          <AuthProvider>
+            <Routes>
+              <Route path="/mypage" element={<MyPage />} />
+            </Routes>
+          </AuthProvider>
+        </MemoryRouter>
+      )
+
+      expect(await screen.findByText('수학 숙제')).toBeInTheDocument()
+      const desc = document.querySelector('.homework-card-description')
+      expect(desc?.querySelector('sub')).toBeTruthy()
+      expect(desc?.querySelector('sup')).toBeTruthy()
+      expect(desc?.querySelector('.math-frac')).toBeTruthy()
+    } finally {
+      restore()
+    }
+  })
 })
