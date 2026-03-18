@@ -30,6 +30,14 @@ const PRODUCTION_BACKEND_API_BASE = 'https://calculatemath-production.up.railway
 export const CURRICULUM_2022_API_PATH = `${API_BASE}/graph/published`
 export const CURRICULUM_2022_PATH = '/data/curriculum_math_2022.json'
 
+const CURRICULUM_NODE_TYPES = new Set([
+  'schoolLevel',
+  'gradeBand',
+  'domain',
+  'textbookUnit',
+  'achievement'
+])
+
 function normalizeApiBase(value: string): string {
   return value.endsWith('/') ? value.slice(0, -1) : value
 }
@@ -55,6 +63,10 @@ function buildApiSources(): Array<{ label: string; path: string }> {
   }
 
   return sources
+}
+
+function looksLikeCurriculumGraph(graph: Curriculum2022Graph): boolean {
+  return graph.nodes.some((node) => CURRICULUM_NODE_TYPES.has(node.nodeType))
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -160,6 +172,11 @@ export async function loadCurriculum2022Graph(signal?: AbortSignal): Promise<Cur
     const parsed = parseCurriculum2022Graph(json)
     if (!parsed) {
       lastError = new Error(`Invalid 2022 curriculum graph schema from ${source.label}`)
+      continue
+    }
+
+    if (source.label !== 'fallback JSON' && !looksLikeCurriculumGraph(parsed)) {
+      lastError = new Error(`API graph from ${source.label} is not curriculum-shaped; trying fallback data`)
       continue
     }
 

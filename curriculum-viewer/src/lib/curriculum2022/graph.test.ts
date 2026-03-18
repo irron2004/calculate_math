@@ -59,6 +59,47 @@ describe('loadCurriculum2022Graph', () => {
     }
   })
 
+  it('falls back to static json when API payload is not curriculum-shaped', async () => {
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = vi
+      .fn(async () => ({ ok: false, status: 404 }))
+      .mockImplementationOnce(async () => ({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          nodes: [
+            { id: 'ROOT-MATH', nodeType: 'root', label: 'Math' },
+            { id: 'S-1', nodeType: 'skill', label: 'skill 1' },
+            { id: 'S-2', nodeType: 'skill', label: 'skill 2' }
+          ],
+          edges: [{ edgeType: 'prereq', source: 'S-1', target: 'S-2' }]
+        })
+      }))
+      .mockImplementationOnce(async () => ({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          meta: { curriculumId: 'KR-MATH-2022' },
+          nodes: [{ id: 'TU-1', nodeType: 'textbookUnit', label: 'Unit 1' }],
+          edges: []
+        })
+      })) as unknown as typeof fetch
+
+    try {
+      const result = await loadCurriculum2022Graph()
+      expect(result.nodes).toHaveLength(1)
+      expect(result.nodes[0].nodeType).toBe('textbookUnit')
+      expect(globalThis.fetch).toHaveBeenNthCalledWith(1, CURRICULUM_2022_API_PATH, {
+        signal: undefined
+      })
+      expect(globalThis.fetch).toHaveBeenNthCalledWith(2, CURRICULUM_2022_PATH, {
+        signal: undefined
+      })
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+
   it('reports HTTP status when both API and fallback fail', async () => {
     const originalFetch = globalThis.fetch
     globalThis.fetch = vi.fn(async () => ({ ok: false, status: 404 })) as unknown as typeof fetch
