@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "validate:data": "node scripts/validate-data.mjs",
+    "convert:curriculum:graph": "node scripts/convert-curriculum-2022-to-graph.mjs",
     "generate:problems:gemini": "node scripts/generate-problems-gemini.mjs",
     "test:e2e": "playwright test"
   },

@@ -6,7 +6,9 @@ from uuid import uuid4
 from app.db import connect
 
 
-def _insert_graph_version(conn, *, status: str, published_at: str | None, nodes: list[dict]) -> None:
+def _insert_graph_version(
+    conn, *, status: str, published_at: str | None, nodes: list[dict[str, object]]
+) -> None:
     graph_version_id = str(uuid4())
     conn.execute(
         """
@@ -102,3 +104,15 @@ def test_published_returns_latest(client):
     payload = response.json()
     node_ids = {node["id"] for node in payload["nodes"]}
     assert "NEW-NODE" in node_ids
+
+
+def test_graph_backend_status_reports_sqlite(client):
+    test_client, _ = client
+
+    response = test_client.get("/api/graph/backend")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["backend"] == "sqlite"
+    assert payload["ready"] is True
+    assert "publishedGraphAvailable" in payload

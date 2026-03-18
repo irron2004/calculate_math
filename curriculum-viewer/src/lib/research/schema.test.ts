@@ -35,4 +35,17 @@ describe('parseResearchPatchV1', () => {
       expect(result.error.issues.map((issue) => issue.code)).toContain('missing_add_edges')
     }
   })
+
+  it('rejects unsupported nodeType values', () => {
+    const result = parseResearchPatchV1Safe({
+      add_nodes: [{ id: 'N1', nodeType: 'gradeBand', label: 'Bad type' }],
+      add_edges: [],
+      remove_edges: []
+    })
+
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.error.issues.map((issue) => issue.code)).toContain('invalid_node_type')
+    }
+  })
 })

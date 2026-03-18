@@ -1,6 +1,7 @@
 import {
   CURRICULUM_2022_API_PATH,
   CURRICULUM_2022_PATH,
+  loadGraphBackendStatus,
   loadCurriculum2022Graph,
   loadPublishedApiGraph
 } from './graph'
@@ -191,6 +192,48 @@ describe('loadPublishedApiGraph', () => {
       expect(result.nodes.map((node) => node.nodeType)).toEqual(['root', 'skill', 'skill'])
       expect(globalThis.fetch).toHaveBeenCalledTimes(1)
       expect(globalThis.fetch).toHaveBeenCalledWith(CURRICULUM_2022_API_PATH, { signal: undefined })
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+})
+
+describe('loadGraphBackendStatus', () => {
+  it('loads graph backend status from API endpoint', async () => {
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        backend: 'neo4j',
+        ready: true,
+        publishedGraphAvailable: true,
+        nodeCount: 12,
+        edgeCount: 34
+      })
+    })) as unknown as typeof fetch
+
+    try {
+      const result = await loadGraphBackendStatus()
+      expect(result.backend).toBe('neo4j')
+      expect(result.ready).toBe(true)
+      expect(result.publishedGraphAvailable).toBe(true)
+      expect(result.nodeCount).toBe(12)
+      expect(result.edgeCount).toBe(34)
+      expect(globalThis.fetch).toHaveBeenCalledWith('/api/graph/backend', { signal: undefined })
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+
+  it('reports endpoint status errors when graph backend status is unavailable', async () => {
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = vi.fn(async () => ({ ok: false, status: 503 })) as unknown as typeof fetch
+
+    try {
+      await expect(loadGraphBackendStatus()).rejects.toThrowError(
+        'Failed to load graph backend status from API(same-origin) (HTTP 503)'
+      )
     } finally {
       globalThis.fetch = originalFetch
     }

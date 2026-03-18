@@ -15,17 +15,22 @@ describe('slugifyLabel', () => {
 })
 
 describe('generateProposedNodeId', () => {
-  it('generates P_TU_<slug> ids', () => {
-    expect(generateProposedNodeId('Solid figures bridge', [])).toBe('P_TU_solid_figures_bridge')
+  it('generates P_S_<slug> ids by default', () => {
+    expect(generateProposedNodeId('Solid figures bridge', [])).toBe('P_S_solid_figures_bridge')
+  })
+
+  it('uses type-specific prefixes', () => {
+    expect(generateProposedNodeId('Solid figures bridge', [], 'unit')).toBe('P_U_solid_figures_bridge')
+    expect(generateProposedNodeId('Solid figures bridge', [], 'problem')).toBe('P_P_solid_figures_bridge')
+    expect(generateProposedNodeId('Solid figures bridge', [], 'textbookUnit')).toBe('P_TU_solid_figures_bridge')
   })
 
   it('adds numeric suffix when colliding with existing ids', () => {
-    const existing = new Set(['P_TU_hello_world', 'P_TU_hello_world_2'])
-    expect(generateProposedNodeId('Hello world', existing)).toBe('P_TU_hello_world_3')
+    const existing = new Set(['P_S_hello_world', 'P_S_hello_world_2'])
+    expect(generateProposedNodeId('Hello world', existing)).toBe('P_S_hello_world_3')
   })
 
   it('returns null when slug is invalid', () => {
     expect(generateProposedNodeId('***', [])).toBeNull()
   })
 })
-

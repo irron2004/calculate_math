@@ -62,6 +62,7 @@ export type ResearchSchemaIssueCode =
   | 'remove_edge_not_object'
   | 'missing_node_id'
   | 'missing_node_type'
+  | 'invalid_node_type'
   | 'missing_node_label'
   | 'missing_edge_source'
   | 'missing_edge_target'
@@ -93,6 +94,7 @@ export class ResearchSchemaError extends Error {
 const MANIFEST_SCHEMA_VERSION: ResearchManifestSchemaVersion = 'research-manifest-v1'
 const PATCH_SCHEMA_VERSION: ResearchPatchSchemaVersion = 'research-patch-v1'
 const TRACKS: ResearchTrack[] = ['T1', 'T2', 'T3']
+const RESEARCH_PATCH_NODE_TYPES = new Set(['textbookUnit', 'unit', 'skill', 'problem'])
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -226,6 +228,13 @@ export function validateResearchPatchV1(input: unknown): ResearchSchemaIssue[] {
     const nodeType = readOptionalString(raw, 'nodeType')?.trim()
     if (!nodeType) {
       pushIssue(issues, 'missing_node_type', `${nodePath}.nodeType`, 'Must be a non-empty string')
+    } else if (!RESEARCH_PATCH_NODE_TYPES.has(nodeType)) {
+      pushIssue(
+        issues,
+        'invalid_node_type',
+        `${nodePath}.nodeType`,
+        `Must be one of: ${Array.from(RESEARCH_PATCH_NODE_TYPES).join(', ')}`
+      )
     }
 
     const label = readOptionalString(raw, 'label')?.trim()

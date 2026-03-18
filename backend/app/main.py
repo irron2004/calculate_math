@@ -1,24 +1,64 @@
 """FastAPI application entrypoint."""
+
 from __future__ import annotations
 
+import importlib
 import logging
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from slowapi import _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
 
 from .api import limiter as api_limiter
 from .api import router
 from .auth import hash_password, verify_password
-from .db import cleanup_expired_refresh_tokens, ensure_admin_user, get_user_by_username, init_db, resolve_database_path, seed_db, update_user_password
+from .db import (
+    cleanup_expired_refresh_tokens,
+    ensure_admin_user,
+    get_user_by_username,
+    init_db,
+    resolve_database_path,
+    seed_db,
+    update_user_password,
+)
+from .graph_storage import shutdown_graph_storage
 
 logger = logging.getLogger(__name__)
+
+
+def _resolve_rate_limit_dependencies() -> tuple[Any, Any]:
+    try:
+        slowapi_module = importlib.import_module("slowapi")
+        slowapi_errors = importlib.import_module("slowapi.errors")
+        return (
+            slowapi_module._rate_limit_exceeded_handler,
+            slowapi_errors.RateLimitExceeded,
+        )
+    except Exception:
+
+        def _fallback_handler(_request: Request, _exc: Exception) -> JSONResponse:
+            return JSONResponse(
+                status_code=429,
+                content={
+                    "error": {
+                        "code": "RATE_LIMIT_EXCEEDED",
+                        "message": "Too many requests.",
+                    }
+                },
+            )
+
+        class _FallbackRateLimitExceeded(Exception):
+            pass
+
+        return _fallback_handler, _FallbackRateLimitExceeded
+
+
+_rate_limit_exceeded_handler, RateLimitExceeded = _resolve_rate_limit_dependencies()
 
 
 def get_cors_origins() -> list[str]:
@@ -47,7 +87,7 @@ def _load_env_file() -> None:
     if not env_path.exists():
         return
     try:
-        from dotenv import load_dotenv
+        load_dotenv = importlib.import_module("dotenv").load_dotenv
     except Exception:
         logger.debug("python-dotenv not installed; skipping .env load")
         return
@@ -59,7 +99,9 @@ def _ensure_admin_account(db_path: Path) -> None:
     username = os.getenv("ADMIN_USERNAME", "").strip()
     password = os.getenv("ADMIN_PASSWORD", "").strip()
     if not username or not password:
-        logger.info("ADMIN_USERNAME or ADMIN_PASSWORD not set; skipping admin bootstrap")
+        logger.info(
+            "ADMIN_USERNAME or ADMIN_PASSWORD not set; skipping admin bootstrap"
+        )
         return
     email = os.getenv("ADMIN_AUTH_EMAIL", f"{username}@local").strip()
     name = os.getenv("ADMIN_NAME", "Admin").strip() or "Admin"
@@ -105,7 +147,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             logger.info("Cleaned up %d expired refresh tokens", cleaned)
     except Exception as exc:
         logger.warning("Failed to cleanup expired tokens: %s", exc)
-    yield
+    try:
+        yield
+    finally:
+        shutdown_graph_storage()
 
 
 def create_app() -> FastAPI:

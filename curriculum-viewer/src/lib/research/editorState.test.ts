@@ -17,7 +17,7 @@ describe('research editor state', () => {
       proposedNodes: [
         {
           id: 'P_TU_bridge',
-          nodeType: 'textbookUnit',
+          nodeType: 'unit',
           label: 'Bridge',
           proposed: true,
           origin: 'manual',
@@ -66,6 +66,7 @@ describe('research editor state', () => {
 
     const loaded = loadResearchEditorState()
     expect(loaded.proposedNodes).toHaveLength(1)
+    expect(loaded.proposedNodes[0].nodeType).toBe('skill')
     expect(loaded.addedEdges).toHaveLength(1)
     expect(loaded.removedEdges).toHaveLength(1)
   })

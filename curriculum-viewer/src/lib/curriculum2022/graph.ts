@@ -23,6 +23,16 @@ export type Curriculum2022Graph = {
   edges: Curriculum2022Edge[]
 }
 
+export type GraphBackendStatus = {
+  backend: string
+  ready: boolean
+  publishedGraphAvailable: boolean
+  nodeCount?: number
+  edgeCount?: number
+  source?: string
+  sourcePath?: string
+}
+
 const apiBaseFromEnv = import.meta.env.VITE_API_URL
 const API_BASE = import.meta.env.DEV ? '/api' : (apiBaseFromEnv || '/api')
 const PRODUCTION_BACKEND_API_BASE = 'https://calculatemath-production.up.railway.app/api'
@@ -65,6 +75,29 @@ function buildApiSources(): Array<{ label: string; path: string }> {
   return sources
 }
 
+function buildBackendStatusSources(): Array<{ label: string; path: string }> {
+  const dedup = new Set<string>()
+  const sources: Array<{ label: string; path: string }> = []
+
+  const append = (label: string, path: string) => {
+    if (dedup.has(path)) return
+    dedup.add(path)
+    sources.push({ label, path })
+  }
+
+  if (apiBaseFromEnv) {
+    append('API(env)', `${normalizeApiBase(apiBaseFromEnv)}/graph/backend`)
+  }
+
+  append('API(same-origin)', '/api/graph/backend')
+
+  if (!import.meta.env.DEV) {
+    append('API(default-production)', `${PRODUCTION_BACKEND_API_BASE}/graph/backend`)
+  }
+
+  return sources
+}
+
 function looksLikeCurriculumGraph(graph: Curriculum2022Graph): boolean {
   return graph.nodes.some((node) => CURRICULUM_NODE_TYPES.has(node.nodeType))
 }
@@ -77,6 +110,36 @@ function asNonEmptyString(value: unknown): string | null {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
   return trimmed.length > 0 ? trimmed : null
+}
+
+function asBoolean(value: unknown): boolean | null {
+  if (typeof value !== 'boolean') return null
+  return value
+}
+
+function asNullableFiniteNumber(value: unknown): number | undefined {
+  if (value === null || value === undefined) return undefined
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined
+  return value
+}
+
+function parseGraphBackendStatus(raw: unknown): Omit<GraphBackendStatus, 'source' | 'sourcePath'> | null {
+  if (!isRecord(raw)) return null
+
+  const backend = asNonEmptyString(raw.backend)
+  const ready = asBoolean(raw.ready)
+  const publishedGraphAvailable = asBoolean(raw.publishedGraphAvailable)
+  const nodeCount = asNullableFiniteNumber(raw.nodeCount)
+  const edgeCount = asNullableFiniteNumber(raw.edgeCount)
+  if (!backend || ready === null || publishedGraphAvailable === null) return null
+
+  return {
+    backend,
+    ready,
+    publishedGraphAvailable,
+    ...(nodeCount !== undefined ? { nodeCount } : {}),
+    ...(edgeCount !== undefined ? { edgeCount } : {})
+  }
 }
 
 function parseNode(raw: unknown): Curriculum2022Node | null {
@@ -186,6 +249,49 @@ export async function loadPublishedApiGraph(signal?: AbortSignal): Promise<Curri
   }
 
   throw lastError ?? new Error('Failed to load published API graph')
+}
+
+export async function loadGraphBackendStatus(signal?: AbortSignal): Promise<GraphBackendStatus> {
+  const sources = buildBackendStatusSources()
+  let lastError: Error | null = null
+
+  for (const source of sources) {
+    let response: Response
+    try {
+      response = await fetch(source.path, { signal })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      lastError = new Error(`Failed to load graph backend status from ${source.label} (${message})`)
+      continue
+    }
+
+    if (!response.ok) {
+      lastError = new Error(`Failed to load graph backend status from ${source.label} (HTTP ${response.status})`)
+      continue
+    }
+
+    let json: unknown
+    try {
+      json = (await response.json()) as unknown
+    } catch {
+      lastError = new Error(`Failed to parse graph backend status JSON from ${source.label}`)
+      continue
+    }
+
+    const parsed = parseGraphBackendStatus(json)
+    if (!parsed) {
+      lastError = new Error(`Invalid graph backend status schema from ${source.label}`)
+      continue
+    }
+
+    return {
+      ...parsed,
+      source: source.label,
+      sourcePath: source.path
+    }
+  }
+
+  throw lastError ?? new Error('Failed to load graph backend status')
 }
 
 export async function loadCurriculum2022Graph(signal?: AbortSignal): Promise<Curriculum2022Graph> {

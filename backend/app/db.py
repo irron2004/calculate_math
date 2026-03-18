@@ -11,6 +11,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
+from .graph_storage import (
+    get_graph_storage_backend,
+    get_neo4j_graph_store,
+    prepare_graph_storage,
+)
+
 DEFAULT_SCHEMA_VERSION = 1
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "app.db"
@@ -669,7 +675,7 @@ def _insert_edges(
             ) from exc
 
 
-def fetch_latest_graph(
+def _fetch_latest_graph_sqlite(
     status: str, path: Optional[Path] = None
 ) -> Optional[Dict[str, Any]]:
     conn = connect(path)
@@ -758,7 +764,7 @@ def _get_active_graph_version_id(conn: sqlite3.Connection) -> Optional[str]:
     return None
 
 
-def fetch_problems(
+def _fetch_problems_sqlite(
     node_id: str, path: Optional[Path] = None
 ) -> Optional[List[Dict[str, Any]]]:
     conn = connect(path)
@@ -802,6 +808,26 @@ def fetch_problems(
         for row in problem_rows
     ]
     return problems
+
+
+def fetch_latest_graph(
+    status: str, path: Optional[Path] = None
+) -> Optional[Dict[str, Any]]:
+    backend = get_graph_storage_backend()
+    if backend == "sqlite":
+        return _fetch_latest_graph_sqlite(status, path)
+    prepare_graph_storage(path or get_database_path())
+    return get_neo4j_graph_store().fetch_latest_graph(status)
+
+
+def fetch_problems(
+    node_id: str, path: Optional[Path] = None
+) -> Optional[List[Dict[str, Any]]]:
+    backend = get_graph_storage_backend()
+    if backend == "sqlite":
+        return _fetch_problems_sqlite(node_id, path)
+    prepare_graph_storage(path or get_database_path())
+    return get_neo4j_graph_store().fetch_problems(node_id)
 
 
 # ============================================================

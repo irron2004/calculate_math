@@ -1,3 +1,5 @@
+import type { ProposedGraphNodeType } from './types'
+
 export function slugifyLabel(label: string): string {
   const normalized = label.trim().toLowerCase().normalize('NFKC')
   if (!normalized) return ''
@@ -11,11 +13,22 @@ export function slugifyLabel(label: string): string {
   return slug
 }
 
-export function generateProposedNodeId(label: string, existingIds: Iterable<string>): string | null {
+const NODE_PREFIX: Record<ProposedGraphNodeType, string> = {
+  textbookUnit: 'P_TU',
+  unit: 'P_U',
+  skill: 'P_S',
+  problem: 'P_P'
+}
+
+export function generateProposedNodeId(
+  label: string,
+  existingIds: Iterable<string>,
+  nodeType: ProposedGraphNodeType = 'skill'
+): string | null {
   const slug = slugifyLabel(label)
   if (!slug) return null
 
-  const baseId = `P_TU_${slug}`
+  const baseId = `${NODE_PREFIX[nodeType]}_${slug}`
   const existing = existingIds instanceof Set ? existingIds : new Set(existingIds)
 
   if (!existing.has(baseId)) return baseId

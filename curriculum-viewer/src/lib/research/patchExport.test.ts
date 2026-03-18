@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { addPrereqEdge, createPrereqEditState, removePrereqEdge } from '../curriculum2022/prereqEdit'
-import type { ProposedTextbookUnitNode } from '../curriculum2022/types'
+import type { ProposedGraphNode } from '../curriculum2022/types'
 import { buildPatchExport } from './patchExport'
 
 describe('buildPatchExport', () => {
@@ -14,10 +14,10 @@ describe('buildPatchExport', () => {
     const withAdded = addPrereqEdge(state, { source: 'C', target: 'A' })
     const withRemoved = removePrereqEdge(withAdded, { source: 'A', target: 'B' })
 
-    const proposedNodes: ProposedTextbookUnitNode[] = [
-      { id: 'P_TU_beta', nodeType: 'textbookUnit', label: 'Beta', proposed: true, origin: 'manual' },
-      { id: 'P_TU_alpha', nodeType: 'textbookUnit', label: 'Alpha', proposed: true, origin: 'manual', note: 'note' },
-      { id: 'A', nodeType: 'textbookUnit', label: 'Base', proposed: true, origin: 'manual' }
+    const proposedNodes: ProposedGraphNode[] = [
+      { id: 'P_S_beta', nodeType: 'skill', label: 'Beta', proposed: true, origin: 'manual' },
+      { id: 'P_U_alpha', nodeType: 'unit', label: 'Alpha', proposed: true, origin: 'manual', note: 'note' },
+      { id: 'A', nodeType: 'skill', label: 'Base', proposed: true, origin: 'manual' }
     ]
 
     const patch = buildPatchExport({
@@ -42,17 +42,17 @@ describe('buildPatchExport', () => {
         ],
         "add_nodes": [
           {
-            "id": "P_TU_alpha",
-            "label": "Alpha",
-            "nodeType": "textbookUnit",
+            "id": "P_S_beta",
+            "label": "Beta",
+            "nodeType": "skill",
             "proposed": true,
-            "reason": "note",
           },
           {
-            "id": "P_TU_beta",
-            "label": "Beta",
-            "nodeType": "textbookUnit",
+            "id": "P_U_alpha",
+            "label": "Alpha",
+            "nodeType": "unit",
             "proposed": true,
+            "reason": "note",
           },
         ],
         "remove_edges": [

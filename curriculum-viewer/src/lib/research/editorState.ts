@@ -1,5 +1,6 @@
 import type { PrereqEdge } from '../curriculum2022/prereqEdit'
-import type { ProposedTextbookUnitNode } from '../curriculum2022/types'
+import type { ProposedGraphNode } from '../curriculum2022/types'
+import { normalizeProposedGraphNodeType } from '../curriculum2022/types'
 import type { ResearchTrack } from './schema'
 import { getBrowserStorage, isRecord, safeGetItem, safeParseJson, safeSetItem } from '../repository/storage'
 
@@ -8,7 +9,7 @@ export const RESEARCH_EDITOR_STORAGE_KEY = 'curriculum-viewer:author:research-ed
 export type ResearchEditorStateV1 = {
   version: 1
   selectedTrack: ResearchTrack
-  proposedNodes: ProposedTextbookUnitNode[]
+  proposedNodes: ProposedGraphNode[]
   addedEdges: PrereqEdge[]
   removedEdges: PrereqEdge[]
 }
@@ -36,10 +37,10 @@ function normalizeEdges(raw: unknown): PrereqEdge[] {
   return edges
 }
 
-function normalizeProposedNodes(raw: unknown): ProposedTextbookUnitNode[] {
+function normalizeProposedNodes(raw: unknown): ProposedGraphNode[] {
   if (!Array.isArray(raw)) return []
   const seen = new Set<string>()
-  const nodes: ProposedTextbookUnitNode[] = []
+  const nodes: ProposedGraphNode[] = []
   for (const item of raw) {
     if (!isRecord(item)) continue
     const id = typeof item.id === 'string' ? item.id.trim() : ''
@@ -51,7 +52,7 @@ function normalizeProposedNodes(raw: unknown): ProposedTextbookUnitNode[] {
     const reason = typeof item.reason === 'string' && item.reason.trim() ? item.reason.trim() : undefined
     nodes.push({
       id,
-      nodeType: 'textbookUnit',
+      nodeType: normalizeProposedGraphNodeType(item.nodeType),
       label,
       proposed: true,
       origin: 'manual',

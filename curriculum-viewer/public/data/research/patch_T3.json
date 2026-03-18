@@ -1,11 +1,11 @@
 {
   "schemaVersion": "research-patch-v1",
   "researcher": "R3",
-  "scope": "curriculum_math_2022:textbookUnit",
+  "scope": "curriculum_math_2022:unit",
   "add_nodes": [
     {
       "id": "P_TU_solid_figures_bridge",
-      "nodeType": "textbookUnit",
+      "nodeType": "unit",
       "label": "입체도형의 구성 요소와 전개도",
       "proposed": true,
       "reason": "2수03-A(입체도형의 모양) 이후 3-4학년군에 입체도형 관련 단원이 없어 6수03-B로의 점프가 큼. 면·모서리·꼭짓점 및 전개도 개념을 bridge로 명시."

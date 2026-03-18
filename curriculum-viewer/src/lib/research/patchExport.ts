@@ -1,6 +1,6 @@
 import type { PrereqEditState, PrereqEdge } from '../curriculum2022/prereqEdit'
 import { listCurrentPrereqEdges, prereqEdgeKey } from '../curriculum2022/prereqEdit'
-import type { ProposedTextbookUnitNode } from '../curriculum2022/types'
+import type { ProposedGraphNode } from '../curriculum2022/types'
 import type { ResearchPatchEdgeV1, ResearchPatchNodeV1, ResearchPatchV1 } from './schema'
 
 function uniqueEdges(edges: ResearchPatchEdgeV1[]): ResearchPatchEdgeV1[] {
@@ -57,7 +57,7 @@ function normalizeRemovedEdges(edges: PrereqEdge[]): ResearchPatchEdgeV1[] {
 export function buildPatchExport(params: {
   baseNodeIds: Iterable<string>
   editState: PrereqEditState
-  proposedNodes: ProposedTextbookUnitNode[]
+  proposedNodes: ProposedGraphNode[]
 }): ResearchPatchV1 {
   const baseNodeIdSet = new Set(params.baseNodeIds)
   const basePrereqKeys = new Set(params.editState.base.map(prereqEdgeKey))
@@ -68,7 +68,7 @@ export function buildPatchExport(params: {
       const reason = node.reason ?? node.note
       return {
         id: node.id,
-        nodeType: 'textbookUnit',
+        nodeType: node.nodeType,
         label: node.label,
         proposed: true,
         ...(reason ? { reason } : {})

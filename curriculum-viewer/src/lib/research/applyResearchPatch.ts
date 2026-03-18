@@ -1,16 +1,17 @@
 import type { PrereqEditState } from '../curriculum2022/prereqEdit'
 import { prereqEdgeKey } from '../curriculum2022/prereqEdit'
-import type { ProposedTextbookUnitNode } from '../curriculum2022/types'
+import type { ProposedGraphNode } from '../curriculum2022/types'
+import { normalizeProposedGraphNodeType } from '../curriculum2022/types'
 import type { ResearchPatchV1 } from './schema'
 
 export type ResearchGraphState = {
-  proposedNodes: ProposedTextbookUnitNode[]
+  proposedNodes: ProposedGraphNode[]
   prereq: PrereqEditState
 }
 
-function uniqueById(nodes: ProposedTextbookUnitNode[]): ProposedTextbookUnitNode[] {
+function uniqueById(nodes: ProposedGraphNode[]): ProposedGraphNode[] {
   const seen = new Set<string>()
-  const out: ProposedTextbookUnitNode[] = []
+  const out: ProposedGraphNode[] = []
   for (const node of nodes) {
     if (seen.has(node.id)) continue
     seen.add(node.id)
@@ -35,16 +36,16 @@ export function applyResearchPatch(params: {
     existingNodeIds.add(node.id)
   }
 
-  const nextProposedNodes: ProposedTextbookUnitNode[] = [...params.state.proposedNodes]
+  const nextProposedNodes: ProposedGraphNode[] = [...params.state.proposedNodes]
 
   for (const node of params.patch.add_nodes) {
-    if (node.nodeType !== 'textbookUnit') continue
+    const nodeType = normalizeProposedGraphNodeType(node.nodeType)
     if (existingNodeIds.has(node.id)) continue
 
     existingNodeIds.add(node.id)
     nextProposedNodes.push({
       id: node.id,
-      nodeType: 'textbookUnit',
+      nodeType,
       label: node.label,
       proposed: true,
       origin: 'research',
@@ -79,4 +80,3 @@ export function applyResearchPatch(params: {
     prereq: { ...params.state.prereq, research: nextResearchPrereq }
   }
 }
-

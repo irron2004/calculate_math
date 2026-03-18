@@ -53,6 +53,14 @@ class TestStatusResponse(BaseModel):
     message: str
 
 
+class GraphBackendStatusResponse(BaseModel):
+    backend: str
+    ready: bool
+    publishedGraphAvailable: bool
+    nodeCount: int | None = None
+    edgeCount: int | None = None
+
+
 # ============================================================
 # Auth Models
 # ============================================================

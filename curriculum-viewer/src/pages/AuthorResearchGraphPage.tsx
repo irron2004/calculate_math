@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import ReactFlow, { Background, Controls, MiniMap, type Connection, type Edge, type Node, type ReactFlowInstance } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { loadCurriculum2022Graph, loadPublishedApiGraph } from '../lib/curriculum2022/graph'
+import {
+  loadCurriculum2022Graph,
+  loadGraphBackendStatus,
+  loadPublishedApiGraph,
+  type GraphBackendStatus
+} from '../lib/curriculum2022/graph'
 import { getEdgeStyle } from '../lib/curriculum2022/view'
 import {
   addPrereqEdge,
@@ -14,6 +19,11 @@ import {
   type PrereqEdgeWithOrigin
 } from '../lib/curriculum2022/prereqEdit'
 import { generateProposedNodeId } from '../lib/curriculum2022/proposedNodes'
+import {
+  PROPOSED_GRAPH_NODE_TYPES,
+  type ProposedGraphNode,
+  type ProposedGraphNodeType
+} from '../lib/curriculum2022/types'
 import { loadResearchPatchForTrack } from '../lib/research/loaders'
 import type { ResearchPatchV1, ResearchTrack } from '../lib/research/schema'
 import { getNodeGuideOrFallback, loadNodeGuideLookup, type NodeGuideLookup } from '../lib/research/nodeGuides'
@@ -26,7 +36,6 @@ import {
   type ResearchSuggestionsStoreV1
 } from '../lib/research/suggestionsStore'
 import { applyResearchPatch, researchEdgeKey } from '../lib/research/applyResearchPatch'
-import type { ProposedTextbookUnitNode } from '../lib/curriculum2022/types'
 import { buildPatchExport } from '../lib/research/patchExport'
 import { loadResearchEditorState, saveResearchEditorState } from '../lib/research/editorState'
 import { parseProblemBank, type ProblemBank } from '../lib/learn/problems'
@@ -102,6 +111,7 @@ const DOMAIN_LABEL_DEFAULT: Record<(typeof DOMAIN_LAYER_ORDER)[number], string> 
 }
 
 const CURRICULUM_STYLE_NODE_TYPES = new Set(['schoolLevel', 'gradeBand', 'domain', 'textbookUnit', 'achievement'])
+const UNIT_LIKE_NODE_TYPES = new Set(['root', 'schoolLevel', 'gradeBand', 'domain', 'textbookUnit', 'unit'])
 
 function normalizeDomainCode(value: unknown): DomainLayerCode {
   return value === 'NA' || value === 'RR' || value === 'GM' || value === 'DP' ? value : DOMAIN_LAYER_FALLBACK
@@ -299,6 +309,18 @@ function getNodeStyle(nodeType: string, proposed?: boolean): CSSProperties {
         borderLeft: '4px solid #7c3aed',
         background: '#faf5ff'
       }
+    case 'unit':
+      return {
+        border: '1px solid #cbd5e1',
+        borderLeft: '4px solid #0369a1',
+        background: '#f8fafc'
+      }
+    case 'problem':
+      return {
+        border: '1px solid #fed7aa',
+        borderLeft: '4px solid #ea580c',
+        background: '#fff7ed'
+      }
     case 'textbookUnit':
       return { border: '1px solid #e2e8f0', borderLeft: '4px solid #0ea5e9', background: '#ffffff' }
     case 'achievement':
@@ -312,6 +334,8 @@ export default function AuthorResearchGraphPage() {
   const reactFlowInstanceRef = useRef<ReactFlowInstance | null>(null)
   const initialEditorState = useMemo(() => loadResearchEditorState(), [])
   const [state, setState] = useState<LoadState>({ status: 'loading' })
+  const [backendStatus, setBackendStatus] = useState<GraphBackendStatus | null>(null)
+  const [backendStatusError, setBackendStatusError] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<ResearchGraphViewMode>('overview')
   const [activeTrack, setActiveTrack] = useState<ResearchTrack>(initialEditorState.selectedTrack)
   const [visibleDomainCodes, setVisibleDomainCodes] = useState<DomainLayerCode[]>([
@@ -329,13 +353,14 @@ export default function AuthorResearchGraphPage() {
   const [message, setMessage] = useState<string | null>(null)
   const [problemBank2022, setProblemBank2022] = useState<ProblemBank | null>(null)
   const [nodeGuideLookup, setNodeGuideLookup] = useState<NodeGuideLookup>(DEFAULT_NODE_GUIDE_LOOKUP)
-  const [manualProposedNodes, setManualProposedNodes] = useState<ProposedTextbookUnitNode[]>(
+  const [manualProposedNodes, setManualProposedNodes] = useState<ProposedGraphNode[]>(
     initialEditorState.proposedNodes
   )
   const [manualAddedEdges, setManualAddedEdges] = useState<PrereqEdge[]>(initialEditorState.addedEdges)
   const [manualRemovedEdges, setManualRemovedEdges] = useState<PrereqEdge[]>(initialEditorState.removedEdges)
   const [showAddProposed, setShowAddProposed] = useState(false)
   const [proposedLabel, setProposedLabel] = useState('')
+  const [proposedNodeType, setProposedNodeType] = useState<ProposedGraphNodeType>('skill')
   const [proposedNote, setProposedNote] = useState('')
   const [proposedError, setProposedError] = useState<string | null>(null)
   const [suggestionsStore, setSuggestionsStore] = useState<ResearchSuggestionsStoreV1>(() => loadResearchSuggestionsStore())
@@ -350,12 +375,13 @@ export default function AuthorResearchGraphPage() {
 
   const isNeo4jDataset = useMemo(() => {
     if (state.status !== 'ready') return false
+    if (backendStatus?.backend === 'neo4j') return true
     const nodes = state.graph.nodes
     const skillCount = nodes.filter((node) => node.nodeType === 'skill').length
     if (skillCount === 0) return false
     const curriculumCount = nodes.filter((node) => CURRICULUM_STYLE_NODE_TYPES.has(node.nodeType)).length
     return curriculumCount === 0
-  }, [state])
+  }, [backendStatus, state])
 
   const initialInspectNodeId = useMemo(() => {
     const params = new URLSearchParams(window.location.search)
@@ -464,6 +490,25 @@ export default function AuthorResearchGraphPage() {
     }
 
     void run()
+
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    loadGraphBackendStatus(controller.signal)
+      .then((status) => {
+        if (controller.signal.aborted) return
+        setBackendStatus(status)
+        setBackendStatusError(null)
+      })
+      .catch((error) => {
+        if (controller.signal.aborted) return
+        const message = error instanceof Error ? error.message : String(error)
+        setBackendStatus(null)
+        setBackendStatusError(message)
+      })
 
     return () => controller.abort()
   }, [])
@@ -1085,14 +1130,16 @@ export default function AuthorResearchGraphPage() {
     const gradeBand = node.gradeBand ?? null
 
     const alignedAchievementIds =
-      node.nodeType === 'textbookUnit' ? alignsToBySource.get(inspectedNodeId) ?? [] : []
+      node.nodeType === 'textbookUnit' || node.nodeType === 'unit'
+        ? alignsToBySource.get(inspectedNodeId) ?? []
+        : []
 
     const alignedAchievements = alignedAchievementIds
       .map((id) => inspectableNodeById.get(id))
       .filter((item): item is InspectableNode => item !== undefined && item.nodeType === 'achievement')
 
     const goals =
-      node.nodeType === 'textbookUnit'
+      node.nodeType === 'textbookUnit' || node.nodeType === 'unit'
         ? alignedAchievements.map((achievement) => ({
             id: achievement.id,
             label: achievement.label,
@@ -1118,7 +1165,7 @@ export default function AuthorResearchGraphPage() {
         for (const problem of problems.slice(0, 2)) {
           examplePrompts.push({ nodeId: node.id, prompt: problem.prompt })
         }
-      } else if (node.nodeType === 'textbookUnit') {
+      } else if (node.nodeType === 'textbookUnit' || node.nodeType === 'unit') {
         for (const achievement of alignedAchievements) {
           const problems = problemBank2022.problemsByNodeId[achievement.id] ?? []
           if (problems.length === 0) continue
@@ -1575,12 +1622,14 @@ export default function AuthorResearchGraphPage() {
 
   const counts = useMemo(() => {
     if (state.status !== 'ready') return null
-    const textbookUnitCount =
-      state.graph.nodes.filter((node) => node.nodeType === 'textbookUnit').length +
-      proposedNodes.filter((node) => node.nodeType === 'textbookUnit').length
-    const visibleTextbookUnitCount = visibleNodes.filter((node) => node.nodeType === 'textbookUnit').length
+    const unitCount =
+      state.graph.nodes.filter((node) => UNIT_LIKE_NODE_TYPES.has(node.nodeType)).length +
+      proposedNodes.filter((node) => node.nodeType === 'unit' || node.nodeType === 'textbookUnit').length
+    const visibleUnitCount = visibleNodes.filter((node) => UNIT_LIKE_NODE_TYPES.has(node.nodeType)).length
     const skillCount = state.graph.nodes.filter((node) => node.nodeType === 'skill').length
     const visibleSkillCount = visibleNodes.filter((node) => node.nodeType === 'skill').length
+    const problemCount = state.graph.nodes.filter((node) => node.nodeType === 'problem').length
+    const visibleProblemCount = visibleNodes.filter((node) => node.nodeType === 'problem').length
     const prereqCounts = currentPrereqEdges.reduce(
       (acc, edge) => {
         acc.total += 1
@@ -1604,10 +1653,12 @@ export default function AuthorResearchGraphPage() {
       visibleNodes: visibleNodes.length,
       edges: state.graph.edges.length,
       visibleEdges: edges.length,
-      textbookUnits: textbookUnitCount,
-      visibleTextbookUnits: visibleTextbookUnitCount,
+      units: unitCount,
+      visibleUnits: visibleUnitCount,
       skills: skillCount,
       visibleSkills: visibleSkillCount,
+      problems: problemCount,
+      visibleProblems: visibleProblemCount,
       prereq: prereqCounts,
       visiblePrereq: visiblePrereqCounts
     }
@@ -1688,10 +1739,9 @@ export default function AuthorResearchGraphPage() {
 
       {counts ? (
         <p className="muted">
-          nodes: {counts.visibleNodes}/{counts.nodes} · edges: {counts.visibleEdges}/{counts.edges} ·
-          {isNeo4jDataset
-            ? ` skill: ${counts.visibleSkills}/${counts.skills}`
-            : ` textbookUnit: ${counts.visibleTextbookUnits}/${counts.textbookUnits}`}
+          nodes: {counts.visibleNodes}/{counts.nodes} · edges: {counts.visibleEdges}/{counts.edges} · unit:{' '}
+          {counts.visibleUnits}/{counts.units} · skill: {counts.visibleSkills}/{counts.skills} · problem:{' '}
+          {counts.visibleProblems}/{counts.problems}
         </p>
       ) : null}
 
@@ -1699,6 +1749,23 @@ export default function AuthorResearchGraphPage() {
         <p className="muted" style={{ fontSize: 12 }}>
           data source: {graphSourceInfo.source ?? 'unknown'}
           {graphSourceInfo.sourcePath ? ` · ${graphSourceInfo.sourcePath}` : ''}
+        </p>
+      ) : null}
+
+      {backendStatus ? (
+        <p className="muted" style={{ fontSize: 12 }}>
+          graph backend: {backendStatus.backend} · {backendStatus.ready ? 'ready' : 'not ready'} · published graph:{' '}
+          {backendStatus.publishedGraphAvailable ? 'available' : 'missing'}
+          {typeof backendStatus.nodeCount === 'number' && typeof backendStatus.edgeCount === 'number'
+            ? ` · nodes ${backendStatus.nodeCount} · edges ${backendStatus.edgeCount}`
+            : ''}
+          {backendStatus.sourcePath ? ` · ${backendStatus.sourcePath}` : ''}
+        </p>
+      ) : null}
+
+      {backendStatusError ? (
+        <p className="muted" style={{ fontSize: 12 }}>
+          graph backend status unavailable: {backendStatusError}
         </p>
       ) : null}
 
@@ -2183,7 +2250,7 @@ export default function AuthorResearchGraphPage() {
             }
 
             const existingIds = new Set<string>(nodeTypeById.keys())
-            const id = generateProposedNodeId(trimmedLabel, existingIds)
+            const id = generateProposedNodeId(trimmedLabel, existingIds, proposedNodeType)
             if (!id) {
               setProposedError('유효한 slug를 생성할 수 없습니다. label을 변경하세요.')
               return
@@ -2194,7 +2261,7 @@ export default function AuthorResearchGraphPage() {
               ...prev,
               {
                 id,
-                nodeType: 'textbookUnit',
+                nodeType: proposedNodeType,
                 label: trimmedLabel,
                 proposed: true,
                 origin: 'manual',
@@ -2203,6 +2270,7 @@ export default function AuthorResearchGraphPage() {
             ])
 
             setProposedLabel('')
+            setProposedNodeType('skill')
             setProposedNote('')
             setShowAddProposed(false)
           }}
@@ -2218,6 +2286,19 @@ export default function AuthorResearchGraphPage() {
             <label className="form-field" style={{ flex: '1 1 260px' }}>
               label
               <input value={proposedLabel} onChange={(event) => setProposedLabel(event.target.value)} />
+            </label>
+            <label className="form-field" style={{ flex: '0 1 180px' }}>
+              node type
+              <select
+                value={proposedNodeType}
+                onChange={(event) => setProposedNodeType(event.target.value as ProposedGraphNodeType)}
+              >
+                {PROPOSED_GRAPH_NODE_TYPES.map((nodeType) => (
+                  <option key={`proposed-type-${nodeType}`} value={nodeType}>
+                    {nodeType}
+                  </option>
+                ))}
+              </select>
             </label>
             <label className="form-field" style={{ flex: '2 1 340px' }}>
               note (optional)
@@ -2326,7 +2407,7 @@ export default function AuthorResearchGraphPage() {
               <div>
                 <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 6 }}>
                   목표
-                  {inspectedPanel.node.nodeType === 'textbookUnit'
+                  {inspectedPanel.node.nodeType === 'textbookUnit' || inspectedPanel.node.nodeType === 'unit'
                     ? ` (성취기준 ${inspectedPanel.alignedAchievementCount}개)`
                     : ''}
                 </div>

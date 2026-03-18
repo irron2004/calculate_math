@@ -81,8 +81,10 @@ from .db import (
     list_homework_problems_admin,
     set_homework_problem_labels,
     get_homework_problem_bank_problems_by_ids,
+    get_database_path,
 )
 from .email_service import send_homework_notification
+from .graph_storage import get_graph_storage_backend, prepare_graph_storage
 from .models import (
     AdminStudentListResponse,
     AdminStudentFeaturesUpdateRequest,
@@ -135,6 +137,7 @@ from .models import (
     HomeworkProblemLabelSetResponse,
     HomeworkProblemBankImportRequest,
     HomeworkProblemBankImportResponse,
+    GraphBackendStatusResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -918,6 +921,45 @@ def get_published_graph() -> GraphResponse | JSONResponse:
             },
         )
     return graph
+
+
+@router.get(
+    "/graph/backend",
+    response_model=GraphBackendStatusResponse,
+    responses={503: {"model": ErrorResponse}},
+)
+def get_graph_backend_status() -> GraphBackendStatusResponse | JSONResponse:
+    backend = get_graph_storage_backend()
+
+    if backend == "neo4j":
+        try:
+            prepare_graph_storage(get_database_path())
+        except Exception as exc:
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "error": {
+                        "code": "GRAPH_BACKEND_UNAVAILABLE",
+                        "message": str(exc),
+                    }
+                },
+            )
+
+    graph = fetch_latest_graph("published")
+    if not graph:
+        return GraphBackendStatusResponse(
+            backend=backend,
+            ready=True,
+            publishedGraphAvailable=False,
+        )
+
+    return GraphBackendStatusResponse(
+        backend=backend,
+        ready=True,
+        publishedGraphAvailable=True,
+        nodeCount=len(graph.get("nodes") or []),
+        edgeCount=len(graph.get("edges") or []),
+    )
 
 
 @router.get(
