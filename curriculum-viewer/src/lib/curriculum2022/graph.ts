@@ -138,6 +138,56 @@ export function parseCurriculum2022Graph(raw: unknown): Curriculum2022Graph | nu
   return { meta, nodes, edges }
 }
 
+function withSourceMeta(graph: Curriculum2022Graph, source: { label: string; path: string }): Curriculum2022Graph {
+  return {
+    ...graph,
+    meta: {
+      ...(graph.meta ?? {}),
+      source: source.label,
+      sourcePath: source.path
+    }
+  }
+}
+
+export async function loadPublishedApiGraph(signal?: AbortSignal): Promise<Curriculum2022Graph> {
+  const sources = buildApiSources()
+  let lastError: Error | null = null
+
+  for (const source of sources) {
+    let response: Response
+    try {
+      response = await fetch(source.path, { signal })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      lastError = new Error(`Failed to load published API graph from ${source.label} (${message})`)
+      continue
+    }
+
+    if (!response.ok) {
+      lastError = new Error(`Failed to load published API graph from ${source.label} (HTTP ${response.status})`)
+      continue
+    }
+
+    let json: unknown
+    try {
+      json = (await response.json()) as unknown
+    } catch {
+      lastError = new Error(`Failed to parse published API graph JSON from ${source.label}`)
+      continue
+    }
+
+    const parsed = parseCurriculum2022Graph(json)
+    if (!parsed) {
+      lastError = new Error(`Invalid published API graph schema from ${source.label}`)
+      continue
+    }
+
+    return withSourceMeta(parsed, source)
+  }
+
+  throw lastError ?? new Error('Failed to load published API graph')
+}
+
 export async function loadCurriculum2022Graph(signal?: AbortSignal): Promise<Curriculum2022Graph> {
   const sources: Array<{ label: string; path: string }> = [
     ...buildApiSources(),
@@ -180,16 +230,7 @@ export async function loadCurriculum2022Graph(signal?: AbortSignal): Promise<Cur
       continue
     }
 
-    const meta = {
-      ...(parsed.meta ?? {}),
-      source: source.label,
-      sourcePath: source.path
-    }
-
-    return {
-      ...parsed,
-      meta
-    }
+    return withSourceMeta(parsed, source)
   }
 
   throw lastError ?? new Error('Failed to load 2022 curriculum graph')

@@ -1,7 +1,8 @@
 import {
   CURRICULUM_2022_API_PATH,
   CURRICULUM_2022_PATH,
-  loadCurriculum2022Graph
+  loadCurriculum2022Graph,
+  loadPublishedApiGraph
 } from './graph'
 
 describe('loadCurriculum2022Graph', () => {
@@ -163,6 +164,33 @@ describe('loadCurriculum2022Graph', () => {
         note: 'meta note',
         reason: 'meta reason'
       })
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+})
+
+describe('loadPublishedApiGraph', () => {
+  it('accepts Neo4j-style skill graph payloads without forcing curriculum fallback', async () => {
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        nodes: [
+          { id: 'ROOT-MATH', nodeType: 'root', label: 'Math' },
+          { id: 'S-1', nodeType: 'skill', label: 'addition' },
+          { id: 'S-2', nodeType: 'skill', label: 'carry addition' }
+        ],
+        edges: [{ edgeType: 'prereq', source: 'S-1', target: 'S-2' }]
+      })
+    })) as unknown as typeof fetch
+
+    try {
+      const result = await loadPublishedApiGraph()
+      expect(result.nodes.map((node) => node.nodeType)).toEqual(['root', 'skill', 'skill'])
+      expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+      expect(globalThis.fetch).toHaveBeenCalledWith(CURRICULUM_2022_API_PATH, { signal: undefined })
     } finally {
       globalThis.fetch = originalFetch
     }
