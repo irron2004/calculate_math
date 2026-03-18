@@ -1495,6 +1495,16 @@ export default function AuthorResearchGraphPage() {
     return `${Math.round(value * 100)}%`
   }
 
+  const graphSourceInfo = useMemo(() => {
+    if (state.status !== 'ready') return null
+    const meta = state.graph.meta
+    if (!meta) return null
+    const source = typeof meta.source === 'string' ? meta.source : null
+    const sourcePath = typeof meta.sourcePath === 'string' ? meta.sourcePath : null
+    if (!source && !sourcePath) return null
+    return { source, sourcePath }
+  }, [state])
+
   return (
     <section>
       <h1>Research Graph Editor</h1>
@@ -1504,6 +1514,13 @@ export default function AuthorResearchGraphPage() {
         <p className="muted">
           nodes: {counts.visibleNodes}/{counts.nodes} · edges: {counts.visibleEdges}/{counts.edges} · textbookUnit:{' '}
           {counts.visibleTextbookUnits}/{counts.textbookUnits}
+        </p>
+      ) : null}
+
+      {graphSourceInfo ? (
+        <p className="muted" style={{ fontSize: 12 }}>
+          data source: {graphSourceInfo.source ?? 'unknown'}
+          {graphSourceInfo.sourcePath ? ` · ${graphSourceInfo.sourcePath}` : ''}
         </p>
       ) : null}
 

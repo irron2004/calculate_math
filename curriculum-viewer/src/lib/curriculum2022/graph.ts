@@ -23,7 +23,39 @@ export type Curriculum2022Graph = {
   edges: Curriculum2022Edge[]
 }
 
+const apiBaseFromEnv = import.meta.env.VITE_API_URL
+const API_BASE = import.meta.env.DEV ? '/api' : (apiBaseFromEnv || '/api')
+const PRODUCTION_BACKEND_API_BASE = 'https://calculatemath-production.up.railway.app/api'
+
+export const CURRICULUM_2022_API_PATH = `${API_BASE}/graph/published`
 export const CURRICULUM_2022_PATH = '/data/curriculum_math_2022.json'
+
+function normalizeApiBase(value: string): string {
+  return value.endsWith('/') ? value.slice(0, -1) : value
+}
+
+function buildApiSources(): Array<{ label: string; path: string }> {
+  const dedup = new Set<string>()
+  const sources: Array<{ label: string; path: string }> = []
+
+  const append = (label: string, path: string) => {
+    if (dedup.has(path)) return
+    dedup.add(path)
+    sources.push({ label, path })
+  }
+
+  if (apiBaseFromEnv) {
+    append('API(env)', `${normalizeApiBase(apiBaseFromEnv)}/graph/published`)
+  }
+
+  append('API(same-origin)', '/api/graph/published')
+
+  if (!import.meta.env.DEV) {
+    append('API(default-production)', `${PRODUCTION_BACKEND_API_BASE}/graph/published`)
+  }
+
+  return sources
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -42,12 +74,13 @@ function parseNode(raw: unknown): Curriculum2022Node | null {
   const nodeType = asNonEmptyString(raw.nodeType)
   const label = asNonEmptyString(raw.label)
   if (!id || !nodeType || !label) return null
-  const gradeBand = asNonEmptyString(raw.gradeBand) ?? undefined
-  const parentId = asNonEmptyString(raw.parentId) ?? undefined
-  const domainCode = asNonEmptyString(raw.domainCode) ?? undefined
+  const meta = isRecord(raw.meta) ? raw.meta : null
+  const gradeBand = asNonEmptyString(raw.gradeBand) ?? asNonEmptyString(meta?.gradeBand) ?? undefined
+  const parentId = asNonEmptyString(raw.parentId) ?? asNonEmptyString(meta?.parentId) ?? undefined
+  const domainCode = asNonEmptyString(raw.domainCode) ?? asNonEmptyString(meta?.domainCode) ?? undefined
   const text = asNonEmptyString(raw.text) ?? undefined
-  const note = asNonEmptyString(raw.note) ?? undefined
-  const reason = asNonEmptyString(raw.reason) ?? undefined
+  const note = asNonEmptyString(raw.note) ?? asNonEmptyString(meta?.note) ?? undefined
+  const reason = asNonEmptyString(raw.reason) ?? asNonEmptyString(meta?.reason) ?? undefined
 
   return {
     id,
@@ -94,29 +127,53 @@ export function parseCurriculum2022Graph(raw: unknown): Curriculum2022Graph | nu
 }
 
 export async function loadCurriculum2022Graph(signal?: AbortSignal): Promise<Curriculum2022Graph> {
-  let response: Response
-  try {
-    response = await fetch(CURRICULUM_2022_PATH, { signal })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`Failed to load 2022 curriculum graph (${message})`)
+  const sources: Array<{ label: string; path: string }> = [
+    ...buildApiSources(),
+    { label: 'fallback JSON', path: CURRICULUM_2022_PATH }
+  ]
+
+  let lastError: Error | null = null
+
+  for (const source of sources) {
+    let response: Response
+    try {
+      response = await fetch(source.path, { signal })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      lastError = new Error(`Failed to load 2022 curriculum graph from ${source.label} (${message})`)
+      continue
+    }
+
+    if (!response.ok) {
+      lastError = new Error(`Failed to load 2022 curriculum graph from ${source.label} (HTTP ${response.status})`)
+      continue
+    }
+
+    let json: unknown
+    try {
+      json = (await response.json()) as unknown
+    } catch {
+      lastError = new Error(`Failed to parse 2022 curriculum graph JSON from ${source.label}`)
+      continue
+    }
+
+    const parsed = parseCurriculum2022Graph(json)
+    if (!parsed) {
+      lastError = new Error(`Invalid 2022 curriculum graph schema from ${source.label}`)
+      continue
+    }
+
+    const meta = {
+      ...(parsed.meta ?? {}),
+      source: source.label,
+      sourcePath: source.path
+    }
+
+    return {
+      ...parsed,
+      meta
+    }
   }
 
-  if (!response.ok) {
-    throw new Error(`Failed to load 2022 curriculum graph (HTTP ${response.status})`)
-  }
-
-  let json: unknown
-  try {
-    json = (await response.json()) as unknown
-  } catch {
-    throw new Error('Failed to parse 2022 curriculum graph JSON')
-  }
-
-  const parsed = parseCurriculum2022Graph(json)
-  if (!parsed) {
-    throw new Error('Invalid curriculum_math_2022.json schema')
-  }
-
-  return parsed
+  throw lastError ?? new Error('Failed to load 2022 curriculum graph')
 }

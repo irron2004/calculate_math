@@ -57,7 +57,7 @@ describe('/author/research-graph', () => {
     globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input)
 
-      if (url === '/data/curriculum_math_2022.json') {
+      if (url === '/api/graph/published' || url === '/data/curriculum_math_2022.json') {
         return {
           ok: true,
           json: async () => ({
@@ -149,7 +149,7 @@ describe('/author/research-graph', () => {
     globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input)
 
-      if (url === '/data/curriculum_math_2022.json') {
+      if (url === '/api/graph/published' || url === '/data/curriculum_math_2022.json') {
         return {
           ok: true,
           json: async () => ({
