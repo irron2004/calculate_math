@@ -44,6 +44,8 @@ type GraphApiPayload = {
   edges: GraphApiEdge[]
 }
 
+const TREE_SHAPE_NODE_TYPES = new Set(['schoolLevel', 'gradeBand', 'domain', 'textbookUnit', 'achievement'])
+
 function asNonEmptyString(value: unknown): string | null {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -114,6 +116,12 @@ function parseGraphApiPayload(raw: unknown): GraphApiPayload | null {
     nodes,
     edges
   }
+}
+
+function looksLikeCurriculumTreeGraph(payload: GraphApiPayload): boolean {
+  const hasContainsEdge = payload.edges.some((edge) => edge.edgeType === 'contains')
+  if (!hasContainsEdge) return false
+  return payload.nodes.some((node) => TREE_SHAPE_NODE_TYPES.has(node.nodeType))
 }
 
 function transformGraphApiPayload(payload: GraphApiPayload): CurriculumData {
@@ -398,6 +406,11 @@ export const defaultCurriculumLoader: CurriculumLoader = async ({ signal }) => {
     const parsedGraph = parseGraphApiPayload(payload)
     if (!parsedGraph) {
       lastError = new Error(`Invalid graph API response schema from ${source.label}`)
+      continue
+    }
+
+    if (!looksLikeCurriculumTreeGraph(parsedGraph)) {
+      lastError = new Error(`Graph API response from ${source.label} is not curriculum tree-shaped`)
       continue
     }
 

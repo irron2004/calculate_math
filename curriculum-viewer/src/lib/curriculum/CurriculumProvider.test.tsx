@@ -120,6 +120,54 @@ describe('CurriculumProvider', () => {
     }
   })
 
+  it('falls back to static curriculum json when API graph is not tree-shaped', async () => {
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = vi
+      .fn(async () => ({ ok: false, status: 404 }))
+      .mockImplementationOnce(async () => ({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          nodes: [
+            { id: 'ROOT-MATH', nodeType: 'root', label: 'Math' },
+            { id: 'S-1', nodeType: 'skill', label: 'skill 1' },
+            { id: 'S-2', nodeType: 'skill', label: 'skill 2' }
+          ],
+          edges: [{ edgeType: 'prereq', source: 'S-1', target: 'S-2' }]
+        })
+      }))
+      .mockImplementationOnce(async () => ({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          meta: { version: 1 },
+          nodes: [
+            {
+              id: 'MATH',
+              type: 'subject',
+              title: '교과 수학',
+              subject: 'math',
+              children_ids: []
+            }
+          ]
+        })
+      })) as unknown as typeof fetch
+
+    try {
+      render(
+        <CurriculumProvider autoLoad loader={defaultCurriculumLoader}>
+          <Status />
+        </CurriculumProvider>
+      )
+
+      await waitFor(() => expect(screen.getByTestId('hasData')).toHaveTextContent('yes'))
+      expect(globalThis.fetch).toHaveBeenNthCalledWith(1, '/api/graph/published', expect.any(Object))
+      expect(globalThis.fetch).toHaveBeenNthCalledWith(2, '/data/curriculum_math_v1.json', expect.any(Object))
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+
   it('exposes structural issues from loaded data', async () => {
     const loader = vi.fn(async () => ({
       meta: { version: 1 },
