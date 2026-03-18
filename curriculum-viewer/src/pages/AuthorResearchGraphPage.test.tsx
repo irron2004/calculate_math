@@ -576,4 +576,80 @@ describe('/author/research-graph', () => {
       restoreFetch()
     }
   })
+
+  it('renders Neo4j-style skill graph payload from published API', async () => {
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input)
+
+      if (url === '/api/graph/published') {
+        return {
+          ok: true,
+          json: async () => ({
+            nodes: [
+              { id: 'ROOT-MATH', nodeType: 'root', label: 'Math' },
+              { id: 'S-1', nodeType: 'skill', label: '덧셈' },
+              { id: 'S-2', nodeType: 'skill', label: '받아올림' }
+            ],
+            edges: [{ edgeType: 'prereq', source: 'S-1', target: 'S-2' }]
+          })
+        }
+      }
+
+      if (url === '/data/research/manifest.json') {
+        return {
+          ok: true,
+          json: async () => ({
+            schemaVersion: 'research-manifest-v1',
+            patchByTrack: {
+              T1: '/data/research/patch_T1.json',
+              T2: '/data/research/patch_T2.json',
+              T3: '/data/research/patch_T3.json'
+            }
+          })
+        }
+      }
+
+      if (url === '/data/research/patch_T1.json' || url === '/data/research/patch_T2.json' || url === '/data/research/patch_T3.json') {
+        return {
+          ok: true,
+          json: async () => ({
+            add_nodes: [],
+            add_edges: [],
+            remove_edges: []
+          })
+        }
+      }
+
+      if (url === '/data/research/node_guides_2022_v1.json') {
+        return {
+          ok: true,
+          json: async () => ({
+            meta: {
+              schemaVersion: 1,
+              curriculumVersion: 'KR-MATH-2022',
+              fallbacks: {
+                summaryGoal: '(준비중)',
+                problemGenerationGuideText: '(준비중)'
+              }
+            },
+            nodes: {}
+          })
+        }
+      }
+
+      return { ok: false, status: 404 }
+    }) as unknown as typeof fetch
+
+    try {
+      await renderPage()
+
+      expect(screen.getByText('Neo4j published graph view (React Flow)')).toBeInTheDocument()
+      const nodeIds = (latestReactFlowProps.nodes ?? []).map((node: any) => node.id)
+      expect(nodeIds).toEqual(expect.arrayContaining(['ROOT-MATH', 'S-1', 'S-2']))
+      expect(screen.getByText(/skill:/)).toHaveTextContent('skill: 2/2')
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
 })

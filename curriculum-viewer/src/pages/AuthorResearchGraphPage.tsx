@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import ReactFlow, { Background, Controls, MiniMap, type Connection, type Edge, type Node, type ReactFlowInstance } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { loadCurriculum2022Graph } from '../lib/curriculum2022/graph'
+import { loadCurriculum2022Graph, loadPublishedApiGraph } from '../lib/curriculum2022/graph'
 import { getEdgeStyle } from '../lib/curriculum2022/view'
 import {
   addPrereqEdge,
@@ -100,6 +100,8 @@ const DOMAIN_LABEL_DEFAULT: Record<(typeof DOMAIN_LAYER_ORDER)[number], string> 
   GM: '도형과 측정',
   DP: '자료와 가능성'
 }
+
+const CURRICULUM_STYLE_NODE_TYPES = new Set(['schoolLevel', 'gradeBand', 'domain', 'textbookUnit', 'achievement'])
 
 function normalizeDomainCode(value: unknown): DomainLayerCode {
   return value === 'NA' || value === 'RR' || value === 'GM' || value === 'DP' ? value : DOMAIN_LAYER_FALLBACK
@@ -219,6 +221,58 @@ function computePrereqDepths(nodeIds: string[], edges: PrereqEdge[]): Map<string
 
   return depth
 }
+
+function computeNeo4jLevels(nodeIds: string[], edges: PrereqEdge[], rootId: string | null): Map<string, number> {
+  const adjacency = new Map<string, Set<string>>()
+  for (const id of nodeIds) adjacency.set(id, new Set())
+
+  for (const edge of edges) {
+    if (!adjacency.has(edge.source) || !adjacency.has(edge.target)) continue
+    adjacency.get(edge.source)?.add(edge.target)
+    adjacency.get(edge.target)?.add(edge.source)
+  }
+
+  const visited = new Set<string>()
+  const levels = new Map<string, number>()
+
+  const orderedStarts: string[] = []
+  if (rootId && adjacency.has(rootId)) orderedStarts.push(rootId)
+  for (const id of nodeIds) {
+    if (id === rootId) continue
+    orderedStarts.push(id)
+  }
+
+  let nextComponentBase = 0
+  for (const start of orderedStarts) {
+    if (visited.has(start)) continue
+
+    const queue: string[] = [start]
+    visited.add(start)
+    levels.set(start, nextComponentBase)
+    let componentMaxLevel = nextComponentBase
+
+    while (queue.length > 0) {
+      const current = queue.shift()
+      if (!current) continue
+      const currentLevel = levels.get(current) ?? nextComponentBase
+      componentMaxLevel = Math.max(componentMaxLevel, currentLevel)
+
+      const neighbors = adjacency.get(current)
+      if (!neighbors) continue
+      for (const neighbor of neighbors) {
+        if (visited.has(neighbor)) continue
+        visited.add(neighbor)
+        levels.set(neighbor, currentLevel + 1)
+        queue.push(neighbor)
+      }
+    }
+
+    nextComponentBase = componentMaxLevel + 1
+  }
+
+  return levels
+}
+
 const RESEARCH_TRACKS: ResearchTrack[] = ['T1', 'T2', 'T3']
 
 function getNodeStyle(nodeType: string, proposed?: boolean): CSSProperties {
@@ -231,6 +285,20 @@ function getNodeStyle(nodeType: string, proposed?: boolean): CSSProperties {
   }
 
   switch (nodeType) {
+    case 'root':
+      return {
+        border: '1px solid #0f172a',
+        borderLeft: '4px solid #0f172a',
+        background: '#0f172a',
+        color: '#f8fafc',
+        boxShadow: '0 6px 20px rgba(15, 23, 42, 0.35)'
+      }
+    case 'skill':
+      return {
+        border: '1px solid #ddd6fe',
+        borderLeft: '4px solid #7c3aed',
+        background: '#faf5ff'
+      }
     case 'textbookUnit':
       return { border: '1px solid #e2e8f0', borderLeft: '4px solid #0ea5e9', background: '#ffffff' }
     case 'achievement':
@@ -279,6 +347,15 @@ export default function AuthorResearchGraphPage() {
   const hoverPanelActiveRef = useRef(false)
   const didApplyInitialInspectRef = useRef(false)
   const didApplyInitialCenterRef = useRef(false)
+
+  const isNeo4jDataset = useMemo(() => {
+    if (state.status !== 'ready') return false
+    const nodes = state.graph.nodes
+    const skillCount = nodes.filter((node) => node.nodeType === 'skill').length
+    if (skillCount === 0) return false
+    const curriculumCount = nodes.filter((node) => CURRICULUM_STYLE_NODE_TYPES.has(node.nodeType)).length
+    return curriculumCount === 0
+  }, [state])
 
   const initialInspectNodeId = useMemo(() => {
     const params = new URLSearchParams(window.location.search)
@@ -369,12 +446,24 @@ export default function AuthorResearchGraphPage() {
   useEffect(() => {
     const controller = new AbortController()
 
-    loadCurriculum2022Graph(controller.signal)
-      .then((graph) => setState({ status: 'ready', graph }))
-      .catch((error) => {
+    const run = async () => {
+      const publishedGraph = await loadPublishedApiGraph(controller.signal).catch(() => null)
+      if (publishedGraph) {
+        const graph = publishedGraph
+        setState({ status: 'ready', graph })
+        return
+      }
+
+      try {
+        const graph = await loadCurriculum2022Graph(controller.signal)
+        setState({ status: 'ready', graph })
+      } catch (error) {
         const message = error instanceof Error ? error.message : String(error)
         setState({ status: 'error', message })
-      })
+      }
+    }
+
+    void run()
 
     return () => controller.abort()
   }, [])
@@ -1099,6 +1188,74 @@ export default function AuthorResearchGraphPage() {
       }
     }
 
+    if (isNeo4jDataset) {
+      const visibleIdSet = new Set(visibleNodes.map((node) => node.id))
+      const graphEdges = currentPrereqEdges.filter(
+        (edge) => visibleIdSet.has(edge.source) && visibleIdSet.has(edge.target)
+      )
+      const rootId = visibleNodes.find((node) => node.nodeType === 'root')?.id ?? null
+      const levelById = computeNeo4jLevels(
+        visibleNodes.map((node) => node.id),
+        graphEdges,
+        rootId
+      )
+
+      const nodesByLevel = new Map<number, typeof visibleNodes>()
+      for (const node of visibleNodes) {
+        const level = levelById.get(node.id) ?? 0
+        const bucket = nodesByLevel.get(level)
+        if (bucket) bucket.push(node)
+        else nodesByLevel.set(level, [node])
+      }
+
+      const radialNodes: Node[] = []
+      const levels = Array.from(nodesByLevel.keys()).sort((a, b) => a - b)
+      const radiusStep = NODE_WIDTH + 120
+
+      for (const level of levels) {
+        const ringNodes = [...(nodesByLevel.get(level) ?? [])].sort((a, b) => a.id.localeCompare(b.id))
+        if (ringNodes.length === 0) continue
+        const radius = level === 0 ? 0 : level * radiusStep
+        const baseAngle = -Math.PI / 2 + level * 0.35
+
+        ringNodes.forEach((node, index) => {
+          const angle =
+            radius === 0 || ringNodes.length === 1
+              ? baseAngle
+              : baseAngle + (2 * Math.PI * index) / ringNodes.length
+          const description = node.note ?? node.reason
+
+          radialNodes.push({
+            id: node.id,
+            position: {
+              x: radius === 0 ? 0 : Math.round(Math.cos(angle) * radius),
+              y: radius === 0 ? 0 : Math.round(Math.sin(angle) * radius)
+            },
+            data: {
+              label: buildResearchNodeLabel({
+                mode: viewMode,
+                nodeType: node.nodeType,
+                depth: level + 1,
+                label: node.label,
+                id: node.id,
+                proposed: Boolean(node.proposed),
+                description
+              })
+            },
+            style: decorateNodeStyle(node.id, {
+              width: NODE_WIDTH,
+              padding: 10,
+              borderRadius: 16,
+              color: '#0f172a',
+              ...getNodeStyle(node.nodeType, Boolean(node.proposed))
+            })
+          })
+        })
+      }
+
+      return radialNodes
+    }
+
     // Use pre-calculated depth from allNodesDepthById
     const depthById = allNodesDepthById
 
@@ -1256,7 +1413,18 @@ export default function AuthorResearchGraphPage() {
     }
 
     return layeredNodes
-  }, [allNodesDepthById, domainCodeById, domainLabelByCode, hoverHighlight, hoveredNodeId, state, viewMode, visibleNodes])
+  }, [
+    allNodesDepthById,
+    currentPrereqEdges,
+    domainCodeById,
+    domainLabelByCode,
+    hoverHighlight,
+    hoveredNodeId,
+    isNeo4jDataset,
+    state,
+    viewMode,
+    visibleNodes
+  ])
 
   useEffect(() => {
     if (didApplyInitialCenterRef.current) return
@@ -1311,6 +1479,7 @@ export default function AuthorResearchGraphPage() {
     }
 
     const decorateForDomain = (style: Record<string, unknown>, source: string, target: string) => {
+      if (isNeo4jDataset) return style
       const sourceDomain = domainCodeById.get(source) ?? DOMAIN_LAYER_FALLBACK
       const targetDomain = domainCodeById.get(target) ?? DOMAIN_LAYER_FALLBACK
       if (sourceDomain === targetDomain) return style
@@ -1346,7 +1515,7 @@ export default function AuthorResearchGraphPage() {
                 id,
                 source: edge.source,
                 target: edge.target,
-                type: 'smoothstep',
+                type: isNeo4jDataset ? 'default' : 'smoothstep',
                 label: getEdgeLabelForMode({ mode: viewMode, edgeType: edge.edgeType }),
                 data: { edgeType: edge.edgeType },
                 style: decorateEdgeStyle(id, domainStyle),
@@ -1374,7 +1543,7 @@ export default function AuthorResearchGraphPage() {
               id,
               source: edge.source,
               target: edge.target,
-              type: 'smoothstep',
+              type: isNeo4jDataset ? 'default' : 'smoothstep',
               label: getEdgeLabelForMode({ mode: viewMode, edgeType: 'prereq' }),
               data: { edgeType: 'prereq', origin: edge.origin },
               style: decorateEdgeStyle(id, domainStyle),
@@ -1399,6 +1568,7 @@ export default function AuthorResearchGraphPage() {
     mergedNonPrereqEdges,
     state,
     viewMode,
+    isNeo4jDataset,
     visibleEdgeTypeSet,
     visibleNodeIdSet
   ])
@@ -1409,6 +1579,8 @@ export default function AuthorResearchGraphPage() {
       state.graph.nodes.filter((node) => node.nodeType === 'textbookUnit').length +
       proposedNodes.filter((node) => node.nodeType === 'textbookUnit').length
     const visibleTextbookUnitCount = visibleNodes.filter((node) => node.nodeType === 'textbookUnit').length
+    const skillCount = state.graph.nodes.filter((node) => node.nodeType === 'skill').length
+    const visibleSkillCount = visibleNodes.filter((node) => node.nodeType === 'skill').length
     const prereqCounts = currentPrereqEdges.reduce(
       (acc, edge) => {
         acc.total += 1
@@ -1434,6 +1606,8 @@ export default function AuthorResearchGraphPage() {
       visibleEdges: edges.length,
       textbookUnits: textbookUnitCount,
       visibleTextbookUnits: visibleTextbookUnitCount,
+      skills: skillCount,
+      visibleSkills: visibleSkillCount,
       prereq: prereqCounts,
       visiblePrereq: visiblePrereqCounts
     }
@@ -1508,12 +1682,16 @@ export default function AuthorResearchGraphPage() {
   return (
     <section>
       <h1>Research Graph Editor</h1>
-      <p className="muted">2022 그래프 기본 렌더링 (React Flow)</p>
+      <p className="muted">
+        {isNeo4jDataset ? 'Neo4j published graph view (React Flow)' : '2022 curriculum graph view (React Flow)'}
+      </p>
 
       {counts ? (
         <p className="muted">
-          nodes: {counts.visibleNodes}/{counts.nodes} · edges: {counts.visibleEdges}/{counts.edges} · textbookUnit:{' '}
-          {counts.visibleTextbookUnits}/{counts.textbookUnits}
+          nodes: {counts.visibleNodes}/{counts.nodes} · edges: {counts.visibleEdges}/{counts.edges} ·
+          {isNeo4jDataset
+            ? ` skill: ${counts.visibleSkills}/${counts.skills}`
+            : ` textbookUnit: ${counts.visibleTextbookUnits}/${counts.textbookUnits}`}
         </p>
       ) : null}
 
