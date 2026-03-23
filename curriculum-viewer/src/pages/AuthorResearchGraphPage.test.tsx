@@ -347,8 +347,8 @@ describe('/author/research-graph', () => {
         expect(tu1).toBeTruthy()
         expect(tu2).toBeTruthy()
 
-        expect(tu2.position.y - tu1.position.y).toBe(90)
-        expect(depthHeader.position.y - domainHeader.position.y).toBe(44)
+        expect(tu2.position.y - tu1.position.y).toBe(84)
+        expect(depthHeader.position.y - domainHeader.position.y).toBe(42)
       })
     } finally {
       restoreFetch()

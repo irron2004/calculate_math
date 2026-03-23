@@ -93,10 +93,10 @@ const DEFAULT_NODE_GUIDE_LOOKUP: NodeGuideLookup = {
 
 const NODE_WIDTH = 260
 const NODE_HEIGHT = 70
-const GRID_GAP_X = 30
-const GRID_GAP_Y = 20
-const GRADE_BAND_GAP_Y = 80
-const DOMAIN_LAYER_GAP_Y = 100
+const GRID_GAP_X = 20
+const GRID_GAP_Y = 14
+const GRADE_BAND_GAP_Y = 48
+const DOMAIN_LAYER_GAP_Y = 64
 const DOMAIN_LAYER_ORDER = ['NA', 'RR', 'GM', 'DP'] as const
 const DOMAIN_LAYER_FALLBACK = '__unspecified__'
 const HOVER_LEAVE_DEBOUNCE_MS = 120
@@ -1276,7 +1276,7 @@ export default function AuthorResearchGraphPage() {
 
       const radialNodes: Node[] = []
       const levels = Array.from(nodesByLevel.keys()).sort((a, b) => a - b)
-      const radiusStep = NODE_WIDTH + 90
+      const radiusStep = NODE_WIDTH + 50
 
       for (const level of levels) {
         const ringNodes = [...(nodesByLevel.get(level) ?? [])].sort((a, b) => a.id.localeCompare(b.id))
@@ -1339,9 +1339,9 @@ export default function AuthorResearchGraphPage() {
     const domainCodes = sortDomainCodes(nodesByDomain.keys())
     const layeredNodes: Node[] = []
     const DOMAIN_HEADER_HEIGHT = 36
-    const DOMAIN_HEADER_GAP_Y = 8
+    const DOMAIN_HEADER_GAP_Y = 6
     const DEPTH_HEADER_HEIGHT = 28
-    const DEPTH_HEADER_GAP_Y = 8
+    const DEPTH_HEADER_GAP_Y = 6
     let yOffset = 0
 
     for (const domainCode of domainCodes) {
