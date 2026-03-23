@@ -252,20 +252,18 @@ function computeNeo4jLevels(nodeIds: string[], edges: PrereqEdge[], rootId: stri
     orderedStarts.push(id)
   }
 
-  let nextComponentBase = 0
   for (const start of orderedStarts) {
     if (visited.has(start)) continue
 
+    const componentBase = rootId && start === rootId ? 0 : 1
     const queue: string[] = [start]
     visited.add(start)
-    levels.set(start, nextComponentBase)
-    let componentMaxLevel = nextComponentBase
+    levels.set(start, componentBase)
 
     while (queue.length > 0) {
       const current = queue.shift()
       if (!current) continue
-      const currentLevel = levels.get(current) ?? nextComponentBase
-      componentMaxLevel = Math.max(componentMaxLevel, currentLevel)
+      const currentLevel = levels.get(current) ?? componentBase
 
       const neighbors = adjacency.get(current)
       if (!neighbors) continue
@@ -276,8 +274,6 @@ function computeNeo4jLevels(nodeIds: string[], edges: PrereqEdge[], rootId: stri
         queue.push(neighbor)
       }
     }
-
-    nextComponentBase = componentMaxLevel + 1
   }
 
   return levels
