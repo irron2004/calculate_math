@@ -359,6 +359,7 @@ export default function AuthorResearchGraphPage() {
   const [manualAddedEdges, setManualAddedEdges] = useState<PrereqEdge[]>(initialEditorState.addedEdges)
   const [manualRemovedEdges, setManualRemovedEdges] = useState<PrereqEdge[]>(initialEditorState.removedEdges)
   const [showAddProposed, setShowAddProposed] = useState(false)
+  const [nodeFindQuery, setNodeFindQuery] = useState('')
   const [proposedLabel, setProposedLabel] = useState('')
   const [proposedNodeType, setProposedNodeType] = useState<ProposedGraphNodeType>('skill')
   const [proposedNote, setProposedNote] = useState('')
@@ -1036,6 +1037,31 @@ export default function AuthorResearchGraphPage() {
     return new Set(visibleNodes.map((node) => node.id))
   }, [visibleNodes])
 
+  const visibleNodeSearchItems = useMemo(() => {
+    return visibleNodes
+      .map((node) => {
+        const label = nodeLabelById.get(node.id) ?? node.label ?? node.id
+        const depth = allNodesDepthById.get(node.id) ?? 1
+        const domainCode = domainCodeById.get(node.id) ?? DOMAIN_LAYER_FALLBACK
+        return {
+          id: node.id,
+          label,
+          depth,
+          domainCode,
+          gradeBand: node.gradeBand ?? '__unspecified__'
+        }
+      })
+      .sort((a, b) => a.id.localeCompare(b.id))
+  }, [allNodesDepthById, domainCodeById, nodeLabelById, visibleNodes])
+
+  const filteredNodeSearchItems = useMemo(() => {
+    const query = nodeFindQuery.trim().toLowerCase()
+    if (!query) return visibleNodeSearchItems.slice(0, 60)
+    return visibleNodeSearchItems
+      .filter((item) => item.id.toLowerCase().includes(query) || item.label.toLowerCase().includes(query))
+      .slice(0, 60)
+  }, [nodeFindQuery, visibleNodeSearchItems])
+
   useEffect(() => {
     if (state.status !== 'ready') return
     if (state.graph.nodes.length === 0) return
@@ -1135,6 +1161,50 @@ export default function AuthorResearchGraphPage() {
       hoverPanelActiveRef.current = false
     }
   }, [inspectedNodeId])
+
+  const handleFitAll = useCallback(() => {
+    if (state.status !== 'ready') return
+    const instance = reactFlowInstanceRef.current
+    if (!instance) return
+    instance.fitView({ duration: 250, padding: 0.04, minZoom: 0.12, maxZoom: 1.6 })
+  }, [state.status])
+
+  const focusNodeById = useCallback(
+    (nodeId: string) => {
+      if (!nodeId || nodeId.startsWith('__')) return
+      const instance = reactFlowInstanceRef.current
+      const targetNode = instance?.getNode(nodeId)
+      if (!targetNode || !instance) return
+
+      setHoveredNodeId(nodeId)
+      setInspectedNodeId(nodeId)
+      setNodeFindQuery(nodeId)
+      instance.fitView({ nodes: [targetNode], duration: 250, padding: 0.08, minZoom: 0.2, maxZoom: 1.6 })
+    },
+    []
+  )
+
+  const handleFindNode = useCallback(() => {
+    const query = nodeFindQuery.trim().toLowerCase()
+    if (!query) {
+      setMessage('노드 ID 또는 라벨을 입력해 주세요.')
+      return
+    }
+
+    const exact = visibleNodeSearchItems.find(
+      (item) => item.id.toLowerCase() === query || item.label.toLowerCase() === query
+    )
+    const partial = filteredNodeSearchItems[0]
+    const target = exact ?? partial
+
+    if (!target) {
+      setMessage(`검색 결과가 없습니다: ${nodeFindQuery}`)
+      return
+    }
+
+    focusNodeById(target.id)
+    setMessage(`노드 이동: ${target.id} (${target.label})`)
+  }, [filteredNodeSearchItems, focusNodeById, nodeFindQuery, visibleNodeSearchItems])
 
   const inspectedPanel = useMemo(() => {
     if (!inspectedNodeId) return null
@@ -1806,6 +1876,39 @@ export default function AuthorResearchGraphPage() {
               View mode
             </div>
             <ResearchGraphModeToggle mode={viewMode} onChange={setViewMode} disabled={state.status !== 'ready'} />
+          </div>
+          <div className="graph-control" style={{ minWidth: 320 }}>
+            <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
+              노드 찾기
+            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+              <input
+                list="research-node-search-list"
+                value={nodeFindQuery}
+                onChange={(event) => setNodeFindQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    handleFindNode()
+                  }
+                }}
+                placeholder="ID 또는 라벨"
+                style={{ minWidth: 220 }}
+              />
+              <button type="button" className="button button-ghost button-small" onClick={handleFindNode}>
+                go
+              </button>
+              <button type="button" className="button button-ghost button-small" onClick={handleFitAll}>
+                fit all
+              </button>
+            </div>
+            <datalist id="research-node-search-list">
+              {filteredNodeSearchItems.map((item) => (
+                <option key={`search-${item.id}`} value={item.id}>
+                  {item.label} · depth {item.depth} · {item.domainCode} · {item.gradeBand}
+                </option>
+              ))}
+            </datalist>
           </div>
           <div className="graph-control" style={{ minWidth: 320 }}>
             <div className="mono" style={{ fontSize: 12, opacity: 0.8, marginBottom: 4 }}>
@@ -2503,6 +2606,7 @@ export default function AuthorResearchGraphPage() {
             nodes={nodes}
             edges={edges}
             fitView
+            fitViewOptions={{ padding: 0.04, minZoom: 0.12, maxZoom: 1.6 }}
             onInit={(instance) => {
               reactFlowInstanceRef.current = instance
             }}
