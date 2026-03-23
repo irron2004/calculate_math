@@ -1,4 +1,5 @@
 """Email service for sending homework notifications via Gmail SMTP."""
+
 from __future__ import annotations
 
 import logging
@@ -6,12 +7,22 @@ import os
 import smtplib
 from email.message import EmailMessage
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional, TypedDict
+
+from .homework_grading import is_objective_answer_correct
 
 logger = logging.getLogger(__name__)
 
 
-def get_smtp_config() -> dict:
+class SMTPConfig(TypedDict):
+    host: str
+    port: int
+    user: str
+    password: str
+    from_addr: str
+
+
+def get_smtp_config() -> SMTPConfig:
     """Get SMTP configuration from environment variables."""
     return {
         "host": os.getenv("SMTP_HOST", "smtp.gmail.com"),
@@ -32,10 +43,7 @@ def is_email_configured() -> bool:
     config = get_smtp_config()
     admin_email = get_admin_email()
     return bool(
-        config["user"]
-        and config["password"]
-        and config["from_addr"]
-        and admin_email
+        config["user"] and config["password"] and config["from_addr"] and admin_email
     )
 
 
@@ -43,8 +51,8 @@ def send_homework_notification(
     student_id: str,
     student_name: Optional[str],
     assignment_title: str,
-    problems: List[dict],
-    answers: dict,
+    problems: List[dict[str, Any]],
+    answers: dict[str, str],
     file_paths: List[str],
 ) -> bool:
     """
@@ -92,11 +100,13 @@ def send_homework_notification(
         correct_answer = problem.get("answer")
         student_answer = answers.get(problem_id, "(미응답)")
 
-        body_lines.extend([
-            "",
-            f"문제 {i} [{problem_type}]",
-            f"Q: {question}",
-        ])
+        body_lines.extend(
+            [
+                "",
+                f"문제 {i} [{problem_type}]",
+                f"Q: {question}",
+            ]
+        )
 
         if problem.get("type") == "objective" and problem.get("options"):
             for j, opt in enumerate(problem["options"], 1):
@@ -104,18 +114,34 @@ def send_homework_notification(
 
         body_lines.append(f"학생 답: {student_answer}")
         if correct_answer:
-            is_correct = str(student_answer).strip() == str(correct_answer).strip()
+            options = (
+                problem.get("options")
+                if isinstance(problem.get("options"), list)
+                else None
+            )
+            if problem.get("type") == "objective":
+                is_correct = is_objective_answer_correct(
+                    student_answer=(
+                        str(student_answer) if isinstance(student_answer, str) else None
+                    ),
+                    correct_answer=str(correct_answer),
+                    options=options,
+                )
+            else:
+                is_correct = str(student_answer).strip() == str(correct_answer).strip()
             status = "정답" if is_correct else "오답"
             body_lines.append(f"정답: {correct_answer} ({status})")
 
     body_lines.append("")
 
     if file_paths:
-        body_lines.extend([
-            "=" * 40,
-            f"첨부 파일: {len(file_paths)}개",
-            "=" * 40,
-        ])
+        body_lines.extend(
+            [
+                "=" * 40,
+                f"첨부 파일: {len(file_paths)}개",
+                "=" * 40,
+            ]
+        )
 
     msg.set_content("\n".join(body_lines))
 
@@ -151,9 +177,14 @@ def send_homework_notification(
 
     # Send email
     try:
-        with smtplib.SMTP(config["host"], config["port"]) as server:
+        smtp_host = str(config["host"])
+        smtp_port = int(config["port"])
+        smtp_user = str(config["user"])
+        smtp_password = str(config["password"])
+
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
             server.starttls()
-            server.login(config["user"], config["password"])
+            server.login(smtp_user, smtp_password)
             server.send_message(msg)
 
         logger.info(

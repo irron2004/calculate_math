@@ -345,6 +345,54 @@ def test_admin_can_list_wrong_problems_for_student(
     assert len(filtered_response.json()["wrongProblems"]) == 2
 
 
+def test_admin_wrong_problem_grading_accepts_objective_option_number(
+    client: tuple[TestClient, Any],
+) -> None:
+    test_client, _db_path = client
+
+    student_token = _register_student(test_client, student_id="student_objective_index")
+    admin_token = _login_admin(test_client)
+
+    create_response = test_client.post(
+        "/api/homework/assignments",
+        json={
+            "title": "객관식 번호 채점 테스트",
+            "targetStudentIds": ["student_objective_index"],
+            "problems": [
+                {
+                    "id": "p1",
+                    "type": "objective",
+                    "question": "정답이 8인 선택지를 고르세요.",
+                    "options": ["2", "5", "8", "11"],
+                    "answer": "8",
+                }
+            ],
+        },
+        headers=_auth_headers(admin_token),
+    )
+    assert create_response.status_code == 200, create_response.text
+    assignment_id = create_response.json()["id"]
+
+    submit_response = test_client.post(
+        f"/api/homework/assignments/{assignment_id}/submit",
+        data={
+            "studentId": "student_objective_index",
+            "answersJson": json.dumps({"p1": "3"}, ensure_ascii=False),
+        },
+        headers=_auth_headers(student_token),
+    )
+    assert submit_response.status_code == 200, submit_response.text
+
+    wrong_response = test_client.get(
+        "/api/homework/admin/students/student_objective_index/wrong-problems",
+        headers=_auth_headers(admin_token),
+    )
+    assert wrong_response.status_code == 200, wrong_response.text
+    wrong_json = wrong_response.json()
+    assert wrong_json["studentId"] == "student_objective_index"
+    assert wrong_json["wrongProblems"] == []
+
+
 def test_admin_assignment_due_at_patch_updates_due_date(
     client: tuple[TestClient, Any],
 ) -> None:

@@ -16,6 +16,7 @@ from .graph_storage import (
     get_neo4j_graph_store,
     prepare_graph_storage,
 )
+from .homework_grading import is_objective_answer_correct
 
 DEFAULT_SCHEMA_VERSION = 1
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -2240,9 +2241,10 @@ def list_wrong_problems_for_student_admin(
                 is_wrong = False
                 if problem_type == "objective":
                     if correct_answer_str is not None:
-                        if (
-                            student_answer is None
-                            or student_answer != correct_answer_str
+                        if not is_objective_answer_correct(
+                            student_answer=student_answer,
+                            correct_answer=correct_answer_str,
+                            options=options_list,
                         ):
                             is_wrong = True
                     if review_marked_wrong:
