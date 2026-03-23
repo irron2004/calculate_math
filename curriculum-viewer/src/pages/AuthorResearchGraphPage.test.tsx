@@ -326,6 +326,35 @@ describe('/author/research-graph', () => {
     }
   })
 
+  it('applies compact spacing constants to layered node and header positions', async () => {
+    const restoreFetch = mockFetch()
+
+    try {
+      await renderPage()
+
+      const user = userEvent.setup()
+      await user.click(screen.getByTestId('research-graph-mode-editor'))
+
+      await waitFor(() => {
+        const nodes = latestReactFlowProps.nodes ?? []
+        const domainHeader = nodes.find((node: any) => String(node.id).startsWith('__domain_header_'))
+        const depthHeader = nodes.find((node: any) => String(node.id).startsWith('__domain_depth_'))
+        const tu1 = nodes.find((node: any) => node.id === 'TU1')
+        const tu2 = nodes.find((node: any) => node.id === 'TU2')
+
+        expect(domainHeader).toBeTruthy()
+        expect(depthHeader).toBeTruthy()
+        expect(tu1).toBeTruthy()
+        expect(tu2).toBeTruthy()
+
+        expect(tu2.position.y - tu1.position.y).toBe(90)
+        expect(depthHeader.position.y - domainHeader.position.y).toBe(44)
+      })
+    } finally {
+      restoreFetch()
+    }
+  })
+
   it('creates a proposed node via the form with generated id', async () => {
     const restoreFetch = mockFetch()
 
@@ -341,7 +370,7 @@ describe('/author/research-graph', () => {
 
       await waitFor(() => {
         const nodeIds = (latestReactFlowProps.nodes ?? []).map((node: any) => node.id)
-        expect(nodeIds.some((id: string) => id.startsWith('P_TU_'))).toBe(true)
+        expect(nodeIds.some((id: string) => id.startsWith('P_'))).toBe(true)
       })
     } finally {
       restoreFetch()

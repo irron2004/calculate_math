@@ -2,7 +2,10 @@ import type { AuthUser, LoginInput, RegisterInput, StudentInfo } from './types'
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from './tokenStorage'
 
 const apiBaseFromEnv = import.meta.env.VITE_API_URL
-const API_BASE = import.meta.env.DEV ? '/api' : (apiBaseFromEnv || '/api')
+const PRODUCTION_BACKEND_API_BASE = 'https://calculatemath-production.up.railway.app/api'
+const API_BASE = import.meta.env.DEV
+  ? '/api'
+  : (apiBaseFromEnv || PRODUCTION_BACKEND_API_BASE)
 
 // Retry configuration for Railway cold start
 const MAX_RETRIES = 2

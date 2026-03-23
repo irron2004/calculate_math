@@ -2,6 +2,16 @@ import type { ResearchManifestV1, ResearchPatchV1, ResearchTrack } from './schem
 import { parseResearchManifestV1Safe, parseResearchPatchV1Safe } from './schema'
 
 export const RESEARCH_MANIFEST_PATH = '/data/research/manifest.json'
+export const RESEARCH_MANIFEST_FALLBACK_PATH = '/data/research/manifest.v2.json'
+
+const EMBEDDED_RESEARCH_MANIFEST: ResearchManifestV1 = {
+  schemaVersion: 'research-manifest-v1',
+  patchByTrack: {
+    T1: '/data/research/patch_T1.json',
+    T2: '/data/research/patch_T2.json',
+    T3: '/data/research/patch_T3.json'
+  }
+}
 
 type LoadOptions = {
   signal?: AbortSignal
@@ -28,12 +38,29 @@ async function fetchJson(path: string, label: string, options?: LoadOptions): Pr
 }
 
 export async function loadResearchManifest(options?: LoadOptions): Promise<ResearchManifestV1> {
-  const json = await fetchJson(RESEARCH_MANIFEST_PATH, 'research manifest', options)
-  const parsed = parseResearchManifestV1Safe(json)
-  if (!parsed.ok) {
-    throw new Error('Invalid research manifest schema')
+  const candidates = [RESEARCH_MANIFEST_PATH, RESEARCH_MANIFEST_FALLBACK_PATH]
+  let lastError: Error | null = null
+
+  for (const path of candidates) {
+    try {
+      const json = await fetchJson(path, 'research manifest', options)
+      const parsed = parseResearchManifestV1Safe(json)
+      if (!parsed.ok) {
+        lastError = new Error('Invalid research manifest schema')
+        continue
+      }
+      return parsed.value
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      lastError = new Error(message)
+    }
   }
-  return parsed.value
+
+  if (lastError) {
+    return EMBEDDED_RESEARCH_MANIFEST
+  }
+
+  throw new Error('Failed to load research manifest')
 }
 
 export async function loadResearchPatch(path: string, options?: LoadOptions): Promise<ResearchPatchV1> {

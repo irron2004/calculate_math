@@ -93,10 +93,10 @@ const DEFAULT_NODE_GUIDE_LOOKUP: NodeGuideLookup = {
 
 const NODE_WIDTH = 260
 const NODE_HEIGHT = 70
-const GRID_GAP_X = 40
-const GRID_GAP_Y = 30
-const GRADE_BAND_GAP_Y = 120
-const DOMAIN_LAYER_GAP_Y = 160
+const GRID_GAP_X = 30
+const GRID_GAP_Y = 20
+const GRADE_BAND_GAP_Y = 80
+const DOMAIN_LAYER_GAP_Y = 100
 const DOMAIN_LAYER_ORDER = ['NA', 'RR', 'GM', 'DP'] as const
 const DOMAIN_LAYER_FALLBACK = '__unspecified__'
 const HOVER_LEAVE_DEBOUNCE_MS = 120
@@ -372,6 +372,7 @@ export default function AuthorResearchGraphPage() {
   const hoverPanelActiveRef = useRef(false)
   const didApplyInitialInspectRef = useRef(false)
   const didApplyInitialCenterRef = useRef(false)
+  const didAutoResetFiltersRef = useRef(false)
 
   const isNeo4jDataset = useMemo(() => {
     if (state.status !== 'ready') return false
@@ -850,6 +851,7 @@ export default function AuthorResearchGraphPage() {
     setVisibleDomainCodes((prev) => {
       const normalized = normalizeDomainCode(code)
       if (prev.includes(normalized)) {
+        if (prev.length === 1) return prev
         return sortDomainCodes(prev.filter((value) => value !== normalized))
       }
       return sortDomainCodes([...prev, normalized])
@@ -1033,6 +1035,23 @@ export default function AuthorResearchGraphPage() {
   const visibleNodeIdSet = useMemo(() => {
     return new Set(visibleNodes.map((node) => node.id))
   }, [visibleNodes])
+
+  useEffect(() => {
+    if (state.status !== 'ready') return
+    if (state.graph.nodes.length === 0) return
+    if (visibleNodes.length > 0) {
+      didAutoResetFiltersRef.current = false
+      return
+    }
+    if (didAutoResetFiltersRef.current) return
+
+    didAutoResetFiltersRef.current = true
+    setVisibleDomainCodes(sortDomainCodes([...DOMAIN_LAYER_ORDER, DOMAIN_LAYER_FALLBACK]))
+    setVisibleDepthRange({ min: 1, max: Math.max(1, availableDepthRange.max) })
+    setVisibleGradeBands([])
+    setEditorVisibleEdgeTypes(getEditorDefaultEdgeTypes())
+    setMessage('필터가 모두 적용되어 노드가 숨겨져 있어 기본값으로 자동 복원했습니다.')
+  }, [availableDepthRange.max, state, visibleNodes.length])
 
   useEffect(() => {
     if (didApplyInitialInspectRef.current) return
@@ -1257,7 +1276,7 @@ export default function AuthorResearchGraphPage() {
 
       const radialNodes: Node[] = []
       const levels = Array.from(nodesByLevel.keys()).sort((a, b) => a - b)
-      const radiusStep = NODE_WIDTH + 120
+      const radiusStep = NODE_WIDTH + 90
 
       for (const level of levels) {
         const ringNodes = [...(nodesByLevel.get(level) ?? [])].sort((a, b) => a.id.localeCompare(b.id))
@@ -1320,9 +1339,9 @@ export default function AuthorResearchGraphPage() {
     const domainCodes = sortDomainCodes(nodesByDomain.keys())
     const layeredNodes: Node[] = []
     const DOMAIN_HEADER_HEIGHT = 36
-    const DOMAIN_HEADER_GAP_Y = 12
+    const DOMAIN_HEADER_GAP_Y = 8
     const DEPTH_HEADER_HEIGHT = 28
-    const DEPTH_HEADER_GAP_Y = 10
+    const DEPTH_HEADER_GAP_Y = 8
     let yOffset = 0
 
     for (const domainCode of domainCodes) {
@@ -2359,7 +2378,7 @@ export default function AuthorResearchGraphPage() {
         </div>
       ) : null}
 
-      <div className="graph-canvas research-graph-canvas" aria-label="Research graph canvas">
+      <section className="graph-canvas research-graph-canvas" aria-label="Research graph canvas">
         {inspectedPanel ? (
           <aside
             className="research-hover-panel"
@@ -2457,8 +2476,8 @@ export default function AuthorResearchGraphPage() {
 
                 {inspectedPanel.examplePrompts.length > 0 ? (
                   <ol style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {inspectedPanel.examplePrompts.map((item, index) => (
-                      <li key={`${item.nodeId}\u0000${index}`}>
+                    {inspectedPanel.examplePrompts.map((item) => (
+                      <li key={`${item.nodeId}\u0000${item.prompt}`}>
                         <div className="mono" style={{ fontSize: 11, opacity: 0.75 }}>
                           {item.nodeId}
                         </div>
@@ -2524,7 +2543,7 @@ export default function AuthorResearchGraphPage() {
             <MiniMap />
           </ReactFlow>
         ) : null}
-      </div>
+      </section>
     </section>
   )
 }
