@@ -4091,3 +4091,99 @@ body {
   line-height: 0;
   font-size: 0;
 }
+
+/* ── Dashboard Home ─────────────────────────────────────── */
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8, 2rem);
+  padding: var(--space-6, 1.5rem) 0;
+}
+
+.dashboard-header h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+}
+
+.dashboard-section h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.dashboard-empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-5, 1.25rem);
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.dashboard-rec-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+
+.dashboard-rec-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-5, 1.25rem);
+  background: linear-gradient(135deg, #2d1b69 0%, rgba(124, 58, 237, 0.1) 100%);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.dashboard-rec-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.dashboard-rec-reason {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.dashboard-wrong-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+}
+
+.dashboard-wrong-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s ease;
+}
+
+.dashboard-wrong-item:hover {
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.06));
+}
+
+.dashboard-wrong-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.dashboard-wrong-count {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
