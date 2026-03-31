@@ -82,6 +82,7 @@ from .db import (
     set_homework_problem_labels,
     get_homework_problem_bank_problems_by_ids,
     get_database_path,
+    get_connection,
 )
 from .email_service import send_homework_notification
 from .graph_storage import get_graph_storage_backend, prepare_graph_storage
@@ -2062,3 +2063,71 @@ async def list_study_sessions(
         conn.close()
 
     return {"sessions": result}
+
+
+# ── Recommendations ───────────────────────────────────────────────
+
+def _compute_recommendations(user_id: str, conn, limit: int = 2) -> list[dict]:
+    from datetime import datetime, timezone, timedelta
+
+    now = datetime.now(timezone.utc)
+    cutoff_14d = (now - timedelta(days=14)).isoformat()
+
+    rows = conn.execute(
+        """
+        SELECT s.node_id, s.updated_at, r.is_correct
+        FROM study_sessions s
+        JOIN study_responses r ON r.session_id = s.id
+        WHERE s.user_id = ? AND s.status = 'SUBMITTED'
+        ORDER BY s.updated_at DESC
+        """,
+        (user_id,),
+    ).fetchall()
+
+    if not rows:
+        return []
+
+    node_stats: dict[str, dict] = {}
+    for row in rows:
+        nid = row["node_id"]
+        if nid not in node_stats:
+            node_stats[nid] = {"wrong_recent": 0, "last_at": row["updated_at"]}
+        if row["updated_at"] >= cutoff_14d and row["is_correct"] == 0:
+            node_stats[nid]["wrong_recent"] += 1
+        if row["updated_at"] > node_stats[nid]["last_at"]:
+            node_stats[nid]["last_at"] = row["updated_at"]
+
+    scored = []
+    for node_id, stats in node_stats.items():
+        try:
+            last_dt = datetime.fromisoformat(stats["last_at"].replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if last_dt.tzinfo is None:
+            last_dt = last_dt.replace(tzinfo=timezone.utc)
+        days_since = (now - last_dt).days
+        score = stats["wrong_recent"] + max(0, 14 - days_since) * 0.1
+        if score <= 0:
+            continue
+
+        if stats["wrong_recent"] > 0:
+            reason = f"최근 {stats['wrong_recent']}번 틀렸어요"
+        elif days_since > 7:
+            reason = "오랫동안 안 풀었어요"
+        else:
+            reason = "조금 더 연습해봐요"
+
+        scored.append({"nodeId": node_id, "reason": reason, "score": score})
+
+    scored.sort(key=lambda x: x["score"], reverse=True)
+    return scored[:limit]
+
+
+@router.get("/recommendations")
+async def get_recommendations(user=Depends(get_current_user)):
+    conn = get_connection(get_database_path())
+    try:
+        items = _compute_recommendations(user.user_id, conn)
+    finally:
+        conn.close()
+    return {"items": items}
