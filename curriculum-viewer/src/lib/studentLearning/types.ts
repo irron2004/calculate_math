@@ -69,12 +69,14 @@ export type LearningGraphNode = {
   id: string
   isStart?: boolean
   order?: number
+  nodeType?: 'course_step' | 'atomic_skill'
+  label?: string
 }
 
 export type LearningGraphEdge = {
   sourceId: string
   targetId: string
-  type: 'requires' | 'prepares_for'
+  type: 'requires' | 'prepares_for' | 'teaches' | 'requires_skill'
 }
 
 export type LearningGraphV1 = {
