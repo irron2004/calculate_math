@@ -125,7 +125,7 @@ def create_study_responses_table(conn: sqlite3.Connection) -> None:
             time_spent_ms INTEGER,
             scratchpad_strokes_json TEXT,
             created_at TEXT NOT NULL,
-            FOREIGN KEY (session_id) REFERENCES study_sessions(id)
+            FOREIGN KEY (session_id) REFERENCES study_sessions(id) ON DELETE CASCADE
         )
     """)
     conn.execute(
