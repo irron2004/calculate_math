@@ -92,11 +92,11 @@ const DEFAULT_NODE_GUIDE_LOOKUP: NodeGuideLookup = {
 }
 
 const NODE_WIDTH = 260
-const NODE_HEIGHT = 70
+const NODE_HEIGHT = 44
 const GRID_GAP_X = 20
-const GRID_GAP_Y = 14
-const GRADE_BAND_GAP_Y = 48
-const DOMAIN_LAYER_GAP_Y = 64
+const GRID_GAP_Y = 6
+const GRADE_BAND_GAP_Y = 20
+const DOMAIN_LAYER_GAP_Y = 32
 const DOMAIN_LAYER_ORDER = ['NA', 'RR', 'GM', 'DP'] as const
 const DOMAIN_LAYER_FALLBACK = '__unspecified__'
 const HOVER_LEAVE_DEBOUNCE_MS = 120
@@ -1011,6 +1011,7 @@ export default function AuthorResearchGraphPage() {
     if (state.status !== 'ready') return []
     if (visibleDomainCodeSet.size === 0) return []
     return allNodes.filter((node) => {
+      if (!UNIT_LIKE_NODE_TYPES.has(node.nodeType)) return false
       const domainCode = domainCodeById.get(node.id) ?? DOMAIN_LAYER_FALLBACK
       if (!visibleDomainCodeSet.has(domainCode)) return false
       const depth = allNodesDepthById.get(node.id) ?? 1
