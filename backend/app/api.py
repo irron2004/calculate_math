@@ -2042,7 +2042,20 @@ async def list_study_sessions(
                     "gradingJson": s["grading_json"],
                     "createdAt": s["created_at"],
                     "updatedAt": s["updated_at"],
-                    "responses": [dict(r) for r in responses],
+                    "responses": [
+                        {
+                            "id": r["id"],
+                            "sessionId": r["session_id"],
+                            "problemId": r["problem_id"],
+                            "inputRaw": r["input_raw"],
+                            "inputNormalized": r["input_normalized"],
+                            "isCorrect": r["is_correct"],
+                            "timeSpentMs": r["time_spent_ms"],
+                            "scratchpadStrokesJson": r["scratchpad_strokes_json"],
+                            "createdAt": r["created_at"],
+                        }
+                        for r in responses
+                    ],
                 }
             )
     finally:
