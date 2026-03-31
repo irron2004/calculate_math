@@ -1660,6 +1660,19 @@ body {
   text-align: right;
 }
 
+.dashboard-skill-tree-cta {
+  margin-bottom: var(--space-5);
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-skill-tree-cta .button-primary {
+  padding: var(--space-4) var(--space-10);
+  font-size: var(--font-size-lg);
+  border-radius: var(--radius-xl);
+  letter-spacing: 0.02em;
+}
+
 .dashboard-actions {
   margin-top: var(--space-6);
   display: flex;

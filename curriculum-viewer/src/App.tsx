@@ -10,8 +10,6 @@ import { CurriculumProvider } from './lib/curriculum/CurriculumProvider'
 import { RepositoryProvider } from './lib/repository/RepositoryProvider'
 import DashboardPage from './pages/DashboardPage'
 import EvalPage from './pages/EvalPage'
-import ExplorerPage from './pages/ExplorerPage'
-import GraphPage from './pages/GraphPage'
 import HealthPage from './pages/HealthPage'
 import HomeworkSubmitPage from './pages/HomeworkSubmitPage'
 import LearnPage from './pages/LearnPage'
@@ -33,7 +31,6 @@ import AuthorValidatePage from './pages/AuthorValidatePage'
 import SkillGraphImportPage from './pages/SkillGraphImportPage'
 import SignupPage from './pages/SignupPage'
 import StudentStageMapPage from './pages/StudentStageMapPage'
-import StudentPreviewPage from './pages/StudentPreviewPage'
 import { ROUTE_SEGMENTS, ROUTES } from './routes'
 
 export default function App() {
@@ -78,14 +75,7 @@ export default function App() {
                     </RequireAuth>
                   }
                 />
-                <Route
-                  path={ROUTE_SEGMENTS.graph}
-                  element={
-                    <RequireAuth>
-                      <GraphPage />
-                    </RequireAuth>
-                  }
-                />
+                <Route path={ROUTE_SEGMENTS.graph} element={<Navigate to={ROUTES.map} replace />} />
                 <Route
                   path={ROUTE_SEGMENTS.map}
                   element={
@@ -94,14 +84,7 @@ export default function App() {
                     </RequireAuth>
                   }
                 />
-                <Route
-                  path={ROUTE_SEGMENTS.tree}
-                  element={
-                    <RequireAuth>
-                      <ExplorerPage />
-                    </RequireAuth>
-                  }
-                />
+                <Route path={ROUTE_SEGMENTS.tree} element={<Navigate to={ROUTES.map} replace />} />
                 <Route
                   path={ROUTE_SEGMENTS.report}
                   element={
@@ -110,14 +93,7 @@ export default function App() {
                     </RequireAuth>
                   }
                 />
-                <Route
-                  path={ROUTE_SEGMENTS.preview}
-                  element={
-                    <RequireAuth>
-                      <StudentPreviewPage />
-                    </RequireAuth>
-                  }
-                />
+                <Route path={ROUTE_SEGMENTS.preview} element={<Navigate to={ROUTES.dashboard} replace />} />
                 <Route
                   path={`${ROUTE_SEGMENTS.learn}/:nodeId`}
                   element={
@@ -134,14 +110,7 @@ export default function App() {
                     </RequireAuth>
                   }
                 />
-                <Route
-                  path={ROUTE_SEGMENTS.health}
-                  element={
-                    <RequireAuth>
-                      <HealthPage />
-                    </RequireAuth>
-                  }
-                />
+                <Route path={ROUTE_SEGMENTS.health} element={<Navigate to={ROUTES.dashboard} replace />} />
                 <Route
                   path={ROUTE_SEGMENTS.mypage}
                   element={

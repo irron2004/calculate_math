@@ -55,10 +55,7 @@ export default function AppLayout() {
             <li>
               <NavLink to={ROUTES.map}>
                 <MapIcon aria-hidden="true" size={18} />
-                <span>지도</span>
-                <span className="nav-badge" aria-label="Beta">
-                  Beta
-                </span>
+                <span>스킬 트리</span>
               </NavLink>
             </li>
           </ul>

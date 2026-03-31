@@ -246,6 +246,12 @@ export default function DashboardPage() {
 
       {!isAdmin && (
         <>
+          <div className="dashboard-skill-tree-cta">
+            <Link to={ROUTES.map} className="button button-primary">
+              스킬 트리 보기
+            </Link>
+          </div>
+
           {!profileLoading && !profile && (
             <div className="dashboard-onboarding">
               <h2>🧭 4분 진단으로 시작점 잡기</h2>
@@ -442,12 +448,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* 빠른 이동 */}
-      <div className="dashboard-actions">
-        <Link to={ROUTES.map} className="button button-ghost">
-          지도 보기 (Beta)
-        </Link>
-      </div>
     </section>
   )
 }
