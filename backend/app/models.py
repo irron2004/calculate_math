@@ -528,3 +528,34 @@ class HomeworkProblemBankImportResponse(BaseModel):
     createdProblemCount: int
     skippedProblemCount: int
     success: bool = True
+
+
+# ============================================================
+# Study Session and Recommendations Models
+# ============================================================
+
+
+class StudyResponseInput(BaseModel):
+    problemId: str
+    inputRaw: str
+    inputNormalized: Optional[str] = None
+    isCorrect: Optional[bool] = None
+    timeSpentMs: Optional[int] = None
+    scratchpadStrokesJson: Optional[str] = None
+
+
+class StudySessionUpsertRequest(BaseModel):
+    nodeId: str
+    status: str = "DRAFT"  # "DRAFT" | "SUBMITTED"
+    gradingJson: Optional[str] = None
+    responses: List[StudyResponseInput] = Field(default_factory=list)
+
+
+class RecommendationItem(BaseModel):
+    nodeId: str
+    reason: str
+    score: float
+
+
+class RecommendationsResponse(BaseModel):
+    items: List[RecommendationItem]
