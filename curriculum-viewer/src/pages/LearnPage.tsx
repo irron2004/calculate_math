@@ -18,6 +18,7 @@ import {
 } from '../lib/studentLearning/attemptSession'
 import type { AttemptSessionStoreV1 } from '../lib/studentLearning/types'
 import { createBrowserSessionRepository } from '../lib/repository/sessionRepository'
+import { syncSessionToServer } from '../lib/repository/serverSessionRepository'
 import { ROUTES } from '../routes'
 import './LearnPage.css'
 
@@ -468,6 +469,13 @@ export default function LearnPage() {
 
     storeRef.current = nextStore
     createBrowserSessionRepository()?.writeStore(userId, nextStore)
+
+    // Best-effort server sync — fire and forget
+    const submittedSession = nextStore.sessionsById[draft.sessionId]
+    if (submittedSession) {
+      syncSessionToServer(submittedSession)
+    }
+
     navigate(`${ROUTES.eval}/${encodeURIComponent(draft.sessionId)}`)
   }
 
