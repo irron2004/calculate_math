@@ -75,6 +75,11 @@ def connect(path: Optional[Path] = None) -> sqlite3.Connection:
     return conn
 
 
+def get_connection(path) -> sqlite3.Connection:
+    """Return a sqlite3.Connection for the given path string or Path object."""
+    return connect(Path(path) if not isinstance(path, Path) else path)
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -87,8 +92,51 @@ def _canonical_json_for_hash(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
-def init_db(path: Optional[Path] = None) -> None:
-    conn = connect(path)
+def create_study_sessions_table(conn: sqlite3.Connection) -> None:
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS study_sessions (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            node_id TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'DRAFT',
+            grading_json TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_study_sessions_user ON study_sessions(user_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_study_sessions_user_node "
+        "ON study_sessions(user_id, node_id)"
+    )
+
+
+def create_study_responses_table(conn: sqlite3.Connection) -> None:
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS study_responses (
+            id TEXT PRIMARY KEY,
+            session_id TEXT NOT NULL,
+            problem_id TEXT NOT NULL,
+            input_raw TEXT NOT NULL,
+            input_normalized TEXT,
+            is_correct INTEGER,
+            time_spent_ms INTEGER,
+            scratchpad_strokes_json TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (session_id) REFERENCES study_sessions(id)
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_study_responses_session "
+        "ON study_responses(session_id)"
+    )
+
+
+def init_db(path=None) -> None:
+    _owns_conn = not isinstance(path, sqlite3.Connection)
+    conn = path if isinstance(path, sqlite3.Connection) else connect(path)
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS graph_versions (
@@ -307,6 +355,8 @@ def init_db(path: Optional[Path] = None) -> None:
     _ensure_homework_sticker_reward_count_column(conn)
     _ensure_user_columns(conn)
     _ensure_refresh_token_columns(conn)
+    create_study_sessions_table(conn)
+    create_study_responses_table(conn)
     conn.execute(
         """
         INSERT INTO schema_version (id, version, applied_at)
@@ -316,7 +366,8 @@ def init_db(path: Optional[Path] = None) -> None:
         (DEFAULT_SCHEMA_VERSION, _now_iso()),
     )
     conn.commit()
-    conn.close()
+    if _owns_conn:
+        conn.close()
 
 
 def _set_schema_version(conn: sqlite3.Connection, version: int) -> None:
