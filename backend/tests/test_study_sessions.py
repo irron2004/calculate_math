@@ -70,3 +70,22 @@ def test_insert_study_response(db):
     assert row is not None
     assert row["input_raw"] == "42"
     assert row["is_correct"] is None
+
+
+def test_upsert_request_defaults():
+    from app.models import StudySessionUpsertRequest
+    req = StudySessionUpsertRequest(nodeId="node1")
+    assert req.status == "DRAFT"
+    assert req.responses == []
+    assert req.gradingJson is None
+
+
+def test_upsert_request_with_responses():
+    from app.models import StudySessionUpsertRequest, StudyResponseInput
+    req = StudySessionUpsertRequest(
+        nodeId="node1",
+        status="SUBMITTED",
+        responses=[StudyResponseInput(problemId="p1", inputRaw="42", isCorrect=True)],
+    )
+    assert len(req.responses) == 1
+    assert req.responses[0].isCorrect is True

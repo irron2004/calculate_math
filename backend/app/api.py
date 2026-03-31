@@ -138,6 +138,8 @@ from .models import (
     HomeworkProblemBankImportRequest,
     HomeworkProblemBankImportResponse,
     GraphBackendStatusResponse,
+    StudySessionUpsertRequest,
+    StudyResponseInput,
 )
 
 logger = logging.getLogger(__name__)
@@ -1952,3 +1954,98 @@ def get_homework_pending_count_endpoint(
         )
     counts = get_pending_homework_count(studentId)
     return HomeworkPendingCountResponse(**counts)
+
+
+# ── Study Sessions ────────────────────────────────────────────────
+
+@router.post("/study-sessions")
+async def upsert_study_session(
+    body: StudySessionUpsertRequest,
+    user=Depends(get_current_user),
+):
+    now = datetime.now(timezone.utc).isoformat()
+    user_id = user.user_id
+
+    conn = get_connection(get_database_path())
+    try:
+        # Reuse existing DRAFT session for the same user+node; create new one otherwise
+        existing = conn.execute(
+            "SELECT id FROM study_sessions WHERE user_id=? AND node_id=? AND status='DRAFT'",
+            (user_id, body.nodeId),
+        ).fetchone()
+
+        if existing:
+            session_id = existing["id"]
+            conn.execute(
+                "UPDATE study_sessions SET status=?, grading_json=?, updated_at=? WHERE id=?",
+                (body.status, body.gradingJson, now, session_id),
+            )
+        else:
+            session_id = str(uuid4())
+            conn.execute(
+                "INSERT INTO study_sessions "
+                "(id, user_id, node_id, status, grading_json, created_at, updated_at) "
+                "VALUES (?,?,?,?,?,?,?)",
+                (session_id, user_id, body.nodeId, body.status, body.gradingJson, now, now),
+            )
+
+        # Replace all responses for this session with the new set
+        conn.execute("DELETE FROM study_responses WHERE session_id=?", (session_id,))
+        for resp in body.responses:
+            resp_id = str(uuid4())
+            is_correct = (
+                1 if resp.isCorrect is True else (0 if resp.isCorrect is False else None)
+            )
+            conn.execute(
+                "INSERT INTO study_responses "
+                "(id, session_id, problem_id, input_raw, input_normalized, "
+                "is_correct, time_spent_ms, scratchpad_strokes_json, created_at) "
+                "VALUES (?,?,?,?,?,?,?,?,?)",
+                (
+                    resp_id, session_id, resp.problemId, resp.inputRaw,
+                    resp.inputNormalized, is_correct, resp.timeSpentMs,
+                    resp.scratchpadStrokesJson, now,
+                ),
+            )
+
+        conn.commit()
+    finally:
+        conn.close()
+
+    return {"sessionId": session_id, "status": body.status}
+
+
+@router.get("/study-sessions")
+async def list_study_sessions(
+    user=Depends(get_current_user),
+):
+    user_id = user.user_id
+
+    conn = get_connection(get_database_path())
+    try:
+        sessions = conn.execute(
+            "SELECT * FROM study_sessions WHERE user_id=? ORDER BY updated_at DESC",
+            (user_id,),
+        ).fetchall()
+
+        result = []
+        for s in sessions:
+            responses = conn.execute(
+                "SELECT * FROM study_responses WHERE session_id=?", (s["id"],)
+            ).fetchall()
+            result.append(
+                {
+                    "id": s["id"],
+                    "userId": s["user_id"],
+                    "nodeId": s["node_id"],
+                    "status": s["status"],
+                    "gradingJson": s["grading_json"],
+                    "createdAt": s["created_at"],
+                    "updatedAt": s["updated_at"],
+                    "responses": [dict(r) for r in responses],
+                }
+            )
+    finally:
+        conn.close()
+
+    return {"sessions": result}
