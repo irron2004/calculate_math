@@ -31,6 +31,7 @@ import AuthorValidatePage from './pages/AuthorValidatePage'
 import SkillGraphImportPage from './pages/SkillGraphImportPage'
 import SignupPage from './pages/SignupPage'
 import StudentStageMapPage from './pages/StudentStageMapPage'
+import SettingsPage from './pages/SettingsPage'
 import { ROUTE_SEGMENTS, ROUTES } from './routes'
 
 export default function App() {
@@ -111,6 +112,14 @@ export default function App() {
                   }
                 />
                 <Route path={ROUTE_SEGMENTS.health} element={<Navigate to={ROUTES.dashboard} replace />} />
+                <Route
+                  path={ROUTE_SEGMENTS.settings}
+                  element={
+                    <RequireAuth>
+                      <SettingsPage />
+                    </RequireAuth>
+                  }
+                />
                 <Route
                   path={ROUTE_SEGMENTS.mypage}
                   element={

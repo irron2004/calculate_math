@@ -1,6 +1,6 @@
 import { type ReactNode, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { ClipboardList, Home, Map as MapIcon } from 'lucide-react'
+import { ClipboardList, Home, Map as MapIcon, Settings } from 'lucide-react'
 import { useAuth } from '../lib/auth/AuthProvider'
 import { ROUTES } from '../routes'
 
@@ -77,6 +77,9 @@ export default function AppLayout() {
                   관리자 모드
                 </button>
               ) : null}
+              <NavLink to={ROUTES.settings} className="button button-ghost" aria-label="설정">
+                <Settings aria-hidden="true" size={16} />
+              </NavLink>
               <button
                 type="button"
                 className="button button-ghost"

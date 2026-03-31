@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import StickerDisplay from '../components/StickerDisplay'
 import StickerHistory from '../components/StickerHistory'
 import { useAuth } from '../lib/auth/AuthProvider'
-import { changePassword, fetchMe } from '../lib/auth/api'
+import { fetchMe } from '../lib/auth/api'
 import { listAssignments, HomeworkApiError } from '../lib/homework/api'
 import type { HomeworkAssignment } from '../lib/homework/types'
 import { getHomeworkStatus, isOverdueSoon } from '../lib/homework/types'
@@ -121,8 +121,7 @@ function AssignmentCard({ assignment }: AssignmentCardProps) {
 }
 
 export default function MyPage() {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
+  const { user } = useAuth()
 
   const [assignments, setAssignments] = useState<HomeworkAssignment[]>([])
   const [loading, setLoading] = useState(true)
@@ -133,22 +132,6 @@ export default function MyPage() {
   const [stickerLoading, setStickerLoading] = useState(false)
   const [stickerError, setStickerError] = useState<string | null>(null)
   const [stickerFeatureEnabled, setStickerFeatureEnabled] = useState(false)
-
-  const [passwordFormOpen, setPasswordFormOpen] = useState(false)
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [passwordError, setPasswordError] = useState<string | null>(null)
-  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null)
-  const [passwordSubmitting, setPasswordSubmitting] = useState(false)
-
-  const resetPasswordForm = useCallback(() => {
-    setCurrentPassword('')
-    setNewPassword('')
-    setConfirmPassword('')
-    setPasswordError(null)
-    setPasswordSuccess(null)
-  }, [])
 
   const loadAssignments = useCallback(async (signal: AbortSignal) => {
     if (!user) return
@@ -383,111 +366,6 @@ export default function MyPage() {
         </>
       )}
 
-      <section className="mypage-account-section">
-        <div className="mypage-account-header">
-          <h2>계정</h2>
-          <button
-            type="button"
-            className="button button-ghost"
-            disabled={passwordSubmitting}
-            aria-expanded={passwordFormOpen}
-            onClick={() => {
-              if (passwordFormOpen) {
-                resetPasswordForm()
-                setPasswordFormOpen(false)
-                return
-              }
-              resetPasswordForm()
-              setPasswordFormOpen(true)
-            }}
-          >
-            {passwordFormOpen ? '닫기' : '비밀번호 변경'}
-          </button>
-        </div>
-
-        {passwordFormOpen ? (
-          <form
-            className="form"
-            onSubmit={async (event) => {
-              event.preventDefault()
-              setPasswordError(null)
-              setPasswordSuccess(null)
-
-              if (!currentPassword || !newPassword || !confirmPassword) {
-                setPasswordError('모든 비밀번호 항목을 입력하세요.')
-                return
-              }
-              if (newPassword.length < 8) {
-                setPasswordError('새 비밀번호는 8자 이상이어야 합니다.')
-                return
-              }
-              if (newPassword !== confirmPassword) {
-                setPasswordError('새 비밀번호가 일치하지 않습니다.')
-                return
-              }
-              if (currentPassword === newPassword) {
-                setPasswordError('현재 비밀번호와 다른 비밀번호를 입력하세요.')
-                return
-              }
-
-              try {
-                setPasswordSubmitting(true)
-                await changePassword(currentPassword, newPassword)
-                setPasswordSuccess('비밀번호가 변경되었습니다. 다시 로그인해 주세요.')
-                setCurrentPassword('')
-                setNewPassword('')
-                setConfirmPassword('')
-                await logout()
-                navigate(ROUTES.login, {
-                  replace: true,
-                  state: { notice: '비밀번호가 변경되었습니다. 다시 로그인해 주세요.' }
-                })
-              } catch (err) {
-                setPasswordError(err instanceof Error ? err.message : '비밀번호 변경에 실패했습니다.')
-              } finally {
-                setPasswordSubmitting(false)
-              }
-            }}
-          >
-            <label className="form-field">
-              현재 비밀번호
-              <input
-                type="password"
-                autoComplete="current-password"
-                value={currentPassword}
-                onChange={(event) => setCurrentPassword(event.target.value)}
-              />
-            </label>
-            <label className="form-field">
-              새 비밀번호
-              <input
-                type="password"
-                autoComplete="new-password"
-                value={newPassword}
-                onChange={(event) => setNewPassword(event.target.value)}
-              />
-            </label>
-            <label className="form-field">
-              새 비밀번호 확인
-              <input
-                type="password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-              />
-            </label>
-            {passwordError ? <p className="error">{passwordError}</p> : null}
-            {passwordSuccess ? <p className="muted">{passwordSuccess}</p> : null}
-            <button
-              type="submit"
-              className="button button-primary"
-              disabled={passwordSubmitting}
-            >
-              {passwordSubmitting ? '변경 중...' : '비밀번호 변경'}
-            </button>
-          </form>
-        ) : null}
-      </section>
     </section>
   )
 }

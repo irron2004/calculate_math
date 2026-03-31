@@ -29,9 +29,9 @@ function statusLabel(status: StageNodeViewModel['status']): string {
 }
 
 function statusIcon(status: StageNodeViewModel['status']): string {
-  if (status === 'CLEARED') return '✅'
-  if (status === 'IN_PROGRESS') return '🟡'
-  if (status === 'AVAILABLE') return '🚀'
+  if (status === 'CLEARED') return '⭐'
+  if (status === 'IN_PROGRESS') return '🔥'
+  if (status === 'AVAILABLE') return '✨'
   return '🔒'
 }
 
@@ -183,7 +183,7 @@ export default function StudentStageMapPage() {
   if (loading || graphLoading) {
     return (
       <section>
-        <h1>지도(내 성장)</h1>
+        <h1>나의 수학 여정</h1>
         <p className="muted">지도를 불러오는 중...</p>
       </section>
     )
@@ -192,7 +192,7 @@ export default function StudentStageMapPage() {
   if (error || graphError || !model) {
     return (
       <section>
-        <h1>지도(내 성장)</h1>
+        <h1>나의 수학 여정</h1>
         <p className="muted">지도를 불러오지 못했어요.</p>
         <p className="error">{error ?? graphError ?? '알 수 없는 오류'}</p>
         <button type="button" className="button button-primary" onClick={() => setReloadToken((v) => v + 1)}>
@@ -209,7 +209,7 @@ export default function StudentStageMapPage() {
   return (
     <section className="student-stage-map-page">
       <header className="student-stage-map-header">
-        <h1>지도(내 성장)</h1>
+        <h1>나의 수학 여정</h1>
         <div className="student-category-chips" role="tablist" aria-label="큰 분류 선택">
           {model.categories.map((category) => (
             <button
@@ -282,6 +282,13 @@ export default function StudentStageMapPage() {
       <section className="student-stage-map-canvas" aria-label="학습 지도">
         <div className="student-stage-map-inner" style={{ height: canvasHeight }}>
           <svg className="student-stage-map-svg" viewBox={`0 0 100 ${canvasHeight}`} preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="mapPathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#7c3aed" />
+                <stop offset="50%" stopColor="#9b7dc8" />
+                <stop offset="100%" stopColor="#a78bfa" />
+              </linearGradient>
+            </defs>
             {pathD ? <path d={pathD} className="student-stage-map-main-path" /> : null}
             {model.sideQuests.map((node) => {
               const anchor = findAnchorStage(node, model.stages)
