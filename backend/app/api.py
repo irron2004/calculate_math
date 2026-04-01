@@ -2164,9 +2164,26 @@ def _compute_recommendations(user_id: str, username: str | None, conn, limit: in
         (user_id,),
     ).fetchall()
 
+    # Collect cleared node IDs (exclude from recommendations)
+    import json as _json
+    cleared_session_rows = conn.execute(
+        "SELECT node_id, grading_json FROM study_sessions WHERE user_id=? AND status='SUBMITTED'",
+        (user_id,),
+    ).fetchall()
+    cleared_node_ids: set[str] = set()
+    for sr in cleared_session_rows:
+        try:
+            g = _json.loads(sr["grading_json"] or "{}")
+            if g.get("cleared") is True:
+                cleared_node_ids.add(sr["node_id"])
+        except Exception:
+            pass
+
     node_stats: dict[str, dict] = {}
     for row in rows:
         nid = row["node_id"]
+        if nid in cleared_node_ids:
+            continue
         if nid not in node_stats:
             node_stats[nid] = {"wrong_recent": 0, "last_at": row["updated_at"]}
         if row["updated_at"] >= cutoff_14d and row["is_correct"] == 0:
@@ -2250,6 +2267,29 @@ def _compute_recommendations(user_id: str, username: str | None, conn, limit: in
                         "reason": "선수 스킬 준비됐어요",
                         "score": 2.0,
                     })
+
+        # ── prepares_for: boost next nodes after cleared nodes ─────────────────
+        if cleared_node_ids:
+            already_scored_ids = {s["nodeId"] for s in scored}
+            for cleared_nid in cleared_node_ids:
+                next_rows = conn.execute(
+                    """
+                    SELECT target FROM edges
+                    WHERE graph_version_id = ?
+                      AND edge_type = 'prepares_for'
+                      AND source = ?
+                    """,
+                    (gv_id, cleared_nid),
+                ).fetchall()
+                for nr in next_rows:
+                    next_nid = nr["target"]
+                    if next_nid not in already_scored_ids and next_nid not in cleared_node_ids:
+                        scored.append({
+                            "nodeId": next_nid,
+                            "reason": "이전 단원을 마쳤어요! 다음 단원이에요",
+                            "score": 1.5,
+                        })
+                        already_scored_ids.add(next_nid)
 
     scored.sort(key=lambda x: x["score"], reverse=True)
     result = scored[:limit]

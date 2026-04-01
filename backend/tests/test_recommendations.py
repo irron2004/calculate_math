@@ -127,3 +127,78 @@ def test_compute_recommendations_placement_no_match():
     os.unlink(path)
 
     assert result == []
+
+
+def _make_db():
+    import os, tempfile
+    from app.db import get_connection, init_db
+    with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+        path = f.name
+    conn = get_connection(path)
+    init_db(conn)
+    return conn, path
+
+
+def _seed_session(conn, user_id: str, node_id: str, *, cleared: bool) -> None:
+    import uuid, json
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).isoformat()
+    sid = str(uuid.uuid4())
+    grading = {"cleared": cleared, "correctCount": 5 if cleared else 3, "totalCount": 5,
+                "accuracy": 1.0 if cleared else 0.6}
+    conn.execute(
+        "INSERT INTO study_sessions (id, user_id, node_id, status, grading_json, created_at, updated_at) VALUES (?,?,?,?,?,?,?)",
+        (sid, user_id, node_id, "SUBMITTED", json.dumps(grading), now, now),
+    )
+    # Insert one response so the JOIN in _compute_recommendations returns a row
+    conn.execute(
+        "INSERT INTO study_responses (id, session_id, problem_id, input_raw, is_correct, created_at) VALUES (?,?,?,?,?,?)",
+        (str(uuid.uuid4()), sid, "p1", "42", 1 if cleared else 0, now),
+    )
+    conn.commit()
+
+
+def test_cleared_node_excluded_from_recommendations():
+    """Nodes with a cleared session must NOT appear in recommendations."""
+    import os
+    conn, path = _make_db()
+    _seed_session(conn, "u1", "NODE-A", cleared=True)
+    from app.api import _compute_recommendations
+    result = _compute_recommendations("u1", None, conn)
+    conn.close()
+    os.unlink(path)
+    node_ids = [r["nodeId"] for r in result]
+    assert "NODE-A" not in node_ids
+
+
+def test_prepares_for_recommends_next_node_after_clear():
+    """Clearing a node should recommend its prepares_for target."""
+    import os
+    from datetime import datetime, timezone
+    conn, path = _make_db()
+
+    now = datetime.now(timezone.utc).isoformat()
+    gv_id = "gv-pf"
+    conn.execute(
+        "INSERT INTO graph_versions (id, graph_id, status, schema_version, created_at) VALUES (?,?,?,?,?)",
+        (gv_id, "g1", "published", 1, now),
+    )
+    conn.execute(
+        "INSERT INTO edges (graph_version_id, id, edge_type, source, target) VALUES (?,?,?,?,?)",
+        (gv_id, "e1", "prepares_for", "CS.INTRO", "CS.NEXT"),
+    )
+    conn.commit()
+
+    _seed_session(conn, "u2", "CS.INTRO", cleared=True)
+
+    from app.api import _compute_recommendations
+    result = _compute_recommendations("u2", None, conn)
+    conn.close()
+    os.unlink(path)
+
+    node_ids = [r["nodeId"] for r in result]
+    reasons = {r["nodeId"]: r["reason"] for r in result}
+
+    assert "CS.INTRO" not in node_ids  # cleared node excluded
+    assert "CS.NEXT" in node_ids
+    assert "이전 단원을 마쳤어요" in reasons["CS.NEXT"]
