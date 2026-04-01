@@ -122,7 +122,7 @@ export default function DashboardPage() {
             <button
               type="button"
               className="button button-primary"
-              onClick={() => navigate(ROUTES.map)}
+              onClick={() => navigate(ROUTES.tree)}
             >
               스킬 트리 보기
             </button>
