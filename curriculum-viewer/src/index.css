@@ -4187,3 +4187,67 @@ body {
   font-size: 0.8rem;
   flex-shrink: 0;
 }
+
+/* ── Self-Diagnosis ─────────────────────────────────────── */
+.diagnosis-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-5, 1.25rem);
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: var(--radius-lg, 12px);
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.diagnosis-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.diagnosis-subtitle {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.diagnosis-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 0.5rem);
+}
+
+.diagnosis-option-btn {
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid #7c3aed66;
+  border-radius: var(--radius-md, 8px);
+  color: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.diagnosis-option-btn:hover:not(:disabled) {
+  background: #7c3aed22;
+  border-color: #7c3aed;
+}
+
+.diagnosis-option-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.diagnosis-option-calc-mistake {
+  border-color: #f59e0b66;
+}
+
+.diagnosis-option-calc-mistake:hover:not(:disabled) {
+  background: #f59e0b22;
+  border-color: #f59e0b;
+}
+
+.diagnosis-done {
+  font-size: 0.9rem;
+  padding: var(--space-2, 0.5rem) 0;
+}

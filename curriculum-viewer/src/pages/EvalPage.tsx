@@ -7,6 +7,11 @@ import { recommendNextNodeIds } from '../lib/studentLearning/progress'
 import type { LearningGraphV1 } from '../lib/studentLearning/types'
 import { createBrowserSessionRepository } from '../lib/repository/sessionRepository'
 import { ROUTES } from '../routes'
+import { loadProblemBank } from '../lib/learn/problems'
+import type { Problem } from '../lib/learn/problems'
+import { saveDiagnosis } from '../lib/diagnosis/api'
+import { CALC_MISTAKE } from '../lib/diagnosis/types'
+import type { DiagnosisChoice } from '../lib/diagnosis/types'
 
 export default function EvalPage() {
   const params = useParams()
@@ -22,6 +27,9 @@ export default function EvalPage() {
 
   const [learningGraph, setLearningGraph] = useState<LearningGraphV1 | null>(null)
   const [graphError, setGraphError] = useState<string | null>(null)
+  const [problems, setProblems] = useState<Record<string, Problem[]>>({})
+  const [diagnosisDone, setDiagnosisDone] = useState(false)
+  const [diagnosisLoading, setDiagnosisLoading] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -38,6 +46,16 @@ export default function EvalPage() {
     }
 
     run()
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    loadProblemBank(controller.signal)
+      .then((bank) => {
+        if (!controller.signal.aborted) setProblems(bank.problemsByNodeId)
+      })
+      .catch(() => {})
     return () => controller.abort()
   }, [])
 
@@ -60,6 +78,44 @@ export default function EvalPage() {
     const candidates = recommendNextNodeIds({ graph: learningGraph, store, maxCount: 1 })
     return candidates[0] ?? null
   }, [grading?.cleared, learningGraph, store])
+
+  const asLabelById = useMemo(() => {
+    const map = new Map<string, string>()
+    if (!learningGraph) return map
+    for (const node of learningGraph.nodes) {
+      if (node.nodeType === 'atomic_skill' && node.label) {
+        map.set(node.id, node.label)
+      }
+    }
+    return map
+  }, [learningGraph])
+
+  const diagnosisOptions = useMemo((): DiagnosisChoice[] => {
+    if (!grading || grading.cleared) return []
+    if (!session?.nodeId) return []
+    const nodeProblems = problems[session.nodeId] ?? []
+    const skillIds = new Set<string>()
+    for (const [problemId, result] of Object.entries(grading.perProblem)) {
+      if (!result.isCorrect) {
+        const problem = nodeProblems.find((p) => p.id === problemId)
+        if (problem?.required_skills) {
+          for (const sk of problem.required_skills) skillIds.add(sk)
+        }
+      }
+    }
+    return Array.from(skillIds).map((skillId) => ({
+      skillId,
+      label: asLabelById.get(skillId) ?? skillId
+    }))
+  }, [grading, session?.nodeId, problems, asLabelById])
+
+  const handleDiagnosis = async (choice: DiagnosisChoice) => {
+    if (!sessionId || diagnosisLoading) return
+    setDiagnosisLoading(true)
+    await saveDiagnosis(sessionId, choice)
+    setDiagnosisDone(true)
+    setDiagnosisLoading(false)
+  }
 
   return (
     <section>
@@ -104,6 +160,36 @@ export default function EvalPage() {
               </ul>
             </div>
           )}
+
+          {!grading.cleared && diagnosisOptions.length > 0 && !diagnosisDone ? (
+            <div className="diagnosis-section">
+              <h2 className="diagnosis-title">왜 틀렸을까요?</h2>
+              <p className="muted diagnosis-subtitle">가장 가까운 이유를 골라보세요</p>
+              <div className="diagnosis-options">
+                {diagnosisOptions.map((opt) => (
+                  <button
+                    key={opt.skillId}
+                    type="button"
+                    className="diagnosis-option-btn"
+                    onClick={() => handleDiagnosis(opt)}
+                    disabled={diagnosisLoading}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className="diagnosis-option-btn diagnosis-option-calc-mistake"
+                  onClick={() => handleDiagnosis(CALC_MISTAKE)}
+                  disabled={diagnosisLoading}
+                >
+                  {CALC_MISTAKE.label}
+                </button>
+              </div>
+            </div>
+          ) : !grading.cleared && diagnosisDone ? (
+            <p className="diagnosis-done muted">기록했어요 👍</p>
+          ) : null}
 
           <EvalResultList perProblem={grading.perProblem} responses={session?.responses ?? {}} />
         </>
