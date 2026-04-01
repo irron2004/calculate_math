@@ -5,6 +5,7 @@ import { useCurriculum } from '../lib/curriculum/CurriculumProvider'
 import { fetchRecommendations } from '../lib/recommendations/api'
 import type { RecommendationItem } from '../lib/recommendations/types'
 import { createBrowserSessionRepository } from '../lib/repository/sessionRepository'
+import { fetchSkillLevels } from '../lib/skillLevels/api'
 import { ROUTES } from '../routes'
 
 type WrongNode = {
@@ -20,6 +21,7 @@ export default function DashboardPage() {
 
   const [recommendations, setRecommendations] = useState<RecommendationItem[]>([])
   const [recLoading, setRecLoading] = useState(false)
+  const [skillLevels, setSkillLevels] = useState<Record<string, number>>({})
 
   useEffect(() => {
     if (!user) return
@@ -33,6 +35,11 @@ export default function DashboardPage() {
         if (!controller.signal.aborted) setRecLoading(false)
       })
     return () => controller.abort()
+  }, [user])
+
+  useEffect(() => {
+    if (!user) return
+    fetchSkillLevels().then(setSkillLevels).catch(() => {})
   }, [user])
 
   const titleById = useMemo(() => {
@@ -65,6 +72,23 @@ export default function DashboardPage() {
       }))
   }, [user, titleById])
 
+  const SKILL_LABELS: Record<string, string> = {
+    'AS.NUMBER_SENSE': '수 세기',
+    'AS.PLACE_VALUE': '자릿값',
+    'AS.ADD_SUB': '덧셈·뺄셈',
+    'AS.MUL_DIV': '곱셈·나눗셈',
+    'AS.FRAC_BASIC': '분수',
+    'AS.DECIMAL': '소수',
+    'AS.RATIO': '비율',
+  }
+
+  const learnedSkills = useMemo(() =>
+    Object.entries(skillLevels)
+      .filter(([, lvl]) => lvl > 0)
+      .map(([skillId, level]) => ({ skillId, label: SKILL_LABELS[skillId] ?? skillId, level })),
+    [skillLevels]
+  )
+
   if (isAdmin) {
     return (
       <section>
@@ -80,6 +104,22 @@ export default function DashboardPage() {
         <h1>{user?.name ?? user?.username}님, 안녕하세요! 👋</h1>
         <p className="muted">오늘도 수학 실력을 키워봐요</p>
       </header>
+
+      {learnedSkills.length > 0 && (
+        <div className="skill-summary-section">
+          <p className="skill-summary-title">내 스킬 현황</p>
+          <div className="skill-chips">
+            {learnedSkills.map(({ skillId, label, level }) => (
+              <span key={skillId} className="skill-chip">
+                <span className="skill-chip-label">{label}</span>
+                <span className="skill-chip-dots">
+                  {'●'.repeat(level)}{'○'.repeat(3 - level)}
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       <section className="dashboard-section" aria-label="오늘의 추천">
         <h2>지금 이거 해봐! ✨</h2>

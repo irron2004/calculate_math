@@ -4353,3 +4353,38 @@ body {
 .skill-tree-card-level-text.mastered {
   color: #f59e0b;
 }
+
+/* ── Skill Chip (Dashboard) ──────────────────────────────────── */
+.skill-summary-section {
+  margin-bottom: 1.5rem;
+}
+
+.skill-summary-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-muted, #888);
+  margin: 0 0 0.5rem 0;
+}
+
+.skill-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skill-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+}
+
+.skill-chip-dots {
+  font-size: 0.625rem;
+  letter-spacing: 1px;
+  color: #f59e0b;
+}
