@@ -17,8 +17,13 @@ function parseNode(raw: unknown): LearningGraphNode | null {
 
   const isStart = typeof raw.isStart === 'boolean' ? raw.isStart : undefined
   const order = typeof raw.order === 'number' && Number.isFinite(raw.order) ? raw.order : undefined
+  const nodeType =
+    raw.nodeType === 'atomic_skill' || raw.nodeType === 'course_step'
+      ? (raw.nodeType as 'atomic_skill' | 'course_step')
+      : undefined
+  const label = asString(raw.label)?.trim() || undefined
 
-  return { id, isStart, order }
+  return { id, isStart, order, nodeType, label }
 }
 
 function parseEdge(raw: unknown): LearningGraphEdge | null {
