@@ -34,6 +34,19 @@ export default function EvalPage() {
   const [diagnosisLoading, setDiagnosisLoading] = useState(false)
   const [clearedSkillLevels, setClearedSkillLevels] = useState<Record<string, number> | null>(null)
 
+  const storeAndSession = useMemo(() => {
+    if (!sessionId || !userId) return { store: null, session: null }
+    const repo = createBrowserSessionRepository()
+    const store = repo ? repo.readStore(userId) : null
+    if (!store) return { store: null, session: null }
+    return { store, session: store.sessionsById[sessionId] ?? null }
+  }, [sessionId, userId])
+
+  const session = storeAndSession.session
+  const store = storeAndSession.store
+
+  const grading = session?.status === 'SUBMITTED' ? session.grading ?? null : null
+
   useEffect(() => {
     const controller = new AbortController()
 
@@ -68,19 +81,6 @@ export default function EvalPage() {
       .catch(() => {})
     return () => controller.abort()
   }, [])
-
-  const storeAndSession = useMemo(() => {
-    if (!sessionId || !userId) return { store: null, session: null }
-    const repo = createBrowserSessionRepository()
-    const store = repo ? repo.readStore(userId) : null
-    if (!store) return { store: null, session: null }
-    return { store, session: store.sessionsById[sessionId] ?? null }
-  }, [sessionId, userId])
-
-  const session = storeAndSession.session
-  const store = storeAndSession.store
-
-  const grading = session?.status === 'SUBMITTED' ? session.grading ?? null : null
 
   const nextNodeId = useMemo(() => {
     if (!grading?.cleared) return null
