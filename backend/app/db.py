@@ -92,6 +92,20 @@ def _canonical_json_for_hash(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
+def create_student_skill_levels_table(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS student_skill_levels (
+          user_id   TEXT NOT NULL,
+          skill_id  TEXT NOT NULL,
+          level     INTEGER NOT NULL DEFAULT 0,
+          updated_at TEXT NOT NULL,
+          PRIMARY KEY (user_id, skill_id)
+        )
+        """
+    )
+
+
 def create_study_sessions_table(conn: sqlite3.Connection) -> None:
     conn.execute("""
         CREATE TABLE IF NOT EXISTS study_sessions (
@@ -355,6 +369,7 @@ def init_db(path=None) -> None:
     _ensure_homework_sticker_reward_count_column(conn)
     _ensure_user_columns(conn)
     _ensure_refresh_token_columns(conn)
+    create_student_skill_levels_table(conn)
     create_study_sessions_table(conn)
     migrate_study_sessions_add_diagnosis(conn)
     create_study_responses_table(conn)
