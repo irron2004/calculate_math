@@ -12,6 +12,7 @@ import { computeNodeProgressV1 } from '../lib/studentLearning/progress'
 import type { AttemptSessionStoreV1, LearningGraphV1 } from '../lib/studentLearning/types'
 import { ROUTES } from '../routes'
 import { useAuth } from '../lib/auth/AuthProvider'
+import { SKILL_LABELS } from '../lib/diagnosis/skillLabels'
 
 const EMPTY_STORE: AttemptSessionStoreV1 = {
   version: 1,
@@ -349,6 +350,23 @@ export default function StudentStageMapPage() {
           <div className="student-stage-sheet" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
             <h3>{selectedStage.title}</h3>
             <p className="muted">{statusLabel(selectedStage.status)}</p>
+            {(() => {
+              const taughtSkillIds = learningGraph?.edges
+                .filter((e) => e.type === 'teaches' && e.sourceId === selectedStage.nodeId)
+                .map((e) => e.targetId) ?? []
+              return taughtSkillIds.length > 0 ? (
+                <div className="stage-sheet-teaches">
+                  <p className="muted stage-sheet-teaches-label">배울 수 있는 스킬</p>
+                  <div className="stage-sheet-teaches-chips">
+                    {taughtSkillIds.map((skillId) => (
+                      <span key={skillId} className="skill-chip">
+                        {SKILL_LABELS[skillId] ?? skillId}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null
+            })()}
             {selectedStage.status === 'LOCKED' ? (
               <p className="muted">
                 먼저 {titleById.get(selectedStage.missingPrereqNodeIds[0] ?? '') ?? '이전 스테이지'}부터 해보자!

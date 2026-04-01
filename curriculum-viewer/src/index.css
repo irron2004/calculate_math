@@ -4388,3 +4388,18 @@ body {
   letter-spacing: 1px;
   color: #f59e0b;
 }
+
+.stage-sheet-teaches {
+  margin: 0.75rem 0;
+}
+
+.stage-sheet-teaches-label {
+  font-size: 0.8125rem;
+  margin-bottom: 0.375rem;
+}
+
+.stage-sheet-teaches-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
