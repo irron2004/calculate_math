@@ -5,6 +5,7 @@ export type NumericProblem = {
   answer: string
   explanation?: string
   tags?: string[]
+  required_skills?: string[]
 }
 
 export type Problem = NumericProblem
@@ -37,10 +38,11 @@ function parseNumericProblem(value: unknown): NumericProblem | null {
   const answer = asString(value.answer)?.trim()
   const explanation = asString(value.explanation)?.trim() || undefined
   const tags = parseStringArray(value.tags)
+  const required_skills = parseStringArray(value.required_skills)
 
   if (!id || !prompt || !answer) return null
 
-  return { id, type: 'numeric', prompt, answer, explanation, tags }
+  return { id, type: 'numeric', prompt, answer, explanation, tags, required_skills }
 }
 
 function parseProblem(value: unknown): Problem | null {
