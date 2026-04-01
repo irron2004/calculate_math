@@ -6,7 +6,21 @@
     { "id": "MATH-2022-G-2-NA-001", "order": 3 },
     { "id": "MATH-2022-G-2-NA-002", "order": 4 },
     { "id": "MATH-2022-G-3-NA-001", "order": 5 },
-    { "id": "MATH-2022-G-3-NA-002", "order": 6 }
+    { "id": "MATH-2022-G-3-NA-002", "order": 6 },
+    { "id": "MATH-2022-G-3-NA-003", "order": 7 },
+    { "id": "MATH-2022-G-3-RR-001", "order": 8 },
+    { "id": "MATH-2022-G-3-RR-002", "order": 9 },
+    { "id": "MATH-2022-G-4-NA-001", "order": 10 },
+    { "id": "MATH-2022-G-4-NA-002", "order": 11 },
+    { "id": "MATH-2022-G-5-NA-001", "order": 12 },
+    { "id": "MATH-2022-G-6-NA-001", "order": 13 },
+    { "id": "AS.NUMBER_SENSE", "nodeType": "atomic_skill", "label": "수 세기와 수의 크기 비교" },
+    { "id": "AS.PLACE_VALUE",  "nodeType": "atomic_skill", "label": "자릿값 이해 (일, 십, 백, 천)" },
+    { "id": "AS.ADD_SUB",      "nodeType": "atomic_skill", "label": "덧셈과 뺄셈" },
+    { "id": "AS.MUL_DIV",      "nodeType": "atomic_skill", "label": "곱셈과 나눗셈" },
+    { "id": "AS.FRAC_BASIC",   "nodeType": "atomic_skill", "label": "분수 개념과 크기 비교" },
+    { "id": "AS.DECIMAL",      "nodeType": "atomic_skill", "label": "소수 개념과 자릿값" },
+    { "id": "AS.RATIO",        "nodeType": "atomic_skill", "label": "비율과 비례" }
   ],
   "edges": [
     { "sourceId": "MATH-2022-G-1-NA-001", "targetId": "MATH-2022-G-1-NA-002", "type": "requires" },
@@ -14,7 +28,17 @@
     { "sourceId": "MATH-2022-G-2-NA-001", "targetId": "MATH-2022-G-2-NA-002", "type": "requires" },
     { "sourceId": "MATH-2022-G-2-NA-002", "targetId": "MATH-2022-G-3-NA-001", "type": "requires" },
     { "sourceId": "MATH-2022-G-3-NA-001", "targetId": "MATH-2022-G-3-NA-002", "type": "requires" },
-    { "sourceId": "MATH-2022-G-2-NA-001", "targetId": "MATH-2022-G-3-NA-001", "type": "prepares_for" }
+    { "sourceId": "MATH-2022-G-2-NA-001", "targetId": "MATH-2022-G-3-NA-001", "type": "prepares_for" },
+    { "sourceId": "MATH-2022-G-1-NA-001", "targetId": "AS.NUMBER_SENSE", "type": "teaches" },
+    { "sourceId": "MATH-2022-G-1-NA-002", "targetId": "AS.PLACE_VALUE",  "type": "teaches" },
+    { "sourceId": "MATH-2022-G-2-NA-001", "targetId": "AS.ADD_SUB",      "type": "teaches" },
+    { "sourceId": "MATH-2022-G-2-NA-002", "targetId": "AS.ADD_SUB",      "type": "teaches" },
+    { "sourceId": "MATH-2022-G-3-NA-001", "targetId": "AS.PLACE_VALUE",  "type": "teaches" },
+    { "sourceId": "MATH-2022-G-3-NA-002", "targetId": "AS.FRAC_BASIC",   "type": "teaches" },
+    { "sourceId": "AS.NUMBER_SENSE", "targetId": "MATH-2022-G-1-NA-002", "type": "requires_skill" },
+    { "sourceId": "AS.PLACE_VALUE",  "targetId": "MATH-2022-G-2-NA-001", "type": "requires_skill" },
+    { "sourceId": "AS.PLACE_VALUE",  "targetId": "MATH-2022-G-2-NA-002", "type": "requires_skill" },
+    { "sourceId": "AS.ADD_SUB",      "targetId": "MATH-2022-G-3-NA-001", "type": "requires_skill" },
+    { "sourceId": "AS.ADD_SUB",      "targetId": "MATH-2022-G-3-NA-002", "type": "requires_skill" }
   ]
 }
-

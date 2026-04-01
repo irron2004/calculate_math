@@ -25,7 +25,13 @@ function parseEdge(raw: unknown): LearningGraphEdge | null {
   if (!isRecord(raw)) return null
   const sourceId = asString(raw.sourceId)?.trim()
   const targetId = asString(raw.targetId)?.trim()
-  const type = raw.type === 'requires' || raw.type === 'prepares_for' ? raw.type : null
+  const type =
+    raw.type === 'requires' ||
+    raw.type === 'prepares_for' ||
+    raw.type === 'teaches' ||
+    raw.type === 'requires_skill'
+      ? raw.type
+      : null
 
   if (!sourceId || !targetId || !type) return null
   return { sourceId, targetId, type }
