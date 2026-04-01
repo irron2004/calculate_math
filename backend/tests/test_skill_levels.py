@@ -133,6 +133,52 @@ def test_update_skill_levels_caps_at_3(db):
     assert row["level"] == 3  # must not exceed 3
 
 
+# ── GET /skill-levels query logic tests ──────────────────────────────────────
+
+def test_get_skill_levels_empty(db):
+    rows = db.execute(
+        "SELECT skill_id, level FROM student_skill_levels WHERE user_id=? AND level > 0",
+        ("new-user",),
+    ).fetchall()
+    assert rows == []
+
+
+def test_get_skill_levels_only_nonzero(db):
+    now = datetime.now(timezone.utc).isoformat()
+    db.execute(
+        "INSERT INTO student_skill_levels (user_id, skill_id, level, updated_at) VALUES (?,?,?,?)",
+        ("u5", "AS.ADD_SUB", 0, now),
+    )
+    db.execute(
+        "INSERT INTO student_skill_levels (user_id, skill_id, level, updated_at) VALUES (?,?,?,?)",
+        ("u5", "AS.MUL_DIV", 2, now),
+    )
+    db.commit()
+    rows = db.execute(
+        "SELECT skill_id, level FROM student_skill_levels WHERE user_id=? AND level > 0",
+        ("u5",),
+    ).fetchall()
+    levels = {r["skill_id"]: r["level"] for r in rows}
+    assert levels == {"AS.MUL_DIV": 2}
+    assert "AS.ADD_SUB" not in levels
+
+
+def test_get_skill_levels_multiple_skills(db):
+    now = datetime.now(timezone.utc).isoformat()
+    for skill, level in [("AS.ADD_SUB", 1), ("AS.PLACE_VALUE", 3), ("AS.DECIMAL", 2)]:
+        db.execute(
+            "INSERT INTO student_skill_levels (user_id, skill_id, level, updated_at) VALUES (?,?,?,?)",
+            ("u6", skill, level, now),
+        )
+    db.commit()
+    rows = db.execute(
+        "SELECT skill_id, level FROM student_skill_levels WHERE user_id=? AND level > 0",
+        ("u6",),
+    ).fetchall()
+    levels = {r["skill_id"]: r["level"] for r in rows}
+    assert levels == {"AS.ADD_SUB": 1, "AS.PLACE_VALUE": 3, "AS.DECIMAL": 2}
+
+
 def test_update_skill_levels_no_teaches_edge_is_noop(db):
     from app.api import _update_skill_levels
 

@@ -2130,6 +2130,21 @@ def _update_skill_levels(conn, user_id: str, node_id: str) -> None:
         # If already level 3, no-op
 
 
+@router.get("/skill-levels")
+async def get_skill_levels(user=Depends(get_current_user)):
+    conn = get_connection(get_database_path())
+    try:
+        rows = conn.execute(
+            "SELECT skill_id, level FROM student_skill_levels WHERE user_id=? AND level > 0",
+            (user.user_id,),
+        ).fetchall()
+    finally:
+        conn.close()
+
+    levels = {row["skill_id"]: row["level"] for row in rows}
+    return {"levels": levels}
+
+
 # ── Recommendations ───────────────────────────────────────────────
 
 def _compute_recommendations(user_id: str, conn, limit: int = 2) -> list[dict]:
