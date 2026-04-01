@@ -59,3 +59,16 @@ def test_diagnosis_json_can_be_set(db):
         "SELECT diagnosis_json FROM study_sessions WHERE id=?", (session_id,)
     ).fetchone()
     assert json.loads(row["diagnosis_json"])["skillId"] == "AS.ADD_SUB"
+
+
+def test_diagnosis_request_model():
+    from app.models import DiagnosisRequest
+    req = DiagnosisRequest(skillId="AS.ADD_SUB", label="덧셈과 뺄셈")
+    assert req.skillId == "AS.ADD_SUB"
+    assert req.label == "덧셈과 뺄셈"
+
+
+def test_diagnosis_request_calc_mistake():
+    from app.models import DiagnosisRequest
+    req = DiagnosisRequest(skillId="CALC_MISTAKE", label="계산 실수예요")
+    assert req.skillId == "CALC_MISTAKE"

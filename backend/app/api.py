@@ -141,6 +141,7 @@ from .models import (
     GraphBackendStatusResponse,
     StudySessionUpsertRequest,
     StudyResponseInput,
+    DiagnosisRequest,
 )
 
 logger = logging.getLogger(__name__)
@@ -2131,3 +2132,33 @@ async def get_recommendations(user=Depends(get_current_user)):
     finally:
         conn.close()
     return {"items": items}
+
+
+# ── Self-Diagnosis ────────────────────────────────────────────────
+
+@router.patch("/study-sessions/{session_id}/diagnosis")
+async def save_diagnosis(
+    session_id: str,
+    body: DiagnosisRequest,
+    user=Depends(get_current_user),
+):
+    import json as _json
+    conn = get_connection(get_database_path())
+    try:
+        row = conn.execute(
+            "SELECT id FROM study_sessions WHERE id=? AND user_id=?",
+            (session_id, user.user_id),
+        ).fetchone()
+        if row is None:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        payload = _json.dumps({"skillId": body.skillId, "label": body.label})
+        conn.execute(
+            "UPDATE study_sessions SET diagnosis_json=? WHERE id=?",
+            (payload, session_id),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return {"ok": True}

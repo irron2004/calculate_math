@@ -559,3 +559,8 @@ class RecommendationItem(BaseModel):
 
 class RecommendationsResponse(BaseModel):
     items: List[RecommendationItem]
+
+
+class DiagnosisRequest(BaseModel):
+    skillId: str
+    label: str
