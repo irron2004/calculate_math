@@ -2199,6 +2199,61 @@ def _compute_recommendations(user_id: str, conn, limit: int = 2) -> list[dict]:
 
         scored.append({"nodeId": node_id, "reason": reason, "score": score})
 
+    # ── Skill-readiness bonus ──────────────────────────────────────────────────
+    version_row = conn.execute(
+        "SELECT id FROM graph_versions WHERE status='published' ORDER BY created_at DESC LIMIT 1"
+    ).fetchone()
+
+    if version_row:
+        gv_id = version_row["id"]
+
+        skill_level_rows = conn.execute(
+            "SELECT skill_id, level FROM student_skill_levels WHERE user_id=? AND level > 0",
+            (user_id,),
+        ).fetchall()
+        student_levels: dict[str, int] = {r["skill_id"]: r["level"] for r in skill_level_rows}
+
+        if student_levels:
+            candidate_rows = conn.execute(
+                """
+                SELECT DISTINCT target AS node_id FROM edges
+                WHERE graph_version_id = ?
+                  AND edge_type = 'requires_skill'
+                """,
+                (gv_id,),
+            ).fetchall()
+
+            already_scored_ids = {s["nodeId"] for s in scored}
+
+            for c_row in candidate_rows:
+                candidate_node_id = c_row["node_id"]
+                if candidate_node_id in already_scored_ids:
+                    continue
+
+                req_rows = conn.execute(
+                    """
+                    SELECT source AS skill_id FROM edges
+                    WHERE graph_version_id = ?
+                      AND edge_type = 'requires_skill'
+                      AND target = ?
+                    """,
+                    (gv_id, candidate_node_id),
+                ).fetchall()
+
+                required_skill_ids = [r["skill_id"] for r in req_rows]
+                if not required_skill_ids:
+                    continue
+
+                all_ready = all(
+                    student_levels.get(s_id, 0) >= 1 for s_id in required_skill_ids
+                )
+                if all_ready:
+                    scored.append({
+                        "nodeId": candidate_node_id,
+                        "reason": "선수 스킬 준비됐어요",
+                        "score": 2.0,
+                    })
+
     scored.sort(key=lambda x: x["score"], reverse=True)
     return scored[:limit]
 

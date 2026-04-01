@@ -198,3 +198,75 @@ def test_update_skill_levels_no_teaches_edge_is_noop(db):
         "SELECT * FROM student_skill_levels WHERE user_id='user-D'"
     ).fetchall()
     assert rows == []
+
+
+# ── Recommendation skill-readiness tests ──────────────────────────────────────
+
+def _seed_requires_skill_edge(db, cs_node_id: str, as_skill_id: str) -> str:
+    """Seed graph_versions + requires_skill edge (AS→CS) for recommendation tests."""
+    gv_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    db.execute(
+        "INSERT INTO graph_versions (id, graph_id, status, schema_version, created_at, published_at) "
+        "VALUES (?,?,?,?,?,?)",
+        (gv_id, "test-graph", "published", 1, now, now),
+    )
+    edge_id = f"requires_skill:{as_skill_id}->{cs_node_id}"
+    db.execute(
+        "INSERT INTO edges (graph_version_id, id, edge_type, source, target) VALUES (?,?,?,?,?)",
+        (gv_id, edge_id, "requires_skill", as_skill_id, cs_node_id),
+    )
+    db.commit()
+    return gv_id
+
+
+def _seed_dummy_session(db, user_id: str, node_id: str = "CS.OTHER"):
+    """Seed a non-cleared study session so _compute_recommendations has rows."""
+    sid = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    db.execute(
+        "INSERT INTO study_sessions (id, user_id, node_id, status, grading_json, created_at, updated_at) "
+        "VALUES (?,?,?,?,?,?,?)",
+        (sid, user_id, node_id, "SUBMITTED",
+         '{"cleared":false,"correctCount":0,"totalCount":1,"accuracy":0,"perProblem":{}}',
+         now, now),
+    )
+    resp_id = str(uuid.uuid4())
+    db.execute(
+        "INSERT INTO study_responses (id, session_id, problem_id, input_raw, input_normalized, "
+        "is_correct, time_spent_ms, scratchpad_strokes_json, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
+        (resp_id, sid, "p1", "1", "1", 0, 1000, None, now),
+    )
+    db.commit()
+
+
+def test_recommendation_skill_readiness_appears_when_skill_ready(db):
+    from app.api import _compute_recommendations
+
+    _seed_requires_skill_edge(db, "CS.FRAC_INTRO", "AS.ADD_SUB")
+    now = datetime.now(timezone.utc).isoformat()
+    db.execute(
+        "INSERT INTO student_skill_levels (user_id, skill_id, level, updated_at) VALUES (?,?,?,?)",
+        ("user-rec", "AS.ADD_SUB", 1, now),
+    )
+    db.commit()
+    _seed_dummy_session(db, "user-rec")
+
+    items = _compute_recommendations("user-rec", db, limit=10)
+    node_ids = [i["nodeId"] for i in items]
+    reasons = {i["nodeId"]: i["reason"] for i in items}
+
+    assert "CS.FRAC_INTRO" in node_ids
+    assert reasons["CS.FRAC_INTRO"] == "선수 스킬 준비됐어요"
+
+
+def test_recommendation_skill_readiness_absent_when_skill_not_ready(db):
+    from app.api import _compute_recommendations
+
+    _seed_requires_skill_edge(db, "CS.FRAC_INTRO2", "AS.MUL_DIV")
+    # Do NOT insert student_skill_levels — skill level stays 0
+    _seed_dummy_session(db, "user-rec2")
+
+    items = _compute_recommendations("user-rec2", db, limit=10)
+    node_ids = [i["nodeId"] for i in items]
+    assert "CS.FRAC_INTRO2" not in node_ids
