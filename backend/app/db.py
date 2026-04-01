@@ -356,6 +356,7 @@ def init_db(path=None) -> None:
     _ensure_user_columns(conn)
     _ensure_refresh_token_columns(conn)
     create_study_sessions_table(conn)
+    migrate_study_sessions_add_diagnosis(conn)
     create_study_responses_table(conn)
     conn.execute(
         """
@@ -457,6 +458,16 @@ def _ensure_refresh_token_columns(conn: sqlite3.Connection) -> None:
         if name in columns:
             continue
         conn.execute(f"ALTER TABLE refresh_tokens ADD COLUMN {definition}")
+
+
+def migrate_study_sessions_add_diagnosis(conn: sqlite3.Connection) -> None:
+    """Add diagnosis_json column if it doesn't exist yet (idempotent migration)."""
+    cur = conn.execute("PRAGMA table_info(study_sessions)")
+    columns = [row["name"] for row in cur.fetchall()]
+    if "diagnosis_json" not in columns:
+        conn.execute(
+            "ALTER TABLE study_sessions ADD COLUMN diagnosis_json TEXT"
+        )
 
 
 def _resolve_graph_id(payload: Dict[str, Any]) -> str:
