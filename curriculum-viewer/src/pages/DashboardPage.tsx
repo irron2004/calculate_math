@@ -6,6 +6,7 @@ import { fetchRecommendations } from '../lib/recommendations/api'
 import type { RecommendationItem } from '../lib/recommendations/types'
 import { createBrowserSessionRepository } from '../lib/repository/sessionRepository'
 import { fetchSkillLevels } from '../lib/skillLevels/api'
+import { SKILL_LABELS } from '../lib/diagnosis/skillLabels'
 import { ROUTES } from '../routes'
 
 type WrongNode = {
@@ -71,16 +72,6 @@ export default function DashboardPage() {
         wrongCount
       }))
   }, [user, titleById])
-
-  const SKILL_LABELS: Record<string, string> = {
-    'AS.NUMBER_SENSE': '수 세기',
-    'AS.PLACE_VALUE': '자릿값',
-    'AS.ADD_SUB': '덧셈·뺄셈',
-    'AS.MUL_DIV': '곱셈·나눗셈',
-    'AS.FRAC_BASIC': '분수',
-    'AS.DECIMAL': '소수',
-    'AS.RATIO': '비율',
-  }
 
   const learnedSkills = useMemo(() =>
     Object.entries(skillLevels)

@@ -13,6 +13,7 @@ import { saveDiagnosis } from '../lib/diagnosis/api'
 import { CALC_MISTAKE } from '../lib/diagnosis/types'
 import type { DiagnosisChoice } from '../lib/diagnosis/types'
 import { fetchSkillLevels } from '../lib/skillLevels/api'
+import { SKILL_LABELS } from '../lib/diagnosis/skillLabels'
 
 export default function EvalPage() {
   const params = useParams()
@@ -124,16 +125,6 @@ export default function EvalPage() {
       .filter((e) => e.type === 'teaches' && e.sourceId === session.nodeId)
       .map((e) => e.targetId)
   }, [learningGraph, session?.nodeId])
-
-  const SKILL_LABELS: Record<string, string> = {
-    'AS.NUMBER_SENSE': '수 세기와 수의 크기 비교',
-    'AS.PLACE_VALUE': '자릿값 이해',
-    'AS.ADD_SUB': '덧셈과 뺄셈',
-    'AS.MUL_DIV': '곱셈과 나눗셈',
-    'AS.FRAC_BASIC': '분수 개념',
-    'AS.DECIMAL': '소수 개념',
-    'AS.RATIO': '비율과 비례',
-  }
 
   const handleDiagnosis = async (choice: DiagnosisChoice) => {
     if (!sessionId || diagnosisLoading) return
