@@ -2011,6 +2011,17 @@ async def upsert_study_session(
             )
 
         conn.commit()
+
+        # Update skill levels if session was cleared
+        if body.status == "SUBMITTED" and body.gradingJson:
+            import json as _json
+            try:
+                grading = _json.loads(body.gradingJson)
+                if grading.get("cleared") is True:
+                    _update_skill_levels(conn, user_id, body.nodeId)
+                    conn.commit()
+            except Exception:
+                pass  # grading_json malformed — skip skill update silently
     finally:
         conn.close()
 
@@ -2064,6 +2075,59 @@ async def list_study_sessions(
         conn.close()
 
     return {"sessions": result}
+
+
+# ── Skill Levels ──────────────────────────────────────────────────
+
+def _update_skill_levels(conn, user_id: str, node_id: str) -> None:
+    """Increment skill levels for all AtomicSkills taught by node_id (up to max 3).
+
+    Looks up edges with edge_type='teaches' and source=node_id in the published
+    graph version. For each taught skill (target), upserts student_skill_levels.
+    """
+    from datetime import datetime, timezone
+
+    version_row = conn.execute(
+        "SELECT id FROM graph_versions WHERE status='published' ORDER BY created_at DESC LIMIT 1"
+    ).fetchone()
+    if not version_row:
+        return
+
+    graph_version_id = version_row["id"]
+
+    taught_rows = conn.execute(
+        """
+        SELECT target FROM edges
+        WHERE graph_version_id = ?
+          AND edge_type = 'teaches'
+          AND source = ?
+        """,
+        (graph_version_id, node_id),
+    ).fetchall()
+
+    if not taught_rows:
+        return
+
+    now = datetime.now(timezone.utc).isoformat()
+
+    for row in taught_rows:
+        skill_id = row["target"]
+        existing = conn.execute(
+            "SELECT level FROM student_skill_levels WHERE user_id=? AND skill_id=?",
+            (user_id, skill_id),
+        ).fetchone()
+
+        if existing is None:
+            conn.execute(
+                "INSERT INTO student_skill_levels (user_id, skill_id, level, updated_at) VALUES (?,?,?,?)",
+                (user_id, skill_id, 1, now),
+            )
+        elif existing["level"] < 3:
+            conn.execute(
+                "UPDATE student_skill_levels SET level=?, updated_at=? WHERE user_id=? AND skill_id=?",
+                (existing["level"] + 1, now, user_id, skill_id),
+            )
+        # If already level 3, no-op
 
 
 # ── Recommendations ───────────────────────────────────────────────
