@@ -351,21 +351,40 @@ export default function StudentStageMapPage() {
             <h3>{selectedStage.title}</h3>
             <p className="muted">{statusLabel(selectedStage.status)}</p>
             {(() => {
+              const requiredSkillIds = learningGraph?.edges
+                .filter((e) => e.type === 'requires_skill' && e.targetId === selectedStage.nodeId)
+                .map((e) => e.sourceId) ?? []
               const taughtSkillIds = learningGraph?.edges
                 .filter((e) => e.type === 'teaches' && e.sourceId === selectedStage.nodeId)
                 .map((e) => e.targetId) ?? []
-              return taughtSkillIds.length > 0 ? (
-                <div className="stage-sheet-teaches">
-                  <p className="muted stage-sheet-teaches-label">배울 수 있는 스킬</p>
-                  <div className="stage-sheet-teaches-chips">
-                    {taughtSkillIds.map((skillId) => (
-                      <span key={skillId} className="skill-chip">
-                        {SKILL_LABELS[skillId] ?? skillId}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ) : null
+              return (
+                <>
+                  {requiredSkillIds.length > 0 && (
+                    <div className="stage-sheet-teaches">
+                      <p className="muted stage-sheet-teaches-label">필요한 스킬</p>
+                      <div className="stage-sheet-teaches-chips">
+                        {requiredSkillIds.map((skillId) => (
+                          <span key={skillId} className="skill-chip">
+                            {SKILL_LABELS[skillId] ?? skillId}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {taughtSkillIds.length > 0 && (
+                    <div className="stage-sheet-teaches">
+                      <p className="muted stage-sheet-teaches-label">배울 수 있는 스킬</p>
+                      <div className="stage-sheet-teaches-chips">
+                        {taughtSkillIds.map((skillId) => (
+                          <span key={skillId} className="skill-chip">
+                            {SKILL_LABELS[skillId] ?? skillId}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )
             })()}
             {selectedStage.status === 'LOCKED' ? (
               <p className="muted">
