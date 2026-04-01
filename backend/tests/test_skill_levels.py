@@ -252,7 +252,7 @@ def test_recommendation_skill_readiness_appears_when_skill_ready(db):
     db.commit()
     _seed_dummy_session(db, "user-rec")
 
-    items = _compute_recommendations("user-rec", db, limit=10)
+    items = _compute_recommendations("user-rec", None, db, limit=10)
     node_ids = [i["nodeId"] for i in items]
     reasons = {i["nodeId"]: i["reason"] for i in items}
 
@@ -267,6 +267,6 @@ def test_recommendation_skill_readiness_absent_when_skill_not_ready(db):
     # Do NOT insert student_skill_levels — skill level stays 0
     _seed_dummy_session(db, "user-rec2")
 
-    items = _compute_recommendations("user-rec2", db, limit=10)
+    items = _compute_recommendations("user-rec2", None, db, limit=10)
     node_ids = [i["nodeId"] for i in items]
     assert "CS.FRAC_INTRO2" not in node_ids

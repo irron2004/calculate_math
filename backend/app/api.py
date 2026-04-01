@@ -2147,7 +2147,7 @@ async def get_skill_levels(user=Depends(get_current_user)):
 
 # ── Recommendations ───────────────────────────────────────────────
 
-def _compute_recommendations(user_id: str, conn, limit: int = 3) -> list[dict]:
+def _compute_recommendations(user_id: str, username: str | None, conn, limit: int = 3) -> list[dict]:
     from datetime import datetime, timezone, timedelta
 
     now = datetime.now(timezone.utc)
@@ -2163,9 +2163,6 @@ def _compute_recommendations(user_id: str, conn, limit: int = 3) -> list[dict]:
         """,
         (user_id,),
     ).fetchall()
-
-    if not rows:
-        return []
 
     node_stats: dict[str, dict] = {}
     for row in rows:
@@ -2255,14 +2252,49 @@ def _compute_recommendations(user_id: str, conn, limit: int = 3) -> list[dict]:
                     })
 
     scored.sort(key=lambda x: x["score"], reverse=True)
-    return scored[:limit]
+    result = scored[:limit]
+
+    # ── Placement-based fallback for new users ─────────────────────────────────
+    if not result and username:
+        import re as _re
+        profile_row = conn.execute(
+            "SELECT estimated_level FROM student_profiles WHERE student_id = ?",
+            (username,),
+        ).fetchone()
+        if profile_row and profile_row["estimated_level"]:
+            m = _re.match(r"E(\d+)-\d+", profile_row["estimated_level"].strip())
+            if m:
+                grade = int(m.group(1))
+                gv_row = conn.execute(
+                    "SELECT id FROM graph_versions WHERE status='published' ORDER BY created_at DESC LIMIT 1"
+                ).fetchone()
+                if gv_row:
+                    node_rows = conn.execute(
+                        """
+                        SELECT id FROM nodes
+                        WHERE graph_version_id = ?
+                          AND node_type = 'course_step'
+                          AND id LIKE ?
+                        ORDER BY order_value ASC
+                        LIMIT ?
+                        """,
+                        (gv_row["id"], f"%G-{grade}-%", limit),
+                    ).fetchall()
+                    for n in node_rows:
+                        result.append({
+                            "nodeId": n["id"],
+                            "reason": "학년에 맞는 첫 단원이에요",
+                            "score": 1.0,
+                        })
+
+    return result
 
 
 @router.get("/recommendations")
 async def get_recommendations(user=Depends(get_current_user)):
     conn = get_connection(get_database_path())
     try:
-        items = _compute_recommendations(user.user_id, conn)
+        items = _compute_recommendations(user.user_id, user.username, conn)
     finally:
         conn.close()
     return {"items": items}
