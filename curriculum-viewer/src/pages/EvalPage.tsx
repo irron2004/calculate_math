@@ -12,6 +12,7 @@ import type { Problem } from '../lib/learn/problems'
 import { saveDiagnosis } from '../lib/diagnosis/api'
 import { CALC_MISTAKE } from '../lib/diagnosis/types'
 import type { DiagnosisChoice } from '../lib/diagnosis/types'
+import { fetchSkillLevels } from '../lib/skillLevels/api'
 
 export default function EvalPage() {
   const params = useParams()
@@ -30,6 +31,7 @@ export default function EvalPage() {
   const [problems, setProblems] = useState<Record<string, Problem[]>>({})
   const [diagnosisDone, setDiagnosisDone] = useState(false)
   const [diagnosisLoading, setDiagnosisLoading] = useState(false)
+  const [clearedSkillLevels, setClearedSkillLevels] = useState<Record<string, number> | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -48,6 +50,13 @@ export default function EvalPage() {
     run()
     return () => controller.abort()
   }, [])
+
+  useEffect(() => {
+    if (!grading?.cleared) return
+    fetchSkillLevels()
+      .then(setClearedSkillLevels)
+      .catch(() => {})
+  }, [grading?.cleared])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -109,6 +118,23 @@ export default function EvalPage() {
     }))
   }, [grading, session?.nodeId, problems, asLabelById])
 
+  const taughtSkillIds = useMemo(() => {
+    if (!learningGraph || !session?.nodeId) return []
+    return learningGraph.edges
+      .filter((e) => e.type === 'teaches' && e.sourceId === session.nodeId)
+      .map((e) => e.targetId)
+  }, [learningGraph, session?.nodeId])
+
+  const SKILL_LABELS: Record<string, string> = {
+    'AS.NUMBER_SENSE': '수 세기와 수의 크기 비교',
+    'AS.PLACE_VALUE': '자릿값 이해',
+    'AS.ADD_SUB': '덧셈과 뺄셈',
+    'AS.MUL_DIV': '곱셈과 나눗셈',
+    'AS.FRAC_BASIC': '분수 개념',
+    'AS.DECIMAL': '소수 개념',
+    'AS.RATIO': '비율과 비례',
+  }
+
   const handleDiagnosis = async (choice: DiagnosisChoice) => {
     if (!sessionId || diagnosisLoading) return
     setDiagnosisLoading(true)
@@ -138,6 +164,33 @@ export default function EvalPage() {
               </p>
             </div>
           </div>
+
+          {grading.cleared && clearedSkillLevels !== null && taughtSkillIds.length > 0 && (
+            <div className="skill-growth-section">
+              <h3 className="skill-growth-title">🌟 스킬이 자랐어요!</h3>
+              <div className="skill-growth-cards">
+                {taughtSkillIds.map((skillId) => {
+                  const level = clearedSkillLevels[skillId] ?? 0
+                  return (
+                    <div key={skillId} className="skill-card">
+                      <div className="skill-card-label">
+                        {SKILL_LABELS[skillId] ?? skillId}
+                      </div>
+                      <div className="skill-level-bar">
+                        {[1, 2, 3].map((seg) => (
+                          <div
+                            key={seg}
+                            className={`skill-level-segment ${level >= seg ? 'filled' : 'empty'}`}
+                          />
+                        ))}
+                      </div>
+                      <div className="skill-level-text">레벨 {level} / 3</div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {grading.perTag && grading.perTag.length > 0 && (
             <div className="tag-accuracy-section">
