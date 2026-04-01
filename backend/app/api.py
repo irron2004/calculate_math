@@ -2147,7 +2147,7 @@ async def get_skill_levels(user=Depends(get_current_user)):
 
 # ── Recommendations ───────────────────────────────────────────────
 
-def _compute_recommendations(user_id: str, conn, limit: int = 2) -> list[dict]:
+def _compute_recommendations(user_id: str, conn, limit: int = 3) -> list[dict]:
     from datetime import datetime, timezone, timedelta
 
     now = datetime.now(timezone.utc)
