@@ -34,6 +34,7 @@ type Props = {
   showControls?: boolean
   showMiniMap?: boolean
   progressByNodeId?: Record<string, NodeProgressV1> | null
+  showAchievements?: boolean
 }
 
 const NODE_WIDTH = 260
@@ -191,14 +192,15 @@ export default function CurriculumGraphView({
   fitViewPadding = DEFAULT_FITVIEW_PADDING,
   showControls = true,
   showMiniMap = true,
-  progressByNodeId = null
+  progressByNodeId = null,
+  showAchievements = false
 }: Props) {
   const instanceRef = useRef<ReactFlowInstance | null>(null)
 
   const layout = useMemo(() => {
     if (!nodes) return { nodes: [], edges: [] }
-    return buildCurriculumGraphLayout({ nodes, direction })
-  }, [nodes, direction])
+    return buildCurriculumGraphLayout({ nodes, direction, showAchievements })
+  }, [nodes, direction, showAchievements])
 
   const nodeById = useMemo(() => {
     return new Map((nodes ?? []).map((node) => [node.id, node]))

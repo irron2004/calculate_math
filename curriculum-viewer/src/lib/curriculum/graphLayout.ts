@@ -73,10 +73,11 @@ function layoutWithDagre(params: {
 export function buildCurriculumGraphLayout(params: {
   nodes: ReadonlyArray<CurriculumNode>
   direction?: GraphLayoutDirection
+  showAchievements?: boolean
 }): CurriculumGraphLayout {
   const direction = params.direction ?? GRAPH_LAYOUT_DEFAULTS.rankdir
   const nodeById = new Map(params.nodes.map((node) => [node.id, node]))
-  const visibleNodes = getGraphVisibleNodes(params.nodes)
+  const visibleNodes = getGraphVisibleNodes(params.nodes, { showAchievements: params.showAchievements })
   const containsEdges = buildContainsEdgeRefsSkippingGradeNodes(params.nodes, nodeById)
   const progressionEdges = buildProgressionEdges(params.nodes)
 

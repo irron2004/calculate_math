@@ -23,6 +23,7 @@ export default function GraphPage() {
   const { data, loading, error } = useCurriculum()
   const { focusNodeId, setFocusNodeId } = useFocusNodeId()
   const [direction, setDirection] = useState<GraphLayoutDirection>('TB')
+  const [showAchievements, setShowAchievements] = useState(false)
   const { user } = useAuth()
 
   const [learningGraph, setLearningGraph] = useState<LearningGraphV1 | null>(null)
@@ -61,8 +62,8 @@ export default function GraphPage() {
 
   const visibleNodeCount = useMemo(() => {
     if (!data) return 0
-    return getGraphVisibleNodes(data.nodes).length
-  }, [data])
+    return getGraphVisibleNodes(data.nodes, { showAchievements }).length
+  }, [data, showAchievements])
 
   const nodeById = useMemo(() => {
     if (!data) return new Map<string, CurriculumNode>()
@@ -140,6 +141,15 @@ export default function GraphPage() {
             <option value="LR">Left - Right</option>
           </select>
         </div>
+        <label className="graph-control" style={{ cursor: 'pointer', userSelect: 'none' }}>
+          <input
+            type="checkbox"
+            checked={showAchievements}
+            onChange={(e) => setShowAchievements(e.target.checked)}
+            style={{ marginRight: 4 }}
+          />
+          성취기준 표시
+        </label>
         <div className="graph-meta">
           {visibleNodeCount > 0 ? `${visibleNodeCount} nodes` : 'Loading…'}
         </div>
@@ -167,6 +177,7 @@ export default function GraphPage() {
           direction={direction}
           fitViewPadding={GRAPH_FITVIEW_PADDING}
           progressByNodeId={progressByNodeId}
+          showAchievements={showAchievements}
         />
       </div>
     </section>
