@@ -111,7 +111,7 @@ const DOMAIN_LABEL_DEFAULT: Record<(typeof DOMAIN_LAYER_ORDER)[number], string> 
 }
 
 const CURRICULUM_STYLE_NODE_TYPES = new Set(['schoolLevel', 'gradeBand', 'domain', 'textbookUnit', 'achievement'])
-const UNIT_LIKE_NODE_TYPES = new Set(['root', 'schoolLevel', 'gradeBand', 'domain', 'textbookUnit', 'unit'])
+const UNIT_LIKE_NODE_TYPES = new Set(['root', 'schoolLevel', 'gradeBand', 'domain', 'textbookUnit', 'unit', 'skill'])
 
 function normalizeDomainCode(value: unknown): DomainLayerCode {
   return value === 'NA' || value === 'RR' || value === 'GM' || value === 'DP' ? value : DOMAIN_LAYER_FALLBACK
