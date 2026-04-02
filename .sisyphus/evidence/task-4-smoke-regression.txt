@@ -1,0 +1,14 @@
+
+> curriculum-viewer@0.0.0 test
+> vitest run src/lib/researchGraph/viewMode.test.ts
+
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90m/mnt/c/Users/irron/Desktop/my/ruahverce/calculate_math/curriculum-viewer[39m
+
+ [32m✓[39m src/lib/researchGraph/viewMode.test.ts [2m ([22m[2m6 tests[22m[2m)[22m[90m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+[2m   Start at [22m 03:13:54
+[2m   Duration [22m 15.07s[2m (transform 122ms, setup 5.41s, collect 52ms, tests 3ms, environment 7.24s, prepare 1.44s)[22m
+

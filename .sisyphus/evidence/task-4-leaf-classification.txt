@@ -1,0 +1,11 @@
+leaf_classification
+non_problem_leaf_count=296
+missing_contains_edges=0
+extra_contains_edges=0
+leafs_by_original_type
+achievement=93
+textbookUnit=203
+
+classification_rule
+- A node is marked expected-terminal when it has zero outgoing edges and no missing parentId-derived contains edge.
+- Nodes listed in missing CSV are treated as structural defects.

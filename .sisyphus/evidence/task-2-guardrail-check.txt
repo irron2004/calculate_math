@@ -1,0 +1,4 @@
+Guardrail check
+- NODE_WIDTH unchanged: 260
+- NODE_HEIGHT unchanged: 70
+- Task 2 excludes radial `radiusStep` change (still pending Task 3)

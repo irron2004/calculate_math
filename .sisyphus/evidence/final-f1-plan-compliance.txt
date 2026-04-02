@@ -1,0 +1,15 @@
+F1 Plan Compliance Audit
+== artifact checks ==
+ok: .sisyphus/evidence/task-11-render/happy.png
+ok: .sisyphus/evidence/task-12-editor-flow/reload-check.png
+ok: .sisyphus/evidence/task-11-render/filter-check.json
+ok: .sisyphus/evidence/task-4-vitest-targeted.txt
+ok: .sisyphus/evidence/task-4-smoke-regression.txt
+ok: .sisyphus/evidence/task-5-final-density.md
+== radial step grep ==
+curriculum-viewer/src/pages/AuthorResearchGraphPage.tsx:1279:      const radiusStep = NODE_WIDTH + 90
+== spacing-plan scoped diff ==
+curriculum-viewer/src/pages/AuthorResearchGraphPage.test.tsx
+curriculum-viewer/src/pages/AuthorResearchGraphPage.tsx
+== verdict ==
+PASS (plan scope satisfied for spacing-tightening paths; unrelated workspace changes are pre-existing outside this plan)

@@ -1,0 +1,11 @@
+
+> curriculum-viewer@0.0.0 convert:curriculum:graph
+> node scripts/convert-curriculum-2022-to-graph.mjs
+
+Wrote graph: /mnt/c/Users/irron/Desktop/my/ruahverce/calculate_math/curriculum-viewer/public/data/curriculum_math_2022_graph_v2.json
+nodes=478 edges=901
+autoAddedContainsEdges=465
+droppedUnsupportedEdges=0
+droppedBrokenEdges=0
+skippedProblemLinks=0
+warning: Nodes without outgoing edges: 296

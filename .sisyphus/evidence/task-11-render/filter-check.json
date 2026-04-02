@@ -1,0 +1,11 @@
+{
+  "countsText": "nodes: 466/466 · edges: 893/889 · unit: 359/359 · skill: 0/0 · problem: 0/0",
+  "labelCountBefore": 466,
+  "labelCountAfterFilter": 370,
+  "labelCountAfterReset": 466,
+  "assertions": {
+    "hasLabelsInitially": true,
+    "hasLabelsAfterFilter": true,
+    "hasLabelsAfterReset": true
+  }
+}

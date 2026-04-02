@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Task 8 Backend Parity Problems",
+  "description": "Schema for documenting parity discrepancies between SQLite and Neo4j backends",
+  "reportVersion": "1.0",
+  "generatedAt": "2026-03-19T10:00:00Z",
+  "comparisonScope": {
+    "sqliteEndpoint": "http://localhost:3001",
+    "neo4jEndpoint": "http://localhost:7474",
+    "graphStorageBackend": "sqlite|neo4j",
+    "testedEndpoints": [
+      "/curriculum",
+      "/curriculum/:id",
+      "/curriculum/:id/children",
+      "/curriculum/:id/prerequisites",
+      "/curriculum/:id/path"
+    ],
+    "testDataSnapshot": "sha-or-commit-reference"
+  },
+  "overallResult": {
+    "parityStatus": "PASS | FAIL | PARTIAL",
+    "task8Eligible": true,
+    "task8BlockingIssues": 0
+  },
+  "problems": [
+    {
+      "id": "PARITY-001",
+      "severity": "CRITICAL | HIGH | MEDIUM | LOW",
+      "endpoint": "/curriculum/:id",
+      "field": "title",
+      "path": "$.nodes[0].title",
+      "sqliteValue": "string | null",
+      "neo4jValue": "string | null",
+      "classification": "DEFECT | EXPECTED | KNOWN_LIMITATION",
+      "reason": "Human-readable explanation of why this differs",
+      "migrationTicket": "TICKET-123",
+      "blocksTask8": true,
+      "mitigation": "Optional: workaround if available"
+    }
+  ],
+  "expectedDivergences": [
+    {
+      "path": "$.metadata.internalId",
+      "description": "Neo4j internal IDs not present in SQLite",
+      "classification": "EXPECTED",
+      "ignore": true
+    }
+  ],
+  "summary": {
+    "totalProblems": 0,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "expectedDivergencesCount": 0,
+    "task8Blocked": false,
+    "f1GatePass": false,
+    "f3GatePass": false
+  },
+  "checklist": {
+    "preflight": {
+      "sqliteReachable": false,
+      "neo4jReachable": false,
+      "testDataSeeded": false,
+      "envDocumented": false
+    },
+    "requiredFields": {
+      "idPresent": false,
+      "typeValid": false,
+      "titlePresent": false,
+      "orderNumeric": false
+    },
+    "relationships": {
+      "rootCardinalityMatch": false,
+      "childEdgesComplete": false,
+      "prerequisiteEdgesComplete": false
+    },
+    "semanticParity": {
+      "noCardinalityMismatches": false,
+      "setEqualityConfirmed": false,
+      "idNormalizationApplied": false
+    }
+  },
+  "evidenceFiles": [
+    {
+      "path": "diff-output/endpoint-comparison-001.json",
+      "description": "Detailed diff for /curriculum endpoint"
+    }
+  ]
+}

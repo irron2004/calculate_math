@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "research-patch-v1",
+  "add_nodes": [
+    {
+      "id": "P_P_task12_problem_node",
+      "nodeType": "problem",
+      "label": "Task12 Problem Node",
+      "proposed": true
+    },
+    {
+      "id": "P_U_task12_unit_node",
+      "nodeType": "unit",
+      "label": "Task12 Unit Node",
+      "proposed": true
+    }
+  ],
+  "add_edges": [
+    {
+      "source": "4수01-B",
+      "target": "6수02-A",
+      "edgeType": "prereq"
+    },
+    {
+      "source": "4수01-C",
+      "target": "6수02-A",
+      "edgeType": "prereq"
+    }
+  ],
+  "remove_edges": []
+}

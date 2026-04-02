@@ -1,0 +1,5 @@
+invalid_node_type enforcement evidence
+
+- Test assertion exists: `src/lib/research/schema.test.ts:48`
+- Assertion: `expect(result.error.issues.map((issue) => issue.code)).toContain('invalid_node_type')`
+- Result: Included in passing `task-10-research-compat.txt` run (5 files, 13 tests passed)

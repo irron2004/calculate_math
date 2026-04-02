@@ -1,0 +1,99 @@
+
+> curriculum-viewer@0.0.0 test:e2e
+> playwright test e2e/research-graph-verification-artifacts.spec.ts
+
+[WebServer] INFO:     Started server process [11983]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+[WebServer] INFO:     127.0.0.1:37392 - "GET /api/health HTTP/1.1" 200 OK
+[WebServer] 
+[WebServer] > curriculum-viewer@0.0.0 build
+[WebServer] > tsc -b && vite build
+[WebServer] 
+[WebServer] [36mvite v5.4.21 [32mbuilding for production...[36m[39m
+[WebServer] transforming...
+[WebServer] [32m✓[39m 2313 modules transformed.
+[WebServer] rendering chunks...
+[WebServer] computing gzip size...
+[WebServer] [2mdist/[22m[32mindex.html                 [39m[1m[2m  1.22 kB[22m[1m[22m[2m │ gzip:   0.55 kB[22m
+[WebServer] [2mdist/[22m[2massets/[22m[35mindex-CWlFPp0B.css  [39m[1m[2m 69.02 kB[22m[1m[22m[2m │ gzip:  12.54 kB[22m
+[WebServer] [2mdist/[22m[2massets/[22m[36mindex-BbRYEwDh.js   [39m[1m[33m735.91 kB[39m[22m[2m │ gzip: 229.86 kB[22m
+[WebServer] [32m✓ built in 23.49s[39m
+[WebServer] [33m
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[WebServer] 
+[WebServer] > curriculum-viewer@0.0.0 preview
+[WebServer] > vite preview --host 127.0.0.1 --port 5173 --strictPort
+[WebServer] 
+[WebServer]   [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+
+Running 4 tests using 1 worker
+[WebServer] INFO:     127.0.0.1:51626 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:51626 - "OPTIONS /api/auth/login HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:51636 - "POST /api/auth/login HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:51626 - "OPTIONS /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:51636 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:51642 - "GET /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:51642 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:51636 - "GET /api/graph/backend HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:51654 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:51636 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:51658 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:51636 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:51642 - "GET /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:51636 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:51642 - "GET /api/graph/backend HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:51674 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:51642 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46710 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+·[WebServer] INFO:     127.0.0.1:46712 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46712 - "OPTIONS /api/auth/login HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46714 - "POST /api/auth/login HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46712 - "OPTIONS /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/backend HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46738 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/backend HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46744 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46746 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/backend HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46754 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46770 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/backend HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:39010 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:39020 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/auth/me HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:46730 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/backend HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:39028 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:46714 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+[WebServer] INFO:     127.0.0.1:39044 - "GET /api/graph/published HTTP/1.1" 404 Not Found
+·[WebServer] INFO:     127.0.0.1:39048 - "POST /api/auth/login HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:39048 - "GET /api/auth/me HTTP/1.1" 200 OK
+·[WebServer] INFO:     127.0.0.1:39052 - "POST /api/auth/login HTTP/1.1" 200 OK
+[WebServer] INFO:     127.0.0.1:39052 - "GET /api/auth/me HTTP/1.1" 200 OK
+·
+  4 passed (1.0m)

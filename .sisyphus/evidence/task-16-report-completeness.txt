@@ -1,0 +1,17 @@
+.sisyphus/evidence/task-1-backend-baseline.txt: OK
+.sisyphus/evidence/task-2-neo4j-schema-audit.md: OK
+.sisyphus/evidence/task-3-graph-structure.json: OK
+.sisyphus/evidence/task-4-missing-link-audit.csv: OK
+.sisyphus/evidence/task-5-skill-problem-coverage.md: OK
+.sisyphus/evidence/task-6-api-smoke/backend.json: OK
+.sisyphus/evidence/task-7-idempotency.md: OK
+.sisyphus/evidence/task-8-backend-parity.md: OK
+.sisyphus/evidence/task-9-traversal.md: OK
+.sisyphus/evidence/task-10-research-compat.txt: OK
+.sisyphus/evidence/task-11-render/happy.png: OK
+.sisyphus/evidence/task-12-editor-flow/export.json: OK
+.sisyphus/evidence/task-13-remediation-log.md: OK
+.sisyphus/evidence/task-14-rebuild/conversion.txt: OK
+.sisyphus/evidence/task-15-regression/backend-tests.txt: OK
+.sisyphus/evidence/task-15-regression/frontend-tests-build.txt: OK
+TOTAL_OK=16/16

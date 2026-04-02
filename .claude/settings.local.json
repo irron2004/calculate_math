@@ -18,7 +18,28 @@
       "Bash(docker compose down:*)",
       "Bash(docker compose:*)",
       "Bash(git ls-files:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(ls:*)",
+      "Bash(find /mnt/c/Users/irron/Desktop/my/ruahverce -maxdepth 2 -type f \\\\\\(-name *기획* -o -name *PRD* -o -name *prd* \\\\\\) ! -path */.git/*)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(python3 -m pytest tests/test_study_sessions.py -v)",
+      "Bash(pip show:*)",
+      "Read(//root/.local/bin/**)",
+      "Read(//home/hskim/.local/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(pip3 list:*)",
+      "Bash(pip3 install:*)",
+      "Bash(python3 -m pytest backend/tests/test_study_sessions.py -v)",
+      "Bash(python3 -m pytest backend/tests/ -v --ignore=backend/tests/test_study_sessions.py)",
+      "Bash(npx vitest:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(''''nodes:'''', len\\(d[''''nodes'''']\\)\\); print\\(''''edges:'''', len\\(d[''''edges'''']\\)\\)\")",
+      "Bash(node:*)",
+      "Bash(python3:*)",
+      "Bash(./node_modules/.bin/tsc -noEmit src/lib/learn/problems.ts)",
+      "Bash(/mnt/c/Users/irron/Desktop/my/ruahverce/calculate_math/backend/app/api.py:*)"
     ]
   }
 }

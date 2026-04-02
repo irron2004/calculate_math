@@ -1,0 +1,18 @@
+Scenarios [20/24 pass] | Integration [2/4] | Evidence [24/24] | VERDICT: REJECT
+
+Failed/blocked scenarios:
+- Task 2 live SHOW CONSTRAINTS/SHOW INDEXES scenario: BLOCKED
+- Task 7 migration run1/run2 idempotency scenario: BLOCKED
+- Task 8 published graph parity scenario (sqlite vs neo4j): BLOCKED
+- Task 8 problems parity scenario (sqlite vs neo4j): BLOCKED
+
+Pass highlights:
+- Structural and link audits (Tasks 3/4/5/9/10) have deterministic evidence.
+- UI render and editor scenarios (Tasks 11/12) passed with Playwright artifacts.
+- Regression suite (Task 15) passed for backend and frontend/build logs.
+
+Blocking evidence:
+- .sisyphus/evidence/task-2-cypher-shell-check.txt
+- .sisyphus/evidence/task-2-neo4j-env-check.txt
+- .sisyphus/evidence/task-7-idempotency.md
+- .sisyphus/evidence/task-8-backend-parity.md

@@ -1,0 +1,6 @@
+schema_check
+backend.json: keys=backend,ready,publishedGraphAvailable,nodeCount,edgeCount
+published.json: keys=error
+problems-known.json: keys=
+problems-known.json: array_length=0
+unknown-node.json: keys=error

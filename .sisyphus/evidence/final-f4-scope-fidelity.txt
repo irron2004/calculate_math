@@ -1,0 +1,19 @@
+F4 Scope Fidelity Check
+== workspace diff snapshot ==
+.sisyphus/boulder.json
+backend/CURRICULUM_GRAPH_SCHEMA_V2.md
+backend/app/db.py
+backend/app/email_service.py
+backend/data/app.db
+backend/tests/test_homework_api.py
+curriculum-viewer/index.html
+curriculum-viewer/src/lib/auth/api.ts
+curriculum-viewer/src/lib/research/loaders.ts
+curriculum-viewer/src/pages/AuthorResearchGraphPage.test.tsx
+curriculum-viewer/src/pages/AuthorResearchGraphPage.tsx
+== spacing-plan scoped diff ==
+curriculum-viewer/src/pages/AuthorResearchGraphPage.test.tsx
+curriculum-viewer/src/pages/AuthorResearchGraphPage.tsx
+== scope containment decision ==
+PASS for this plan: only research-graph page + its test are modified within spacing-tightening scope.
+NOTE: backend/auth/research-loader changes are present in workspace but are unrelated pre-existing work and not touched by this spacing plan execution.

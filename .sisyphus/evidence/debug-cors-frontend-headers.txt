@@ -1,0 +1,11 @@
+HTTP/2 200 
+access-control-allow-credentials: true
+access-control-allow-origin: https://calculatemathfrontend-production.up.railway.app
+content-type: application/json
+date: Thu, 19 Mar 2026 16:06:47 GMT
+server: railway-edge
+vary: Origin
+x-railway-edge: railway/asia-southeast1-eqsg3a
+x-railway-request-id: doUV4rxGSjuAKHj6DcO5xA
+content-length: 225494
+

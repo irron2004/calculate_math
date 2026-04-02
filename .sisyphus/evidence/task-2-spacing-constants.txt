@@ -1,0 +1,9 @@
+curriculum-viewer/src/pages/AuthorResearchGraphPage.tsx
+const NODE_WIDTH = 260
+const NODE_HEIGHT = 70
+const GRID_GAP_X = 30
+const GRID_GAP_Y = 20
+const GRADE_BAND_GAP_Y = 80
+const DOMAIN_LAYER_GAP_Y = 100
+const DOMAIN_HEADER_GAP_Y = 8
+const DEPTH_HEADER_GAP_Y = 8

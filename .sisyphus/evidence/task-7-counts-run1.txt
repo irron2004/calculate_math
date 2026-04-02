@@ -1,0 +1,2 @@
+graphVersions, graphNodes, problems, graphEdges, hasNodeRels
+2, 6, 3, 4, 6

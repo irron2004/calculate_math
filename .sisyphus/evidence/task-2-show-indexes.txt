@@ -1,0 +1,15 @@
++--------------------------------------------------------------------------------------------------------------------+
+| name                   | type     | entityType     | labelsOrTypes    | properties                      | state    |
++--------------------------------------------------------------------------------------------------------------------+
+| "graph_node_key"       | "RANGE"  | "NODE"         | ["GraphNode"]    | ["key"]                         | "ONLINE" |
+| "graph_node_version"   | "RANGE"  | "NODE"         | ["GraphNode"]    | ["graph_version_id", "node_id"] | "ONLINE" |
+| "graph_version_id"     | "RANGE"  | "NODE"         | ["GraphVersion"] | ["id"]                          | "ONLINE" |
+| "graph_version_status" | "RANGE"  | "NODE"         | ["GraphVersion"] | ["status"]                      | "ONLINE" |
+| "index_343aff4e"       | "LOOKUP" | "NODE"         | NULL             | NULL                            | "ONLINE" |
+| "index_f7700477"       | "LOOKUP" | "RELATIONSHIP" | NULL             | NULL                            | "ONLINE" |
+| "problem_id"           | "RANGE"  | "NODE"         | ["Problem"]      | ["id"]                          | "ONLINE" |
+| "problem_node_order"   | "RANGE"  | "NODE"         | ["Problem"]      | ["node_id", "order_value"]      | "ONLINE" |
++--------------------------------------------------------------------------------------------------------------------+
+
+8 rows
+ready to start consuming query after 27 ms, results consumed after another 2 ms

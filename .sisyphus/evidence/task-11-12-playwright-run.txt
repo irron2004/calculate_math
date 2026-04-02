@@ -1,0 +1,11 @@
+
+> curriculum-viewer@0.0.0 test:e2e
+> playwright test e2e/research-graph-verification-artifacts.spec.ts
+
+
+Running 2 tests using 1 worker
+
+  ✓  1 e2e/research-graph-verification-artifacts.spec.ts:119:1 › task11: render and filter evidence capture (13.1s)
+  ✓  2 e2e/research-graph-verification-artifacts.spec.ts:197:1 › task12: editor create-export-reload evidence capture (21.7s)
+
+  2 passed (56.0s)

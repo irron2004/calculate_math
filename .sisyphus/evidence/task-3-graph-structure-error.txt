@@ -1,0 +1,1 @@
+invalid_node_type_detected at nodes[0].nodeType="invalid_type"

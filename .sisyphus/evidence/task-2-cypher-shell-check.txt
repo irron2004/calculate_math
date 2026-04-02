@@ -1,0 +1,1 @@
+/bin/bash: line 1: cypher-shell: command not found

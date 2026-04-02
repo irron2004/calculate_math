@@ -1,0 +1,14 @@
+HTTP/2 200 
+access-control-allow-credentials: true
+access-control-allow-headers: Accept, Accept-Language, Authorization, Content-Language, Content-Type, Origin, X-Requested-With
+access-control-allow-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+access-control-allow-origin: https://math.ruahverce.com
+access-control-max-age: 600
+content-type: text/plain; charset=utf-8
+date: Thu, 19 Mar 2026 16:45:07 GMT
+server: railway-edge
+vary: Origin
+x-railway-edge: railway/asia-southeast1-eqsg3a
+x-railway-request-id: aEwYaX23QPOqm-75ipRofQ
+content-length: 2
+

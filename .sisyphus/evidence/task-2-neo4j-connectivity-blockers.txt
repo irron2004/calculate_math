@@ -1,0 +1,8 @@
+neo4j_connectivity_check=resolved_via_railway_ssh
+timestamp=2026-03-19
+cypher_shell=missing
+neo4j_uri_env=unset
+neo4j_username_env=unset
+neo4j_database_env=unset
+impact=local_runner_blocked_but_railway_runner_available
+required_to_unblock=none_for_railway_execution

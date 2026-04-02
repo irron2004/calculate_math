@@ -1,0 +1,10 @@
++--------------------------------------------------------------------------------+
+| name               | type         | entityType | labelsOrTypes    | properties |
++--------------------------------------------------------------------------------+
+| "graph_node_key"   | "UNIQUENESS" | "NODE"     | ["GraphNode"]    | ["key"]    |
+| "graph_version_id" | "UNIQUENESS" | "NODE"     | ["GraphVersion"] | ["id"]     |
+| "problem_id"       | "UNIQUENESS" | "NODE"     | ["Problem"]      | ["id"]     |
++--------------------------------------------------------------------------------+
+
+3 rows
+ready to start consuming query after 26 ms, results consumed after another 4 ms

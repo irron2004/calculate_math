@@ -1,0 +1,8 @@
+..........                                                               [100%]
+=============================== warnings summary ===============================
+backend/.venv/lib/python3.12/site-packages/starlette/formparsers.py:10
+  /mnt/c/Users/irron/Desktop/my/ruahverce/calculate_math/backend/.venv/lib/python3.12/site-packages/starlette/formparsers.py:10: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+10 passed, 1 warning in 2.14s

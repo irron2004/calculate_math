@@ -1,0 +1,5 @@
+schemaVersion= 2
+nodes= 478
+edges= 901
+has_2수01-01= True
+has_ROOT-MATH= False

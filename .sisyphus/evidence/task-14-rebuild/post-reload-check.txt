@@ -1,0 +1,9 @@
+artifact=curriculum-viewer/public/data/curriculum_math_2022_graph_v2.json
+schemaVersion=curriculum-graph-v2
+nodes=478
+edges=901
+duplicate_node_ids=0
+invalid_node_types=0
+unknown_edge_refs=0
+neo4j_reload=pass (railway services calculate_math + calculate_math_neo4j)
+neo4j_counts_after_reload=graphVersions:2,graphNodes:6,problems:3,graphEdges:4,hasNodeRels:6

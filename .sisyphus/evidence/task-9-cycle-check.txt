@@ -1,0 +1,5 @@
+prereq_edge_count=12
+participating_nodes=15
+reciprocal_pairs=0
+cycle_detected=false
+cycle_path=(none)

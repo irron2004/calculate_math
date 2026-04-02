@@ -1,0 +1,35 @@
+{
+  "task": 8,
+  "status": "executed",
+  "reason": "live sqlite vs neo4j parity captured on Railway calculate_math service",
+  "nodeId": "E-3-ADD-001",
+  "evidence": {
+    "sqlite": {
+      "knownNode": ".sisyphus/evidence/task-8-sqlite-problems-known.json",
+      "knownNodeStatus": ".sisyphus/evidence/task-8-sqlite-problems-known-status.txt",
+      "unknownNode": ".sisyphus/evidence/task-8-sqlite-unknown.json",
+      "unknownNodeStatus": ".sisyphus/evidence/task-8-sqlite-unknown-status.txt"
+    },
+    "neo4j": {
+      "knownNode": ".sisyphus/evidence/task-8-neo4j-problems-known.json",
+      "knownNodeStatus": ".sisyphus/evidence/task-8-neo4j-problems-known-status.txt",
+      "unknownNode": ".sisyphus/evidence/task-8-neo4j-unknown.json",
+      "unknownNodeStatus": ".sisyphus/evidence/task-8-neo4j-unknown-status.txt"
+    }
+  },
+  "normalizedComparison": {
+    "knownNode": {
+      "sqliteProblemIds": ["P-ADD-0001", "P-ADD-0002"],
+      "neo4jProblemIds": ["P-ADD-0001", "P-ADD-0002"],
+      "sameIds": true,
+      "sameCount": true
+    },
+    "unknownNode": {
+      "sqliteCode": "NODE_NOT_FOUND",
+      "neo4jCode": "NODE_NOT_FOUND",
+      "sameErrorCode": true
+    }
+  },
+  "severity": "high",
+  "verdict": "pass"
+}

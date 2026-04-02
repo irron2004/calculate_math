@@ -1,0 +1,29 @@
+{
+  "customDomainCreate": {
+    "id": "ef96a834-a2be-40ef-b0ff-9de81a27f9cc",
+    "domain": "math.ruahverce.com",
+    "createdAt": "2026-03-19T17:00:26.629Z",
+    "updatedAt": "2026-03-19T17:00:26.629Z",
+    "serviceId": "7b399d9c-ccfc-4513-801a-7b041da80445",
+    "environmentId": "5bc8f712-a441-484b-a7d7-491455ba6341",
+    "projectId": "f6eaa074-88ea-467c-a0e5-4eb09a878966",
+    "targetPort": null,
+    "status": {
+      "dnsRecords": [
+        {
+          "hostlabel": "math",
+          "fqdn": "math.ruahverce.com",
+          "recordType": "DNS_RECORD_TYPE_CNAME",
+          "requiredValue": "rqsepyut.up.railway.app",
+          "currentValue": "",
+          "status": "DNS_RECORD_STATUS_REQUIRES_UPDATE",
+          "zone": "ruahverce.com",
+          "purpose": "DNS_RECORD_PURPOSE_TRAFFIC_ROUTE"
+        }
+      ],
+      "cdnProvider": "DETECTED_CDN_PROVIDER_CLOUDFLARE",
+      "certificates": [],
+      "certificateStatus": "CERTIFICATE_STATUS_TYPE_VALIDATING_OWNERSHIP"
+    }
+  }
+}

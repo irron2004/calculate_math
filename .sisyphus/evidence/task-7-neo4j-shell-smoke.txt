@@ -1,0 +1,9 @@
+/var/lib/neo4j/bin/cypher-shell
++----+
+| ok |
++----+
+| 1  |
++----+
+
+1 row
+ready to start consuming query after 54 ms, results consumed after another 1 ms

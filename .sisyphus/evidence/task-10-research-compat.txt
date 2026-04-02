@@ -1,0 +1,18 @@
+
+> curriculum-viewer@0.0.0 test
+> vitest run src/lib/research/schema.test.ts src/lib/research/applyResearchPatch.test.ts src/lib/research/editorState.test.ts src/lib/research/patchExport.test.ts src/lib/research/loaders.test.ts
+
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90m/mnt/c/Users/irron/Desktop/my/ruahverce/calculate_math/curriculum-viewer[39m
+
+ [32m✓[39m src/lib/research/schema.test.ts [2m ([22m[2m4 tests[22m[2m)[22m[90m 7[2mms[22m[39m
+ [32m✓[39m src/lib/research/loaders.test.ts [2m ([22m[2m3 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+ [32m✓[39m src/lib/research/applyResearchPatch.test.ts [2m ([22m[2m2 tests[22m[2m)[22m[90m 5[2mms[22m[39m
+ [32m✓[39m src/lib/research/patchExport.test.ts [2m ([22m[2m1 test[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m src/lib/research/editorState.test.ts [2m ([22m[2m3 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[32m13 passed[39m[22m[90m (13)[39m
+[2m   Start at [22m 12:58:21
+[2m   Duration [22m 56.68s[2m (transform 2.56s, setup 89.92s, collect 3.33s, tests 46ms, environment 164.05s, prepare 17.23s)[22m
+
