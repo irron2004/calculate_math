@@ -3,6 +3,7 @@ export type CurriculumNodeType = 'subject' | 'grade' | 'domain' | 'standard'
 export type CurriculumNode = {
   id: string
   type: CurriculumNodeType
+  nodeType?: string
   title: string
   parent_id?: string
   children_ids: string[]

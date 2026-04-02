@@ -8,7 +8,7 @@ export type ContainsEdgeRef = {
 export function getGraphVisibleNodes(
   nodes: ReadonlyArray<CurriculumNode>
 ): CurriculumNode[] {
-  return nodes.filter((node) => node.type !== 'grade')
+  return nodes.filter((node) => node.type !== 'grade' && node.nodeType !== 'achievement')
 }
 
 export function buildContainsEdgeRefsSkippingGradeNodes(

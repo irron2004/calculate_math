@@ -324,6 +324,7 @@ function transformGraphApiPayload(payload: GraphApiPayload): CurriculumData {
     const standardNode: CurriculumNode = {
       id: node.id,
       type: 'standard',
+      nodeType: node.nodeType,
       title: node.label,
       ...(node.text ? { text: node.text } : {}),
       subject: 'math',

@@ -153,6 +153,7 @@ function buildDomainSummaries(params: {
   const map = new Map<string, DomainSummary>()
 
   for (const node of params.learningGraph.nodes) {
+    if (node.nodeType === 'atomic_skill') continue
     const curriculumNode = params.curriculumNodeById.get(node.id)
     const domainId = findDomainId(curriculumNode)
     const domainLabel = findDomainLabel(curriculumNode)
