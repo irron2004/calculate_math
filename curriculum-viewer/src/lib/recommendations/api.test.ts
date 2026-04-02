@@ -8,7 +8,7 @@ vi.mock('../auth/api', () => ({
 import { authFetch } from '../auth/api'
 
 describe('fetchRecommendations', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => { vi.clearAllMocks() })
 
   it('returns items on success', async () => {
     vi.mocked(authFetch).mockResolvedValue({

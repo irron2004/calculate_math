@@ -8,7 +8,7 @@ vi.mock('../auth/api', () => ({
 import { authFetch } from '../auth/api'
 
 describe('saveDiagnosis', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => { vi.clearAllMocks() })
 
   it('PATCHes /api/study-sessions/:id/diagnosis', async () => {
     vi.mocked(authFetch).mockResolvedValue({

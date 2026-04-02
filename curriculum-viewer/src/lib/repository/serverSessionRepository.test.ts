@@ -28,7 +28,7 @@ const makeSession = (overrides: Partial<AttemptSessionV1> = {}): AttemptSessionV
 })
 
 describe('syncSessionToServer', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => { vi.clearAllMocks() })
 
   it('POSTs session data to /api/study-sessions', async () => {
     vi.mocked(authFetch).mockResolvedValue({

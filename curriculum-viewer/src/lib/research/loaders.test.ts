@@ -24,18 +24,21 @@ describe('loadResearchManifest', () => {
     }
   })
 
-  it('reports HTTP status for missing manifest', async () => {
+  it('falls back to embedded manifest on HTTP error', async () => {
     const originalFetch = globalThis.fetch
     globalThis.fetch = vi.fn(async () => ({ ok: false, status: 404 })) as unknown as typeof fetch
 
     try {
-      await expect(loadResearchManifest()).rejects.toThrowError('Failed to load research manifest (HTTP 404)')
+      const manifest = await loadResearchManifest()
+      // Falls back to EMBEDDED_RESEARCH_MANIFEST — never rejects
+      expect(manifest).toBeDefined()
+      expect(manifest.schemaVersion).toBe('research-manifest-v1')
     } finally {
       globalThis.fetch = originalFetch
     }
   })
 
-  it('reports JSON parsing errors', async () => {
+  it('falls back to embedded manifest on JSON parse error', async () => {
     const originalFetch = globalThis.fetch
     globalThis.fetch = vi.fn(async () => ({
       ok: true,
@@ -45,7 +48,10 @@ describe('loadResearchManifest', () => {
     })) as unknown as typeof fetch
 
     try {
-      await expect(loadResearchManifest()).rejects.toThrowError('Failed to parse research manifest JSON')
+      const manifest = await loadResearchManifest()
+      // Falls back to EMBEDDED_RESEARCH_MANIFEST — never rejects
+      expect(manifest).toBeDefined()
+      expect(manifest.schemaVersion).toBe('research-manifest-v1')
     } finally {
       globalThis.fetch = originalFetch
     }

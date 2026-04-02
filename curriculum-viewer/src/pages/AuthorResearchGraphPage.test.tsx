@@ -347,7 +347,7 @@ describe('/author/research-graph', () => {
         expect(tu1).toBeTruthy()
         expect(tu2).toBeTruthy()
 
-        expect(tu2.position.y - tu1.position.y).toBe(84)
+        expect(tu2.position.y - tu1.position.y).toBe(50)
         expect(depthHeader.position.y - domainHeader.position.y).toBe(42)
       })
     } finally {

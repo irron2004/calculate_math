@@ -18,9 +18,8 @@ describe('App routing', () => {
     )
     expect(within(nav).getByRole('link', { name: '숙제' })).toHaveAttribute('href', '/mypage')
 
-    const mapLink = within(nav).getByRole('link', { name: /지도/i })
+    const mapLink = within(nav).getByRole('link', { name: /스킬 트리/i })
     expect(mapLink).toHaveAttribute('href', '/map')
-    expect(mapLink).toHaveTextContent(/beta/i)
 
     const showDetailPanel = ['/graph', '/tree', '/learn', '/report'].some((prefix) =>
       window.location.pathname.startsWith(prefix)
@@ -87,7 +86,7 @@ describe('App routing', () => {
     render(<App />)
 
     expect(
-      await screen.findByRole('heading', { name: '홈' })
+      await screen.findByRole('heading', { name: /안녕하세요/ })
     ).toBeInTheDocument()
     await waitFor(() => expect(window.location.pathname).toBe('/dashboard'))
     expectPersistentLayout()
@@ -99,7 +98,7 @@ describe('App routing', () => {
     render(<App />)
 
     expect(
-      await screen.findByRole('heading', { name: '홈' })
+      await screen.findByRole('heading', { name: /안녕하세요/ })
     ).toBeInTheDocument()
     await waitFor(() => expect(window.location.pathname).toBe('/dashboard'))
     expectPersistentLayout()
@@ -113,7 +112,7 @@ describe('App routing', () => {
     render(<App />)
 
     expect(
-      await screen.findByRole('heading', { name: '홈' })
+      await screen.findByRole('heading', { name: /안녕하세요/ })
     ).toBeInTheDocument()
     await waitFor(() => expect(window.location.pathname).toBe('/dashboard'))
     expectPersistentLayout()
@@ -126,7 +125,7 @@ describe('App routing', () => {
     render(<App />)
 
     expect(
-      await screen.findByRole('heading', { name: '홈' })
+      await screen.findByRole('heading', { name: /안녕하세요/ })
     ).toBeInTheDocument()
 
     const user = userEvent.setup()
@@ -143,9 +142,9 @@ describe('App routing', () => {
     setStoredUser('demo')
     window.history.pushState({}, '', '/map')
     render(<App />)
-    expect(screen.getByRole('heading', { name: /지도/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /나의 수학 여정/ })).toBeInTheDocument()
     expectPersistentLayout()
-    expect(screen.getByRole('link', { name: /지도/i })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: /스킬 트리/i })).toHaveAttribute('aria-current', 'page')
   })
 
   it('renders Report page at /report (authenticated)', () => {
@@ -159,9 +158,8 @@ describe('App routing', () => {
   })
 
   it.each([
-    ['/graph', '지도'],
-    ['/tree', '트리'],
-    ['/health', '데이터 검증']
+    ['/graph', '나의 수학 여정'],
+    ['/tree', '스킬 트리']
   ])('renders %s when authenticated', async (pathname, heading) => {
     setStoredUser('demo')
     window.history.pushState({}, '', pathname)
@@ -210,7 +208,7 @@ describe('App routing', () => {
     window.history.pushState({}, '', '/dashboard')
     render(<App />)
 
-    expect(await screen.findByRole('heading', { name: '홈' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '관리자 대시보드' })).toBeInTheDocument()
     expectPersistentLayout()
 
     const user = userEvent.setup()

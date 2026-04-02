@@ -31,6 +31,7 @@ import AuthorValidatePage from './pages/AuthorValidatePage'
 import SkillGraphImportPage from './pages/SkillGraphImportPage'
 import SignupPage from './pages/SignupPage'
 import StudentStageMapPage from './pages/StudentStageMapPage'
+import TreePage from './pages/TreePage'
 import SettingsPage from './pages/SettingsPage'
 import { ROUTE_SEGMENTS, ROUTES } from './routes'
 
@@ -85,7 +86,14 @@ export default function App() {
                     </RequireAuth>
                   }
                 />
-                <Route path={ROUTE_SEGMENTS.tree} element={<Navigate to={ROUTES.map} replace />} />
+                <Route
+                  path={ROUTE_SEGMENTS.tree}
+                  element={
+                    <RequireAuth>
+                      <TreePage />
+                    </RequireAuth>
+                  }
+                />
                 <Route
                   path={ROUTE_SEGMENTS.report}
                   element={
