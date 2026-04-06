@@ -148,6 +148,138 @@ def create_study_responses_table(conn: sqlite3.Connection) -> None:
     )
 
 
+def create_homework_label_structures_table(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS homework_label_structures (
+            label_id TEXT PRIMARY KEY,
+            label_slug TEXT NOT NULL,
+            school_level TEXT,
+            grade INTEGER,
+            unit_id TEXT,
+            unit_slug TEXT,
+            concept_slug TEXT,
+            difficulty TEXT,
+            set_no INTEGER,
+            assignment_name TEXT,
+            label_display_name TEXT,
+            raw_label_text TEXT,
+            source_key TEXT,
+            source_label TEXT,
+            mapping_status TEXT NOT NULL DEFAULT 'unmapped',
+            mapping_status_changed_at TEXT,
+            mapped_at TEXT,
+            effective_from TEXT,
+            effective_to TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            archived_at TEXT,
+            FOREIGN KEY (label_id) REFERENCES homework_labels(id) ON DELETE CASCADE,
+            CHECK (school_level IN ('elem', 'mid', 'high') OR school_level IS NULL),
+            CHECK (difficulty IN ('low', 'mid', 'high') OR difficulty IS NULL),
+            CHECK (
+                mapping_status IN (
+                    'unmapped',
+                    'proposed',
+                    'mapped',
+                    'split',
+                    'merged',
+                    'deprecated'
+                )
+            )
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_homework_label_structures_unit_id "
+        "ON homework_label_structures(unit_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_homework_label_structures_unit_slug "
+        "ON homework_label_structures(unit_slug)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_homework_label_structures_mapping_status "
+        "ON homework_label_structures(mapping_status)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_homework_label_structures_mapped_at "
+        "ON homework_label_structures(mapped_at)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_homework_label_structures_school_grade_unit "
+        "ON homework_label_structures(school_level, grade, unit_id)"
+    )
+
+
+def create_homework_label_mapping_events_table(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS homework_label_mapping_events (
+            id TEXT PRIMARY KEY,
+            label_id TEXT NOT NULL,
+            from_status TEXT,
+            to_status TEXT NOT NULL,
+            event_type TEXT NOT NULL,
+            unit_id_before TEXT,
+            unit_id_after TEXT,
+            unit_slug_before TEXT,
+            unit_slug_after TEXT,
+            actor_type TEXT,
+            actor_id TEXT,
+            note TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (label_id) REFERENCES homework_labels(id) ON DELETE CASCADE,
+            CHECK (
+                to_status IN (
+                    'unmapped',
+                    'proposed',
+                    'mapped',
+                    'split',
+                    'merged',
+                    'deprecated'
+                )
+            ),
+            CHECK (
+                from_status IN (
+                    'unmapped',
+                    'proposed',
+                    'mapped',
+                    'split',
+                    'merged',
+                    'deprecated'
+                ) OR from_status IS NULL
+            ),
+            CHECK (
+                event_type IN (
+                    'created',
+                    'status_changed',
+                    'mapped',
+                    'split',
+                    'merged',
+                    'deprecated',
+                    'reverted',
+                    'backfilled'
+                )
+            )
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_homework_label_mapping_events_label_created "
+        "ON homework_label_mapping_events(label_id, created_at)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_homework_label_mapping_events_to_status_created "
+        "ON homework_label_mapping_events(to_status, created_at)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_homework_label_mapping_events_event_type_created "
+        "ON homework_label_mapping_events(event_type, created_at)"
+    )
+
+
 def init_db(path=None) -> None:
     _owns_conn = not isinstance(path, sqlite3.Connection)
     conn = path if isinstance(path, sqlite3.Connection) else connect(path)
@@ -373,6 +505,8 @@ def init_db(path=None) -> None:
     create_study_sessions_table(conn)
     migrate_study_sessions_add_diagnosis(conn)
     create_study_responses_table(conn)
+    create_homework_label_structures_table(conn)
+    create_homework_label_mapping_events_table(conn)
     conn.execute(
         """
         INSERT INTO schema_version (id, version, applied_at)
