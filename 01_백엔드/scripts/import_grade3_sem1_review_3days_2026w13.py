@@ -37,9 +37,9 @@ LABELS: list[tuple[str, str]] = [
     ("semester1", "1학기"),
     ("review", "복습"),
     ("source_ai_generated", "AI생성문항"),
-    ("day_mon", "월요일"),
-    ("day_tue", "화요일"),
-    ("day_wed", "수요일"),
+    ("day-mon", "요일: 월"),
+    ("day-tue", "요일: 화"),
+    ("day-wed", "요일: 수"),
     ("difficulty_basic", "난이도-기초"),
     ("difficulty_intermediate", "난이도-중"),
     ("difficulty_advanced", "난이도-상"),
@@ -519,7 +519,7 @@ def _day_payloads() -> dict[str, dict[str, Any]]:
 
 def _label_keys_for_problem(day_key: str) -> list[str]:
     base = [COMMON_LABEL_KEY, "grade3", "semester1", "review", "source_ai_generated"]
-    day_label = f"day_{day_key}"
+    day_label = f"day-{day_key}"
     if day_key == "mon":
         return [*base, day_label, "difficulty_basic"]
     if day_key == "tue":

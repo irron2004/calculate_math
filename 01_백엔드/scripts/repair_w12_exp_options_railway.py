@@ -96,27 +96,27 @@ def _ensure_label(api_base: str, token: str, key: str, label: str) -> None:
 
 
 def _label_keys_for_problem(day_key: str, order_index: int) -> list[str]:
-    day_label = f"day_{day_key}"
+    day_label = f"day-{day_key}"
     if 1 <= order_index <= 4:
         return [
-            "exp_grade2_ineq_2026w12",
+            "hwset-high-2-exponential-inequality-w12",
             day_label,
-            "src_0363",
-            "src_0376",
-            "exp_substitute_range",
+            "source-0363",
+            "source-0376",
+            "concept-exponential-substitute-range-root-count",
         ]
     if order_index == 5:
         return [
-            "exp_grade2_ineq_2026w12",
+            "hwset-high-2-exponential-inequality-w12",
             day_label,
-            "src_0373",
-            "exp_given_solution",
+            "source-0373",
+            "concept-exponential-inequality-given-solution",
         ]
     return [
-        "exp_grade2_ineq_2026w12",
+        "hwset-high-2-exponential-inequality-w12",
         day_label,
-        "src_0372",
-        "exp_system_intersection",
+        "source-0372",
+        "concept-exponential-system-inequality-intersection",
     ]
 
 
@@ -197,7 +197,7 @@ def main() -> None:
         headers=_headers(token),
         params={
             "weekKey": WEEK_KEY,
-            "labelKey": "exp_grade2_ineq_2026w12",
+            "labelKey": "hwset-high-2-exponential-inequality-w12",
             "limit": 500,
             "offset": 0,
         },
@@ -263,7 +263,7 @@ def main() -> None:
         keys = [
             k
             for k in (item.get("labelKeys") or [])
-            if isinstance(k, str) and k != "exp_grade2_ineq_2026w12"
+            if isinstance(k, str) and k != "hwset-high-2-exponential-inequality-w12"
         ]
         if "exp_placeholder_archived" not in keys:
             keys.append("exp_placeholder_archived")
@@ -281,7 +281,7 @@ def main() -> None:
         headers=_headers(token),
         params={
             "weekKey": WEEK_KEY,
-            "labelKey": "exp_grade2_ineq_2026w12",
+            "labelKey": "hwset-high-2-exponential-inequality-w12",
             "limit": 500,
             "offset": 0,
         },

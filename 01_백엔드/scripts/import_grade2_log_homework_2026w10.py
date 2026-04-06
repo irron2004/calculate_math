@@ -20,8 +20,8 @@ from app.db import (  # noqa: E402
 
 
 WEEK_KEY = "2026-W10"
-COMMON_LABEL_KEY = "log_grade2_derived"
-COMMON_LABEL_TEXT = "고2-로그-파생"
+COMMON_LABEL_KEY = "hwset-high-2-logarithm-derived"
+COMMON_LABEL_TEXT = "고2 로그 - 파생"
 
 
 def mcq(

@@ -23,11 +23,11 @@ COMMON_LABELS: list[tuple[str, str]] = [
     ("hs1_abs_quadratic_extrema", "고1-절댓값이차식의최대최소"),
     ("format_mcq_5", "객관식-5지선다"),
     ("source_slack_2026_04_06", "원본-Slack-2026-04-06"),
-    ("day_mon", "월요일"),
-    ("day_tue", "화요일"),
-    ("day_wed", "수요일"),
-    ("day_thu", "목요일"),
-    ("day_fri", "금요일"),
+    ("day-mon", "요일: 월"),
+    ("day-tue", "요일: 화"),
+    ("day-wed", "요일: 수"),
+    ("day-thu", "요일: 목"),
+    ("day-fri", "요일: 금"),
 ]
 
 DAY_DATA: dict[str, list[dict[str, Any]]] = {
@@ -165,7 +165,7 @@ def _ensure_label(api_base: str, token: str, key: str, label: str) -> None:
 def _problem_label_keys(day_key: str, topic: str) -> list[str]:
     keys = [
         "hs1_quad_extrema_2026w15",
-        f"day_{day_key}",
+        f"day-{day_key}",
         "format_mcq_5",
         "source_slack_2026_04_06",
     ]

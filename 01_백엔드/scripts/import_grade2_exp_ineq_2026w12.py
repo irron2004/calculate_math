@@ -21,23 +21,23 @@ from app.db import (  # noqa: E402
 
 
 WEEK_KEY = "2026-W12"
-COMMON_LABEL_KEY = "exp_grade2_ineq_2026w12"
-COMMON_LABEL_TEXT = "고2-지수부등식-주간50제-2026W12"
+COMMON_LABEL_KEY = "hwset-high-2-exponential-inequality-w12"
+COMMON_LABEL_TEXT = "고2 지수부등식 - 2026 W12"
 
 LABELS: list[tuple[str, str]] = [
     (COMMON_LABEL_KEY, COMMON_LABEL_TEXT),
-    ("src_0363", "원본-0363"),
-    ("src_0376", "원본-0376"),
-    ("src_0373", "원본-0373"),
-    ("src_0372", "원본-0372"),
-    ("exp_substitute_range", "치환후범위-근개수/항상성립"),
-    ("exp_given_solution", "해가주어진-지수부등식"),
-    ("exp_system_intersection", "연립부등식-교집합"),
-    ("day_mon", "월요일"),
-    ("day_tue", "화요일"),
-    ("day_wed", "수요일"),
-    ("day_thu", "목요일"),
-    ("day_fri", "금요일"),
+    ("source-0363", "원본 0363"),
+    ("source-0376", "원본 0376"),
+    ("source-0373", "원본 0373"),
+    ("source-0372", "원본 0372"),
+    ("concept-exponential-substitute-range-root-count", "개념: 치환 후 범위/근개수/항상성립"),
+    ("concept-exponential-inequality-given-solution", "개념: 해가 주어진 지수부등식"),
+    ("concept-exponential-system-inequality-intersection", "개념: 연립부등식 교집합"),
+    ("day-mon", "요일: 월"),
+    ("day-tue", "요일: 화"),
+    ("day-wed", "요일: 수"),
+    ("day-thu", "요일: 목"),
+    ("day-fri", "요일: 금"),
 ]
 
 
@@ -338,18 +338,28 @@ def _ensure_labels(db_path: Path) -> None:
 
 
 def _label_keys_for_problem(day_key: str, order_index: int) -> list[str]:
-    day_label = f"day_{day_key}"
+    day_label = f"day-{day_key}"
     if 1 <= order_index <= 4:
         return [
             COMMON_LABEL_KEY,
             day_label,
-            "src_0363",
-            "src_0376",
-            "exp_substitute_range",
+            "source-0363",
+            "source-0376",
+            "concept-exponential-substitute-range-root-count",
         ]
     if order_index == 5:
-        return [COMMON_LABEL_KEY, day_label, "src_0373", "exp_given_solution"]
-    return [COMMON_LABEL_KEY, day_label, "src_0372", "exp_system_intersection"]
+        return [
+            COMMON_LABEL_KEY,
+            day_label,
+            "source-0373",
+            "concept-exponential-inequality-given-solution",
+        ]
+    return [
+        COMMON_LABEL_KEY,
+        day_label,
+        "source-0372",
+        "concept-exponential-system-inequality-intersection",
+    ]
 
 
 def import_all(db_path: Path) -> None:
