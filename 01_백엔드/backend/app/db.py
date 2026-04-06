@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sqlite3
 import hashlib
 from datetime import datetime, timezone
@@ -90,6 +91,40 @@ def _sha256_hex(value: str) -> str:
 
 def _canonical_json_for_hash(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _parse_hwset_key_to_structure(*, key: str, label: str) -> Dict[str, Any]:
+    body = key.removeprefix("hwset-")
+    parts = [part for part in body.split("-") if part]
+
+    school_level = parts[0] if len(parts) > 0 else None
+    grade = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else None
+    unit_slug = "-".join(parts[2:]) if len(parts) > 2 else body
+    unit_slug = re.sub(r"-w\d+$", "", unit_slug)
+
+    mapping_status = "mapped"
+    if not school_level or grade is None or not unit_slug:
+        mapping_status = "unmapped"
+    elif key.endswith("-candidate") or key.endswith("-draft"):
+        mapping_status = "proposed"
+
+    label_slug = body
+    if school_level and grade is not None and unit_slug:
+        label_slug = f"{school_level}-{grade}-{unit_slug}"
+
+    return {
+        "label_slug": label_slug,
+        "school_level": school_level,
+        "grade": grade,
+        "unit_id": None,
+        "unit_slug": unit_slug or None,
+        "concept_slug": None,
+        "difficulty": None,
+        "set_no": None,
+        "assignment_name": label,
+        "label_display_name": label,
+        "mapping_status": mapping_status,
+    }
 
 
 def create_student_skill_levels_table(conn: sqlite3.Connection) -> None:
@@ -1803,6 +1838,156 @@ def import_homework_problem_batch(
             "batchId": batch_id,
             "createdProblemCount": created_problem_count,
             "skippedProblemCount": total - created_problem_count,
+        }
+    finally:
+        conn.close()
+
+
+def backfill_homework_label_structures(
+    *,
+    path: Optional[Path] = None,
+    include_kinds: Optional[set[str]] = None,
+    dry_run: bool = False,
+) -> Dict[str, int]:
+    conn = connect(path)
+    try:
+        now = _now_iso()
+        rows = conn.execute(
+            """
+            SELECT id, key, label, kind, created_at, archived_at
+            FROM homework_labels
+            WHERE archived_at IS NULL
+            ORDER BY created_at ASC, id ASC
+            """
+        ).fetchall()
+
+        scanned = 0
+        created = 0
+        skipped = 0
+        mapped = 0
+        proposed = 0
+        unmapped = 0
+
+        for row in rows:
+            scanned += 1
+            key = str(row["key"])
+            kind = str(row["kind"])
+            label = str(row["label"])
+
+            if include_kinds and kind not in include_kinds:
+                skipped += 1
+                continue
+
+            if not key.startswith("hwset-"):
+                skipped += 1
+                continue
+
+            exists = conn.execute(
+                "SELECT 1 FROM homework_label_structures WHERE label_id = ?",
+                (row["id"],),
+            ).fetchone()
+            if exists:
+                skipped += 1
+                continue
+
+            parsed = _parse_hwset_key_to_structure(key=key, label=label)
+            status = str(parsed["mapping_status"])
+
+            if status == "mapped":
+                mapped += 1
+            elif status == "proposed":
+                proposed += 1
+            else:
+                unmapped += 1
+
+            if not dry_run:
+                conn.execute(
+                    """
+                    INSERT INTO homework_label_structures (
+                        label_id,
+                        label_slug,
+                        school_level,
+                        grade,
+                        unit_id,
+                        unit_slug,
+                        concept_slug,
+                        difficulty,
+                        set_no,
+                        assignment_name,
+                        label_display_name,
+                        raw_label_text,
+                        source_key,
+                        source_label,
+                        mapping_status,
+                        mapping_status_changed_at,
+                        mapped_at,
+                        created_at,
+                        updated_at,
+                        archived_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        row["id"],
+                        parsed["label_slug"],
+                        parsed["school_level"],
+                        parsed["grade"],
+                        parsed["unit_id"],
+                        parsed["unit_slug"],
+                        parsed["concept_slug"],
+                        parsed["difficulty"],
+                        parsed["set_no"],
+                        parsed["assignment_name"],
+                        parsed["label_display_name"],
+                        label,
+                        key,
+                        label,
+                        status,
+                        now,
+                        now if status == "mapped" else None,
+                        str(row["created_at"]),
+                        now,
+                        row["archived_at"],
+                    ),
+                )
+                conn.execute(
+                    """
+                    INSERT INTO homework_label_mapping_events (
+                        id,
+                        label_id,
+                        from_status,
+                        to_status,
+                        event_type,
+                        actor_type,
+                        actor_id,
+                        note,
+                        created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        str(uuid4()),
+                        row["id"],
+                        None,
+                        status,
+                        "backfilled",
+                        "system",
+                        "backfill_homework_label_structures",
+                        f"Backfilled from homework_labels.key={key}",
+                        now,
+                    ),
+                )
+
+            created += 1
+
+        if not dry_run:
+            conn.commit()
+
+        return {
+            "scanned": scanned,
+            "created": created,
+            "skipped": skipped,
+            "mapped": mapped,
+            "proposed": proposed,
+            "unmapped": unmapped,
         }
     finally:
         conn.close()
