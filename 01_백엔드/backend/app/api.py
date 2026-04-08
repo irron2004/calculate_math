@@ -81,6 +81,8 @@ from .db import (
     list_homework_problems_admin,
     set_homework_problem_labels,
     get_homework_problem_bank_problems_by_ids,
+    list_admin_daily_homework_summary_for_student,
+    get_admin_daily_homework_submission_detail,
     get_database_path,
     get_connection,
 )
@@ -98,6 +100,8 @@ from .models import (
     AdminStudentAssignmentStatusListResponse,
     AdminWrongProblemItem,
     AdminWrongProblemListResponse,
+    AdminDailyHomeworkSummaryResponse,
+    AdminDailyHomeworkSubmissionDetailResponse,
     AdminSubmissionDetail,
     AuthChangePasswordRequest,
     AuthChangePasswordResponse,
@@ -1713,6 +1717,76 @@ def list_admin_wrong_problems_for_student(
     )
     items = [AdminWrongProblemItem(**p) for p in data.get("wrongProblems", [])]
     return AdminWrongProblemListResponse(studentId=student_id, wrongProblems=items)
+
+
+@router.get(
+    "/homework/admin/students/{student_id}/daily-summary",
+    response_model=AdminDailyHomeworkSummaryResponse,
+)
+def get_admin_daily_homework_summary(
+    student_id: str,
+    asOf: str | None = Query(default=None),
+    includeSubmitted: bool = Query(default=True),
+    includeFutureScheduled: bool = Query(default=False),
+    _admin=Depends(require_admin),
+) -> AdminDailyHomeworkSummaryResponse:
+    data = list_admin_daily_homework_summary_for_student(
+        student_id=student_id,
+        due_on_or_before=asOf,
+        include_submitted=includeSubmitted,
+        include_future_scheduled=includeFutureScheduled,
+    )
+    return AdminDailyHomeworkSummaryResponse(**data)
+
+
+@router.get(
+    "/homework/admin/students/{student_id}/assignments/{assignment_id}/submission-status",
+    response_model=AdminStudentAssignmentStatusListResponse,
+)
+def get_admin_assignment_submission_status_for_student(
+    student_id: str,
+    assignment_id: str,
+    _admin=Depends(require_admin),
+) -> AdminStudentAssignmentStatusListResponse | JSONResponse:
+    assignments = list_homework_assignments_for_student_admin(student_id)
+    matched = [a for a in assignments if a.get("id") == assignment_id]
+    if not matched:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "ASSIGNMENT_NOT_FOUND",
+                    "message": "Assignment not found for this student",
+                }
+            },
+        )
+    items = [AdminStudentAssignmentStatusItem(**a) for a in matched]
+    return AdminStudentAssignmentStatusListResponse(
+        studentId=student_id, assignments=items
+    )
+
+
+@router.get(
+    "/homework/admin/submissions/{submission_id}/answer-check",
+    response_model=AdminDailyHomeworkSubmissionDetailResponse,
+    responses={404: {"model": ErrorResponse}},
+)
+def get_admin_submission_answer_check_detail(
+    submission_id: str,
+    _admin=Depends(require_admin),
+) -> AdminDailyHomeworkSubmissionDetailResponse | JSONResponse:
+    submission = get_admin_daily_homework_submission_detail(submission_id)
+    if not submission:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": {
+                    "code": "SUBMISSION_NOT_FOUND",
+                    "message": "Submission not found",
+                }
+            },
+        )
+    return AdminDailyHomeworkSubmissionDetailResponse(**submission)
 
 
 @router.get(

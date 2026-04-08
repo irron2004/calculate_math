@@ -460,6 +460,53 @@ class AdminWrongProblemListResponse(BaseModel):
     wrongProblems: List[AdminWrongProblemItem]
 
 
+class AdminDailyHomeworkSummaryItem(BaseModel):
+    assignmentId: str
+    title: str
+    description: Optional[str] = None
+    dueAt: Optional[str] = None
+    scheduledAt: Optional[str] = None
+    assignedAt: str
+    submitted: bool
+    submissionId: Optional[str] = None
+    submittedAt: Optional[str] = None
+    submissionStatus: str
+    reviewStatus: Optional[str] = None
+    isOverdue: bool = False
+    problemCount: int
+
+
+class AdminDailyHomeworkSummaryResponse(BaseModel):
+    studentId: str
+    asOf: str
+    timezone: str = "UTC"
+    assignments: List[AdminDailyHomeworkSummaryItem]
+
+
+class AdminDailyHomeworkProblemAnswerItem(BaseModel):
+    problemId: str
+    problemIndex: int
+    type: str
+    question: str
+    options: Optional[List[str]] = None
+    correctAnswer: Optional[str] = None
+    studentAnswer: Optional[str] = None
+    isCorrect: Optional[bool] = None
+    review: AdminWrongProblemReview = Field(default_factory=AdminWrongProblemReview)
+
+
+class AdminDailyHomeworkSubmissionDetailResponse(BaseModel):
+    submissionId: str
+    assignmentId: str
+    assignmentTitle: str
+    studentId: str
+    dueAt: Optional[str] = None
+    submittedAt: str
+    submissionStatus: str
+    reviewStatus: str
+    problems: List[AdminDailyHomeworkProblemAnswerItem]
+
+
 class HomeworkPendingCountResponse(BaseModel):
     """Count of homework items by status for a student."""
 

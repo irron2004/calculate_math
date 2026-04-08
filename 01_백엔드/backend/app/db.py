@@ -3308,6 +3308,181 @@ def get_submission_file(
         conn.close()
 
 
+def list_admin_daily_homework_summary_for_student(
+    student_id: str,
+    *,
+    due_on_or_before: Optional[str] = None,
+    include_submitted: bool = True,
+    include_future_scheduled: bool = False,
+    path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    normalized_student_id = student_id.strip()
+    if not normalized_student_id:
+        return {"studentId": student_id, "asOf": _now_iso(), "assignments": []}
+
+    as_of = due_on_or_before.strip() if due_on_or_before and due_on_or_before.strip() else _now_iso()
+
+    conn = connect(path)
+    try:
+        rows = conn.execute(
+            """
+            SELECT
+                ha.id,
+                ha.title,
+                ha.description,
+                ha.problems_json,
+                ha.due_at,
+                ha.scheduled_at,
+                hat.assigned_at,
+                hs.id AS submission_id,
+                hs.submitted_at AS submitted_at,
+                hs.review_status AS review_status
+            FROM homework_assignments ha
+            INNER JOIN homework_assignment_targets hat ON ha.id = hat.assignment_id
+            LEFT JOIN homework_submissions hs ON hs.id = (
+                SELECT id
+                FROM homework_submissions
+                WHERE assignment_id = ha.id AND student_id = hat.student_id
+                ORDER BY submitted_at DESC
+                LIMIT 1
+            )
+            WHERE hat.student_id = ?
+            ORDER BY COALESCE(ha.due_at, ha.created_at) ASC, ha.created_at ASC, ha.id ASC
+            """,
+            (normalized_student_id,),
+        ).fetchall()
+
+        assignments: list[Dict[str, Any]] = []
+        for row in rows:
+            due_at = row["due_at"]
+            scheduled_at = row["scheduled_at"]
+            submitted_at = row["submitted_at"]
+            submission_id = row["submission_id"]
+            review_status = row["review_status"] or ("pending" if submission_id else None)
+
+            if due_at and due_at > as_of:
+                continue
+            if not include_future_scheduled and scheduled_at and scheduled_at > as_of:
+                continue
+            if not include_submitted and submission_id:
+                continue
+
+            try:
+                problems = json.loads(row["problems_json"])
+                problem_count = len(problems) if isinstance(problems, list) else 0
+            except Exception:
+                problem_count = 0
+
+            if submission_id and submitted_at and due_at:
+                submission_status = "late_submitted" if submitted_at > due_at else "submitted"
+            elif submission_id:
+                submission_status = "submitted"
+            else:
+                submission_status = "not_submitted"
+
+            assignments.append(
+                {
+                    "assignmentId": row["id"],
+                    "title": row["title"],
+                    "description": row["description"],
+                    "dueAt": due_at,
+                    "scheduledAt": scheduled_at,
+                    "assignedAt": row["assigned_at"],
+                    "submitted": bool(submission_id),
+                    "submissionId": submission_id,
+                    "submittedAt": submitted_at,
+                    "submissionStatus": submission_status,
+                    "reviewStatus": review_status,
+                    "isOverdue": bool(not submission_id and due_at and due_at < as_of),
+                    "problemCount": problem_count,
+                }
+            )
+
+        return {
+            "studentId": normalized_student_id,
+            "asOf": as_of,
+            "assignments": assignments,
+        }
+    finally:
+        conn.close()
+
+
+def get_admin_daily_homework_submission_detail(
+    submission_id: str,
+    *,
+    path: Optional[Path] = None,
+) -> Optional[Dict[str, Any]]:
+    submission = get_submission_admin(submission_id, path=path)
+    if not submission:
+        return None
+
+    due_at = submission.get("dueAt")
+    submitted_at = submission.get("submittedAt")
+    if due_at and submitted_at:
+        submission_status = "late_submitted" if submitted_at > due_at else "submitted"
+    else:
+        submission_status = "submitted"
+
+    answers = submission.get("answers") or {}
+    reviews = submission.get("problemReviews") or {}
+    problems_payload = submission.get("problems") or []
+    items: list[Dict[str, Any]] = []
+    for idx, raw_problem in enumerate(problems_payload, start=1):
+        if not isinstance(raw_problem, dict):
+            continue
+        problem = dict(raw_problem)
+        problem_id = str(problem.get("id") or f"p{idx}")
+        problem_type = str(problem.get("type") or "")
+        options = problem.get("options") if isinstance(problem.get("options"), list) else None
+        correct_answer = problem.get("answer")
+        correct_answer_str = str(correct_answer) if isinstance(correct_answer, str) else None
+        student_answer_value = answers.get(problem_id)
+        student_answer = str(student_answer_value) if student_answer_value is not None else None
+
+        is_correct: Optional[bool] = None
+        if problem_type == "objective" and correct_answer_str is not None:
+            is_correct = is_objective_answer_correct(
+                student_answer=student_answer,
+                correct_answer=correct_answer_str,
+                options=options,
+            )
+
+        review_obj = reviews.get(problem_id)
+        needs_revision = False
+        comment = ""
+        if isinstance(review_obj, dict):
+            needs_revision = bool(review_obj.get("needsRevision"))
+            raw_comment = review_obj.get("comment")
+            if isinstance(raw_comment, str):
+                comment = raw_comment
+
+        items.append(
+            {
+                "problemId": problem_id,
+                "problemIndex": idx,
+                "type": problem_type,
+                "question": str(problem.get("question") or ""),
+                "options": options,
+                "correctAnswer": correct_answer_str,
+                "studentAnswer": student_answer,
+                "isCorrect": is_correct,
+                "review": {"needsRevision": needs_revision, "comment": comment},
+            }
+        )
+
+    return {
+        "submissionId": submission["id"],
+        "assignmentId": submission["assignmentId"],
+        "assignmentTitle": submission["assignmentTitle"],
+        "studentId": submission["studentId"],
+        "dueAt": submission.get("dueAt"),
+        "submittedAt": submission["submittedAt"],
+        "submissionStatus": submission_status,
+        "reviewStatus": submission.get("reviewStatus") or "pending",
+        "problems": items,
+    }
+
+
 def get_pending_homework_count(
     student_id: str, path: Optional[Path] = None
 ) -> Dict[str, int]:
