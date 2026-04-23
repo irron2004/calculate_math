@@ -1,0 +1,35 @@
+{
+  "weekKey": "2026-W15",
+  "dayKey": "mon",
+  "title": "분수와 소수 혼합 연습",
+  "description": "chat으로 받은 문제를 업로드하기 전에 가공하는 예시 포맷",
+  "expectedProblemCount": 3,
+  "importedBy": "hskim",
+  "labelDefinitions": [
+    {
+      "key": "frac_decimal_mix",
+      "label": "분수-소수 혼합",
+      "kind": "custom"
+    }
+  ],
+  "commonLabelKeys": ["frac_decimal_mix"],
+  "problems": [
+    {
+      "stem": "0.5와 같은 분수는 무엇인가요?",
+      "choices": ["1/4", "1/2", "2/3", "3/4"],
+      "answerKey": "B"
+    },
+    {
+      "question": "3/10을 소수로 쓰세요.",
+      "type": "subjective",
+      "answer": "0.3",
+      "labelKeys": ["review"]
+    },
+    {
+      "prompt": "다음 중 0.25와 같은 분수는?",
+      "problemType": "multiple_choice",
+      "options": ["1/2", "1/3", "1/4", "2/5"],
+      "correctIndex": 3
+    }
+  ]
+}
