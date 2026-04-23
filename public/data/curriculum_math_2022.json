@@ -13,7 +13,7 @@
         "url": "https://ncic.re.kr"
       }
     ],
-    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied | p2 applied | p3 applied | p4 applied",
+    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied | p2 applied | p3 applied | p4 applied | p6 applied",
     "generated_at": "2026-02-15",
     "editor": "ChatGPT"
   },
@@ -11144,6 +11144,198 @@
       "edgeType": "prereq",
       "source": "P_TU_COMBINATORICS",
       "target": "P_TU_PROBABILITY"
+    },
+    {
+      "id": "prereq:4수01-07->9수01-C",
+      "edgeType": "prereq",
+      "source": "4수01-07",
+      "target": "9수01-C"
+    },
+    {
+      "id": "prereq:4수01-A->9수01-A",
+      "edgeType": "prereq",
+      "source": "4수01-A",
+      "target": "9수01-A"
+    },
+    {
+      "id": "prereq:4수01-E->9수02-B",
+      "edgeType": "prereq",
+      "source": "4수01-E",
+      "target": "9수02-B"
+    },
+    {
+      "id": "prereq:9수02-N->P_TU_POLYNOMIAL",
+      "edgeType": "prereq",
+      "source": "9수02-N",
+      "target": "P_TU_POLYNOMIAL"
+    },
+    {
+      "id": "prereq:9수02-N->P_TU_FACTORING",
+      "edgeType": "prereq",
+      "source": "9수02-N",
+      "target": "P_TU_FACTORING"
+    },
+    {
+      "id": "prereq:9수01-D->P_TU_COMPLEX_NUM",
+      "edgeType": "prereq",
+      "source": "9수01-D",
+      "target": "P_TU_COMPLEX_NUM"
+    },
+    {
+      "id": "prereq:9수02-M->P_TU_FUNCTION",
+      "edgeType": "prereq",
+      "source": "9수02-M",
+      "target": "P_TU_FUNCTION"
+    },
+    {
+      "id": "prereq:9수03-J->P_TU_TRIG_FUNC",
+      "edgeType": "prereq",
+      "source": "9수03-J",
+      "target": "P_TU_TRIG_FUNC"
+    },
+    {
+      "id": "prereq:P_TU_EXP_LAWS_REVIEW->P_TU_EXP_FUNC",
+      "edgeType": "prereq",
+      "source": "P_TU_EXP_LAWS_REVIEW",
+      "target": "P_TU_EXP_FUNC"
+    },
+    {
+      "id": "prereq:P_TU_EXP_FUNC->P_TU_LOG_CONCEPT",
+      "edgeType": "prereq",
+      "source": "P_TU_EXP_FUNC",
+      "target": "P_TU_LOG_CONCEPT"
+    },
+    {
+      "id": "prereq:P_TU_LOG_CONCEPT->P_TU_LOG_PROPERTIES",
+      "edgeType": "prereq",
+      "source": "P_TU_LOG_CONCEPT",
+      "target": "P_TU_LOG_PROPERTIES"
+    },
+    {
+      "id": "prereq:P_TU_LIMIT->P_TU_DERIVATIVE",
+      "edgeType": "prereq",
+      "source": "P_TU_LIMIT",
+      "target": "P_TU_DERIVATIVE"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->P_TU_DERIV_APP",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIVATIVE",
+      "target": "P_TU_DERIV_APP"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_APP->P_TU_INTEGRAL",
+      "edgeType": "prereq",
+      "source": "P_TU_DERIV_APP",
+      "target": "P_TU_INTEGRAL"
+    },
+    {
+      "id": "prereq:2수01-05->2수01-06",
+      "edgeType": "prereq",
+      "source": "2수01-05",
+      "target": "2수01-06"
+    },
+    {
+      "id": "prereq:2수01-06->2수01-08",
+      "edgeType": "prereq",
+      "source": "2수01-06",
+      "target": "2수01-08"
+    },
+    {
+      "id": "prereq:2수01-06->2수01-09",
+      "edgeType": "prereq",
+      "source": "2수01-06",
+      "target": "2수01-09"
+    },
+    {
+      "id": "prereq:2수01-10->2수01-11",
+      "edgeType": "prereq",
+      "source": "2수01-10",
+      "target": "2수01-11"
+    },
+    {
+      "id": "prereq:4수01-04->4수01-05",
+      "edgeType": "prereq",
+      "source": "4수01-04",
+      "target": "4수01-05"
+    },
+    {
+      "id": "prereq:4수01-05->4수01-06",
+      "edgeType": "prereq",
+      "source": "4수01-05",
+      "target": "4수01-06"
+    },
+    {
+      "id": "prereq:4수01-02->4수01-07",
+      "edgeType": "prereq",
+      "source": "4수01-02",
+      "target": "4수01-07"
+    },
+    {
+      "id": "prereq:4수01-03->4수01-08",
+      "edgeType": "prereq",
+      "source": "4수01-03",
+      "target": "4수01-08"
+    },
+    {
+      "id": "prereq:P_ACH_EXP_LAWS_1->P_ACH_EXP_LAWS_2",
+      "edgeType": "prereq",
+      "source": "P_ACH_EXP_LAWS_1",
+      "target": "P_ACH_EXP_LAWS_2"
+    },
+    {
+      "id": "prereq:P_ACH_EXP_LAWS_2->P_ACH_EXP_FUNC",
+      "edgeType": "prereq",
+      "source": "P_ACH_EXP_LAWS_2",
+      "target": "P_ACH_EXP_FUNC"
+    },
+    {
+      "id": "prereq:P_ACH_EXP_FUNC->P_ACH_LOG_DEF",
+      "edgeType": "prereq",
+      "source": "P_ACH_EXP_FUNC",
+      "target": "P_ACH_LOG_DEF"
+    },
+    {
+      "id": "prereq:P_ACH_LOG_DEF->P_ACH_LOG_LAWS",
+      "edgeType": "prereq",
+      "source": "P_ACH_LOG_DEF",
+      "target": "P_ACH_LOG_LAWS"
+    },
+    {
+      "id": "prereq:P_ACH_LIMIT_FUNC->P_ACH_CONTINUOUS",
+      "edgeType": "prereq",
+      "source": "P_ACH_LIMIT_FUNC",
+      "target": "P_ACH_CONTINUOUS"
+    },
+    {
+      "id": "prereq:P_ACH_CONTINUOUS->P_ACH_DERIV_DEF",
+      "edgeType": "prereq",
+      "source": "P_ACH_CONTINUOUS",
+      "target": "P_ACH_DERIV_DEF"
+    },
+    {
+      "id": "prereq:P_ACH_DERIV_DEF->P_ACH_DERIV_RULES",
+      "edgeType": "prereq",
+      "source": "P_ACH_DERIV_DEF",
+      "target": "P_ACH_DERIV_RULES"
+    },
+    {
+      "id": "prereq:P_ACH_DERIV_RULES->P_ACH_DERIV_APP_TANGENT",
+      "edgeType": "prereq",
+      "source": "P_ACH_DERIV_RULES",
+      "target": "P_ACH_DERIV_APP_TANGENT"
+    },
+    {
+      "id": "prereq:P_ACH_INTEGRAL_INDEF->P_ACH_INTEGRAL_DEF",
+      "edgeType": "prereq",
+      "source": "P_ACH_INTEGRAL_INDEF",
+      "target": "P_ACH_INTEGRAL_DEF"
+    },
+    {
+      "id": "prereq:P_ACH_INTEGRAL_DEF->P_ACH_INTEGRAL_AREA",
+      "edgeType": "prereq",
+      "source": "P_ACH_INTEGRAL_DEF",
+      "target": "P_ACH_INTEGRAL_AREA"
     }
   ]
 }
