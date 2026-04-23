@@ -13,7 +13,7 @@
         "url": "https://ncic.re.kr"
       }
     ],
-    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied | p2 applied | p3 applied",
+    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied | p2 applied | p3 applied | p4 applied",
     "generated_at": "2026-02-15",
     "editor": "ChatGPT"
   },
@@ -11084,6 +11084,66 @@
       "edgeType": "alignsTo",
       "source": "P_TU_INTEGRAL_APP",
       "target": "P_ACH_INTEGRAL_AREA"
+    },
+    {
+      "id": "prereq:4수01-07->P_TU_RATIONAL_FUNC",
+      "edgeType": "prereq",
+      "source": "4수01-07",
+      "target": "P_TU_RATIONAL_FUNC"
+    },
+    {
+      "id": "prereq:4수01-06->P_TU_RATIONAL_FUNC",
+      "edgeType": "prereq",
+      "source": "4수01-06",
+      "target": "P_TU_RATIONAL_FUNC"
+    },
+    {
+      "id": "prereq:P_TU_SEQUENCE_ARITH->P_TU_LIMIT",
+      "edgeType": "prereq",
+      "source": "P_TU_SEQUENCE_ARITH",
+      "target": "P_TU_LIMIT"
+    },
+    {
+      "id": "prereq:P_TU_QUADRATIC_FUNCTION->P_TU_DERIVATIVE",
+      "edgeType": "prereq",
+      "source": "P_TU_QUADRATIC_FUNCTION",
+      "target": "P_TU_DERIVATIVE"
+    },
+    {
+      "id": "prereq:P_TU_COORD_GEOM->P_TU_DERIV_APP",
+      "edgeType": "prereq",
+      "source": "P_TU_COORD_GEOM",
+      "target": "P_TU_DERIV_APP"
+    },
+    {
+      "id": "prereq:P_TU_INTEGRAL->P_TU_INTEGRAL_APP",
+      "edgeType": "prereq",
+      "source": "P_TU_INTEGRAL",
+      "target": "P_TU_INTEGRAL_APP"
+    },
+    {
+      "id": "prereq:P_TU_QUADRATIC_EQUATION->P_TU_COMPLEX_NUM",
+      "edgeType": "prereq",
+      "source": "P_TU_QUADRATIC_EQUATION",
+      "target": "P_TU_COMPLEX_NUM"
+    },
+    {
+      "id": "prereq:P_TU_FACTORING->P_TU_QUADRATIC_EQUATION",
+      "edgeType": "prereq",
+      "source": "P_TU_FACTORING",
+      "target": "P_TU_QUADRATIC_EQUATION"
+    },
+    {
+      "id": "prereq:P_TU_POLYNOMIAL->P_TU_FUNCTION",
+      "edgeType": "prereq",
+      "source": "P_TU_POLYNOMIAL",
+      "target": "P_TU_FUNCTION"
+    },
+    {
+      "id": "prereq:P_TU_COMBINATORICS->P_TU_PROBABILITY",
+      "edgeType": "prereq",
+      "source": "P_TU_COMBINATORICS",
+      "target": "P_TU_PROBABILITY"
     }
   ]
 }
