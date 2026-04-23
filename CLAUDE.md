@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**calculate_math** is a curriculum visualization and learning platform for Korean math education. Students navigate a graph-based curriculum map, solve problems, and receive homework assignments. Authors edit and publish curriculum graphs.
+**calculate_math (수학 모험)** is a skill-graph-based math learning platform. A single giant graph spans from basic addition to calculus, organized into four branches from the 2022 Korean curriculum: 수와 연산(NA), 변화와 관계(RR), 도형과 측정(GM), 자료와 가능성(DP). Learning order is determined by skill connections, not grade levels. Nodes are maximally granular (e.g., 1-digit addition → 2-digit addition → 3-digit addition). MVP covers elementary grades 1–4 and high school grade 2.
+
+Students navigate the graph, solve problems, and receive homework. Authors edit and publish curriculum graphs.
 
 **Stack:** Vite + React 18 + ReactFlow (frontend) · FastAPI + SQLite/Neo4j (backend)
 
@@ -72,6 +74,22 @@ Components consume these via `useAuth()`, `useCurriculum()`, `useRepositories()`
 - `neo4j_graph.py` — Neo4j graph operations (optional)
 - `graph_patch.py` — Graph editing operations
 
+### Homework admin lookup conventions
+
+For **student homework status lookup**, **submission checking**, and **submitted answer inspection**, prefer the existing admin daily-check APIs:
+
+- `GET /api/homework/admin/students/{student_id}/daily-summary`
+  - Use for: what homework the student should have completed by `asOf`, whether it was submitted, late-submitted, or overdue.
+- `GET /api/homework/admin/students/{student_id}/assignments/{assignment_id}/submission-status`
+  - Use for: re-checking submission presence/status for one assignment.
+- `GET /api/homework/admin/submissions/{submission_id}/answer-check`
+  - Use for: inspecting submitted problems, student answers, correct answers, and objective auto-check results.
+
+Reference design doc:
+- `03_문서/docs/homework_daily_answer_check_v1_be_owner_output.md`
+
+Do not add a new ad-hoc lookup API for these use cases unless the existing admin lookup surface is proven insufficient.
+
 **Graph versioning:** Draft graphs are edited by authors, then published as immutable snapshots that students see.
 
 ### Data
@@ -102,3 +120,16 @@ Copy `.env.example` to `.env`. Key variables:
 ## Neo4j Schema (when using Neo4j backend)
 
 Documented in `backend/CURRICULUM_GRAPH_SCHEMA_V2.md`. Nodes: `:GraphVersion`, `:GraphNode`, `:Problem`. Migration script: `scripts/migrate_graph_to_neo4j.py`.
+
+## 하네스: 수학 모험 (calculate_math)
+
+**목표:** 교육 연구 중심의 스킬 그래프 기반 수학 학습 서비스를 7명 에이전트 팀(연구원 4 + 개발자 2 + 조교 1)으로 조율.
+
+**트리거:** 커리큘럼 그래프 설계, 문제 출제/숙제 세트, 진단 taxonomy, 주간 KPI 분석, 백엔드·프론트 구현, 숙제 운영 작업 요청 시 `math-adventure-harness` 스킬을 사용하라. 단순 파일 읽기·단일 질문은 직접 응답.
+
+**에이전트·스킬:** `.claude/agents/`, `.claude/skills/` 참조. 오케스트레이터는 `.claude/skills/math-adventure-harness/`.
+
+**변경 이력:**
+| 날짜 | 변경 내용 | 대상 | 사유 |
+|------|----------|------|------|
+| 2026-04-23 | 초기 구성 (연구원 4 + 개발 2 + 조교 1) | 전체 | 연구 중심 프로젝트 하네스 신규 구축 |

@@ -117,6 +117,22 @@ Reactions are lightweight social signals. Humans use them constantly — they sa
 
 Skills provide your tools. When you need one, check its `SKILL.md`. Keep local notes (camera names, SSH details, voice preferences) in `TOOLS.md`.
 
+## Project-Specific API Conventions
+
+When checking **student homework status / submission presence / answer-check state**, use the existing admin homework lookup APIs instead of inventing new ad-hoc query paths.
+
+- Student's due-by-today homework summary:
+  - `GET /api/homework/admin/students/{student_id}/daily-summary`
+- Student's submission status for a specific assignment:
+  - `GET /api/homework/admin/students/{student_id}/assignments/{assignment_id}/submission-status`
+- Submitted homework answer-check detail:
+  - `GET /api/homework/admin/submissions/{submission_id}/answer-check`
+
+Reference doc:
+- `03_문서/docs/homework_daily_answer_check_v1_be_owner_output.md`
+
+If the task is "look up homework status", "check whether submitted", or "inspect submitted answers", start from these APIs first.
+
 **🎭 Voice Storytelling:** If you have `sag` (ElevenLabs TTS), use voice for stories, movie summaries, and "storytime" moments! Way more engaging than walls of text. Surprise people with funny voices.
 
 **📝 Platform Formatting:**
