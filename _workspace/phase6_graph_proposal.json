@@ -1,0 +1,181 @@
+{
+  "phase": "Phase 6",
+  "scope": "중·고 prereq 보강 + 고등 achievement 간 prereq (샘플)",
+  "strategy": "MVP(초1-4+고2) 기준 우선순위. 전체 중·고 prereq 채움은 아니고 학습 경로의 핵심 연결만.",
+  "generated_at": "2026-04-23",
+  "principle": "근거 약한 연결보다는 강한 연결 적게. 각 엣지에 rationale 필수.",
+
+  "new_edges_tb_prereq": [
+    {
+      "id": "prereq:4수01-07->9수01-C",
+      "edgeType": "prereq", "source": "4수01-07", "target": "9수01-C",
+      "rationale": "분모 같은 분수 덧뺄(초3-4) → 순환소수와 유리수(중1). 분수↔소수 표기 전환 기반"
+    },
+    {
+      "id": "prereq:4수01-A->9수01-A",
+      "edgeType": "prereq", "source": "4수01-A", "target": "9수01-A",
+      "rationale": "큰 수 개념(초3-4) → 소인수분해·최대공약수(중1). 수의 구조 분해로 자연 연결"
+    },
+    {
+      "id": "prereq:4수01-E->9수02-B",
+      "edgeType": "prereq", "source": "4수01-E", "target": "9수02-B",
+      "rationale": "자연수 곱나눗(초3-4) → 일차식 연산(중1). 수 연산의 대수화"
+    },
+    {
+      "id": "prereq:9수02-N->P_TU_POLYNOMIAL",
+      "edgeType": "prereq", "source": "9수02-N", "target": "P_TU_POLYNOMIAL",
+      "rationale": "중3 다항식 곱·인수분해 → 고1 다항식 심화. 인수분해 공식 확장 관계"
+    },
+    {
+      "id": "prereq:9수02-N->P_TU_FACTORING",
+      "edgeType": "prereq", "source": "9수02-N", "target": "P_TU_FACTORING",
+      "rationale": "중3 인수분해 기초 → 고1 다항식 인수분해(인수정리·조립제법 포함)"
+    },
+    {
+      "id": "prereq:9수01-D->P_TU_COMPLEX_NUM",
+      "edgeType": "prereq", "source": "9수01-D", "target": "P_TU_COMPLEX_NUM",
+      "rationale": "실수 체계 확장(중3) → 복소수(고1). 수 체계 확장 연속선"
+    },
+    {
+      "id": "prereq:9수02-M->P_TU_FUNCTION",
+      "edgeType": "prereq", "source": "9수02-M", "target": "P_TU_FUNCTION",
+      "rationale": "일차함수(중2) → 함수 일반(고1). 함수 개념의 일반화"
+    },
+    {
+      "id": "prereq:9수03-J->P_TU_TRIG_FUNC",
+      "edgeType": "prereq", "source": "9수03-J", "target": "P_TU_TRIG_FUNC",
+      "rationale": "삼각비(중3) → 삼각함수(고등). 각의 확장(예각→일반각)"
+    },
+    {
+      "id": "prereq:P_TU_EXP_LAWS_REVIEW->P_TU_EXP_FUNC",
+      "edgeType": "prereq", "source": "P_TU_EXP_LAWS_REVIEW", "target": "P_TU_EXP_FUNC",
+      "rationale": "지수법칙 숙달 → 지수함수 그래프·방정식"
+    },
+    {
+      "id": "prereq:P_TU_EXP_FUNC->P_TU_LOG_CONCEPT",
+      "edgeType": "prereq", "source": "P_TU_EXP_FUNC", "target": "P_TU_LOG_CONCEPT",
+      "rationale": "지수함수의 역함수로서 로그 도입"
+    },
+    {
+      "id": "prereq:P_TU_LOG_CONCEPT->P_TU_LOG_PROPERTIES",
+      "edgeType": "prereq", "source": "P_TU_LOG_CONCEPT", "target": "P_TU_LOG_PROPERTIES",
+      "rationale": "로그 정의 → 로그 성질(법칙)"
+    },
+    {
+      "id": "prereq:P_TU_LIMIT->P_TU_DERIVATIVE",
+      "edgeType": "prereq", "source": "P_TU_LIMIT", "target": "P_TU_DERIVATIVE",
+      "rationale": "함수 극한·연속 → 미분계수(평균변화율의 극한)"
+    },
+    {
+      "id": "prereq:P_TU_DERIVATIVE->P_TU_DERIV_APP",
+      "edgeType": "prereq", "source": "P_TU_DERIVATIVE", "target": "P_TU_DERIV_APP",
+      "rationale": "도함수 → 접선·극값·증감 (활용)"
+    },
+    {
+      "id": "prereq:P_TU_DERIV_APP->P_TU_INTEGRAL",
+      "edgeType": "prereq", "source": "P_TU_DERIV_APP", "target": "P_TU_INTEGRAL",
+      "rationale": "미분 활용까지 완성 후 그 역과정인 적분으로 전환"
+    }
+  ],
+
+  "new_edges_achievement_prereq": [
+    {
+      "id": "prereq:2수01-05->2수01-06",
+      "edgeType": "prereq", "source": "2수01-05", "target": "2수01-06",
+      "rationale": "덧뺄 의미 이해가 계산 원리 선행"
+    },
+    {
+      "id": "prereq:2수01-06->2수01-08",
+      "edgeType": "prereq", "source": "2수01-06", "target": "2수01-08",
+      "rationale": "두자리 덧뺄이 세 수 연속 연산 선행"
+    },
+    {
+      "id": "prereq:2수01-06->2수01-09",
+      "edgeType": "prereq", "source": "2수01-06", "target": "2수01-09",
+      "rationale": "기본 덧뺄이 □가 포함된 식 풀이 선행"
+    },
+    {
+      "id": "prereq:2수01-10->2수01-11",
+      "edgeType": "prereq", "source": "2수01-10", "target": "2수01-11",
+      "rationale": "곱셈 의미 이해 → 곱셈구구 계산"
+    },
+    {
+      "id": "prereq:4수01-04->4수01-05",
+      "edgeType": "prereq", "source": "4수01-04", "target": "4수01-05",
+      "rationale": "세자리 덧뺄이 두자리 곱셈(부분곱 합산) 선행"
+    },
+    {
+      "id": "prereq:4수01-05->4수01-06",
+      "edgeType": "prereq", "source": "4수01-05", "target": "4수01-06",
+      "rationale": "곱셈이 나눗셈의 역연산 이해에 선행"
+    },
+    {
+      "id": "prereq:4수01-02->4수01-07",
+      "edgeType": "prereq", "source": "4수01-02", "target": "4수01-07",
+      "rationale": "분수 의미 → 분수 덧뺄"
+    },
+    {
+      "id": "prereq:4수01-03->4수01-08",
+      "edgeType": "prereq", "source": "4수01-03", "target": "4수01-08",
+      "rationale": "소수 개념 → 소수 덧뺄"
+    },
+    {
+      "id": "prereq:P_ACH_EXP_LAWS_1->P_ACH_EXP_LAWS_2",
+      "edgeType": "prereq", "source": "P_ACH_EXP_LAWS_1", "target": "P_ACH_EXP_LAWS_2",
+      "rationale": "정수지수 → 유리·실수지수 확장 (Phase 3 신규 노드)"
+    },
+    {
+      "id": "prereq:P_ACH_EXP_LAWS_2->P_ACH_EXP_FUNC",
+      "edgeType": "prereq", "source": "P_ACH_EXP_LAWS_2", "target": "P_ACH_EXP_FUNC",
+      "rationale": "실수지수 계산 → 지수함수 이해"
+    },
+    {
+      "id": "prereq:P_ACH_EXP_FUNC->P_ACH_LOG_DEF",
+      "edgeType": "prereq", "source": "P_ACH_EXP_FUNC", "target": "P_ACH_LOG_DEF",
+      "rationale": "지수함수 → 그 역함수로서 로그"
+    },
+    {
+      "id": "prereq:P_ACH_LOG_DEF->P_ACH_LOG_LAWS",
+      "edgeType": "prereq", "source": "P_ACH_LOG_DEF", "target": "P_ACH_LOG_LAWS",
+      "rationale": "로그 정의 → 로그 성질"
+    },
+    {
+      "id": "prereq:P_ACH_LIMIT_FUNC->P_ACH_CONTINUOUS",
+      "edgeType": "prereq", "source": "P_ACH_LIMIT_FUNC", "target": "P_ACH_CONTINUOUS",
+      "rationale": "극한 계산 → 연속 조건 판정"
+    },
+    {
+      "id": "prereq:P_ACH_CONTINUOUS->P_ACH_DERIV_DEF",
+      "edgeType": "prereq", "source": "P_ACH_CONTINUOUS", "target": "P_ACH_DERIV_DEF",
+      "rationale": "연속 전제에서 미분계수 정의"
+    },
+    {
+      "id": "prereq:P_ACH_DERIV_DEF->P_ACH_DERIV_RULES",
+      "edgeType": "prereq", "source": "P_ACH_DERIV_DEF", "target": "P_ACH_DERIV_RULES",
+      "rationale": "정의 기반 미분 → 공식 활용"
+    },
+    {
+      "id": "prereq:P_ACH_DERIV_RULES->P_ACH_DERIV_APP_TANGENT",
+      "edgeType": "prereq", "source": "P_ACH_DERIV_RULES", "target": "P_ACH_DERIV_APP_TANGENT",
+      "rationale": "미분 기술 숙달 → 접선·극값 활용"
+    },
+    {
+      "id": "prereq:P_ACH_INTEGRAL_INDEF->P_ACH_INTEGRAL_DEF",
+      "edgeType": "prereq", "source": "P_ACH_INTEGRAL_INDEF", "target": "P_ACH_INTEGRAL_DEF",
+      "rationale": "부정적분 → 정적분(미적분 기본정리)"
+    },
+    {
+      "id": "prereq:P_ACH_INTEGRAL_DEF->P_ACH_INTEGRAL_AREA",
+      "edgeType": "prereq", "source": "P_ACH_INTEGRAL_DEF", "target": "P_ACH_INTEGRAL_AREA",
+      "rationale": "정적분 → 넓이 활용"
+    }
+  ],
+
+  "summary": {
+    "textbookUnit_prereq_edges": 14,
+    "achievement_prereq_edges": 18,
+    "total_new_edges": 32,
+    "note_m_coverage": "중학교 단원 34개 중 초→중 연결 3개, 중→고 연결 5개만 추가. 나머지 중학 내부 연결은 후속 작업으로 보류(MVP 우선순위 낮음).",
+    "dep_on_prior_phases": "P_ACH_* 노드 18개는 Phase 3에 의존. Phase 3 머지 전에는 prereq 엣지 생성 불가."
+  }
+}
