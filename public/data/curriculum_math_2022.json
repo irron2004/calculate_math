@@ -13,7 +13,7 @@
         "url": "https://ncic.re.kr"
       }
     ],
-    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes.",
+    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied",
     "generated_at": "2026-02-15",
     "editor": "ChatGPT"
   },
@@ -103,7 +103,24 @@
         "수와 연산"
       ],
       "text": "0과 100까지의 수 개념을 이해하고, 수를 세고 읽고 쓸 수 있다",
-      "description": "0과 100까지의 수 개념을 이해하고, 수를 세고 읽고 쓸 수 있다"
+      "description": "0과 100까지의 수 개념을 이해하고, 수를 세고 읽고 쓸 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_count_0_100",
+          "label": "0-100 수 세기/읽기/쓰기",
+          "weakTags": [
+            "NA_num_count_skip",
+            "NA_num_count_order"
+          ]
+        },
+        {
+          "id": "AS_NA_num_ordinal",
+          "label": "순서 개념(몇 번째)",
+          "weakTags": [
+            "NA_num_count_order"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-02",
@@ -122,7 +139,32 @@
         "수와 연산"
       ],
       "text": "일·십·백·천의 자릿값과 위치적 기수법을 이해하여 네 자리 이하의 수를 읽고 쓸 수 있다",
-      "description": "일·십·백·천의 자릿값과 위치적 기수법을 이해하여 네 자리 이하의 수를 읽고 쓸 수 있다"
+      "description": "일·십·백·천의 자릿값과 위치적 기수법을 이해하여 네 자리 이하의 수를 읽고 쓸 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_place_tens_ones",
+          "label": "십·일 자릿값 이해",
+          "weakTags": [
+            "NA_place_digit_confusion"
+          ]
+        },
+        {
+          "id": "AS_NA_place_hundreds",
+          "label": "백의 자리 이해",
+          "weakTags": [
+            "NA_place_digit_confusion",
+            "NA_place_zero_read"
+          ]
+        },
+        {
+          "id": "AS_NA_place_thousands",
+          "label": "천의 자리 이해(네자리)",
+          "weakTags": [
+            "NA_place_four_digit_mix",
+            "NA_place_zero_read"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-03",
@@ -141,7 +183,24 @@
         "수와 연산"
       ],
       "text": "네 자리 이하 자연수의 계열과 크기를 이해하고 비교할 수 있다",
-      "description": "네 자리 이하 자연수의 계열과 크기를 이해하고 비교할 수 있다"
+      "description": "네 자리 이하 자연수의 계열과 크기를 이해하고 비교할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_compare_2digit",
+          "label": "두자리 수 크기 비교",
+          "weakTags": [
+            "NA_num_compare_reversed"
+          ]
+        },
+        {
+          "id": "AS_NA_compare_4digit",
+          "label": "네자리 수 크기 비교",
+          "weakTags": [
+            "NA_num_compare_reversed",
+            "NA_place_four_digit_mix"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-04",
@@ -160,7 +219,23 @@
         "수와 연산"
       ],
       "text": "하나의 수를 두 수로 분해하고 합성하는 활동을 통해 수 감각을 기른다",
-      "description": "하나의 수를 두 수로 분해하고 합성하는 활동을 통해 수 감각을 기른다"
+      "description": "하나의 수를 두 수로 분해하고 합성하는 활동을 통해 수 감각을 기른다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_decompose_10",
+          "label": "10 만들기(보수)",
+          "weakTags": [
+            "NA_num_decompose_miss"
+          ]
+        },
+        {
+          "id": "AS_NA_decompose_20",
+          "label": "20까지 분해·합성",
+          "weakTags": [
+            "NA_num_decompose_miss"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-B",
@@ -196,7 +271,23 @@
         "수와 연산"
       ],
       "text": "실생활 상황과 연결하여 덧셈과 뺄셈의 의미를 이해한다",
-      "description": "실생활 상황과 연결하여 덧셈과 뺄셈의 의미를 이해한다"
+      "description": "실생활 상황과 연결하여 덧셈과 뺄셈의 의미를 이해한다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_word_add_meaning",
+          "label": "덧셈 상황 해석(합·증가)",
+          "weakTags": [
+            "NA_word_op_choice"
+          ]
+        },
+        {
+          "id": "AS_NA_word_sub_meaning",
+          "label": "뺄셈 상황 해석(차·감소·비교)",
+          "weakTags": [
+            "NA_word_op_choice"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-06",
@@ -215,7 +306,84 @@
         "수와 연산"
       ],
       "text": "두 자리 수의 덧셈과 뺄셈 계산 원리를 이해하고 계산할 수 있다",
-      "description": "두 자리 수의 덧셈과 뺄셈 계산 원리를 이해하고 계산할 수 있다"
+      "description": "두 자리 수의 덧셈과 뺄셈 계산 원리를 이해하고 계산할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_add_1d_1d",
+          "label": "한자리 + 한자리(합 10 이내)",
+          "weakTags": []
+        },
+        {
+          "id": "AS_NA_add_1d_1d_over10",
+          "label": "한자리 + 한자리(합 10 초과, 받아올림 도입)",
+          "weakTags": [
+            "NA_add_carry_missing"
+          ]
+        },
+        {
+          "id": "AS_NA_add_2d_1d_no_carry",
+          "label": "두자리 + 한자리(받아올림 없음)",
+          "weakTags": [
+            "NA_add_align_digit"
+          ]
+        },
+        {
+          "id": "AS_NA_add_2d_1d_carry",
+          "label": "두자리 + 한자리(받아올림 있음)",
+          "weakTags": [
+            "NA_add_carry_missing",
+            "NA_add_carry_wrong_place"
+          ]
+        },
+        {
+          "id": "AS_NA_add_2d_2d_no_carry",
+          "label": "두자리 + 두자리(받아올림 없음)",
+          "weakTags": [
+            "NA_add_align_digit"
+          ]
+        },
+        {
+          "id": "AS_NA_add_2d_2d_carry",
+          "label": "두자리 + 두자리(받아올림 있음)",
+          "weakTags": [
+            "NA_add_carry_missing",
+            "NA_add_carry_wrong_place"
+          ]
+        },
+        {
+          "id": "AS_NA_sub_1d_1d",
+          "label": "한자리 - 한자리",
+          "weakTags": []
+        },
+        {
+          "id": "AS_NA_sub_2d_1d_no_borrow",
+          "label": "두자리 - 한자리(내림 없음)",
+          "weakTags": []
+        },
+        {
+          "id": "AS_NA_sub_2d_1d_borrow",
+          "label": "두자리 - 한자리(내림 있음)",
+          "weakTags": [
+            "NA_sub_borrow_missing"
+          ]
+        },
+        {
+          "id": "AS_NA_sub_2d_2d_no_borrow",
+          "label": "두자리 - 두자리(내림 없음)",
+          "weakTags": [
+            "NA_sub_borrow_direction"
+          ]
+        },
+        {
+          "id": "AS_NA_sub_2d_2d_borrow",
+          "label": "두자리 - 두자리(내림 있음)",
+          "weakTags": [
+            "NA_sub_borrow_missing",
+            "NA_sub_borrow_direction",
+            "NA_sub_zero_borrow"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-07",
@@ -234,7 +402,23 @@
         "수와 연산"
       ],
       "text": "덧셈과 뺄셈 사이의 관계를 이해한다",
-      "description": "덧셈과 뺄셈 사이의 관계를 이해한다"
+      "description": "덧셈과 뺄셈 사이의 관계를 이해한다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_addsub_family",
+          "label": "덧뺄 식족 만들기(3+4=7 ↔ 7-4=3)",
+          "weakTags": [
+            "NA_addsub_inverse"
+          ]
+        },
+        {
+          "id": "AS_NA_addsub_check",
+          "label": "역연산으로 검산",
+          "weakTags": [
+            "NA_addsub_inverse"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-08",
@@ -253,7 +437,30 @@
         "수와 연산"
       ],
       "text": "두 자리 수 범위에서 세 수의 덧셈과 뺄셈을 할 수 있다",
-      "description": "두 자리 수 범위에서 세 수의 덧셈과 뺄셈을 할 수 있다"
+      "description": "두 자리 수 범위에서 세 수의 덧셈과 뺄셈을 할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_three_add",
+          "label": "세 수 연속 덧셈",
+          "weakTags": [
+            "NA_add_three_numbers_order"
+          ]
+        },
+        {
+          "id": "AS_NA_three_sub",
+          "label": "세 수 연속 뺄셈",
+          "weakTags": [
+            "NA_add_three_numbers_order"
+          ]
+        },
+        {
+          "id": "AS_NA_three_mixed",
+          "label": "덧뺄 혼합 세 수",
+          "weakTags": [
+            "NA_add_three_numbers_order"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-09",
@@ -272,7 +479,30 @@
         "수와 연산"
       ],
       "text": "□가 사용된 덧셈·뺄셈식을 만들고 □의 값을 구할 수 있다",
-      "description": "□가 사용된 덧셈·뺄셈식을 만들고 □의 값을 구할 수 있다"
+      "description": "□가 사용된 덧셈·뺄셈식을 만들고 □의 값을 구할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_box_add_final",
+          "label": "□+a=b 형태 푸는 법",
+          "weakTags": [
+            "NA_addsub_inverse"
+          ]
+        },
+        {
+          "id": "AS_NA_box_sub_final",
+          "label": "□-a=b 형태 푸는 법",
+          "weakTags": [
+            "NA_addsub_inverse"
+          ]
+        },
+        {
+          "id": "AS_NA_box_middle",
+          "label": "a-□=b 형태(□가 중간)",
+          "weakTags": [
+            "NA_addsub_inverse"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-C",
@@ -308,7 +538,24 @@
         "수와 연산"
       ],
       "text": "실생활 상황과 연결하여 곱셈의 의미를 이해한다",
-      "description": "실생활 상황과 연결하여 곱셈의 의미를 이해한다"
+      "description": "실생활 상황과 연결하여 곱셈의 의미를 이해한다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_mul_meaning",
+          "label": "묶어세기/반복덧셈으로서 곱셈",
+          "weakTags": [
+            "NA_mul_repeated_add"
+          ]
+        },
+        {
+          "id": "AS_NA_mul_word_problem",
+          "label": "곱셈 문장제 상황 파악",
+          "weakTags": [
+            "NA_word_op_choice",
+            "NA_mul_repeated_add"
+          ]
+        }
+      ]
     },
     {
       "id": "2수01-11",
@@ -327,7 +574,37 @@
         "수와 연산"
       ],
       "text": "곱셈구구를 이해하고, 한 자리 수의 곱셈을 할 수 있다",
-      "description": "곱셈구구를 이해하고, 한 자리 수의 곱셈을 할 수 있다"
+      "description": "곱셈구구를 이해하고, 한 자리 수의 곱셈을 할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_mul_times_table_2_5",
+          "label": "2단·5단 구구",
+          "weakTags": [
+            "NA_mul_times_table"
+          ]
+        },
+        {
+          "id": "AS_NA_mul_times_table_3_4_6",
+          "label": "3·4·6단 구구",
+          "weakTags": [
+            "NA_mul_times_table"
+          ]
+        },
+        {
+          "id": "AS_NA_mul_times_table_7_8_9",
+          "label": "7·8·9단 구구(어려운 단)",
+          "weakTags": [
+            "NA_mul_times_table"
+          ]
+        },
+        {
+          "id": "AS_NA_mul_times_table_full",
+          "label": "1~9단 전체 구구 숙달",
+          "weakTags": [
+            "NA_mul_times_table"
+          ]
+        }
+      ]
     },
     {
       "id": "KR-MATH-2022-E-1-2-RR",
@@ -5259,6 +5536,60 @@
         "기하"
       ],
       "descShort": "2023 수능 기하 30번 문항"
+    },
+    {
+      "id": "2수01-B1",
+      "nodeType": "textbookUnit",
+      "label": "두자리 덧뺄 (받아올림·내림 없음)",
+      "parentId": "2수01-B",
+      "officialCode": "",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "schoolLevel": "E",
+      "order": 1,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산",
+        "drill-down"
+      ],
+      "description": "두자리 수 덧뺄셈 중 자리올림/내림이 없는 표준형. 세로셈 자리 맞추기 정확성 측정."
+    },
+    {
+      "id": "2수01-B2",
+      "nodeType": "textbookUnit",
+      "label": "두자리 덧셈 (받아올림 있음)",
+      "parentId": "2수01-B",
+      "officialCode": "",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "schoolLevel": "E",
+      "order": 2,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산",
+        "drill-down"
+      ],
+      "description": "받아올림이 필요한 두자리 덧셈. 자릿값 이해 전제."
+    },
+    {
+      "id": "2수01-B3",
+      "nodeType": "textbookUnit",
+      "label": "두자리 뺄셈 (내림 있음)",
+      "parentId": "2수01-B",
+      "officialCode": "",
+      "gradeBand": "1-2",
+      "domainCode": "NA",
+      "schoolLevel": "E",
+      "order": 3,
+      "tags": [
+        "초등",
+        "1-2",
+        "수와 연산",
+        "drill-down"
+      ],
+      "description": "내림(빌려오기)이 필요한 두자리 뺄셈. 0이 있는 경우(103-57)는 별도."
     }
   ],
   "edges": [
@@ -9465,6 +9796,60 @@
       "source": "P_TU_VECTOR_DOT",
       "target": "CSAT2023-GE-30",
       "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
+    },
+    {
+      "id": "contains:2수01-B->2수01-B1",
+      "edgeType": "contains",
+      "source": "2수01-B",
+      "target": "2수01-B1"
+    },
+    {
+      "id": "contains:2수01-B->2수01-B2",
+      "edgeType": "contains",
+      "source": "2수01-B",
+      "target": "2수01-B2"
+    },
+    {
+      "id": "contains:2수01-B->2수01-B3",
+      "edgeType": "contains",
+      "source": "2수01-B",
+      "target": "2수01-B3"
+    },
+    {
+      "id": "prereq:2수01-B1->2수01-B2",
+      "edgeType": "prereq",
+      "source": "2수01-B1",
+      "target": "2수01-B2"
+    },
+    {
+      "id": "prereq:2수01-B1->2수01-B3",
+      "edgeType": "prereq",
+      "source": "2수01-B1",
+      "target": "2수01-B3"
+    },
+    {
+      "id": "prereq:2수01-B2->2수01-B3",
+      "edgeType": "prereq",
+      "source": "2수01-B2",
+      "target": "2수01-B3"
+    },
+    {
+      "id": "alignsTo:2수01-B1->2수01-06",
+      "edgeType": "alignsTo",
+      "source": "2수01-B1",
+      "target": "2수01-06"
+    },
+    {
+      "id": "alignsTo:2수01-B2->2수01-06",
+      "edgeType": "alignsTo",
+      "source": "2수01-B2",
+      "target": "2수01-06"
+    },
+    {
+      "id": "alignsTo:2수01-B3->2수01-06",
+      "edgeType": "alignsTo",
+      "source": "2수01-B3",
+      "target": "2수01-06"
     }
   ]
 }
