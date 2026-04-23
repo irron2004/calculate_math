@@ -13,7 +13,7 @@
         "url": "https://ncic.re.kr"
       }
     ],
-    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied",
+    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied | p2 applied",
     "generated_at": "2026-02-15",
     "editor": "ChatGPT"
   },
@@ -652,7 +652,30 @@
       ],
       "text": "생활 주변의 규칙적인 변화를 찾아 여러 가지 방법으로 표현할 수 있다",
       "note": "조사 메모 기반(예상 성취기준)",
-      "description": "생활 주변의 규칙적인 변화를 찾아 여러 가지 방법으로 표현할 수 있다"
+      "description": "생활 주변의 규칙적인 변화를 찾아 여러 가지 방법으로 표현할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_pattern_find",
+          "label": "반복 규칙 찾기(색·모양)",
+          "weakTags": [
+            "RR_pattern_rule_miss"
+          ]
+        },
+        {
+          "id": "AS_RR_pattern_predict",
+          "label": "규칙 적용해 다음 항 예측",
+          "weakTags": [
+            "RR_pattern_rule_miss"
+          ]
+        },
+        {
+          "id": "AS_RR_pattern_describe",
+          "label": "규칙을 말·식으로 표현",
+          "weakTags": [
+            "RR_pattern_visual_text"
+          ]
+        }
+      ]
     },
     {
       "id": "KR-MATH-2022-E-1-2-GM",
@@ -699,7 +722,23 @@
         "도형과 측정"
       ],
       "text": "주변 사물에서 입체도형의 모양(예: 상자, 공)을 직관적으로 알아본다",
-      "description": "주변 사물에서 입체도형의 모양(예: 상자, 공)을 직관적으로 알아본다"
+      "description": "주변 사물에서 입체도형의 모양(예: 상자, 공)을 직관적으로 알아본다",
+      "atomicSkills": [
+        {
+          "id": "AS_GM_3d_identify",
+          "label": "상자·공·기둥 모양 인식",
+          "weakTags": [
+            "GM_shape3d_identify"
+          ]
+        },
+        {
+          "id": "AS_GM_3d_classify",
+          "label": "입체도형 분류",
+          "weakTags": [
+            "GM_shape3d_identify"
+          ]
+        }
+      ]
     },
     {
       "id": "2수03-B",
@@ -735,7 +774,23 @@
         "도형과 측정"
       ],
       "text": "삼각형과 사각형을 알고 그 구성 요소(변, 꼭짓점)를 이해한다",
-      "description": "삼각형과 사각형을 알고 그 구성 요소(변, 꼭짓점)를 이해한다"
+      "description": "삼각형과 사각형을 알고 그 구성 요소(변, 꼭짓점)를 이해한다",
+      "atomicSkills": [
+        {
+          "id": "AS_GM_2d_identify",
+          "label": "삼각형·사각형 구분",
+          "weakTags": [
+            "GM_shape2d_identify"
+          ]
+        },
+        {
+          "id": "AS_GM_elements_count",
+          "label": "변·꼭짓점 개수 세기",
+          "weakTags": [
+            "GM_shape_elements_miss"
+          ]
+        }
+      ]
     },
     {
       "id": "2수03-C",
@@ -771,7 +826,30 @@
         "도형과 측정"
       ],
       "text": "두 대상의 길이, 무게, 넓이 등을 직접 비교하여 어느 쪽이 더 큰지 판단할 수 있다",
-      "description": "두 대상의 길이, 무게, 넓이 등을 직접 비교하여 어느 쪽이 더 큰지 판단할 수 있다"
+      "description": "두 대상의 길이, 무게, 넓이 등을 직접 비교하여 어느 쪽이 더 큰지 판단할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_GM_compare_length",
+          "label": "두 물체 길이 직접 비교",
+          "weakTags": [
+            "GM_measure_direct_wrong"
+          ]
+        },
+        {
+          "id": "AS_GM_compare_area",
+          "label": "두 물체 넓이 직접 비교",
+          "weakTags": [
+            "GM_measure_direct_wrong"
+          ]
+        },
+        {
+          "id": "AS_GM_compare_weight",
+          "label": "두 물체 무게 직접 비교",
+          "weakTags": [
+            "GM_measure_direct_wrong"
+          ]
+        }
+      ]
     },
     {
       "id": "2수03-D",
@@ -807,7 +885,30 @@
         "도형과 측정"
       ],
       "text": "시계 보기를 통해 시각과 시간(시와 분)을 이해하고 말할 수 있다",
-      "description": "시계 보기를 통해 시각과 시간(시와 분)을 이해하고 말할 수 있다"
+      "description": "시계 보기를 통해 시각과 시간(시와 분)을 이해하고 말할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_GM_clock_hour",
+          "label": "정시·반시각 읽기",
+          "weakTags": [
+            "GM_time_read_confusion"
+          ]
+        },
+        {
+          "id": "AS_GM_clock_minute",
+          "label": "분 단위까지 읽기",
+          "weakTags": [
+            "GM_time_read_confusion"
+          ]
+        },
+        {
+          "id": "AS_GM_time_interval",
+          "label": "시간의 차이(경과시간)",
+          "weakTags": [
+            "GM_time_calc_wrong"
+          ]
+        }
+      ]
     },
     {
       "id": "2수03-E",
@@ -843,7 +944,28 @@
         "도형과 측정"
       ],
       "text": "길이의 단위(cm, m)를 사용하여 길이를 측정하고 비교할 수 있다",
-      "description": "길이의 단위(cm, m)를 사용하여 길이를 측정하고 비교할 수 있다"
+      "description": "길이의 단위(cm, m)를 사용하여 길이를 측정하고 비교할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_GM_ruler_align",
+          "label": "자 0 지점 맞추고 읽기",
+          "weakTags": [
+            "GM_length_measure_start"
+          ]
+        },
+        {
+          "id": "AS_GM_cm_measure",
+          "label": "cm 단위 길이 측정",
+          "weakTags": []
+        },
+        {
+          "id": "AS_GM_m_cm_convert",
+          "label": "m↔cm 환산(100cm=1m)",
+          "weakTags": [
+            "GM_length_unit_confuse"
+          ]
+        }
+      ]
     },
     {
       "id": "KR-MATH-2022-E-1-2-DP",
@@ -890,7 +1012,21 @@
         "자료와 가능성"
       ],
       "text": "주어진 대상들을 기준에 따라 분류하고, 분류 결과를 말할 수 있다",
-      "description": "주어진 대상들을 기준에 따라 분류하고, 분류 결과를 말할 수 있다"
+      "description": "주어진 대상들을 기준에 따라 분류하고, 분류 결과를 말할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_DP_classify_one_criterion",
+          "label": "한 가지 기준으로 분류",
+          "weakTags": [
+            "DP_classify_criterion"
+          ]
+        },
+        {
+          "id": "AS_DP_classify_describe",
+          "label": "분류 결과 말하기",
+          "weakTags": []
+        }
+      ]
     },
     {
       "id": "2수04-B",
@@ -926,7 +1062,21 @@
         "자료와 가능성"
       ],
       "text": "분류한 자료를 표로 정리할 수 있다",
-      "description": "분류한 자료를 표로 정리할 수 있다"
+      "description": "분류한 자료를 표로 정리할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_DP_tally",
+          "label": "○/× 표시로 세기",
+          "weakTags": []
+        },
+        {
+          "id": "AS_DP_table_fill",
+          "label": "분류표에 수치 채우기",
+          "weakTags": [
+            "DP_table_total_miss"
+          ]
+        }
+      ]
     },
     {
       "id": "2수04-03",
@@ -945,7 +1095,21 @@
         "자료와 가능성"
       ],
       "text": "자료를 O, X, / 기호 등을 이용한 그림그래프로 나타내고 해석할 수 있다",
-      "description": "자료를 O, X, / 기호 등을 이용한 그림그래프로 나타내고 해석할 수 있다"
+      "description": "자료를 O, X, / 기호 등을 이용한 그림그래프로 나타내고 해석할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_DP_pictograph_draw",
+          "label": "그림그래프 그리기",
+          "weakTags": []
+        },
+        {
+          "id": "AS_DP_pictograph_read",
+          "label": "그림그래프 읽고 해석",
+          "weakTags": [
+            "DP_graph_scale_read"
+          ]
+        }
+      ]
     },
     {
       "id": "KR-MATH-2022-E-3-4",
@@ -1002,7 +1166,31 @@
         "수와 연산"
       ],
       "text": "다섯 자리 이상의 큰 수를 읽고 쓸 수 있다",
-      "description": "다섯 자리 이상의 큰 수를 읽고 쓸 수 있다"
+      "description": "다섯 자리 이상의 큰 수를 읽고 쓸 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_large_5digit",
+          "label": "5자리 수 읽기/쓰기",
+          "weakTags": [
+            "NA_large_num_comma_read",
+            "NA_large_num_zero_place"
+          ]
+        },
+        {
+          "id": "AS_NA_large_man",
+          "label": "만 단위 수(1만~1억)",
+          "weakTags": [
+            "NA_large_num_comma_read"
+          ]
+        },
+        {
+          "id": "AS_NA_large_eok",
+          "label": "억·조 단위 수",
+          "weakTags": [
+            "NA_large_num_comma_read"
+          ]
+        }
+      ]
     },
     {
       "id": "4수01-B",
@@ -1038,7 +1226,30 @@
         "수와 연산"
       ],
       "text": "분수의 의미(전체-부분 관계 등)를 알고 분수를 읽고 쓸 수 있다",
-      "description": "분수의 의미(전체-부분 관계 등)를 알고 분수를 읽고 쓸 수 있다"
+      "description": "분수의 의미(전체-부분 관계 등)를 알고 분수를 읽고 쓸 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_frac_part_whole",
+          "label": "전체-부분 관계로 분수 이해",
+          "weakTags": [
+            "NA_frac_meaning"
+          ]
+        },
+        {
+          "id": "AS_NA_frac_notation",
+          "label": "분자·분모 표기/읽기",
+          "weakTags": [
+            "NA_frac_read_write"
+          ]
+        },
+        {
+          "id": "AS_NA_frac_unit_fraction",
+          "label": "단위분수(1/n) 개념",
+          "weakTags": [
+            "NA_frac_meaning"
+          ]
+        }
+      ]
     },
     {
       "id": "4수01-C",
@@ -1074,7 +1285,23 @@
         "수와 연산"
       ],
       "text": "소수의 개념을 이해하고 소수를 읽고 쓸 수 있다",
-      "description": "소수의 개념을 이해하고 소수를 읽고 쓸 수 있다"
+      "description": "소수의 개념을 이해하고 소수를 읽고 쓸 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_dec_tenth",
+          "label": "소수 첫째자리(1/10)",
+          "weakTags": [
+            "NA_dec_place_read"
+          ]
+        },
+        {
+          "id": "AS_NA_dec_hundredth",
+          "label": "소수 둘째자리(1/100)",
+          "weakTags": [
+            "NA_dec_place_read"
+          ]
+        }
+      ]
     },
     {
       "id": "4수01-D",
@@ -1110,7 +1337,50 @@
         "수와 연산"
       ],
       "text": "세 자리 수 범위에서 덧셈과 뺄셈의 계산 원리를 이해하고 계산할 수 있다",
-      "description": "세 자리 수 범위에서 덧셈과 뺄셈의 계산 원리를 이해하고 계산할 수 있다"
+      "description": "세 자리 수 범위에서 덧셈과 뺄셈의 계산 원리를 이해하고 계산할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_add_3d_no_carry",
+          "label": "세자리 덧셈(받아올림 없음)",
+          "weakTags": [
+            "NA_add_align_digit"
+          ]
+        },
+        {
+          "id": "AS_NA_add_3d_single_carry",
+          "label": "세자리 덧셈(받아올림 1회)",
+          "weakTags": [
+            "NA_add_carry_missing"
+          ]
+        },
+        {
+          "id": "AS_NA_add_3d_multi_carry",
+          "label": "세자리 덧셈(연속 받아올림)",
+          "weakTags": [
+            "NA_add_3d_multi_carry"
+          ]
+        },
+        {
+          "id": "AS_NA_sub_3d_no_borrow",
+          "label": "세자리 뺄셈(내림 없음)",
+          "weakTags": []
+        },
+        {
+          "id": "AS_NA_sub_3d_single_borrow",
+          "label": "세자리 뺄셈(내림 1회)",
+          "weakTags": [
+            "NA_sub_borrow_missing"
+          ]
+        },
+        {
+          "id": "AS_NA_sub_3d_multi_borrow",
+          "label": "세자리 뺄셈(연속 내림·0 포함)",
+          "weakTags": [
+            "NA_sub_3d_multi_borrow",
+            "NA_sub_zero_borrow"
+          ]
+        }
+      ]
     },
     {
       "id": "4수01-E",
@@ -1146,7 +1416,39 @@
         "수와 연산"
       ],
       "text": "자연수의 곱셈(예: 두 자리 수 × 두 자리 수)의 계산 원리를 이해하고 계산할 수 있다",
-      "description": "자연수의 곱셈(예: 두 자리 수 × 두 자리 수)의 계산 원리를 이해하고 계산할 수 있다"
+      "description": "자연수의 곱셈(예: 두 자리 수 × 두 자리 수)의 계산 원리를 이해하고 계산할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_mul_2d_1d",
+          "label": "두자리 × 한자리",
+          "weakTags": [
+            "NA_mul_carry_combine"
+          ]
+        },
+        {
+          "id": "AS_NA_mul_3d_1d",
+          "label": "세자리 × 한자리",
+          "weakTags": [
+            "NA_mul_carry_combine"
+          ]
+        },
+        {
+          "id": "AS_NA_mul_2d_2d",
+          "label": "두자리 × 두자리(부분곱)",
+          "weakTags": [
+            "NA_mul_2d_2d_partial",
+            "NA_mul_carry_combine"
+          ]
+        },
+        {
+          "id": "AS_NA_mul_3d_2d",
+          "label": "세자리 × 두자리",
+          "weakTags": [
+            "NA_mul_2d_2d_partial",
+            "NA_mul_carry_combine"
+          ]
+        }
+      ]
     },
     {
       "id": "4수01-06",
@@ -1165,7 +1467,29 @@
         "수와 연산"
       ],
       "text": "나눗셈의 의미를 알고 한 자리 수로 나눗셈을 할 수 있다",
-      "description": "나눗셈의 의미를 알고 한 자리 수로 나눗셈을 할 수 있다"
+      "description": "나눗셈의 의미를 알고 한 자리 수로 나눗셈을 할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_div_2d_1d_exact",
+          "label": "두자리 ÷ 한자리(나누어떨어짐)",
+          "weakTags": []
+        },
+        {
+          "id": "AS_NA_div_2d_1d_remainder",
+          "label": "두자리 ÷ 한자리(나머지)",
+          "weakTags": [
+            "NA_div_remainder"
+          ]
+        },
+        {
+          "id": "AS_NA_div_3d_1d",
+          "label": "세자리 ÷ 한자리",
+          "weakTags": [
+            "NA_div_remainder",
+            "NA_div_zero_in_quotient"
+          ]
+        }
+      ]
     },
     {
       "id": "4수01-F",
@@ -1201,7 +1525,31 @@
         "수와 연산"
       ],
       "text": "분모가 같은 분수의 덧셈과 뺄셈을 계산하고 그 의미를 이해한다",
-      "description": "분모가 같은 분수의 덧셈과 뺄셈을 계산하고 그 의미를 이해한다"
+      "description": "분모가 같은 분수의 덧셈과 뺄셈을 계산하고 그 의미를 이해한다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_frac_add_proper",
+          "label": "진분수+진분수(분모 동일)",
+          "weakTags": [
+            "NA_frac_add_same_denom"
+          ]
+        },
+        {
+          "id": "AS_NA_frac_sub_proper",
+          "label": "진분수-진분수(분모 동일)",
+          "weakTags": [
+            "NA_frac_sub_same_denom"
+          ]
+        },
+        {
+          "id": "AS_NA_frac_mixed_ops",
+          "label": "대분수 덧뺄(분모 동일)",
+          "weakTags": [
+            "NA_frac_improper_mixed",
+            "NA_frac_add_same_denom"
+          ]
+        }
+      ]
     },
     {
       "id": "4수01-G",
@@ -1237,7 +1585,30 @@
         "수와 연산"
       ],
       "text": "소수의 덧셈과 뺄셈을 계산하고 그 방법을 설명할 수 있다",
-      "description": "소수의 덧셈과 뺄셈을 계산하고 그 방법을 설명할 수 있다"
+      "description": "소수의 덧셈과 뺄셈을 계산하고 그 방법을 설명할 수 있다",
+      "atomicSkills": [
+        {
+          "id": "AS_NA_dec_add_same_place",
+          "label": "자릿수 같은 소수 덧셈",
+          "weakTags": [
+            "NA_dec_add_align"
+          ]
+        },
+        {
+          "id": "AS_NA_dec_add_diff_place",
+          "label": "자릿수 다른 소수 덧셈",
+          "weakTags": [
+            "NA_dec_add_align"
+          ]
+        },
+        {
+          "id": "AS_NA_dec_sub_simple",
+          "label": "소수 뺄셈",
+          "weakTags": [
+            "NA_dec_sub_align"
+          ]
+        }
+      ]
     },
     {
       "id": "KR-MATH-2022-E-3-4-RR",
@@ -5590,6 +5961,74 @@
         "drill-down"
       ],
       "description": "내림(빌려오기)이 필요한 두자리 뺄셈. 0이 있는 경우(103-57)는 별도."
+    },
+    {
+      "id": "4수01-D1",
+      "nodeType": "textbookUnit",
+      "label": "세자리 덧셈 (연속 받아올림)",
+      "parentId": "4수01-D",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "schoolLevel": "E",
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산",
+        "drill-down"
+      ],
+      "description": "받아올림이 두 번 이상 연속 발생하는 세자리 덧셈."
+    },
+    {
+      "id": "4수01-D2",
+      "nodeType": "textbookUnit",
+      "label": "세자리 뺄셈 (0 포함 연속 내림)",
+      "parentId": "4수01-D",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "schoolLevel": "E",
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산",
+        "drill-down"
+      ],
+      "description": "피감수에 0이 있는 경우의 세자리 뺄셈 (예: 1000-357)."
+    },
+    {
+      "id": "4수01-E1",
+      "nodeType": "textbookUnit",
+      "label": "두자리×두자리 곱셈",
+      "parentId": "4수01-E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "schoolLevel": "E",
+      "order": 1,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산",
+        "drill-down"
+      ],
+      "description": "부분곱을 이용한 두자리 × 두자리."
+    },
+    {
+      "id": "4수01-E2",
+      "nodeType": "textbookUnit",
+      "label": "나눗셈 나머지가 있는 경우",
+      "parentId": "4수01-E",
+      "gradeBand": "3-4",
+      "domainCode": "NA",
+      "schoolLevel": "E",
+      "order": 2,
+      "tags": [
+        "초등",
+        "3-4",
+        "수와 연산",
+        "drill-down"
+      ],
+      "description": "나머지 처리가 필요한 나눗셈."
     }
   ],
   "edges": [
@@ -9850,6 +10289,72 @@
       "edgeType": "alignsTo",
       "source": "2수01-B3",
       "target": "2수01-06"
+    },
+    {
+      "id": "contains:4수01-D->4수01-D1",
+      "edgeType": "contains",
+      "source": "4수01-D",
+      "target": "4수01-D1"
+    },
+    {
+      "id": "contains:4수01-D->4수01-D2",
+      "edgeType": "contains",
+      "source": "4수01-D",
+      "target": "4수01-D2"
+    },
+    {
+      "id": "contains:4수01-E->4수01-E1",
+      "edgeType": "contains",
+      "source": "4수01-E",
+      "target": "4수01-E1"
+    },
+    {
+      "id": "contains:4수01-E->4수01-E2",
+      "edgeType": "contains",
+      "source": "4수01-E",
+      "target": "4수01-E2"
+    },
+    {
+      "id": "prereq:2수01-B2->4수01-D1",
+      "edgeType": "prereq",
+      "source": "2수01-B2",
+      "target": "4수01-D1"
+    },
+    {
+      "id": "prereq:2수01-B3->4수01-D2",
+      "edgeType": "prereq",
+      "source": "2수01-B3",
+      "target": "4수01-D2"
+    },
+    {
+      "id": "prereq:4수01-D1->4수01-E1",
+      "edgeType": "prereq",
+      "source": "4수01-D1",
+      "target": "4수01-E1"
+    },
+    {
+      "id": "alignsTo:4수01-D1->4수01-04",
+      "edgeType": "alignsTo",
+      "source": "4수01-D1",
+      "target": "4수01-04"
+    },
+    {
+      "id": "alignsTo:4수01-D2->4수01-04",
+      "edgeType": "alignsTo",
+      "source": "4수01-D2",
+      "target": "4수01-04"
+    },
+    {
+      "id": "alignsTo:4수01-E1->4수01-05",
+      "edgeType": "alignsTo",
+      "source": "4수01-E1",
+      "target": "4수01-05"
+    },
+    {
+      "id": "alignsTo:4수01-E2->4수01-06",
+      "edgeType": "alignsTo",
+      "source": "4수01-E2",
+      "target": "4수01-06"
     }
   ]
 }
