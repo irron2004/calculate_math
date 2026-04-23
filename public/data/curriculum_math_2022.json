@@ -13,7 +13,7 @@
         "url": "https://ncic.re.kr"
       }
     ],
-    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied | p2 applied",
+    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied | p2 applied | p3 applied",
     "generated_at": "2026-02-15",
     "editor": "ChatGPT"
   },
@@ -6029,6 +6029,531 @@
         "drill-down"
       ],
       "description": "나머지 처리가 필요한 나눗셈."
+    },
+    {
+      "id": "P_ACH_EXP_LAWS_1",
+      "nodeType": "achievement",
+      "label": "지수법칙(정수지수) 이해·적용",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 3,
+      "text": "정수 지수를 가진 식의 법칙을 이해하고 계산할 수 있다",
+      "description": "a^m · a^n = a^(m+n) 등 지수법칙의 정수 범위 적용",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_exp_integer",
+          "label": "정수지수 연산",
+          "weakTags": [
+            "RR_exp_law_misuse"
+          ]
+        },
+        {
+          "id": "AS_RR_exp_negative",
+          "label": "음의 지수 처리(a^-n = 1/a^n)",
+          "weakTags": [
+            "RR_exp_negative_sign"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_EXP_LAWS_2",
+      "nodeType": "achievement",
+      "label": "지수 확장(유리·실수 지수)",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 4,
+      "text": "유리수·실수 지수의 의미를 이해하고 계산할 수 있다",
+      "description": "a^(1/n) 의미, 거듭제곱근과의 관계",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_exp_rational",
+          "label": "유리수 지수 계산",
+          "weakTags": [
+            "RR_exp_law_misuse",
+            "RR_root_index_confusion"
+          ]
+        },
+        {
+          "id": "AS_RR_nth_root",
+          "label": "n제곱근 계산",
+          "weakTags": [
+            "RR_root_index_confusion"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_EXP_FUNC",
+      "nodeType": "achievement",
+      "label": "지수함수 성질과 그래프",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 4,
+      "text": "지수함수의 그래프를 그리고 성질을 이해한다",
+      "description": "y=a^x의 단조성, 점근선, 이동/변환",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_exp_graph",
+          "label": "지수함수 그래프 그리기",
+          "weakTags": [
+            "RR_func_graph_reflection"
+          ]
+        },
+        {
+          "id": "AS_RR_exp_equation_solve",
+          "label": "지수방정식 풀이(같은 밑으로)",
+          "weakTags": [
+            "RR_exp_eq_same_base"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_LOG_DEF",
+      "nodeType": "achievement",
+      "label": "로그의 정의와 기본 성질",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 3,
+      "text": "로그의 정의와 기본 성질을 이해한다",
+      "description": "log_a x = y ↔ a^y = x, 로그 정의역·치역",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_log_def",
+          "label": "로그 정의로 값 구하기",
+          "weakTags": [
+            "RR_log_def_inverse"
+          ]
+        },
+        {
+          "id": "AS_RR_log_domain",
+          "label": "로그 정의역 조건(진수>0, 밑≠1)",
+          "weakTags": [
+            "RR_log_domain_miss"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_LOG_LAWS",
+      "nodeType": "achievement",
+      "label": "로그의 성질과 밑 변환",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 4,
+      "text": "로그의 성질(곱·몫·거듭제곱)과 밑 변환 공식을 이용할 수 있다",
+      "description": "log(xy), log(x/y), log x^n, 밑 변환",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_log_product",
+          "label": "log(xy) = log x + log y",
+          "weakTags": [
+            "RR_log_law_misuse"
+          ]
+        },
+        {
+          "id": "AS_RR_log_power",
+          "label": "log x^n = n log x",
+          "weakTags": [
+            "RR_log_law_misuse"
+          ]
+        },
+        {
+          "id": "AS_RR_log_base_change",
+          "label": "밑 변환 공식 적용",
+          "weakTags": [
+            "RR_log_base_change"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_TRIG_RATIO",
+      "nodeType": "achievement",
+      "label": "삼각비와 단위원 위의 삼각함수",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 3,
+      "text": "삼각비의 정의와 단위원에서의 삼각함수 값을 구할 수 있다",
+      "description": "sin, cos, tan 정의 및 특수각 값",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_trig_special_angle",
+          "label": "특수각(30·45·60·90) 값",
+          "weakTags": [
+            "RR_trig_special_miss"
+          ]
+        },
+        {
+          "id": "AS_RR_trig_quadrant_sign",
+          "label": "사분면별 부호 판단",
+          "weakTags": [
+            "RR_trig_quadrant_sign"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_TRIG_IDENTITY",
+      "nodeType": "achievement",
+      "label": "삼각함수 항등식과 덧셈정리",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 4,
+      "text": "삼각함수 기본 항등식과 덧셈정리를 이용해 식을 변형할 수 있다",
+      "description": "sin²+cos²=1, sin(A±B), cos(A±B)",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_trig_pyth",
+          "label": "피타고라스 항등식 활용",
+          "weakTags": [
+            "RR_trig_identity_miss"
+          ]
+        },
+        {
+          "id": "AS_RR_trig_addition",
+          "label": "삼각함수 덧셈정리",
+          "weakTags": [
+            "RR_trig_addition_sign"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_SEQ_ARITH",
+      "nodeType": "achievement",
+      "label": "등차수열 일반항과 합",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 3,
+      "text": "등차수열의 일반항과 첫째항부터 제n항까지의 합을 구할 수 있다",
+      "description": "a_n = a + (n-1)d, S_n = n(a + l)/2",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_seq_arith_term",
+          "label": "등차수열 일반항 구하기",
+          "weakTags": [
+            "RR_seq_term_formula"
+          ]
+        },
+        {
+          "id": "AS_RR_seq_arith_sum",
+          "label": "등차수열 합 공식 적용",
+          "weakTags": [
+            "RR_seq_sum_count_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_SEQ_GEOM",
+      "nodeType": "achievement",
+      "label": "등비수열 일반항과 합",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 3,
+      "text": "등비수열의 일반항과 첫째항부터 제n항까지의 합을 구할 수 있다",
+      "description": "a_n = ar^(n-1), S_n = a(1-r^n)/(1-r)",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_seq_geom_term",
+          "label": "등비수열 일반항",
+          "weakTags": [
+            "RR_seq_term_formula"
+          ]
+        },
+        {
+          "id": "AS_RR_seq_geom_sum_r1",
+          "label": "r=1일 때 합 구분 처리",
+          "weakTags": [
+            "RR_seq_geom_r1_miss"
+          ]
+        },
+        {
+          "id": "AS_RR_seq_geom_sum_general",
+          "label": "등비수열 합 공식 적용",
+          "weakTags": [
+            "RR_seq_sum_count_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_LIMIT_FUNC",
+      "nodeType": "achievement",
+      "label": "함수의 극한",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 4,
+      "text": "함수의 극한의 의미를 이해하고 극한값을 구할 수 있다",
+      "description": "x→a에서 f(x)의 극한, 좌우극한, 발산",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_limit_direct_sub",
+          "label": "대입으로 극한 계산",
+          "weakTags": []
+        },
+        {
+          "id": "AS_RR_limit_indet_0_0",
+          "label": "0/0 꼴 인수분해·유리화",
+          "weakTags": [
+            "RR_limit_indet_method"
+          ]
+        },
+        {
+          "id": "AS_RR_limit_one_sided",
+          "label": "좌극한·우극한 구분",
+          "weakTags": [
+            "RR_limit_one_sided_miss"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_CONTINUOUS",
+      "nodeType": "achievement",
+      "label": "함수의 연속",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 4,
+      "text": "함수의 연속 조건을 이해하고 판정할 수 있다",
+      "description": "f(a) 존재, lim f(x) 존재, 두 값 일치 세 조건",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_continuity_check",
+          "label": "연속 조건 3개 체크",
+          "weakTags": [
+            "RR_continuity_partial_check"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_DERIV_DEF",
+      "nodeType": "achievement",
+      "label": "미분계수와 도함수의 정의",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 4,
+      "text": "미분계수의 정의로부터 도함수를 구할 수 있다",
+      "description": "f'(a) 정의(평균변화율의 극한), f'(x) 도함수",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_deriv_limit_def",
+          "label": "정의로 미분계수 계산",
+          "weakTags": [
+            "RR_deriv_def_formula"
+          ]
+        },
+        {
+          "id": "AS_RR_deriv_power_rule",
+          "label": "거듭제곱 함수 미분(nx^(n-1))",
+          "weakTags": [
+            "RR_deriv_power_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_DERIV_RULES",
+      "nodeType": "achievement",
+      "label": "미분 공식과 합성·곱·나눗 미분",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 5,
+      "text": "합·곱·몫·합성함수의 미분 공식을 이용할 수 있다",
+      "description": "(f±g)'=f'±g', (fg)', (f/g)', 합성함수 미분",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_deriv_sum",
+          "label": "합·차 미분",
+          "weakTags": []
+        },
+        {
+          "id": "AS_RR_deriv_product",
+          "label": "곱 미분 공식",
+          "weakTags": [
+            "RR_deriv_product_missing_term"
+          ]
+        },
+        {
+          "id": "AS_RR_deriv_quotient",
+          "label": "몫 미분 공식",
+          "weakTags": [
+            "RR_deriv_quotient_sign"
+          ]
+        },
+        {
+          "id": "AS_RR_deriv_chain",
+          "label": "합성함수 미분(체인 룰)",
+          "weakTags": [
+            "RR_deriv_chain_miss"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_DERIV_APP_TANGENT",
+      "nodeType": "achievement",
+      "label": "미분의 활용: 접선과 극값",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 5,
+      "text": "도함수를 이용해 접선, 극값, 증감을 판정할 수 있다",
+      "description": "접선 방정식, f'=0인 점에서 극값, 증감표",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_tangent_line",
+          "label": "접선 방정식 구하기",
+          "weakTags": [
+            "RR_tangent_point_substitution"
+          ]
+        },
+        {
+          "id": "AS_RR_extreme_judge",
+          "label": "f'=0 → 극값 판정(증감표)",
+          "weakTags": [
+            "RR_extreme_sign_change"
+          ]
+        },
+        {
+          "id": "AS_RR_increasing_decreasing",
+          "label": "증가·감소 구간 판정",
+          "weakTags": [
+            "RR_extreme_sign_change"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_INTEGRAL_INDEF",
+      "nodeType": "achievement",
+      "label": "부정적분 정의와 기본 공식",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 4,
+      "text": "부정적분의 정의를 이해하고 기본 공식으로 계산할 수 있다",
+      "description": "∫f(x)dx = F(x) + C, 거듭제곱 적분",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_integral_power",
+          "label": "거듭제곱 적분 공식",
+          "weakTags": [
+            "RR_integral_power_error"
+          ]
+        },
+        {
+          "id": "AS_RR_integral_constant_C",
+          "label": "적분상수 C 표기",
+          "weakTags": [
+            "RR_integral_C_miss"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_INTEGRAL_DEF",
+      "nodeType": "achievement",
+      "label": "정적분과 미적분 기본정리",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 5,
+      "text": "정적분을 정의하고 미적분 기본정리로 계산할 수 있다",
+      "description": "∫_a^b f = F(b) - F(a)",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_integral_ftc",
+          "label": "미적분 기본정리 적용",
+          "weakTags": [
+            "RR_integral_ftc_sign"
+          ]
+        },
+        {
+          "id": "AS_RR_integral_bounds_swap",
+          "label": "적분 구간 교환 부호",
+          "weakTags": [
+            "RR_integral_bound_order"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P_ACH_INTEGRAL_AREA",
+      "nodeType": "achievement",
+      "label": "적분의 활용: 넓이",
+      "parentId": "KR-MATH-2022-H-10-12-RR",
+      "domainCode": "RR",
+      "gradeBand": "10-12",
+      "schoolLevel": "H",
+      "officialCode": "",
+      "skillLevel": 5,
+      "text": "정적분을 이용해 곡선과 x축, 두 곡선 사이의 넓이를 구할 수 있다",
+      "description": "|f|의 적분, (f-g)의 적분",
+      "atomicSkills": [
+        {
+          "id": "AS_RR_area_under_curve",
+          "label": "곡선과 x축 사이 넓이",
+          "weakTags": [
+            "RR_area_sign_split"
+          ]
+        },
+        {
+          "id": "AS_RR_area_between_curves",
+          "label": "두 곡선 사이 넓이",
+          "weakTags": [
+            "RR_area_order_fg"
+          ]
+        }
+      ]
     }
   ],
   "edges": [
@@ -10355,6 +10880,210 @@
       "edgeType": "alignsTo",
       "source": "4수01-E2",
       "target": "4수01-06"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_EXP_LAWS_1",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_EXP_LAWS_1"
+    },
+    {
+      "id": "alignsTo:P_TU_EXP_LAWS_REVIEW->P_ACH_EXP_LAWS_1",
+      "edgeType": "alignsTo",
+      "source": "P_TU_EXP_LAWS_REVIEW",
+      "target": "P_ACH_EXP_LAWS_1"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_EXP_LAWS_2",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_EXP_LAWS_2"
+    },
+    {
+      "id": "alignsTo:P_TU_EXP_LAWS_REVIEW->P_ACH_EXP_LAWS_2",
+      "edgeType": "alignsTo",
+      "source": "P_TU_EXP_LAWS_REVIEW",
+      "target": "P_ACH_EXP_LAWS_2"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_EXP_FUNC",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_EXP_FUNC"
+    },
+    {
+      "id": "alignsTo:P_TU_EXP_FUNC->P_ACH_EXP_FUNC",
+      "edgeType": "alignsTo",
+      "source": "P_TU_EXP_FUNC",
+      "target": "P_ACH_EXP_FUNC"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_LOG_DEF",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_LOG_DEF"
+    },
+    {
+      "id": "alignsTo:P_TU_LOG_CONCEPT->P_ACH_LOG_DEF",
+      "edgeType": "alignsTo",
+      "source": "P_TU_LOG_CONCEPT",
+      "target": "P_ACH_LOG_DEF"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_LOG_LAWS",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_LOG_LAWS"
+    },
+    {
+      "id": "alignsTo:P_TU_LOG_PROPERTIES->P_ACH_LOG_LAWS",
+      "edgeType": "alignsTo",
+      "source": "P_TU_LOG_PROPERTIES",
+      "target": "P_ACH_LOG_LAWS"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_TRIG_RATIO",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_TRIG_RATIO"
+    },
+    {
+      "id": "alignsTo:P_TU_TRIG_FUNC->P_ACH_TRIG_RATIO",
+      "edgeType": "alignsTo",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "P_ACH_TRIG_RATIO"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_TRIG_IDENTITY",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_TRIG_IDENTITY"
+    },
+    {
+      "id": "alignsTo:P_TU_TRIG_FUNC->P_ACH_TRIG_IDENTITY",
+      "edgeType": "alignsTo",
+      "source": "P_TU_TRIG_FUNC",
+      "target": "P_ACH_TRIG_IDENTITY"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_SEQ_ARITH",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_SEQ_ARITH"
+    },
+    {
+      "id": "alignsTo:P_TU_SEQUENCE_ARITH->P_ACH_SEQ_ARITH",
+      "edgeType": "alignsTo",
+      "source": "P_TU_SEQUENCE_ARITH",
+      "target": "P_ACH_SEQ_ARITH"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_SEQ_GEOM",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_SEQ_GEOM"
+    },
+    {
+      "id": "alignsTo:P_TU_SEQUENCE_GEOM->P_ACH_SEQ_GEOM",
+      "edgeType": "alignsTo",
+      "source": "P_TU_SEQUENCE_GEOM",
+      "target": "P_ACH_SEQ_GEOM"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_LIMIT_FUNC",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_LIMIT_FUNC"
+    },
+    {
+      "id": "alignsTo:P_TU_LIMIT->P_ACH_LIMIT_FUNC",
+      "edgeType": "alignsTo",
+      "source": "P_TU_LIMIT",
+      "target": "P_ACH_LIMIT_FUNC"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_CONTINUOUS",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_CONTINUOUS"
+    },
+    {
+      "id": "alignsTo:P_TU_LIMIT->P_ACH_CONTINUOUS",
+      "edgeType": "alignsTo",
+      "source": "P_TU_LIMIT",
+      "target": "P_ACH_CONTINUOUS"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_DERIV_DEF",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_DERIV_DEF"
+    },
+    {
+      "id": "alignsTo:P_TU_DERIVATIVE->P_ACH_DERIV_DEF",
+      "edgeType": "alignsTo",
+      "source": "P_TU_DERIVATIVE",
+      "target": "P_ACH_DERIV_DEF"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_DERIV_RULES",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_DERIV_RULES"
+    },
+    {
+      "id": "alignsTo:P_TU_DERIVATIVE->P_ACH_DERIV_RULES",
+      "edgeType": "alignsTo",
+      "source": "P_TU_DERIVATIVE",
+      "target": "P_ACH_DERIV_RULES"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_DERIV_APP_TANGENT",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_DERIV_APP_TANGENT"
+    },
+    {
+      "id": "alignsTo:P_TU_DERIV_APP->P_ACH_DERIV_APP_TANGENT",
+      "edgeType": "alignsTo",
+      "source": "P_TU_DERIV_APP",
+      "target": "P_ACH_DERIV_APP_TANGENT"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_INTEGRAL_INDEF",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_INTEGRAL_INDEF"
+    },
+    {
+      "id": "alignsTo:P_TU_INTEGRAL->P_ACH_INTEGRAL_INDEF",
+      "edgeType": "alignsTo",
+      "source": "P_TU_INTEGRAL",
+      "target": "P_ACH_INTEGRAL_INDEF"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_INTEGRAL_DEF",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_INTEGRAL_DEF"
+    },
+    {
+      "id": "alignsTo:P_TU_INTEGRAL->P_ACH_INTEGRAL_DEF",
+      "edgeType": "alignsTo",
+      "source": "P_TU_INTEGRAL",
+      "target": "P_ACH_INTEGRAL_DEF"
+    },
+    {
+      "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_INTEGRAL_AREA",
+      "edgeType": "contains",
+      "source": "KR-MATH-2022-H-10-12-RR",
+      "target": "P_ACH_INTEGRAL_AREA"
+    },
+    {
+      "id": "alignsTo:P_TU_INTEGRAL_APP->P_ACH_INTEGRAL_AREA",
+      "edgeType": "alignsTo",
+      "source": "P_TU_INTEGRAL_APP",
+      "target": "P_ACH_INTEGRAL_AREA"
     }
   ]
 }
