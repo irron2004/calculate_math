@@ -1,0 +1,194 @@
+{
+  "phase": "Phase 1",
+  "scope": "초1-2 NA (2수01 전체)",
+  "strategy": "achievement에 atomicSkills 필드 추가 (계층 비파괴) + 2수01-06(두자리 덧뺄)은 하위 textbookUnit 분해",
+  "generated_at": "2026-04-23",
+  "rationale_doc": "_workspace/phase1_weaktag_taxonomy_v0_3_draft.md",
+
+  "field_additions": [
+    {
+      "targetId": "2수01-01",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_count_0_100", "label": "0-100 수 세기/읽기/쓰기", "weakTags": ["NA_num_count_skip", "NA_num_count_order"]},
+          {"id": "AS_NA_num_ordinal", "label": "순서 개념(몇 번째)", "weakTags": ["NA_num_count_order"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-02",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_place_tens_ones", "label": "십·일 자릿값 이해", "weakTags": ["NA_place_digit_confusion"]},
+          {"id": "AS_NA_place_hundreds", "label": "백의 자리 이해", "weakTags": ["NA_place_digit_confusion", "NA_place_zero_read"]},
+          {"id": "AS_NA_place_thousands", "label": "천의 자리 이해(네자리)", "weakTags": ["NA_place_four_digit_mix", "NA_place_zero_read"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-03",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_compare_2digit", "label": "두자리 수 크기 비교", "weakTags": ["NA_num_compare_reversed"]},
+          {"id": "AS_NA_compare_4digit", "label": "네자리 수 크기 비교", "weakTags": ["NA_num_compare_reversed", "NA_place_four_digit_mix"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-04",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_decompose_10", "label": "10 만들기(보수)", "weakTags": ["NA_num_decompose_miss"]},
+          {"id": "AS_NA_decompose_20", "label": "20까지 분해·합성", "weakTags": ["NA_num_decompose_miss"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-05",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_word_add_meaning", "label": "덧셈 상황 해석(합·증가)", "weakTags": ["NA_word_op_choice"]},
+          {"id": "AS_NA_word_sub_meaning", "label": "뺄셈 상황 해석(차·감소·비교)", "weakTags": ["NA_word_op_choice"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-06",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_add_1d_1d", "label": "한자리 + 한자리(합 10 이내)", "weakTags": []},
+          {"id": "AS_NA_add_1d_1d_over10", "label": "한자리 + 한자리(합 10 초과, 받아올림 도입)", "weakTags": ["NA_add_carry_missing"]},
+          {"id": "AS_NA_add_2d_1d_no_carry", "label": "두자리 + 한자리(받아올림 없음)", "weakTags": ["NA_add_align_digit"]},
+          {"id": "AS_NA_add_2d_1d_carry", "label": "두자리 + 한자리(받아올림 있음)", "weakTags": ["NA_add_carry_missing", "NA_add_carry_wrong_place"]},
+          {"id": "AS_NA_add_2d_2d_no_carry", "label": "두자리 + 두자리(받아올림 없음)", "weakTags": ["NA_add_align_digit"]},
+          {"id": "AS_NA_add_2d_2d_carry", "label": "두자리 + 두자리(받아올림 있음)", "weakTags": ["NA_add_carry_missing", "NA_add_carry_wrong_place"]},
+          {"id": "AS_NA_sub_1d_1d", "label": "한자리 - 한자리", "weakTags": []},
+          {"id": "AS_NA_sub_2d_1d_no_borrow", "label": "두자리 - 한자리(내림 없음)", "weakTags": []},
+          {"id": "AS_NA_sub_2d_1d_borrow", "label": "두자리 - 한자리(내림 있음)", "weakTags": ["NA_sub_borrow_missing"]},
+          {"id": "AS_NA_sub_2d_2d_no_borrow", "label": "두자리 - 두자리(내림 없음)", "weakTags": ["NA_sub_borrow_direction"]},
+          {"id": "AS_NA_sub_2d_2d_borrow", "label": "두자리 - 두자리(내림 있음)", "weakTags": ["NA_sub_borrow_missing", "NA_sub_borrow_direction", "NA_sub_zero_borrow"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-07",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_addsub_family", "label": "덧뺄 식족 만들기(3+4=7 ↔ 7-4=3)", "weakTags": ["NA_addsub_inverse"]},
+          {"id": "AS_NA_addsub_check", "label": "역연산으로 검산", "weakTags": ["NA_addsub_inverse"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-08",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_three_add", "label": "세 수 연속 덧셈", "weakTags": ["NA_add_three_numbers_order"]},
+          {"id": "AS_NA_three_sub", "label": "세 수 연속 뺄셈", "weakTags": ["NA_add_three_numbers_order"]},
+          {"id": "AS_NA_three_mixed", "label": "덧뺄 혼합 세 수", "weakTags": ["NA_add_three_numbers_order"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-09",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_box_add_final", "label": "□+a=b 형태 푸는 법", "weakTags": ["NA_addsub_inverse"]},
+          {"id": "AS_NA_box_sub_final", "label": "□-a=b 형태 푸는 법", "weakTags": ["NA_addsub_inverse"]},
+          {"id": "AS_NA_box_middle", "label": "a-□=b 형태(□가 중간)", "weakTags": ["NA_addsub_inverse"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-10",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_mul_meaning", "label": "묶어세기/반복덧셈으로서 곱셈", "weakTags": ["NA_mul_repeated_add"]},
+          {"id": "AS_NA_mul_word_problem", "label": "곱셈 문장제 상황 파악", "weakTags": ["NA_word_op_choice", "NA_mul_repeated_add"]}
+        ]
+      }
+    },
+    {
+      "targetId": "2수01-11",
+      "add": {
+        "atomicSkills": [
+          {"id": "AS_NA_mul_times_table_2_5", "label": "2단·5단 구구", "weakTags": ["NA_mul_times_table"]},
+          {"id": "AS_NA_mul_times_table_3_4_6", "label": "3·4·6단 구구", "weakTags": ["NA_mul_times_table"]},
+          {"id": "AS_NA_mul_times_table_7_8_9", "label": "7·8·9단 구구(어려운 단)", "weakTags": ["NA_mul_times_table"]},
+          {"id": "AS_NA_mul_times_table_full", "label": "1~9단 전체 구구 숙달", "weakTags": ["NA_mul_times_table"]}
+        ]
+      }
+    }
+  ],
+
+  "node_drill_down_subunits": [
+    {
+      "note": "2수01-B (두자리 덧뺄)을 난이도별 3개 sub-textbookUnit으로 분해. 기존 2수01-B는 유지하고, 하위 단원을 contains로 연결.",
+      "newNodes": [
+        {
+          "id": "2수01-B1",
+          "nodeType": "textbookUnit",
+          "label": "두자리 덧뺄 (받아올림·내림 없음)",
+          "parentId": "2수01-B",
+          "officialCode": "",
+          "gradeBand": "1-2",
+          "domainCode": "NA",
+          "schoolLevel": "E",
+          "order": 1,
+          "tags": ["초등", "1-2", "수와 연산", "drill-down"],
+          "description": "두자리 수 덧뺄셈 중 자리올림/내림이 없는 표준형. 세로셈 자리 맞추기 정확성 측정.",
+          "rationale": "받아올림 없는 계산은 받아올림 있는 계산의 필수 선행. 약점 여부를 분리 측정해야 함."
+        },
+        {
+          "id": "2수01-B2",
+          "nodeType": "textbookUnit",
+          "label": "두자리 덧셈 (받아올림 있음)",
+          "parentId": "2수01-B",
+          "officialCode": "",
+          "gradeBand": "1-2",
+          "domainCode": "NA",
+          "schoolLevel": "E",
+          "order": 2,
+          "tags": ["초등", "1-2", "수와 연산", "drill-down"],
+          "description": "받아올림이 필요한 두자리 덧셈. 자릿값 이해 전제.",
+          "rationale": "가장 흔한 초1-2 약점 영역. 분리 측정 필요."
+        },
+        {
+          "id": "2수01-B3",
+          "nodeType": "textbookUnit",
+          "label": "두자리 뺄셈 (내림 있음)",
+          "parentId": "2수01-B",
+          "officialCode": "",
+          "gradeBand": "1-2",
+          "domainCode": "NA",
+          "schoolLevel": "E",
+          "order": 3,
+          "tags": ["초등", "1-2", "수와 연산", "drill-down"],
+          "description": "내림(빌려오기)이 필요한 두자리 뺄셈. 0이 있는 경우(103-57)는 별도.",
+          "rationale": "내림 없는 뺄셈과 분리. 0 내림은 독립 약점 영역."
+        }
+      ]
+    }
+  ],
+
+  "new_edges": [
+    {"id": "contains:2수01-B->2수01-B1", "edgeType": "contains", "source": "2수01-B", "target": "2수01-B1"},
+    {"id": "contains:2수01-B->2수01-B2", "edgeType": "contains", "source": "2수01-B", "target": "2수01-B2"},
+    {"id": "contains:2수01-B->2수01-B3", "edgeType": "contains", "source": "2수01-B", "target": "2수01-B3"},
+    {"id": "prereq:2수01-B1->2수01-B2", "edgeType": "prereq", "source": "2수01-B1", "target": "2수01-B2", "rationale": "자리 맞추기 기초가 받아올림 선행"},
+    {"id": "prereq:2수01-B1->2수01-B3", "edgeType": "prereq", "source": "2수01-B1", "target": "2수01-B3", "rationale": "내림 없는 뺄셈이 내림 있는 뺄셈 선행"},
+    {"id": "prereq:2수01-B2->2수01-B3", "edgeType": "prereq", "source": "2수01-B2", "target": "2수01-B3", "rationale": "받아올림 덧셈이 내림 뺄셈의 역연산 이해에 도움"},
+    {"id": "alignsTo:2수01-B1->2수01-06", "edgeType": "alignsTo", "source": "2수01-B1", "target": "2수01-06"},
+    {"id": "alignsTo:2수01-B2->2수01-06", "edgeType": "alignsTo", "source": "2수01-B2", "target": "2수01-06"},
+    {"id": "alignsTo:2수01-B3->2수01-06", "edgeType": "alignsTo", "source": "2수01-B3", "target": "2수01-06"}
+  ],
+
+  "summary": {
+    "achievement_atomicSkills_added": 11,
+    "total_atomicSkills": 36,
+    "new_textbookUnit_nodes": 3,
+    "new_edges": 9,
+    "weakTag_added_to_taxonomy_v0_3": 19,
+    "existing_node_edge_modifications": 0
+  }
+}

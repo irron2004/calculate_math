@@ -13,9 +13,11 @@
         "url": "https://ncic.re.kr"
       }
     ],
-    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes | p1 applied | p2 applied | p3 applied | p4 applied | p6 applied",
+    "note": "nodes/edges는 docs/2022_curriculum.md(조사 메모 정리)를 기반으로 v1 테스트용으로 구성됨 | v2: middle(7-9) and high(10-12) domains/units/achievements expanded; descriptions added for new nodes. | v0.3 merge: atomicSkills added, drill-down for 초1-4 NA, 고2 achievements added, branch convergence edges, prereq expansion. CSAT unchanged.",
     "generated_at": "2026-02-15",
-    "editor": "ChatGPT"
+    "editor": "ChatGPT",
+    "merged_at": "2026-04-23",
+    "taxonomy_version": "weakTag v0.3"
   },
   "nodes": [
     {
@@ -10762,126 +10764,6 @@
       "note": "2023 수능 문항 해결을 위한 핵심 개념 연결"
     },
     {
-      "id": "contains:2수01-B->2수01-B1",
-      "edgeType": "contains",
-      "source": "2수01-B",
-      "target": "2수01-B1"
-    },
-    {
-      "id": "contains:2수01-B->2수01-B2",
-      "edgeType": "contains",
-      "source": "2수01-B",
-      "target": "2수01-B2"
-    },
-    {
-      "id": "contains:2수01-B->2수01-B3",
-      "edgeType": "contains",
-      "source": "2수01-B",
-      "target": "2수01-B3"
-    },
-    {
-      "id": "prereq:2수01-B1->2수01-B2",
-      "edgeType": "prereq",
-      "source": "2수01-B1",
-      "target": "2수01-B2"
-    },
-    {
-      "id": "prereq:2수01-B1->2수01-B3",
-      "edgeType": "prereq",
-      "source": "2수01-B1",
-      "target": "2수01-B3"
-    },
-    {
-      "id": "prereq:2수01-B2->2수01-B3",
-      "edgeType": "prereq",
-      "source": "2수01-B2",
-      "target": "2수01-B3"
-    },
-    {
-      "id": "alignsTo:2수01-B1->2수01-06",
-      "edgeType": "alignsTo",
-      "source": "2수01-B1",
-      "target": "2수01-06"
-    },
-    {
-      "id": "alignsTo:2수01-B2->2수01-06",
-      "edgeType": "alignsTo",
-      "source": "2수01-B2",
-      "target": "2수01-06"
-    },
-    {
-      "id": "alignsTo:2수01-B3->2수01-06",
-      "edgeType": "alignsTo",
-      "source": "2수01-B3",
-      "target": "2수01-06"
-    },
-    {
-      "id": "contains:4수01-D->4수01-D1",
-      "edgeType": "contains",
-      "source": "4수01-D",
-      "target": "4수01-D1"
-    },
-    {
-      "id": "contains:4수01-D->4수01-D2",
-      "edgeType": "contains",
-      "source": "4수01-D",
-      "target": "4수01-D2"
-    },
-    {
-      "id": "contains:4수01-E->4수01-E1",
-      "edgeType": "contains",
-      "source": "4수01-E",
-      "target": "4수01-E1"
-    },
-    {
-      "id": "contains:4수01-E->4수01-E2",
-      "edgeType": "contains",
-      "source": "4수01-E",
-      "target": "4수01-E2"
-    },
-    {
-      "id": "prereq:2수01-B2->4수01-D1",
-      "edgeType": "prereq",
-      "source": "2수01-B2",
-      "target": "4수01-D1"
-    },
-    {
-      "id": "prereq:2수01-B3->4수01-D2",
-      "edgeType": "prereq",
-      "source": "2수01-B3",
-      "target": "4수01-D2"
-    },
-    {
-      "id": "prereq:4수01-D1->4수01-E1",
-      "edgeType": "prereq",
-      "source": "4수01-D1",
-      "target": "4수01-E1"
-    },
-    {
-      "id": "alignsTo:4수01-D1->4수01-04",
-      "edgeType": "alignsTo",
-      "source": "4수01-D1",
-      "target": "4수01-04"
-    },
-    {
-      "id": "alignsTo:4수01-D2->4수01-04",
-      "edgeType": "alignsTo",
-      "source": "4수01-D2",
-      "target": "4수01-04"
-    },
-    {
-      "id": "alignsTo:4수01-E1->4수01-05",
-      "edgeType": "alignsTo",
-      "source": "4수01-E1",
-      "target": "4수01-05"
-    },
-    {
-      "id": "alignsTo:4수01-E2->4수01-06",
-      "edgeType": "alignsTo",
-      "source": "4수01-E2",
-      "target": "4수01-06"
-    },
-    {
       "id": "contains:KR-MATH-2022-H-10-12-RR->P_ACH_EXP_LAWS_1",
       "edgeType": "contains",
       "source": "KR-MATH-2022-H-10-12-RR",
@@ -11084,6 +10966,126 @@
       "edgeType": "alignsTo",
       "source": "P_TU_INTEGRAL_APP",
       "target": "P_ACH_INTEGRAL_AREA"
+    },
+    {
+      "id": "contains:2수01-B->2수01-B1",
+      "edgeType": "contains",
+      "source": "2수01-B",
+      "target": "2수01-B1"
+    },
+    {
+      "id": "contains:2수01-B->2수01-B2",
+      "edgeType": "contains",
+      "source": "2수01-B",
+      "target": "2수01-B2"
+    },
+    {
+      "id": "contains:2수01-B->2수01-B3",
+      "edgeType": "contains",
+      "source": "2수01-B",
+      "target": "2수01-B3"
+    },
+    {
+      "id": "prereq:2수01-B1->2수01-B2",
+      "edgeType": "prereq",
+      "source": "2수01-B1",
+      "target": "2수01-B2"
+    },
+    {
+      "id": "prereq:2수01-B1->2수01-B3",
+      "edgeType": "prereq",
+      "source": "2수01-B1",
+      "target": "2수01-B3"
+    },
+    {
+      "id": "prereq:2수01-B2->2수01-B3",
+      "edgeType": "prereq",
+      "source": "2수01-B2",
+      "target": "2수01-B3"
+    },
+    {
+      "id": "alignsTo:2수01-B1->2수01-06",
+      "edgeType": "alignsTo",
+      "source": "2수01-B1",
+      "target": "2수01-06"
+    },
+    {
+      "id": "alignsTo:2수01-B2->2수01-06",
+      "edgeType": "alignsTo",
+      "source": "2수01-B2",
+      "target": "2수01-06"
+    },
+    {
+      "id": "alignsTo:2수01-B3->2수01-06",
+      "edgeType": "alignsTo",
+      "source": "2수01-B3",
+      "target": "2수01-06"
+    },
+    {
+      "id": "contains:4수01-D->4수01-D1",
+      "edgeType": "contains",
+      "source": "4수01-D",
+      "target": "4수01-D1"
+    },
+    {
+      "id": "contains:4수01-D->4수01-D2",
+      "edgeType": "contains",
+      "source": "4수01-D",
+      "target": "4수01-D2"
+    },
+    {
+      "id": "contains:4수01-E->4수01-E1",
+      "edgeType": "contains",
+      "source": "4수01-E",
+      "target": "4수01-E1"
+    },
+    {
+      "id": "contains:4수01-E->4수01-E2",
+      "edgeType": "contains",
+      "source": "4수01-E",
+      "target": "4수01-E2"
+    },
+    {
+      "id": "prereq:2수01-B2->4수01-D1",
+      "edgeType": "prereq",
+      "source": "2수01-B2",
+      "target": "4수01-D1"
+    },
+    {
+      "id": "prereq:2수01-B3->4수01-D2",
+      "edgeType": "prereq",
+      "source": "2수01-B3",
+      "target": "4수01-D2"
+    },
+    {
+      "id": "prereq:4수01-D1->4수01-E1",
+      "edgeType": "prereq",
+      "source": "4수01-D1",
+      "target": "4수01-E1"
+    },
+    {
+      "id": "alignsTo:4수01-D1->4수01-04",
+      "edgeType": "alignsTo",
+      "source": "4수01-D1",
+      "target": "4수01-04"
+    },
+    {
+      "id": "alignsTo:4수01-D2->4수01-04",
+      "edgeType": "alignsTo",
+      "source": "4수01-D2",
+      "target": "4수01-04"
+    },
+    {
+      "id": "alignsTo:4수01-E1->4수01-05",
+      "edgeType": "alignsTo",
+      "source": "4수01-E1",
+      "target": "4수01-05"
+    },
+    {
+      "id": "alignsTo:4수01-E2->4수01-06",
+      "edgeType": "alignsTo",
+      "source": "4수01-E2",
+      "target": "4수01-06"
     },
     {
       "id": "prereq:4수01-07->P_TU_RATIONAL_FUNC",
